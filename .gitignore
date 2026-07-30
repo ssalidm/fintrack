@@ -1,0 +1,90 @@
+# ==========================================
+# Environment variables and secrets
+# ==========================================
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# ==========================================
+# Java and Maven
+# ==========================================
+backend/target/
+target/
+*.class
+*.jar
+*.war
+*.ear
+.mvn/timing.properties
+
+# Maven wrapper JAR must remain tracked
+!backend/.mvn/wrapper/maven-wrapper.jar
+
+# ==========================================
+# Node, React and Vite
+# ==========================================
+frontend/node_modules/
+frontend/dist/
+frontend/coverage/
+frontend/.vite/
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# ==========================================
+# Logs
+# ==========================================
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ==========================================
+# IntelliJ IDEA
+# ==========================================
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# ==========================================
+# VS Code
+# ==========================================
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.example.json
+
+# ==========================================
+# Operating systems
+# ==========================================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ==========================================
+# Docker and local volumes
+# ==========================================
+docker-data/
+postgres-data/
+volumes/
+
+# ==========================================
+# Testcontainers
+# ==========================================
+.testcontainers.properties
+
+# ==========================================
+# Temporary files
+# ==========================================
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.cache/
