@@ -1,0 +1,42 @@
+name: fintrack
+
+services:
+  db:
+    image: postgres:18-alpine
+    container_name: fintrack-postgres
+
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+    ports:
+      - "${POSTGRES_PORT}:5432"
+
+    volumes:
+      - fintrack-postgres-data:/var/lib/postgresql
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+    networks:
+      - fintrack-network
+
+volumes:
+  fintrack-postgres-data:
+    name: fintrack-postgres-data
+
+networks:
+  fintrack-network:
+    name: fintrack-network
+    driver: bridge
