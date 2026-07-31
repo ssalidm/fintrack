@@ -58,6 +58,11 @@ fintrack/
 
 The current development phase covers project setup and architecture.
 
+## Project objectives
+
+FinTrack is being developed to demonstrate secure full-stack engineering,
+database design, automated testing, CI/CD, and production deployment.
+
 ## Author
 
 David Ssali
