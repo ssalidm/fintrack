@@ -32,6 +32,39 @@ services:
     networks:
       - fintrack-network
 
+  flyway:
+    image: flyway/flyway:13.1.0-alpine
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    environment:
+      FLYWAY_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
+      FLYWAY_USER: ${FINTRACK_MIGRATION_USER}
+      FLYWAY_PASSWORD: ${FINTRACK_MIGRATION_PASSWORD}
+
+      FLYWAY_LOCATIONS: filesystem:/flyway/sql/migrations
+      FLYWAY_DEFAULT_SCHEMA: infra
+      FLYWAY_SCHEMAS: infra,identity,finance,reporting,audit
+      FLYWAY_TABLE: flyway_schema_history
+
+      FLYWAY_CONNECT_RETRIES: 10
+      FLYWAY_VALIDATE_MIGRATION_NAMING: "true"
+      FLYWAY_CLEAN_DISABLED: "true"
+
+    volumes:
+      - ./database/migrations:/flyway/sql/migrations:ro
+
+    networks:
+      - fintrack-network
+
+    profiles:
+      - tools
+
+    command:
+      - info
+
 volumes:
   fintrack-postgres-data:
     name: fintrack-postgres-data

@@ -65,6 +65,12 @@ REVOKE ALL PRIVILEGES
     ON SCHEMA infra, identity, finance, reporting, audit
     FROM PUBLIC;
 
+-- Flyway owns and maintains its infrastructure metadata.
+-- This does not grant access to application-domain schemas.
+GRANT USAGE, CREATE
+    ON SCHEMA infra
+    TO fintrack_migration;
+
 -- Spring Boot may resolve objects in these schemas, but cannot create them.
 GRANT USAGE
     ON SCHEMA identity, finance, reporting, audit
