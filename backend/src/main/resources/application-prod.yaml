@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: ${FINTRACK_DB_URL}
+    username: ${FINTRACK_APPLICATION_USER}
+    password: ${FINTRACK_APPLICATION_PASWORD}
+
+  flyway:
+    url: ${FINTRACK_DB_URL}
+    user: ${FINTRACK_MIGRATION_USER}
+    password: ${FINTRACK_MIGRATION_PASSWORD}
+    default-schema: infra
+
+management:
+  endpoint:
+    health:
+      show-details: never
