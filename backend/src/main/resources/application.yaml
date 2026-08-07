@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: fintrack-backend
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    clean-disabled: true
+    validate-on-migrate: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info
