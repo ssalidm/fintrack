@@ -15,3 +15,8 @@ management:
     health:
       show-components: always
       show-details: never
+
+fintrack:
+  security:
+    jwt:
+      secret: ${FINTRACK_JWT_SECRET}

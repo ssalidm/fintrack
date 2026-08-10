@@ -19,3 +19,10 @@ management:
         include:
           - health
           - info
+
+fintrack:
+  security:
+    jwt:
+      issuer: fintrack-api
+      access-token-ttl: PT15M
+      refresh-token-ttl: P30D

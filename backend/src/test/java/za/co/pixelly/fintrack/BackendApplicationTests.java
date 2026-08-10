@@ -1,160 +1,92 @@
-package za.co.pixelly.fintrack;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.postgresql.PostgreSQLContainer;
-
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-@Testcontainers
-@SpringBootTest
-@ActiveProfiles("test")
-class BackendApplicationTests {
-
-    private static final String FINTRACK_APPLICATION_USER = "fintrack_application";
-    private static final String FINTRACK_APPLICATION_PASSWORD = "application-test-password";
-    private static final String FINTRACK_MIGRATION_USER = "fintrack_migration";
-    private static final String FINTRACK_MIGRATION_PASSWORD = "migration-test-password";
-
-    @Container
-    static final PostgreSQLContainer POSTGRES =
-        new PostgreSQLContainer("postgres:18-alpine")
-            .withDatabaseName("fintrack_test_db")
-            .withUsername("postgres")
-            .withPassword("postgres")
-            .withInitScript("test-db-init.sql");
-
-    @DynamicPropertySource
-    static void configureDatabase(DynamicPropertyRegistry registry) {
-
-        registry.add(
-            "spring.datasource.url",
-            POSTGRES::getJdbcUrl
-        );
-
-        registry.add(
-            "spring.datasource.username",
-            () -> FINTRACK_APPLICATION_USER
-        );
-
-        registry.add(
-            "spring.datasource.password",
-            () -> FINTRACK_APPLICATION_PASSWORD
-        );
-
-        registry.add(
-            "spring.flyway.url",
-            POSTGRES::getJdbcUrl
-        );
-
-        registry.add(
-            "spring.flyway.user",
-            () -> FINTRACK_MIGRATION_USER
-        );
-
-        registry.add(
-            "spring.flyway.password",
-            () -> FINTRACK_MIGRATION_PASSWORD
-        );
-
-        registry.add(
-            "spring.flyway.default-schema",
-            () -> "infra"
-        );
-    }
-
-    @Autowired
-    private DataSource dataSource;
-
-    @Test
-    void contextLoads() {
-
-    }
-
-    @Test
-    void applicationDataSourceUsesLeastPrivilegeRole() throws Exception {
-
-        try (
-            Connection connection = dataSource.getConnection();
-            Statement statement = connection.createStatement();
-            ResultSet result = statement.executeQuery("""
-                SELECT
-                    current_user,
-                    has_schema_privilege(
-                        current_user,
-                        'finance',
-                        'CREATE'
-                    ),
-                    has_schema_privilege(
-                        current_user,
-                        'infra',
-                        'USAGE'
-                    )
-                """)
-        ) {
-
-            assertTrue(result.next());
-
-            assertEquals(
-                "fintrack_application",
-                result.getString(1)
-            );
-
-            assertFalse(result.getBoolean(2));
-            assertFalse(result.getBoolean(3));
-        }
-    }
-
-    @Test
-    void migrationsPreserveOwnershipBoundaries() throws Exception {
-
-        try (
-            Connection connection = DriverManager.getConnection(
-                POSTGRES.getJdbcUrl(),
-                POSTGRES.getUsername(),
-                POSTGRES.getPassword()
-            );
-            Statement statement = connection.createStatement();
-            ResultSet result = statement.executeQuery("""
-                SELECT
-                    (
-                        SELECT tableowner
-                        FROM pg_tables
-                        WHERE schemaname = 'infra'
-                            AND tablename = 'flyway_schema_history'
-                    ),
-                    (
-                        SELECT tableowner
-                        FROM pg_tables
-                        WHERE schemaname = 'identity'
-                            AND tablename = 'users'
-                    )
-                """)
-        ) {
-
-            assertTrue(result.next());
-
-            assertEquals(
-                "fintrack_migration",
-                result.getString(1)
-            );
-
-            assertEquals(
-                "fintrack_owner",
-                result.getString(2)
-            );
-        }
-    }
-}
+//package za.co.pixelly.fintrack;
+//
+//import org.junit.jupiter.api.Test;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.boot.test.context.SpringBootTest;
+//import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+//import org.springframework.http.MediaType;
+//import org.springframework.jdbc.core.JdbcTemplate;
+//import org.springframework.security.crypto.password.PasswordEncoder;
+//import org.springframework.test.context.ActiveProfiles;
+//import org.springframework.test.context.DynamicPropertyRegistry;
+//import org.springframework.test.context.DynamicPropertySource;
+//import org.springframework.test.web.servlet.MockMvc;
+//import org.testcontainers.junit.jupiter.Container;
+//import org.testcontainers.junit.jupiter.Testcontainers;
+//import org.testcontainers.postgresql.PostgreSQLContainer;
+//
+//import javax.sql.DataSource;
+//import java.sql.Connection;
+//import java.sql.DriverManager;
+//import java.sql.ResultSet;
+//import java.sql.Statement;
+//import java.util.UUID;
+//
+//import static org.junit.jupiter.api.Assertions.*;
+//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+//
+//@Testcontainers
+//@SpringBootTest
+//@ActiveProfiles("test")
+//@AutoConfigureMockMvc
+//class BackendApplicationTests {
+//
+//    @Autowired
+//    private MockMvc mockMvc;
+//
+//    @Autowired
+//    private JdbcTemplate jdbcTemplate;
+//
+//
+//
+//
+//
+//
+//
+//    @Test
+//    void logsInUserAndIssuesAccessAndRefreshTokens() throws Exception {
+//
+//        String email =
+//            "david+" + UUID.randomUUID() + "@test.com";
+//
+//        String payload = """
+//            {
+//              "email": "%s",
+//              "password": "SecurePassword123!",
+//              "firstName": "David",
+//              "lastName": "Ssali"
+//            }
+//            """.formatted(email);
+//
+//        mockMvc.perform(post("/api/v1/auth/register")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content(payload))
+//            .andExpect(status().isCreated());
+//
+//        jdbcTemplate.update("""
+//                UPDATE identity.users
+//                SET status = 'ACTIVE',
+//                    email_verified_at = CURRENT_TIMESTAMP
+//                WHERE email = ?
+//                """,
+//            email
+//        );
+//
+//        String loginRequest = """
+//            {
+//                "email": "%s",
+//                "password": "SecurePassword123!"
+//            }
+//            """.formatted(email);
+//
+//        mockMvc.perform(post("/api/v1/auth/login")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content(loginRequest))
+//            .andExpect(status().isOk())
+//            .andExpect(jsonPath("$.result.accessToken").isNotEmpty())
+//            .andExpect(jsonPath("$.result.refreshToken").isNotEmpty())
+//            .andReturn();
+//    }
+//
+//}

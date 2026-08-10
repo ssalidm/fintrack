@@ -8,3 +8,8 @@ spring:
     clean-disabled: true
     validate-on-migrate: true
     locations: classpath:db/migration
+
+fintrack:
+  security:
+    jwt:
+      secret: NOSUIDDGICbMmX4Uzu4LDrp/IRMT7CSstm+cXl9UOQ4=
