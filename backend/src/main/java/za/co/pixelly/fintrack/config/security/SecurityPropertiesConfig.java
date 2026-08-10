@@ -6,7 +6,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties({
     JwtProperties.class,
-    EmailVerificationProperties.class
+    EmailVerificationProperties.class,
+    PasswordResetProperties.class
 })
 public class SecurityPropertiesConfig {
 }

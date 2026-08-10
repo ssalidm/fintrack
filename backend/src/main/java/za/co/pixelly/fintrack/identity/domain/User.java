@@ -111,6 +111,22 @@ public class User {
         updatedAt = now;
     }
 
+    public boolean isPasswordResetEligible() {
+        return status != UserStatus.DEACTIVATED;
+    }
+
+    public void resetPassword(
+        String newPasswordHash,
+        Instant now
+    ) {
+        this.passwordHash = newPasswordHash;
+
+        this.failedLoginAttempts = 0;
+        this.lockedUntil = null;
+
+        this.updatedAt = now;
+    }
+
     @PreUpdate
     void updateTimeStamp() {
         updatedAt = Instant.now();

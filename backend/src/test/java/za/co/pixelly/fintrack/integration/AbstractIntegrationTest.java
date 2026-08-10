@@ -13,6 +13,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 import za.co.pixelly.fintrack.integration.support.TestEmailVerificationSender;
+import za.co.pixelly.fintrack.integration.support.TestPasswordResetSender;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -85,12 +86,21 @@ public abstract class AbstractIntegrationTest {
     @Autowired
     protected TestEmailVerificationSender emailSender;
 
+    @Autowired
+    protected TestPasswordResetSender passwordResetSender;
+
+
     @TestConfiguration(proxyBeanMethods = false)
     public static class TestMailConfiguration {
 
         @Bean
         TestEmailVerificationSender emailVerificationSender() {
             return new TestEmailVerificationSender();
+        }
+
+        @Bean
+        TestPasswordResetSender passwordResetSender() {
+            return new TestPasswordResetSender();
         }
     }
 }
