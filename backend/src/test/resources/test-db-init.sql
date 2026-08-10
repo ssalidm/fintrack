@@ -76,6 +76,20 @@ GRANT CONNECT
     ON DATABASE fintrack_test_db
     TO fintrack_migration, fintrack_application;
 
+-- Runtime application may resolve application-facing schemas.
+GRANT USAGE
+    ON SCHEMA identity, finance, reporting
+    TO fintrack_application;
+
+
+-- Tables created later by fintrack_owner in the identity schema
+-- receive the same runtime privileges as the real FinTrack database.
+ALTER DEFAULT PRIVILEGES
+    FOR ROLE fintrack_owner
+    IN SCHEMA identity
+    GRANT SELECT, INSERT, UPDATE
+    ON TABLES
+    TO fintrack_application;
 
 -- Flyway must be able to maintain its own history table.
 GRANT USAGE, CREATE
