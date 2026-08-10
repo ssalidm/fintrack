@@ -10,7 +10,7 @@ import java.util.Base64;
 import java.util.HexFormat;
 
 @Component
-public class RefreshTokenCodec {
+public class OpaqueTokenCodec {
 
     private final SecureRandom secureRandom = new SecureRandom();
 

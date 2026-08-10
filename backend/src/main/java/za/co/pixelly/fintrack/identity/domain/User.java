@@ -88,6 +88,23 @@ public class User {
             && (lockedUntil == null || !lockedUntil.isAfter(now));
     }
 
+    public boolean isPendingVerification() {
+        return status == UserStatus.PENDING_VERIFICATION;
+    }
+
+    public void verifyEmail(Instant now) {
+
+        if (status != UserStatus.PENDING_VERIFICATION) {
+            throw new IllegalStateException(
+                "User is not awaiting email verification"
+            );
+        }
+
+        status = UserStatus.ACTIVE;
+        emailVerifiedAt = now;
+        updatedAt = now;
+    }
+
     public void recordSuccessfulLogin(Instant now) {
         failedLoginAttempts = 0;
         lastLoginAt = now;

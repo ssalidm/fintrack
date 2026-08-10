@@ -26,3 +26,5 @@ fintrack:
       issuer: fintrack-api
       access-token-ttl: PT15M
       refresh-token-ttl: P30D
+    email-verification:
+      token-ttl: PT24H

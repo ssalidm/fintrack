@@ -8,7 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.web.servlet.MvcResult;
-import za.co.pixelly.fintrack.identity.application.RefreshTokenCodec;
+import za.co.pixelly.fintrack.identity.application.OpaqueTokenCodec;
 import za.co.pixelly.fintrack.integration.AbstractIntegrationTest;
 
 import java.util.Map;
@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
-    private RefreshTokenCodec refreshTokenCodec;
+    private OpaqueTokenCodec refreshTokenCodec;
 
     @Autowired
     private JwtDecoder jwtDecoder;

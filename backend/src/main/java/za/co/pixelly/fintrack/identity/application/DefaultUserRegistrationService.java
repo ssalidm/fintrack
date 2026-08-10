@@ -27,6 +27,7 @@ public class DefaultUserRegistrationService implements UserRegistrationService {
     private final ApplicationRoleRepository applicationRoleRepository;
     private final UserRoleRepository userRoleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailVerificationService emailVerificationService;
 
     @Override
     @Transactional
@@ -56,6 +57,8 @@ public class DefaultUserRegistrationService implements UserRegistrationService {
         userRoleRepository.save(
             UserRole.assign(user, userRole)
         );
+
+        emailVerificationService.issueFor(user);
 
         return RegisterResponse.from(user);
 
