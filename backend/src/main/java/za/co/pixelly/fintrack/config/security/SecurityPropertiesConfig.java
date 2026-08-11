@@ -7,7 +7,8 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties({
     JwtProperties.class,
     EmailVerificationProperties.class,
-    PasswordResetProperties.class
+    PasswordResetProperties.class,
+    LoginSecurityProperties.class
 })
 public class SecurityPropertiesConfig {
 }

@@ -19,8 +19,7 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
 
@@ -163,10 +162,51 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void protectedEndpointRejectsMissingAccessToken() throws Exception {
+    void protectedEndpointReturnsJson401WithoutToken() throws Exception {
 
-        mockMvc.perform(get("/api/v1/auth/me"))
-            .andExpect(status().isUnauthorized());
+        mockMvc.perform(
+                get("/api/v1/auth/me")
+            )
+            .andExpect(status().isUnauthorized()
+            )
+            .andExpect(content().contentTypeCompatibleWith(
+                    MediaType.APPLICATION_JSON
+                )
+            )
+            .andExpect(jsonPath("$.success").value(false)
+            )
+            .andExpect(
+                jsonPath("$.message").value("Authentication is required")
+            );
+    }
+
+    @Test
+    void protectedEndpointReturnsJson401ForInvalidJwt()
+        throws Exception {
+
+        mockMvc.perform(
+                get("/api/v1/auth/me")
+                    .header(
+                        "Authorization",
+                        "Bearer definitely-not-a-jwt"
+                    )
+            )
+            .andExpect(
+                status().isUnauthorized()
+            )
+            .andExpect(
+                content().contentTypeCompatibleWith(
+                    "application/json"
+                )
+            )
+            .andExpect(
+                jsonPath("$.success")
+                    .value(false)
+            )
+            .andExpect(
+                jsonPath("$.status")
+                    .value(401)
+            );
     }
 
     private String uniqueEmail(String prefix) {
@@ -280,18 +320,231 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
             .andExpect(status().isCreated());
     }
 
-    private void activateUser(String email) {
+    @Test
+    void failedLoginIncrementsFailedAttemptCounter()
+        throws Exception {
 
-        int updated = jdbcTemplate.update("""
+        String email =
+            uniqueEmail("failed-attempt");
+
+        registerUser(
+            email,
+            "SecurePassword123!"
+        );
+
+        activateUser(email);
+
+        mockMvc.perform(
+                post("/api/v1/auth/login")
+                    .contentType("application/json")
+                    .content("""
+                        {
+                          "email": "%s",
+                          "password": "WrongPassword123!"
+                        }
+                        """.formatted(email))
+            )
+            .andExpect(status().isUnauthorized());
+
+        Integer attempts =
+            jdbcTemplate.queryForObject("""
+                    SELECT failed_login_attempts
+                    FROM identity.users
+                    WHERE email = ?
+                    """,
+                Integer.class,
+                email
+            );
+
+        assertEquals(1, attempts);
+    }
+
+    @Test
+    void repeatedFailedLoginsTemporarilyLockAccount()
+        throws Exception {
+
+        String email =
+            uniqueEmail("lockout");
+
+        registerUser(
+            email,
+            "SecurePassword123!"
+        );
+
+        activateUser(email);
+
+        for (int attempt = 0; attempt < 5; attempt++) {
+
+            mockMvc.perform(
+                    post("/api/v1/auth/login")
+                        .contentType(
+                            "application/json"
+                        )
+                        .content("""
+                            {
+                              "email": "%s",
+                              "password":
+                              "WrongPassword123!"
+                            }
+                            """.formatted(email))
+                )
+                .andExpect(
+                    status().isUnauthorized()
+                );
+        }
+
+        Integer failedAttempts =
+            jdbcTemplate.queryForObject("""
+                    SELECT failed_login_attempts
+                    FROM identity.users
+                    WHERE email = ?
+                    """,
+                Integer.class,
+                email
+            );
+
+        assertEquals(5, failedAttempts);
+
+        Object lockedUntil =
+            jdbcTemplate.queryForObject("""
+                    SELECT locked_until
+                    FROM identity.users
+                    WHERE email = ?
+                    """,
+                Object.class,
+                email
+            );
+
+        assertNotNull(lockedUntil);
+
+
+        /*
+         * Even the correct password must not work
+         * during the lock period.
+         */
+        mockMvc.perform(
+                post("/api/v1/auth/login")
+                    .contentType(
+                        "application/json"
+                    )
+                    .content("""
+                        {
+                          "email": "%s",
+                          "password":
+                          "SecurePassword123!"
+                        }
+                        """.formatted(email))
+            )
+            .andExpect(
+                status().isUnauthorized()
+            );
+    }
+
+    @Test
+    void successfulLoginClearsPreviousFailedAttempts()
+        throws Exception {
+
+        String email =
+            uniqueEmail("failure-reset");
+
+        registerUser(
+            email,
+            "SecurePassword123!"
+        );
+
+        activateUser(email);
+
+        for (int attempt = 0; attempt < 2; attempt++) {
+
+            mockMvc.perform(
+                    post("/api/v1/auth/login")
+                        .contentType(
+                            "application/json"
+                        )
+                        .content("""
+                            {
+                              "email": "%s",
+                              "password":
+                              "WrongPassword123!"
+                            }
+                            """.formatted(email))
+                )
+                .andExpect(
+                    status().isUnauthorized()
+                );
+        }
+
+        login(
+            email,
+            "SecurePassword123!"
+        );
+
+        Integer attempts =
+            jdbcTemplate.queryForObject("""
+                    SELECT failed_login_attempts
+                    FROM identity.users
+                    WHERE email = ?
+                    """,
+                Integer.class,
+                email
+            );
+
+        assertEquals(0, attempts);
+
+        Object lockedUntil =
+            jdbcTemplate.queryForObject("""
+                    SELECT locked_until
+                    FROM identity.users
+                    WHERE email = ?
+                    """,
+                Object.class,
+                email
+            );
+
+        assertNull(lockedUntil);
+    }
+
+    @Test
+    void expiredTemporaryLockAllowsLoginAgain()
+        throws Exception {
+
+        String email =
+            uniqueEmail("expired-lock");
+
+        registerUser(
+            email,
+            "SecurePassword123!"
+        );
+
+        activateUser(email);
+
+        jdbcTemplate.update("""
                 UPDATE identity.users
-                   SET status = 'ACTIVE',
-                       email_verified_at = CURRENT_TIMESTAMP
+                   SET failed_login_attempts = 5,
+                       locked_until =
+                           CURRENT_TIMESTAMP
+                           - INTERVAL '1 minute'
                  WHERE email = ?
                 """,
             email
         );
 
-        assertEquals(1, updated);
+        login(
+            email,
+            "SecurePassword123!"
+        );
+
+        Integer attempts =
+            jdbcTemplate.queryForObject("""
+                    SELECT failed_login_attempts
+                    FROM identity.users
+                    WHERE email = ?
+                    """,
+                Integer.class,
+                email
+            );
+
+        assertEquals(0, attempts);
     }
 
     @Test
@@ -364,6 +617,20 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
                     }
                     """.formatted(refreshToken)))
             .andExpect(status().isUnauthorized());
+    }
+
+    private void activateUser(String email) {
+
+        int updated = jdbcTemplate.update("""
+                UPDATE identity.users
+                   SET status = 'ACTIVE',
+                       email_verified_at = CURRENT_TIMESTAMP
+                 WHERE email = ?
+                """,
+            email
+        );
+
+        assertEquals(1, updated);
     }
 
     private MvcResult login(

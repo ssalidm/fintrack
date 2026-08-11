@@ -16,16 +16,23 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(
         HttpSecurity http,
-        JwtAuthenticationConverter jwtAuthenticationConverter
+        JwtAuthenticationConverter jwtAuthenticationConverter,
+        RestAuthenticationEntryPoint authenticationEntryPoint,
+        RestAccessDeniedHandler accessDeniedHandler
     ) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
+
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
+
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(
-                    EndpointRequest.to("health", "info")
+                    EndpointRequest.to(
+                        "health",
+                        "info"
+                    )
                 ).permitAll()
 
                 .requestMatchers(
@@ -39,15 +46,33 @@ public class SecurityConfig {
                     "/api/v1/auth/reset-password"
                 ).permitAll()
 
-                .anyRequest().authenticated()
+                .anyRequest()
+                .authenticated()
+            )
+
+            .exceptionHandling(exceptions ->
+                exceptions
+                    .authenticationEntryPoint(
+                        authenticationEntryPoint
+                    )
+                    .accessDeniedHandler(
+                        accessDeniedHandler
+                    )
             )
 
             .oauth2ResourceServer(oauth2 ->
-                oauth2.jwt(jwt ->
-                    jwt.jwtAuthenticationConverter(
-                        jwtAuthenticationConverter
+                oauth2
+                    .authenticationEntryPoint(
+                        authenticationEntryPoint
                     )
-                )
+                    .accessDeniedHandler(
+                        accessDeniedHandler
+                    )
+                    .jwt(jwt ->
+                        jwt.jwtAuthenticationConverter(
+                            jwtAuthenticationConverter
+                        )
+                    )
             );
 
         return http.build();

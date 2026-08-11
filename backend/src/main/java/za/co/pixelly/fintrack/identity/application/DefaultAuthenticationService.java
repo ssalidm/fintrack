@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import za.co.pixelly.fintrack.common.Util;
 import za.co.pixelly.fintrack.common.exception.AccountNotActiveException;
 import za.co.pixelly.fintrack.common.exception.InvalidCredentialsException;
 import za.co.pixelly.fintrack.common.exception.InvalidRefreshTokenException;
@@ -14,6 +15,7 @@ import za.co.pixelly.fintrack.identity.api.TokenResponse;
 import za.co.pixelly.fintrack.identity.domain.AuthSession;
 import za.co.pixelly.fintrack.identity.domain.RefreshToken;
 import za.co.pixelly.fintrack.identity.domain.User;
+import za.co.pixelly.fintrack.identity.domain.UserStatus;
 import za.co.pixelly.fintrack.identity.persistence.AuthSessionRepository;
 import za.co.pixelly.fintrack.identity.persistence.RefreshTokenRepository;
 import za.co.pixelly.fintrack.identity.persistence.UserRepository;
@@ -31,6 +33,7 @@ public class DefaultAuthenticationService implements AuthenticationService {
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
     private final AuthSessionRepository sessionRepository;
+    private final LoginAttemptService loginAttemptService;
     private final RefreshTokenRepository refreshTokenRepository;
 
     private final PasswordEncoder passwordEncoder;
@@ -38,31 +41,48 @@ public class DefaultAuthenticationService implements AuthenticationService {
     private final AccessTokenService accessTokenService;
     private final JwtProperties jwtProperties;
 
+
     @Override
     @Transactional
     public TokenResponse login(
         LoginRequest request,
         String userAgent
     ) {
-        String email = request.email()
-            .trim()
-            .toLowerCase(Locale.ROOT);
+        Instant now = Instant.now();
+        String email = Util.normalizeEmail(request.email());
 
         User user = userRepository
             .findByEmail(email)
             .orElseThrow(InvalidCredentialsException::new);
 
+        /*
+         * Do not allow further attempts during a temporary lock.
+         */
+        if (user.isTemporarilyLocked(now)) {
+            throw new InvalidCredentialsException();
+        }
+
         if (!passwordEncoder.matches(
             request.password(),
             user.getPasswordHash()
         )) {
+
+            loginAttemptService.recordFailure(user.getId());
+
             throw new InvalidCredentialsException();
         }
 
-        Instant now = Instant.now();
+        /*
+         * Only reveal account-state information after
+         * the password itself has been proven correct.
+         */
+        if (!user.isActive()) {
 
-        if (!user.canAuthenticate(now)) {
-            throw new AccountNotActiveException();
+            if (user.isPendingVerification()) {
+                throw new AccountNotActiveException();
+            }
+
+            throw new InvalidCredentialsException();
         }
 
         Instant sessionExpiresAt =
