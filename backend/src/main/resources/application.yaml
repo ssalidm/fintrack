@@ -26,3 +26,13 @@ fintrack:
       issuer: fintrack-api
       access-token-ttl: PT15M
       refresh-token-ttl: P30D
+
+    email-verification:
+      token-ttl: PT24H
+
+    password-reset:
+      token-ttl: PT30M
+
+    login:
+      max-failed-attempts: 5
+      lock-duration: PT15M

@@ -3,6 +3,7 @@ package za.co.pixelly.fintrack.identity.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -83,14 +84,81 @@ public class User {
         return new User(email, passwordHash, firstName, lastName);
     }
 
+    public boolean isActive() {
+        return status == UserStatus.ACTIVE;
+    }
+
     public boolean canAuthenticate(Instant now) {
-        return status == UserStatus.ACTIVE
-            && (lockedUntil == null || !lockedUntil.isAfter(now));
+        return isActive() && !isTemporarilyLocked(now);
+    }
+
+
+    public boolean isPendingVerification() {
+        return status == UserStatus.PENDING_VERIFICATION;
+    }
+
+    public void verifyEmail(Instant now) {
+
+        if (status != UserStatus.PENDING_VERIFICATION) {
+            throw new IllegalStateException(
+                "User is not awaiting email verification"
+            );
+        }
+
+        status = UserStatus.ACTIVE;
+        emailVerifiedAt = now;
+        updatedAt = now;
     }
 
     public void recordSuccessfulLogin(Instant now) {
         failedLoginAttempts = 0;
+        lockedUntil = null;
         lastLoginAt = now;
+        updatedAt = now;
+    }
+
+    public boolean isPasswordResetEligible() {
+        return status != UserStatus.DEACTIVATED;
+    }
+
+    public void resetPassword(
+        String newPasswordHash,
+        Instant now
+    ) {
+        this.passwordHash = newPasswordHash;
+
+        this.failedLoginAttempts = 0;
+        this.lockedUntil = null;
+
+        this.updatedAt = now;
+    }
+
+    public boolean isTemporarilyLocked(Instant now) {
+        return lockedUntil != null
+            && lockedUntil.isAfter(now);
+    }
+
+    public void recordFailedLogin(
+        Instant now,
+        int maxFailedAttempts,
+        Duration lockDuration
+    ) {
+        /*
+         * A previous temporary lock has expired.
+         * Begin a fresh sequence of failed attempts.
+         */
+        if (lockedUntil != null && !lockedUntil.isAfter(now)) {
+
+            failedLoginAttempts = 0;
+            lockedUntil = null;
+        }
+
+        failedLoginAttempts++;
+
+        if (failedLoginAttempts >= maxFailedAttempts) {
+            lockedUntil = now.plus(lockDuration);
+        }
+
         updatedAt = now;
     }
 

@@ -5,6 +5,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import za.co.pixelly.fintrack.common.Util;
 import za.co.pixelly.fintrack.common.exception.DuplicateEmailException;
 import za.co.pixelly.fintrack.identity.api.RegisterRequest;
 import za.co.pixelly.fintrack.identity.api.RegisterResponse;
@@ -27,11 +28,12 @@ public class DefaultUserRegistrationService implements UserRegistrationService {
     private final ApplicationRoleRepository applicationRoleRepository;
     private final UserRoleRepository userRoleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailVerificationService emailVerificationService;
 
     @Override
     @Transactional
     public RegisterResponse register(RegisterRequest request) {
-        String email = normalizeEmail(request.email());
+        String email = Util.normalizeEmail(request.email());
 
         if (userRepository.existsByEmail(email)) {
             throw new DuplicateEmailException();
@@ -57,11 +59,9 @@ public class DefaultUserRegistrationService implements UserRegistrationService {
             UserRole.assign(user, userRole)
         );
 
+        emailVerificationService.issueFor(user);
+
         return RegisterResponse.from(user);
 
-    }
-
-    private String normalizeEmail(String email) {
-        return email.trim().toLowerCase(Locale.ROOT);
     }
 }

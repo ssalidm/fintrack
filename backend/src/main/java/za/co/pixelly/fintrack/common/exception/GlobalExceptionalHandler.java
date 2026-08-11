@@ -75,4 +75,34 @@ public class GlobalExceptionalHandler {
                 exception.getMessage()
             ));
     }
+
+    @ExceptionHandler(InvalidEmailVerificationTokenException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleInvalidEmailVerificationToken(
+        InvalidEmailVerificationTokenException exception
+    ) {
+        return ResponseEntity
+            .badRequest()
+            .body(
+                ApiResponse.error(
+                    HttpStatus.BAD_REQUEST.value(),
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler(InvalidPasswordResetTokenException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleInvalidPasswordResetToken(
+        InvalidPasswordResetTokenException exception
+    ) {
+        return ResponseEntity
+            .badRequest()
+            .body(
+                ApiResponse.error(
+                    HttpStatus.BAD_REQUEST.value(),
+                    exception.getMessage()
+                )
+            );
+    }
 }

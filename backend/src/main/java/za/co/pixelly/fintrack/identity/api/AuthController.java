@@ -10,6 +10,8 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import za.co.pixelly.fintrack.common.api.ApiResponse;
 import za.co.pixelly.fintrack.identity.application.AuthenticationService;
+import za.co.pixelly.fintrack.identity.application.EmailVerificationService;
+import za.co.pixelly.fintrack.identity.application.PasswordResetService;
 import za.co.pixelly.fintrack.identity.application.UserRegistrationService;
 
 import java.util.Map;
@@ -23,6 +25,8 @@ public class AuthController {
 
     private final UserRegistrationService registrationService;
     private final AuthenticationService authenticationService;
+    private final EmailVerificationService emailVerificationService;
+    private final PasswordResetService passwordResetService;
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<RegisterResponse>> register(
@@ -86,6 +90,86 @@ public class AuthController {
             ApiResponse.success(
                 HttpStatus.OK.value(),
                 "Logged out successfully",
+                null
+            )
+        );
+    }
+
+    @PostMapping("/verify-email")
+    public ResponseEntity<ApiResponse<Void>> verifyEmail(
+        @Valid @RequestBody VerifyEmailRequest request
+    ) {
+        emailVerificationService.verify(
+            request.token()
+        );
+
+        return ResponseEntity.ok(
+            ApiResponse.success(
+                HttpStatus.OK.value(),
+                "Email verified successfully",
+                null
+            )
+        );
+    }
+
+    @PostMapping("/resend-verification")
+    public ResponseEntity<ApiResponse<Void>>
+    resendVerification(
+        @Valid
+        @RequestBody
+        ResendVerificationRequest request
+    ) {
+        emailVerificationService.resend(
+            request.email()
+        );
+
+        return ResponseEntity
+            .status(HttpStatus.ACCEPTED)
+            .body(
+                ApiResponse.success(
+                    HttpStatus.ACCEPTED.value(),
+                    "If an eligible account exists, a verification email will be sent",
+                    null
+                )
+            );
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponse<Void>> forgotPassword(
+        @Valid
+        @RequestBody
+        ForgotPasswordRequest request
+    ) {
+        passwordResetService.requestReset(
+            request.email()
+        );
+
+        return ResponseEntity
+            .status(HttpStatus.ACCEPTED)
+            .body(
+                ApiResponse.success(
+                    HttpStatus.ACCEPTED.value(),
+                    "If an eligible account exists, password reset instructions will be sent",
+                    null
+                )
+            );
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse<Void>> resetPassword(
+        @Valid
+        @RequestBody
+        ResetPasswordRequest request
+    ) {
+        passwordResetService.resetPassword(
+            request.token(),
+            request.newPassword()
+        );
+
+        return ResponseEntity.ok(
+            ApiResponse.success(
+                HttpStatus.OK.value(),
+                "Password reset successfully. Please log in again.",
                 null
             )
         );

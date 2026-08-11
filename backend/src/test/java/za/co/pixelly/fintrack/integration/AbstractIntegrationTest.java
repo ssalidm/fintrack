@@ -2,17 +2,23 @@ package za.co.pixelly.fintrack.integration;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.postgresql.PostgreSQLContainer;
+import za.co.pixelly.fintrack.integration.support.TestEmailVerificationSender;
+import za.co.pixelly.fintrack.integration.support.TestPasswordResetSender;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@Import(AbstractIntegrationTest.TestMailConfiguration.class)
 public abstract class AbstractIntegrationTest {
 
     private static final String FINTRACK_APPLICATION_USER = "fintrack_application";
@@ -76,4 +82,25 @@ public abstract class AbstractIntegrationTest {
 
     @Autowired
     protected JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    protected TestEmailVerificationSender emailSender;
+
+    @Autowired
+    protected TestPasswordResetSender passwordResetSender;
+
+
+    @TestConfiguration(proxyBeanMethods = false)
+    public static class TestMailConfiguration {
+
+        @Bean
+        TestEmailVerificationSender emailVerificationSender() {
+            return new TestEmailVerificationSender();
+        }
+
+        @Bean
+        TestPasswordResetSender passwordResetSender() {
+            return new TestPasswordResetSender();
+        }
+    }
 }
