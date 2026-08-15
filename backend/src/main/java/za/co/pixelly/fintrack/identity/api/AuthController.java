@@ -38,7 +38,7 @@ public class AuthController {
             .status(HttpStatus.CREATED)
             .body(ApiResponse.success(
                 HttpStatus.CREATED.value(),
-                "Account created successfully",
+                "User registered successfully",
                 response
             ));
     }

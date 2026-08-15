@@ -1,5 +1,6 @@
 package za.co.pixelly.fintrack.integration;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -7,11 +8,14 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.postgresql.PostgreSQLContainer;
+import za.co.pixelly.fintrack.integration.support.AuthenticatedUser;
+import za.co.pixelly.fintrack.integration.support.IdentityTestClient;
 import za.co.pixelly.fintrack.integration.support.TestEmailVerificationSender;
 import za.co.pixelly.fintrack.integration.support.TestPasswordResetSender;
 
@@ -89,9 +93,34 @@ public abstract class AbstractIntegrationTest {
     @Autowired
     protected TestPasswordResetSender passwordResetSender;
 
+    @Autowired
+    protected JwtDecoder jwtDecoder;
+
+    protected IdentityTestClient identityTestClient;
+
+    @BeforeEach
+    void configureIdentityTestClient() {
+
+        identityTestClient =
+            new IdentityTestClient(
+                mockMvc,
+                emailSender,
+                jwtDecoder
+            );
+    }
+
+    protected AuthenticatedUser createAuthenticatedUser(
+        String prefix
+    ) throws Exception {
+        return identityTestClient.createAuthenticatedUser(prefix);
+    }
+
 
     @TestConfiguration(proxyBeanMethods = false)
     public static class TestMailConfiguration {
+
+        @Autowired
+        MockMvc mockMvc;
 
         @Bean
         TestEmailVerificationSender emailVerificationSender() {
@@ -102,5 +131,6 @@ public abstract class AbstractIntegrationTest {
         TestPasswordResetSender passwordResetSender() {
             return new TestPasswordResetSender();
         }
+
     }
 }
