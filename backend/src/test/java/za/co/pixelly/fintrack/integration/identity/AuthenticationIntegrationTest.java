@@ -6,7 +6,6 @@ import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.boot.json.JsonParser;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.web.servlet.MvcResult;
 import za.co.pixelly.fintrack.identity.application.OpaqueTokenCodec;
 import za.co.pixelly.fintrack.integration.AbstractIntegrationTest;
@@ -25,9 +24,6 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
     private OpaqueTokenCodec refreshTokenCodec;
-
-    @Autowired
-    private JwtDecoder jwtDecoder;
 
     private final JsonParser jsonParser = new JacksonJsonParser();
 

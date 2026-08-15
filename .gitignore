@@ -90,6 +90,6 @@ volumes/
 .cache/
 
 # ==========================================
-# Scripts
+# Backups
 # ==========================================
-database/scripts/connect.sh
+database/backups/
