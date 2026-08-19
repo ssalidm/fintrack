@@ -38,7 +38,7 @@ public class AccountController {
             .status(HttpStatus.CREATED)
             .body(
                 ApiResponse.success(
-                    HttpStatus.CREATED.value(),
+                    HttpStatus.CREATED,
                     "Account Created Successfully",
                     account
                 )
@@ -55,7 +55,7 @@ public class AccountController {
     ) {
         return ResponseEntity.ok(
             ApiResponse.success(
-                HttpStatus.OK.value(),
+                HttpStatus.OK,
                 "Accounts retrieved successfully",
                 accountService.findAccounts(userId(jwt), status)
             )
@@ -71,7 +71,7 @@ public class AccountController {
     ) {
         return ResponseEntity.ok(
             ApiResponse.success(
-                HttpStatus.OK.value(),
+                HttpStatus.OK,
                 "Account retrieved successfully",
                 accountService.findById(userId(jwt), accountId)
             )
@@ -97,7 +97,7 @@ public class AccountController {
 
         return ResponseEntity.ok(
             ApiResponse.success(
-                HttpStatus.OK.value(),
+                HttpStatus.OK,
                 "Account updated successfully",
                 result
             )
@@ -123,14 +123,15 @@ public class AccountController {
 
         return ResponseEntity.ok(
             ApiResponse.success(
-                HttpStatus.OK.value(),
+                HttpStatus.OK,
                 "Account archived successfully",
                 result
             )
         );
     }
 
+
     private UUID userId(Jwt jwt) {
-        return UUID.fromString(jwt.getSubject());
+        return UUID.fromString(Objects.requireNonNull(jwt.getSubject()));
     }
 }

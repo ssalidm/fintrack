@@ -37,11 +37,12 @@ public class AuthController {
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(ApiResponse.success(
-                HttpStatus.CREATED.value(),
+                HttpStatus.CREATED,
                 "User registered successfully",
                 response
             ));
     }
+
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<TokenResponse>> login(
@@ -55,12 +56,13 @@ public class AuthController {
 
         return ResponseEntity.ok(
             ApiResponse.success(
-                HttpStatus.OK.value(),
+                HttpStatus.OK,
                 "Login successful",
                 response
             )
         );
     }
+
 
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<TokenResponse>> refresh(
@@ -70,12 +72,13 @@ public class AuthController {
 
         return ResponseEntity.ok(
             ApiResponse.success(
-                HttpStatus.OK.value(),
+                HttpStatus.OK,
                 "Token refreshed successfully",
                 response
             )
         );
     }
+
 
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(
@@ -88,12 +91,13 @@ public class AuthController {
 
         return ResponseEntity.ok(
             ApiResponse.success(
-                HttpStatus.OK.value(),
+                HttpStatus.OK,
                 "Logged out successfully",
                 null
             )
         );
     }
+
 
     @PostMapping("/verify-email")
     public ResponseEntity<ApiResponse<Void>> verifyEmail(
@@ -105,12 +109,13 @@ public class AuthController {
 
         return ResponseEntity.ok(
             ApiResponse.success(
-                HttpStatus.OK.value(),
+                HttpStatus.OK,
                 "Email verified successfully",
                 null
             )
         );
     }
+
 
     @PostMapping("/resend-verification")
     public ResponseEntity<ApiResponse<Void>>
@@ -127,12 +132,13 @@ public class AuthController {
             .status(HttpStatus.ACCEPTED)
             .body(
                 ApiResponse.success(
-                    HttpStatus.ACCEPTED.value(),
+                    HttpStatus.ACCEPTED,
                     "If an eligible account exists, a verification email will be sent",
                     null
                 )
             );
     }
+
 
     @PostMapping("/forgot-password")
     public ResponseEntity<ApiResponse<Void>> forgotPassword(
@@ -148,12 +154,13 @@ public class AuthController {
             .status(HttpStatus.ACCEPTED)
             .body(
                 ApiResponse.success(
-                    HttpStatus.ACCEPTED.value(),
+                    HttpStatus.ACCEPTED,
                     "If an eligible account exists, password reset instructions will be sent",
                     null
                 )
             );
     }
+
 
     @PostMapping("/reset-password")
     public ResponseEntity<ApiResponse<Void>> resetPassword(
@@ -168,12 +175,13 @@ public class AuthController {
 
         return ResponseEntity.ok(
             ApiResponse.success(
-                HttpStatus.OK.value(),
+                HttpStatus.OK,
                 "Password reset successfully. Please log in again.",
                 null
             )
         );
     }
+
 
     @GetMapping("/me")
     public Map<String, Object> me(

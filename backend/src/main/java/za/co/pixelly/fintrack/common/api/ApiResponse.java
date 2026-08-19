@@ -1,6 +1,7 @@
 package za.co.pixelly.fintrack.common.api;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.springframework.http.HttpStatus;
 
 import java.time.Instant;
 import java.util.Map;
@@ -16,13 +17,13 @@ public record ApiResponse<T>(
 ) {
 
     public static <T> ApiResponse<T> success(
-        int status,
+        HttpStatus status,
         String message,
         T result
     ) {
         return new ApiResponse<>(
             true,
-            status,
+            status.value(),
             message,
             result,
             null,
@@ -31,12 +32,12 @@ public record ApiResponse<T>(
     }
 
     public static ApiResponse<Void> error(
-        int status,
+        HttpStatus status,
         String message
     ) {
         return new ApiResponse<>(
             false,
-            status,
+            status.value(),
             message,
             null,
             null,
@@ -45,13 +46,13 @@ public record ApiResponse<T>(
     }
 
     public static ApiResponse<Void> validation(
-        int status,
+        HttpStatus status,
         String message,
         Map<String, String> errors
     ) {
         return new ApiResponse<>(
             false,
-            status,
+            status.value(),
             message,
             null,
             errors,
