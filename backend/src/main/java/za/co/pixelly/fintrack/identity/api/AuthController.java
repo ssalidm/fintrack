@@ -1,5 +1,6 @@
 package za.co.pixelly.fintrack.identity.api;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+@Tag(
+    name = "Authentication",
+    description = "Registration, authentication and account security"
+)
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor

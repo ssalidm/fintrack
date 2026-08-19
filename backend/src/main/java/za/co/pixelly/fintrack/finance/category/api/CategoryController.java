@@ -1,5 +1,7 @@
 package za.co.pixelly.fintrack.finance.category.api;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import static za.co.pixelly.fintrack.config.OpenApiConfig.BEARER_AUTH;
+
+@Tag(
+    name = "Categories",
+    description = "Manage income and expense categories"
+)
+@SecurityRequirement(name = BEARER_AUTH)
 @RestController
 @RequestMapping("/api/v1/categories")
 @RequiredArgsConstructor
