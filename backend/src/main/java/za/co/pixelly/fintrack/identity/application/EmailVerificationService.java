@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import za.co.pixelly.fintrack.common.exception.InvalidEmailVerificationTokenException;
 import za.co.pixelly.fintrack.config.security.EmailVerificationProperties;
+import za.co.pixelly.fintrack.identity.application.event.UserActivatedEvent;
 import za.co.pixelly.fintrack.identity.domain.EmailVerificationToken;
 import za.co.pixelly.fintrack.identity.domain.User;
 import za.co.pixelly.fintrack.identity.persistence.EmailVerificationTokenRepository;
@@ -37,8 +38,7 @@ public class EmailVerificationService {
         String tokenHash =
             tokenCodec.hash(rawToken);
 
-        EmailVerificationToken token =
-            tokenRepository
+        EmailVerificationToken token = tokenRepository
                 .findByTokenHashForUpdate(tokenHash)
                 .orElseThrow(
                     InvalidEmailVerificationTokenException::new
@@ -60,6 +60,10 @@ public class EmailVerificationService {
 
         token.consume(now);
         user.verifyEmail(now);
+
+        eventPublisher.publishEvent(
+            new UserActivatedEvent(user.getId())
+        );
     }
 
     @Transactional

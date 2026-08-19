@@ -5,6 +5,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import za.co.pixelly.fintrack.common.Util;
 import za.co.pixelly.fintrack.common.exception.InvalidPasswordResetTokenException;
 import za.co.pixelly.fintrack.config.security.PasswordResetProperties;
 import za.co.pixelly.fintrack.identity.domain.PasswordResetToken;
@@ -103,7 +104,7 @@ public class PasswordResetService {
 
     private void issueToken(User user) {
 
-        Instant now = Instant.now();
+        Instant now = Util.now();
 
         tokenRepository
             .findActiveByUserIdForUpdate(user.getId())

@@ -35,7 +35,7 @@ public class RestAccessDeniedHandler implements AccessDeniedHandler {
 
         ApiResponse<Void> body =
             ApiResponse.error(
-                HttpStatus.FORBIDDEN.value(),
+                HttpStatus.FORBIDDEN,
                 "Access denied"
             );
 

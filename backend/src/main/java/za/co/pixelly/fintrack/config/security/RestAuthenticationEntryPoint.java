@@ -39,7 +39,7 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
         ApiResponse<Void> body =
             ApiResponse.error(
-                HttpStatus.UNAUTHORIZED.value(),
+                HttpStatus.UNAUTHORIZED,
                 "Authentication is required"
             );
 
