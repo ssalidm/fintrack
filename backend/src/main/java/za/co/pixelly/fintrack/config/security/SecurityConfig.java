@@ -46,6 +46,14 @@ public class SecurityConfig {
                     "/api/v1/auth/reset-password"
                 ).permitAll()
 
+                // OpenAPI / Swagger
+                .requestMatchers(
+                    "/swagger-ui.html",
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**"
+                )
+                .permitAll()
+
                 .anyRequest()
                 .authenticated()
             )

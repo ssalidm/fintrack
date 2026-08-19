@@ -1,5 +1,7 @@
 package za.co.pixelly.fintrack.finance.account.api;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -10,11 +12,17 @@ import org.springframework.web.bind.annotation.*;
 import za.co.pixelly.fintrack.common.api.ApiResponse;
 import za.co.pixelly.fintrack.finance.account.application.AccountService;
 import za.co.pixelly.fintrack.finance.account.domain.AccountStatus;
+import static za.co.pixelly.fintrack.config.OpenApiConfig.BEARER_AUTH;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+@Tag(
+    name = "Accounts",
+    description = "Manage user-owned financial accounts"
+)
+@SecurityRequirement(name = BEARER_AUTH)
 @RestController
 @RequestMapping("/api/v1/accounts")
 @RequiredArgsConstructor

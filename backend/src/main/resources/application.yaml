@@ -36,3 +36,13 @@ fintrack:
     login:
       max-failed-attempts: 5
       lock-duration: PT15M
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: method
+    try-it-out-enabled: true
