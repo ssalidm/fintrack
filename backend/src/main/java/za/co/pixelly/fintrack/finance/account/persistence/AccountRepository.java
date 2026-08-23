@@ -12,7 +12,7 @@ import java.util.UUID;
 
 public interface AccountRepository extends JpaRepository<Account, UUID> {
 
-    Optional<Account> findByIdAndUserId(UUID id, UUID userID);
+    Optional<Account> findByIdAndUserId(UUID id, UUID userId);
 
     List<Account> findAllByUserIdAndStatusOrderByCreatedAtDesc(
         UUID userId,

@@ -1,6 +1,5 @@
 package za.co.pixelly.fintrack.common.exception;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +14,11 @@ import za.co.pixelly.fintrack.finance.account.application.*;
 import za.co.pixelly.fintrack.finance.category.application.*;
 import za.co.pixelly.fintrack.finance.category.domain.TemplateCategoryTypeChangeException;
 import za.co.pixelly.fintrack.finance.currency.application.InvalidCurrencyException;
+import za.co.pixelly.fintrack.finance.transaction.application.*;
+import za.co.pixelly.fintrack.finance.transfer.application.InactiveTransferAccountException;
+import za.co.pixelly.fintrack.finance.transfer.application.TransferAccountCurrencyMismatchException;
+import za.co.pixelly.fintrack.finance.transfer.application.TransferAlreadyVoidedException;
+import za.co.pixelly.fintrack.finance.transfer.application.TransferNotFoundException;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -284,6 +288,136 @@ public class GlobalExceptionHandler {
             .body(
                 ApiResponse.error(
                     HttpStatus.CONFLICT,
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler(TransactionNotFoundException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleTransactionNotFound(
+        TransactionNotFoundException exception
+    ) {
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(
+                ApiResponse.error(
+                    HttpStatus.NOT_FOUND,
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler({
+        InactiveTransactionAccountException.class,
+        InactiveTransactionCategoryException.class
+    })
+    ResponseEntity<ApiResponse<Void>>
+    handleTransactionStateConflict(
+        RuntimeException exception
+    ) {
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(
+                ApiResponse.error(
+                    HttpStatus.CONFLICT,
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler(TransactionCategoryTypeMismatchException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleTransactionCategoryMismatch(
+        TransactionCategoryTypeMismatchException exception
+    ) {
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(
+                ApiResponse.error(
+                    HttpStatus.BAD_REQUEST,
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler(StaleTransactionVersionException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleStaleTransactionVersion(
+        StaleTransactionVersionException exception
+    ) {
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(
+                ApiResponse.error(
+                    HttpStatus.CONFLICT,
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler({
+        TransactionAlreadyVoidedException.class,
+        VoidedTransactionModificationException.class,
+        TransferTransactionModificationException.class
+    })
+    ResponseEntity<ApiResponse<Void>>
+    handleTransactionConflict(
+        RuntimeException exception
+    ) {
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(
+                ApiResponse.error(
+                    HttpStatus.CONFLICT,
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler(TransferNotFoundException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleTransferNotFound(
+        TransferNotFoundException exception
+    ) {
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(
+                ApiResponse.error(
+                    HttpStatus.NOT_FOUND,
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler({
+        TransferAlreadyVoidedException.class,
+        InactiveTransferAccountException.class
+    })
+    ResponseEntity<ApiResponse<Void>>
+    handleTransferConflict(
+        RuntimeException exception
+    ) {
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(
+                ApiResponse.error(
+                    HttpStatus.CONFLICT,
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler(TransferAccountCurrencyMismatchException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleTransferCurrencyMismatch(
+        TransferAccountCurrencyMismatchException exception
+    ) {
+        return ResponseEntity
+            .badRequest()
+            .body(
+                ApiResponse.error(
+                    HttpStatus.BAD_REQUEST,
                     exception.getMessage()
                 )
             );
