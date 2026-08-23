@@ -33,7 +33,7 @@ services:
       - fintrack-network
 
   flyway:
-    image: flyway/flyway:13.1.0-alpine
+    image: flyway/flyway:13.3.0-alpine
 
     depends_on:
       db:

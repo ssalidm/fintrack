@@ -1,0 +1,11 @@
+package za.co.pixelly.fintrack.finance.transaction.application;
+
+public class InactiveTransactionCategoryException
+    extends RuntimeException {
+
+    public InactiveTransactionCategoryException() {
+        super(
+            "Transactions can only use an active category"
+        );
+    }
+}

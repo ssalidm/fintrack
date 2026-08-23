@@ -12,6 +12,11 @@ public final class Util {
         return email.trim().toLowerCase(Locale.ROOT);
     }
 
+    public static String normalizeNullable(String value) {
+        if (value == null) return null;
+        return value.trim().isEmpty() ? null : value.trim();
+    }
+
     public static Instant now() {
         return Instant.now();
     }
