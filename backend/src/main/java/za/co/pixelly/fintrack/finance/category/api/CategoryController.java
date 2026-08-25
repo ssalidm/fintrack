@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import za.co.pixelly.fintrack.common.api.ApiMessage;
 import za.co.pixelly.fintrack.common.api.ApiResponse;
 import za.co.pixelly.fintrack.finance.category.application.CategoryService;
 import za.co.pixelly.fintrack.finance.category.domain.CategoryStatus;
@@ -19,6 +20,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static za.co.pixelly.fintrack.config.OpenApiConfig.BEARER_AUTH;
+
 
 @Tag(
     name = "Categories",
@@ -50,7 +52,7 @@ public class CategoryController {
             .body(
                 ApiResponse.success(
                     HttpStatus.CREATED,
-                    "Category created successfully",
+                    ApiMessage.Category.CREATED,
                     result
                 )
             );
@@ -82,7 +84,7 @@ public class CategoryController {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
-                "Categories retrieved successfully",
+                ApiMessage.Category.FETCHED_ALL,
                 result
             )
         );
@@ -104,7 +106,7 @@ public class CategoryController {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
-                "Category retrieved successfully",
+                ApiMessage.Category.FETCHED,
                 result
             )
         );
@@ -130,7 +132,7 @@ public class CategoryController {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
-                "Category updated successfully",
+                ApiMessage.Category.UPDATED,
                 result
             )
         );
@@ -156,7 +158,7 @@ public class CategoryController {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
-                "Category archived successfully",
+                ApiMessage.Category.ARCHIVED,
                 result
             )
         );

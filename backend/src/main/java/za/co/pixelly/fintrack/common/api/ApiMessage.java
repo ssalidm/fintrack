@@ -18,7 +18,7 @@ public final class ApiMessage {
         public static final String REFRESH_SUCCESS = "Token refreshed successfully";
         public static final String VERIFY_SUCCESS = "Email verified successfully";
         public static final String RESEND_VERIFY = "If an eligible account exists, a verification email will be sent";
-        public static final String PASSWORD_RESET = "If an eligible account exists, password reset instructions will be sent";
+        public static final String FORGOT_PASSWORD = "If an eligible account exists, password reset instructions will be sent";
         public static final String RESET_SUCCESS = "Password reset successfully. Please log in again";
     }
 
@@ -75,5 +75,21 @@ public final class ApiMessage {
         public static final String FETCHED = "Transfer retrieved successfully";
         public static final String FETCHED_ALL = "Transfers retrieved successfully";
         public static final String VOIDED = "Transfer voided successfully";
+    }
+
+    /*
+     * TRANSFERS
+     */
+    public static final class Budget {
+        private Budget() {
+        }
+
+        public static final String CREATED = "Budget created successfully";
+        public static final String FETCHED = "Budget retrieved successfully";
+        public static final String FETCHED_ALL = "Budgets retrieved successfully";
+        public static final String UPDATED = "Budgets updated successfully";
+        public static final String ARCHIVED = "Budget archived successfully";
+        public static final String LIMIT_CREATED = "Budget category limit created successfully";
+        public static final String LIMIT_UPDATED = "Budget category limit updated successfully";
     }
 }

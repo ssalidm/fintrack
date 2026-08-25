@@ -24,8 +24,8 @@ fintrack:
   security:
     jwt:
       issuer: fintrack-api
-      access-token-ttl: PT30M
-      refresh-token-ttl: P30D
+      access-token-ttl: PT15M
+      refresh-token-ttl: PT24H
 
     email-verification:
       token-ttl: PT24H

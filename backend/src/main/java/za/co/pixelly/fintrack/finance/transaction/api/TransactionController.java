@@ -20,6 +20,7 @@ import java.util.UUID;
 
 import static za.co.pixelly.fintrack.config.OpenApiConfig.BEARER_AUTH;
 
+
 @Tag(
     name = "Transactions",
     description = "Manage and query financial transactions"
