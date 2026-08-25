@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import za.co.pixelly.fintrack.common.api.ApiMessage;
 import za.co.pixelly.fintrack.common.api.ApiResponse;
 import za.co.pixelly.fintrack.identity.application.AuthenticationService;
 import za.co.pixelly.fintrack.identity.application.EmailVerificationService;
@@ -18,6 +19,7 @@ import za.co.pixelly.fintrack.identity.application.UserRegistrationService;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+
 
 @Tag(
     name = "Authentication",
@@ -43,7 +45,7 @@ public class AuthController {
             .status(HttpStatus.CREATED)
             .body(ApiResponse.success(
                 HttpStatus.CREATED,
-                "User registered successfully",
+                ApiMessage.Auth.REGISTER_SUCCESS,
                 response
             ));
     }
@@ -62,7 +64,7 @@ public class AuthController {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
-                "Login successful",
+                ApiMessage.Auth.LOGIN_SUCCESS,
                 response
             )
         );
@@ -78,7 +80,7 @@ public class AuthController {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
-                "Token refreshed successfully",
+                ApiMessage.Auth.REFRESH_SUCCESS,
                 response
             )
         );
@@ -97,7 +99,7 @@ public class AuthController {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
-                "Logged out successfully",
+                ApiMessage.Auth.LOGOUT_SUCCESS,
                 null
             )
         );
@@ -115,7 +117,7 @@ public class AuthController {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
-                "Email verified successfully",
+                ApiMessage.Auth.VERIFY_SUCCESS,
                 null
             )
         );
@@ -138,7 +140,7 @@ public class AuthController {
             .body(
                 ApiResponse.success(
                     HttpStatus.ACCEPTED,
-                    "If an eligible account exists, a verification email will be sent",
+                    ApiMessage.Auth.RESEND_VERIFY,
                     null
                 )
             );
@@ -160,7 +162,7 @@ public class AuthController {
             .body(
                 ApiResponse.success(
                     HttpStatus.ACCEPTED,
-                    "If an eligible account exists, password reset instructions will be sent",
+                    ApiMessage.Auth.FORGOT_PASSWORD,
                     null
                 )
             );
@@ -181,7 +183,7 @@ public class AuthController {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
-                "Password reset successfully. Please log in again.",
+                ApiMessage.Auth.RESET_SUCCESS,
                 null
             )
         );

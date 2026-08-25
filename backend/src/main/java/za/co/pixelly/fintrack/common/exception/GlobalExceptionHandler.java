@@ -11,6 +11,10 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.exc.InvalidFormatException;
 import za.co.pixelly.fintrack.common.api.ApiResponse;
 import za.co.pixelly.fintrack.finance.account.application.*;
+import za.co.pixelly.fintrack.finance.budget.application.BudgetConflictException;
+import za.co.pixelly.fintrack.finance.budget.application.BudgetLimitNotFoundException;
+import za.co.pixelly.fintrack.finance.budget.application.BudgetNotFoundException;
+import za.co.pixelly.fintrack.finance.budget.application.BudgetValidationException;
 import za.co.pixelly.fintrack.finance.category.application.*;
 import za.co.pixelly.fintrack.finance.category.domain.TemplateCategoryTypeChangeException;
 import za.co.pixelly.fintrack.finance.currency.application.InvalidCurrencyException;
@@ -415,8 +419,45 @@ public class GlobalExceptionHandler {
     ) {
         return ResponseEntity
             .badRequest()
-            .body(
-                ApiResponse.error(
+            .body(ApiResponse.error(
+                    HttpStatus.BAD_REQUEST,
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler({
+        BudgetNotFoundException.class,
+        BudgetLimitNotFoundException.class
+    })
+    ResponseEntity<ApiResponse<Void>> handleBudgetNotFound(RuntimeException exception) {
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(ApiResponse.error(
+                    HttpStatus.NOT_FOUND,
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler(BudgetConflictException.class)
+    ResponseEntity<ApiResponse<Void>> handleBudgetConflict(BudgetConflictException exception) {
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(ApiResponse.error(
+                    HttpStatus.CONFLICT,
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler(
+        BudgetValidationException.class
+    )
+    ResponseEntity<ApiResponse<Void>> handleBudgetValidation(BudgetValidationException exception) {
+        return ResponseEntity
+            .badRequest()
+            .body(ApiResponse.error(
                     HttpStatus.BAD_REQUEST,
                     exception.getMessage()
                 )

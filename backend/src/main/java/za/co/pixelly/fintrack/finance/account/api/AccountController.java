@@ -9,14 +9,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import za.co.pixelly.fintrack.common.api.ApiMessage;
 import za.co.pixelly.fintrack.common.api.ApiResponse;
 import za.co.pixelly.fintrack.finance.account.application.AccountService;
 import za.co.pixelly.fintrack.finance.account.domain.AccountStatus;
+
 import static za.co.pixelly.fintrack.config.OpenApiConfig.BEARER_AUTH;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+
 
 @Tag(
     name = "Accounts",
@@ -47,7 +50,7 @@ public class AccountController {
             .body(
                 ApiResponse.success(
                     HttpStatus.CREATED,
-                    "Account Created Successfully",
+                    ApiMessage.Account.CREATED,
                     account
                 )
             );
@@ -64,7 +67,7 @@ public class AccountController {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
-                "Accounts retrieved successfully",
+                ApiMessage.Account.FETCHED_ALL,
                 accountService.findAccounts(userId(jwt), status)
             )
         );
@@ -80,7 +83,7 @@ public class AccountController {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
-                "Account retrieved successfully",
+                ApiMessage.Account.FETCHED,
                 accountService.findById(userId(jwt), accountId)
             )
         );
@@ -106,7 +109,7 @@ public class AccountController {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
-                "Account updated successfully",
+                ApiMessage.Account.UPDATED,
                 result
             )
         );
@@ -132,7 +135,7 @@ public class AccountController {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
-                "Account archived successfully",
+                ApiMessage.Account.ARCHIVED,
                 result
             )
         );
