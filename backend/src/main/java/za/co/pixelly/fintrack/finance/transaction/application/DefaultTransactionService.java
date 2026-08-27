@@ -51,10 +51,12 @@ public class DefaultTransactionService implements TransactionService {
 
         Instant now = Instant.now();
 
-        Transaction transaction = Transaction.createManual(
+        Transaction transaction = Transaction.createTransaction(
             userId,
             account.getId(),
             category.getId(),
+            null,
+            null,
             transactionType,
             request.amount(),
             request.transactionDate(),
@@ -160,7 +162,7 @@ public class DefaultTransactionService implements TransactionService {
 
         validateCategoryType(targetType, targetCategory);
 
-        transaction.updateManual(
+        transaction.updateTransaction(
             request.accountId(),
             request.categoryId(),
             request.transactionType() == null

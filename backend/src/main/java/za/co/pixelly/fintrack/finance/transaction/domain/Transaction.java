@@ -74,10 +74,12 @@ public class Transaction {
     @Column(name = "recurrence_due_date")
     private LocalDate recurrenceDueDate;
 
-    public static Transaction createManual(
+    public static Transaction createTransaction(
         UUID userId,
         UUID accountId,
         UUID categoryId,
+        UUID recurringTransactionId,
+        LocalDate recurrenceDueDate,
         TransactionType transactionType,
         BigDecimal amount,
         LocalDate transactionDate,
@@ -101,13 +103,13 @@ public class Transaction {
         transaction.voidReason = null;
         transaction.createdAt = now;
         transaction.updatedAt = now;
-        transaction.recurringTransactionId = null;
-        transaction.recurrenceDueDate = null;
+        transaction.recurringTransactionId = recurringTransactionId;
+        transaction.recurrenceDueDate = recurrenceDueDate;
 
         return transaction;
     }
 
-    public void updateManual(
+    public void updateTransaction(
         UUID accountId,
         UUID categoryId,
         TransactionType transactionType,
@@ -163,7 +165,6 @@ public class Transaction {
 
         this.updatedAt = now;
     }
-
 
     private static String normalizeNullable(
         String value
