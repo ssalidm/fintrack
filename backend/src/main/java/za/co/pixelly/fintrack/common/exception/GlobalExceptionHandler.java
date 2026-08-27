@@ -22,6 +22,9 @@ import za.co.pixelly.fintrack.finance.goal.application.GoalContributionNotFoundE
 import za.co.pixelly.fintrack.finance.goal.application.SavingsGoalConflictException;
 import za.co.pixelly.fintrack.finance.goal.application.SavingsGoalNotFoundException;
 import za.co.pixelly.fintrack.finance.goal.application.SavingsGoalValidationException;
+import za.co.pixelly.fintrack.finance.recurring.application.RecurringTransactionConflictException;
+import za.co.pixelly.fintrack.finance.recurring.application.RecurringTransactionNotFoundException;
+import za.co.pixelly.fintrack.finance.recurring.application.RecurringTransactionValidationException;
 import za.co.pixelly.fintrack.finance.transaction.application.*;
 import za.co.pixelly.fintrack.finance.transfer.application.InactiveTransferAccountException;
 import za.co.pixelly.fintrack.finance.transfer.application.TransferAccountCurrencyMismatchException;
@@ -486,9 +489,7 @@ public class GlobalExceptionHandler {
             );
     }
 
-    @ExceptionHandler(
-        SavingsGoalConflictException.class
-    )
+    @ExceptionHandler(SavingsGoalConflictException.class)
     ResponseEntity<ApiResponse<Void>>
     handleGoalConflict(
         SavingsGoalConflictException exception
@@ -503,13 +504,51 @@ public class GlobalExceptionHandler {
             );
     }
 
-    @ExceptionHandler(
-        SavingsGoalValidationException.class
-    )
+    @ExceptionHandler(SavingsGoalValidationException.class)
     ResponseEntity<ApiResponse<Void>>
     handleGoalValidation(
         SavingsGoalValidationException exception
     ) {
+        return ResponseEntity
+            .badRequest()
+            .body(
+                ApiResponse.error(
+                    HttpStatus.BAD_REQUEST,
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler(RecurringTransactionNotFoundException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleRecurringTransactionNotFound(RecurringTransactionNotFoundException exception
+    ) {
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(
+                ApiResponse.error(
+                    HttpStatus.NOT_FOUND,
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler(RecurringTransactionConflictException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleRecurringTransactionConflict(RecurringTransactionConflictException exception) {
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(
+                ApiResponse.error(
+                    HttpStatus.CONFLICT,
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler(RecurringTransactionValidationException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleRecurringTransactionValidation(RecurringTransactionValidationException exception) {
         return ResponseEntity
             .badRequest()
             .body(

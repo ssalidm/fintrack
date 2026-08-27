@@ -20,3 +20,6 @@ fintrack:
   security:
     jwt:
       secret: ${FINTRACK_JWT_SECRET}
+
+  recurring:
+    processing-cron: "0 0/10 * * * *"

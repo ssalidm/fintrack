@@ -112,4 +112,21 @@ public final class ApiMessage {
         public static final String CONTRIBUTION_FETCHED = "Goal contribution retrieved successfully";
         public static final String CONTRIBUTION_VOIDED = "Goal contribution voided successfully";
     }
+
+    /*
+     * SAVINGS GOAL
+     */
+    public static final class Recurring {
+        private Recurring() {
+        }
+
+        public static final String CREATED = "Recurring transaction created successfully";
+        public static final String FETCHED = "Recurring transaction retrieved successfully";
+        public static final String FETCHED_ALL = "Recurring transactions retrieved successfully";
+        public static final String UPDATED = "Recurring transaction updated successfully";
+        public static final String ARCHIVED = "Recurring transaction archived successfully";
+        public static final String PAUSED = "Recurring transaction paused successfully";
+        public static final String RESUMED = "Recurring transaction resumed successfully";
+        public static final String OCCURRENCE_POSTED = "Recurring transaction occurrence posted successfully";
+    }
 }

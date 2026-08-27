@@ -13,3 +13,9 @@ fintrack:
   security:
     jwt:
       secret: NOSUIDDGICbMmX4Uzu4LDrp/IRMT7CSstm+cXl9UOQ4=
+
+  recurring:
+    processing-cron: "-"
+    zone: "Africa/Johannesburg"
+    schedule-batch-size: 100
+    max-catch-up-per-schedule: 100
