@@ -87,9 +87,29 @@ public final class ApiMessage {
         public static final String CREATED = "Budget created successfully";
         public static final String FETCHED = "Budget retrieved successfully";
         public static final String FETCHED_ALL = "Budgets retrieved successfully";
-        public static final String UPDATED = "Budgets updated successfully";
+        public static final String UPDATED = "Budget updated successfully";
         public static final String ARCHIVED = "Budget archived successfully";
         public static final String LIMIT_CREATED = "Budget category limit created successfully";
         public static final String LIMIT_UPDATED = "Budget category limit updated successfully";
+    }
+
+
+    /*
+     * SAVINGS GOAL
+     */
+    public static final class Goal {
+        private Goal() {
+        }
+
+        public static final String CREATED = "Savings goal created successfully";
+        public static final String FETCHED = "Savings goal retrieved successfully";
+        public static final String FETCHED_ALL = "Savings goals retrieved successfully";
+        public static final String UPDATED = "Savings goals updated successfully";
+        public static final String ARCHIVED = "Savings goal archived successfully";
+        public static final String COMPLETED = "Savings goal completed successfully";
+        public static final String CONTRIBUTION_CREATED = "Goal contribution created successfully";
+        public static final String CONTRIBUTION_FETCHED_ALL = "Goal contributions retrieved successfully";
+        public static final String CONTRIBUTION_FETCHED = "Goal contribution retrieved successfully";
+        public static final String CONTRIBUTION_VOIDED = "Goal contribution voided successfully";
     }
 }

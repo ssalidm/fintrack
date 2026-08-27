@@ -18,6 +18,10 @@ import za.co.pixelly.fintrack.finance.budget.application.BudgetValidationExcepti
 import za.co.pixelly.fintrack.finance.category.application.*;
 import za.co.pixelly.fintrack.finance.category.domain.TemplateCategoryTypeChangeException;
 import za.co.pixelly.fintrack.finance.currency.application.InvalidCurrencyException;
+import za.co.pixelly.fintrack.finance.goal.application.GoalContributionNotFoundException;
+import za.co.pixelly.fintrack.finance.goal.application.SavingsGoalConflictException;
+import za.co.pixelly.fintrack.finance.goal.application.SavingsGoalNotFoundException;
+import za.co.pixelly.fintrack.finance.goal.application.SavingsGoalValidationException;
 import za.co.pixelly.fintrack.finance.transaction.application.*;
 import za.co.pixelly.fintrack.finance.transfer.application.InactiveTransferAccountException;
 import za.co.pixelly.fintrack.finance.transfer.application.TransferAccountCurrencyMismatchException;
@@ -458,6 +462,58 @@ public class GlobalExceptionHandler {
         return ResponseEntity
             .badRequest()
             .body(ApiResponse.error(
+                    HttpStatus.BAD_REQUEST,
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler({
+        SavingsGoalNotFoundException.class,
+        GoalContributionNotFoundException.class
+    })
+    ResponseEntity<ApiResponse<Void>>
+    handleGoalNotFound(
+        RuntimeException exception
+    ) {
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(
+                ApiResponse.error(
+                    HttpStatus.NOT_FOUND,
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler(
+        SavingsGoalConflictException.class
+    )
+    ResponseEntity<ApiResponse<Void>>
+    handleGoalConflict(
+        SavingsGoalConflictException exception
+    ) {
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(
+                ApiResponse.error(
+                    HttpStatus.CONFLICT,
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler(
+        SavingsGoalValidationException.class
+    )
+    ResponseEntity<ApiResponse<Void>>
+    handleGoalValidation(
+        SavingsGoalValidationException exception
+    ) {
+        return ResponseEntity
+            .badRequest()
+            .body(
+                ApiResponse.error(
                     HttpStatus.BAD_REQUEST,
                     exception.getMessage()
                 )
