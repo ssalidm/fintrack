@@ -8,6 +8,7 @@ import za.co.pixelly.fintrack.finance.account.api.AccountResponse;
 import za.co.pixelly.fintrack.finance.account.api.ArchiveAccountRequest;
 import za.co.pixelly.fintrack.finance.account.api.CreateAccountRequest;
 import za.co.pixelly.fintrack.finance.account.api.UpdateAccountRequest;
+import za.co.pixelly.fintrack.finance.account.application.exceptions.*;
 import za.co.pixelly.fintrack.finance.account.domain.Account;
 import za.co.pixelly.fintrack.finance.account.domain.AccountStatus;
 import za.co.pixelly.fintrack.finance.account.persistence.AccountRepository;

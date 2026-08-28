@@ -5,17 +5,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import za.co.pixelly.fintrack.common.Util;
-import za.co.pixelly.fintrack.common.exception.AccountNotActiveException;
-import za.co.pixelly.fintrack.common.exception.InvalidCredentialsException;
-import za.co.pixelly.fintrack.common.exception.InvalidRefreshTokenException;
+import za.co.pixelly.fintrack.finance.account.application.exceptions.AccountNotActiveException;
 import za.co.pixelly.fintrack.config.security.JwtProperties;
 import za.co.pixelly.fintrack.identity.api.LoginRequest;
 import za.co.pixelly.fintrack.identity.api.RefreshRequest;
 import za.co.pixelly.fintrack.identity.api.TokenResponse;
+import za.co.pixelly.fintrack.identity.application.exceptions.InvalidCredentialsException;
+import za.co.pixelly.fintrack.identity.application.exceptions.InvalidRefreshTokenException;
 import za.co.pixelly.fintrack.identity.domain.AuthSession;
 import za.co.pixelly.fintrack.identity.domain.RefreshToken;
 import za.co.pixelly.fintrack.identity.domain.User;
-import za.co.pixelly.fintrack.identity.domain.UserStatus;
 import za.co.pixelly.fintrack.identity.persistence.AuthSessionRepository;
 import za.co.pixelly.fintrack.identity.persistence.RefreshTokenRepository;
 import za.co.pixelly.fintrack.identity.persistence.UserRepository;
@@ -23,7 +22,6 @@ import za.co.pixelly.fintrack.identity.persistence.UserRoleRepository;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 @Service

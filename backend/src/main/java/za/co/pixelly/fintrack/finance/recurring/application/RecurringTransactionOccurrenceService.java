@@ -10,6 +10,8 @@ import za.co.pixelly.fintrack.finance.category.domain.Category;
 import za.co.pixelly.fintrack.finance.category.domain.CategoryStatus;
 import za.co.pixelly.fintrack.finance.category.persistence.CategoryRepository;
 import za.co.pixelly.fintrack.finance.recurring.api.*;
+import za.co.pixelly.fintrack.finance.recurring.application.exceptions.RecurringTransactionConflictException;
+import za.co.pixelly.fintrack.finance.recurring.application.exceptions.RecurringTransactionNotFoundException;
 import za.co.pixelly.fintrack.finance.recurring.domain.*;
 import za.co.pixelly.fintrack.finance.recurring.persistence.RecurringTransactionRepository;
 import za.co.pixelly.fintrack.finance.transaction.api.TransactionResponse;

@@ -10,26 +10,27 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.exc.InvalidFormatException;
 import za.co.pixelly.fintrack.common.api.ApiResponse;
-import za.co.pixelly.fintrack.finance.account.application.*;
-import za.co.pixelly.fintrack.finance.budget.application.BudgetConflictException;
-import za.co.pixelly.fintrack.finance.budget.application.BudgetLimitNotFoundException;
-import za.co.pixelly.fintrack.finance.budget.application.BudgetNotFoundException;
-import za.co.pixelly.fintrack.finance.budget.application.BudgetValidationException;
-import za.co.pixelly.fintrack.finance.category.application.*;
+import za.co.pixelly.fintrack.finance.account.application.exceptions.*;
+import za.co.pixelly.fintrack.finance.budget.application.exceptions.BudgetConflictException;
+import za.co.pixelly.fintrack.finance.budget.application.exceptions.BudgetLimitNotFoundException;
+import za.co.pixelly.fintrack.finance.budget.application.exceptions.BudgetNotFoundException;
+import za.co.pixelly.fintrack.finance.budget.application.exceptions.BudgetValidationException;
+import za.co.pixelly.fintrack.finance.category.application.exceptions.*;
 import za.co.pixelly.fintrack.finance.category.domain.TemplateCategoryTypeChangeException;
 import za.co.pixelly.fintrack.finance.currency.application.InvalidCurrencyException;
-import za.co.pixelly.fintrack.finance.goal.application.GoalContributionNotFoundException;
-import za.co.pixelly.fintrack.finance.goal.application.SavingsGoalConflictException;
-import za.co.pixelly.fintrack.finance.goal.application.SavingsGoalNotFoundException;
-import za.co.pixelly.fintrack.finance.goal.application.SavingsGoalValidationException;
-import za.co.pixelly.fintrack.finance.recurring.application.RecurringTransactionConflictException;
-import za.co.pixelly.fintrack.finance.recurring.application.RecurringTransactionNotFoundException;
-import za.co.pixelly.fintrack.finance.recurring.application.RecurringTransactionValidationException;
-import za.co.pixelly.fintrack.finance.transaction.application.*;
-import za.co.pixelly.fintrack.finance.transfer.application.InactiveTransferAccountException;
-import za.co.pixelly.fintrack.finance.transfer.application.TransferAccountCurrencyMismatchException;
-import za.co.pixelly.fintrack.finance.transfer.application.TransferAlreadyVoidedException;
-import za.co.pixelly.fintrack.finance.transfer.application.TransferNotFoundException;
+import za.co.pixelly.fintrack.finance.goal.application.exceptions.GoalContributionNotFoundException;
+import za.co.pixelly.fintrack.finance.goal.application.exceptions.SavingsGoalConflictException;
+import za.co.pixelly.fintrack.finance.goal.application.exceptions.SavingsGoalNotFoundException;
+import za.co.pixelly.fintrack.finance.goal.application.exceptions.SavingsGoalValidationException;
+import za.co.pixelly.fintrack.finance.recurring.application.exceptions.RecurringTransactionConflictException;
+import za.co.pixelly.fintrack.finance.recurring.application.exceptions.RecurringTransactionNotFoundException;
+import za.co.pixelly.fintrack.finance.recurring.application.exceptions.RecurringTransactionValidationException;
+import za.co.pixelly.fintrack.finance.transaction.application.exceptions.*;
+import za.co.pixelly.fintrack.finance.transfer.application.exceptions.InactiveTransferAccountException;
+import za.co.pixelly.fintrack.finance.transfer.application.exceptions.TransferAccountCurrencyMismatchException;
+import za.co.pixelly.fintrack.finance.transfer.application.exceptions.TransferAlreadyVoidedException;
+import za.co.pixelly.fintrack.finance.transfer.application.exceptions.TransferNotFoundException;
+import za.co.pixelly.fintrack.identity.application.exceptions.*;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -116,6 +117,58 @@ public class GlobalExceptionHandler {
             .body(
                 ApiResponse.error(
                     HttpStatus.BAD_REQUEST,
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler(UserProfileNotFoundException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleUserProfileNotFound(UserProfileNotFoundException exception) {
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(
+                ApiResponse.error(
+                    HttpStatus.NOT_FOUND,
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler(UserProfileConflictException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleUserProfileConflict(UserProfileConflictException exception) {
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(
+                ApiResponse.error(
+                    HttpStatus.CONFLICT,
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler(InvalidCurrentPasswordException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleInvalidCurrentPassword(InvalidCurrentPasswordException exception) {
+        return ResponseEntity
+            .badRequest()
+            .body(
+                ApiResponse.error(
+                    HttpStatus.BAD_REQUEST,
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler(PasswordReuseException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handlePasswordReuse(PasswordReuseException exception) {
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(
+                ApiResponse.error(
+                    HttpStatus.CONFLICT,
                     exception.getMessage()
                 )
             );

@@ -61,7 +61,7 @@ public class AuthSession {
     }
 
     public boolean isActive(Instant now) {
-        return revokedAt == null || expiresAt.isAfter(now);
+        return revokedAt == null && expiresAt.isAfter(now);
     }
 
     public void touch(Instant now) {

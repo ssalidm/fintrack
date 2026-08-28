@@ -162,6 +162,19 @@ public class User {
         updatedAt = now;
     }
 
+    public void updateProfile(
+        String firstName,
+        String lastName
+    ) {
+        if (firstName != null) {
+            this.firstName = firstName.trim();
+        }
+
+        if (lastName != null) {
+            this.lastName = lastName.trim();
+        }
+    }
+
     @PreUpdate
     void updateTimeStamp() {
         updatedAt = Instant.now();

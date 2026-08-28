@@ -23,6 +23,18 @@ public final class ApiMessage {
     }
 
     /*
+     * PROFILE
+     */
+    public static final class Profile {
+        private Profile() {
+        }
+
+        public static final String FETCHED = "Profile retrieved successfully";
+        public static final String UPDATED = "Profile updated successfully";
+        public static final String PASSWORD_UPDATED = "Password changed successfully";
+    }
+
+    /*
      * ACCOUNTS
      */
     public static final class Account {

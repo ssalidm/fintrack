@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import za.co.pixelly.fintrack.finance.category.api.*;
+import za.co.pixelly.fintrack.finance.category.application.exceptions.*;
 import za.co.pixelly.fintrack.finance.category.domain.Category;
 import za.co.pixelly.fintrack.finance.category.domain.CategoryStatus;
 import za.co.pixelly.fintrack.finance.category.domain.CategoryType;
