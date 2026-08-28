@@ -4,13 +4,20 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.boot.json.JsonParser;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import za.co.pixelly.fintrack.finance.recurring.application.RecurringTransactionOccurrenceService;
 import za.co.pixelly.fintrack.integration.AbstractIntegrationTest;
 import za.co.pixelly.fintrack.integration.support.AuthenticatedUser;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Map;
 import java.util.UUID;
 
@@ -18,8 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-class RecurringTransactionIntegrationTest
-    extends AbstractIntegrationTest {
+@Import(RecurringTransactionIntegrationTest.TestClockConfiguration.class)
+class RecurringTransactionIntegrationTest extends AbstractIntegrationTest {
 
     private final JsonParser jsonParser = new JacksonJsonParser();
 
@@ -760,6 +767,13 @@ class RecurringTransactionIntegrationTest
                 "GROCERIES"
             );
 
+        LocalDate today =
+            TEST_TODAY;
+
+        LocalDate historicalStartDate =
+            today.minusDays(7);
+
+
         MvcResult created =
             createRecurringWithCatchUpMode(
                 user,
@@ -770,23 +784,26 @@ class RecurringTransactionIntegrationTest
                 "25",
                 "DAILY",
                 1,
-                "2026-08-20",
+                historicalStartDate.toString(),
                 null,
                 true,
                 "START_FROM_CURRENT"
             )
-                .andExpect(
-                    status().isCreated()
-                )
+                .andExpect(status().isCreated())
                 .andExpect(
                     jsonPath("$.result.startDate")
-                        .value("2026-08-20")
+                        .value(
+                            historicalStartDate.toString()
+                        )
                 )
                 .andExpect(
                     jsonPath("$.result.nextDueDate")
-                        .value("2026-08-27")
+                        .value(
+                            today.toString()
+                        )
                 )
                 .andReturn();
+
 
         UUID scheduleId =
             UUID.fromString(
@@ -801,11 +818,7 @@ class RecurringTransactionIntegrationTest
             occurrenceService
                 .processAutomaticSchedule(
                     scheduleId,
-                    LocalDate.of(
-                        2026,
-                        8,
-                        27
-                    ),
+                    today,
                     100
                 );
 
@@ -845,11 +858,7 @@ class RecurringTransactionIntegrationTest
             );
 
         assertEquals(
-            LocalDate.of(
-                2026,
-                8,
-                27
-            ),
+            today,
             generatedDueDate
         );
     }
@@ -914,6 +923,22 @@ class RecurringTransactionIntegrationTest
             .andExpect(
                 status().isUnauthorized()
             );
+    }
+
+
+    private static final LocalDate TEST_TODAY = LocalDate.of(2026, 8, 27);
+
+    @TestConfiguration(proxyBeanMethods = false)
+    static class TestClockConfiguration {
+
+        @Bean
+        @Primary
+        Clock recurringTestClock() {
+            return Clock.fixed(
+                Instant.parse("2026-08-27T10:00:00Z"),
+                ZoneId.of("Africa/Johannesburg")
+            );
+        }
     }
 
 
@@ -990,22 +1015,22 @@ class RecurringTransactionIntegrationTest
                     "application/json"
                 )
                 .content("""
-                            {
-                              "accountId": "%s",
-                              "categoryId": "%s",
-                              "name": "%s",
-                              "transactionType": "%s",
-                              "amount": %s,
-                              "description": "Integration recurring transaction",
-                              "merchantName": "Integration Merchant",
-                              "frequency": "%s",
-                              "intervalCount": %d,
-                              "startDate": "%s",
-                              "endDate": %s,
-                              "autoPost": %s,
-                              "catchUpMode": "%s"
-                            }
-                            """.formatted(
+                    {
+                      "accountId": "%s",
+                      "categoryId": "%s",
+                      "name": "%s",
+                      "transactionType": "%s",
+                      "amount": %s,
+                      "description": "Integration recurring transaction",
+                      "merchantName": "Integration Merchant",
+                      "frequency": "%s",
+                      "intervalCount": %d,
+                      "startDate": "%s",
+                      "endDate": %s,
+                      "autoPost": %s,
+                      "catchUpMode": "%s"
+                    }
+                    """.formatted(
                     accountId,
                     categoryId,
                     name,

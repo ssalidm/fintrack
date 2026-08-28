@@ -6,7 +6,7 @@ import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.boot.json.JsonParser;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
-import za.co.pixelly.fintrack.finance.category.application.CategoryNotFoundException;
+import za.co.pixelly.fintrack.finance.category.application.exceptions.CategoryNotFoundException;
 import za.co.pixelly.fintrack.finance.category.domain.Category;
 import za.co.pixelly.fintrack.finance.category.persistence.CategoryRepository;
 import za.co.pixelly.fintrack.integration.AbstractIntegrationTest;

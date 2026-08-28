@@ -6,17 +6,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import za.co.pixelly.fintrack.common.Util;
-import za.co.pixelly.fintrack.common.exception.DuplicateEmailException;
 import za.co.pixelly.fintrack.identity.api.RegisterRequest;
 import za.co.pixelly.fintrack.identity.api.RegisterResponse;
+import za.co.pixelly.fintrack.identity.application.exceptions.DuplicateEmailException;
 import za.co.pixelly.fintrack.identity.domain.ApplicationRole;
 import za.co.pixelly.fintrack.identity.domain.User;
 import za.co.pixelly.fintrack.identity.domain.UserRole;
 import za.co.pixelly.fintrack.identity.persistence.ApplicationRoleRepository;
 import za.co.pixelly.fintrack.identity.persistence.UserRepository;
 import za.co.pixelly.fintrack.identity.persistence.UserRoleRepository;
-
-import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor

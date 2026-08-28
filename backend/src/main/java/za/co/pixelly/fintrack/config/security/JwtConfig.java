@@ -2,6 +2,8 @@ package za.co.pixelly.fintrack.config.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
@@ -38,18 +40,27 @@ public class JwtConfig {
     @Bean
     JwtDecoder jwtDecoder(
         SecretKey secretKey,
+        JwtSessionValidator jwtSessionValidator,
         JwtProperties properties
     ) {
-        NimbusJwtDecoder decoder =
-            NimbusJwtDecoder
-                .withSecretKey(secretKey)
-                .macAlgorithm(MacAlgorithm.HS256)
-                .build();
+        NimbusJwtDecoder decoder = NimbusJwtDecoder
+            .withSecretKey(secretKey)
+            .macAlgorithm(MacAlgorithm.HS256)
+            .build();
+
+        OAuth2TokenValidator<Jwt> defaultValidator = JwtValidators
+            .createDefaultWithIssuer(
+                properties.issuer()
+            );
+
+        OAuth2TokenValidator<Jwt> validator =
+            new DelegatingOAuth2TokenValidator<>(
+                defaultValidator,
+                jwtSessionValidator
+            );
 
         decoder.setJwtValidator(
-            JwtValidators.createDefaultWithIssuer(
-                properties.issuer()
-            )
+            validator
         );
 
         return decoder;

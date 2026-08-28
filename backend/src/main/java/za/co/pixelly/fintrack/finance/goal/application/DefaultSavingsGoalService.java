@@ -7,6 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import za.co.pixelly.fintrack.common.api.PageResponse;
 import za.co.pixelly.fintrack.finance.goal.api.*;
+import za.co.pixelly.fintrack.finance.goal.application.exceptions.GoalContributionNotFoundException;
+import za.co.pixelly.fintrack.finance.goal.application.exceptions.SavingsGoalConflictException;
+import za.co.pixelly.fintrack.finance.goal.application.exceptions.SavingsGoalNotFoundException;
+import za.co.pixelly.fintrack.finance.goal.application.exceptions.SavingsGoalValidationException;
 import za.co.pixelly.fintrack.finance.goal.domain.*;
 import za.co.pixelly.fintrack.finance.goal.persistence.*;
 
