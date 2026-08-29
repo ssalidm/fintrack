@@ -35,6 +35,21 @@ public final class ApiMessage {
     }
 
     /*
+     * ADMIN
+     */
+    public static final class Admin {
+        private Admin() {
+        }
+
+        public static final String FETCHED_ALL = "Users retrieved successfully";
+        public static final String FETCHED = "User retrieved successfully";
+        public static final String DEACTIVATED = "User deactivated successfully";
+        public static final String ACTIVATED = "User activated successfully";
+        public static final String SESSIONS_FETCHED = "User sessions retrieved successfully";
+        public static final String SESSIONS_REVOKED = "User sessions revoked successfully";
+    }
+
+    /*
      * ACCOUNTS
      */
     public static final class Account {

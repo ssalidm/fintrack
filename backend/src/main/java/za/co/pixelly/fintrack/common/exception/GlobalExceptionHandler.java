@@ -174,6 +174,45 @@ public class GlobalExceptionHandler {
             );
     }
 
+    @ExceptionHandler(AdminUserNotFoundException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleAdminUserNotFound(AdminUserNotFoundException exception) {
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(
+                ApiResponse.error(
+                    HttpStatus.NOT_FOUND,
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler(AdminOperationNotAllowedException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleAdminOperationNotAllowed(AdminOperationNotAllowedException exception) {
+        return ResponseEntity
+            .status(HttpStatus.FORBIDDEN)
+            .body(
+                ApiResponse.error(
+                    HttpStatus.FORBIDDEN,
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler(AdminUserConflictException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleAdminUserConflict(AdminUserConflictException exception) {
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(
+                ApiResponse.error(
+                    HttpStatus.CONFLICT,
+                    exception.getMessage()
+                )
+            );
+    }
+
     @ExceptionHandler(AccountNotFoundException.class)
     ResponseEntity<ApiResponse<Void>>
     handleAccountNotFound(AccountNotFoundException exception) {

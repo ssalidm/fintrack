@@ -115,6 +115,44 @@ public abstract class AbstractIntegrationTest {
         return identityTestClient.createAuthenticatedUser(prefix);
     }
 
+    protected AuthenticatedUser createAuthenticatedAdmin(
+        String prefix
+    ) throws Exception {
+
+        AuthenticatedUser user = createAuthenticatedUser(prefix);
+
+        jdbcTemplate.update(
+            """
+                INSERT INTO identity.user_roles (
+                    user_id,
+                    role_id,
+                    assigned_at,
+                    assigned_by_user_id
+                )
+                SELECT
+                    ?,
+                    role.id,
+                    CURRENT_TIMESTAMP,
+                    NULL
+                FROM identity.application_roles role
+                WHERE role.code = 'ROLE_ADMIN'
+                ON CONFLICT (user_id, role_id)
+                DO NOTHING
+                """,
+            user.userId()
+        );
+
+        /*
+         * ROLE_ADMIN was assigned after the original JWT
+         * was issued, so log in again to obtain a token
+         * containing the new authority.
+         */
+        return identityTestClient.login(
+            user.email(),
+            IdentityTestClient.DEFAULT_PASSWORD
+        );
+    }
+
 
     @TestConfiguration(proxyBeanMethods = false)
     public static class TestMailConfiguration {

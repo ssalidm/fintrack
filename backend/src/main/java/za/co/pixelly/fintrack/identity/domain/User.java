@@ -175,6 +175,32 @@ public class User {
         }
     }
 
+    public void deactivate(
+        Instant now
+    ) {
+        if (status == UserStatus.DEACTIVATED) {
+            throw new IllegalStateException(
+                "User is already deactivated"
+            );
+        }
+
+        status = UserStatus.DEACTIVATED;
+        updatedAt = now;
+    }
+
+    public void activate(
+        Instant now
+    ) {
+        if (status != UserStatus.DEACTIVATED) {
+            throw new IllegalStateException(
+                "Only deactivated users can be activated"
+            );
+        }
+
+        status = UserStatus.ACTIVE;
+        updatedAt = now;
+    }
+
     @PreUpdate
     void updateTimeStamp() {
         updatedAt = Instant.now();
