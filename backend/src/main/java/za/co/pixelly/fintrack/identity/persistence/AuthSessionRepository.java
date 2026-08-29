@@ -1,5 +1,7 @@
 package za.co.pixelly.fintrack.identity.persistence;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -23,9 +25,14 @@ public interface AuthSessionRepository extends JpaRepository<AuthSession, UUID> 
          where session.userId = :userId
            and session.revokedAt is null
         """)
-    int revokeActiveByUserId(
+    void revokeActiveByUserId(
         @Param("userId") UUID userId,
         @Param("now") Instant now,
         @Param("reason") String reason
+    );
+
+    Page<AuthSession> findAllByUserIdOrderByCreatedAtDesc(
+        UUID userId,
+        Pageable pageable
     );
 }

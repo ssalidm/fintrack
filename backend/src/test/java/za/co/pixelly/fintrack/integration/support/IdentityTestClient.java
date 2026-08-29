@@ -17,8 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class IdentityTestClient {
 
-    private static final String DEFAULT_PASSWORD =
-        "SecurePassword123!";
+    public static final String DEFAULT_PASSWORD = "SecurePassword123!";
 
     private final MockMvc mockMvc;
     private final TestEmailVerificationSender emailVerificationSender;
@@ -109,7 +108,7 @@ public class IdentityTestClient {
     }
 
     @SuppressWarnings("unchecked")
-    private AuthenticatedUser login(
+    public AuthenticatedUser login(
         String email,
         String password
     ) throws Exception {

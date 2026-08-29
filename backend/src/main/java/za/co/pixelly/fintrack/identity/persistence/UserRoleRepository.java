@@ -17,4 +17,25 @@ public interface UserRoleRepository extends JpaRepository<UserRole, UserRoleId> 
         """)
     List<String> findRoleCodesByUserId(UUID userId);
 
+    @Query("""
+        SELECT
+            ur.user.id AS userId,
+            ur.role.code AS roleCode
+        FROM UserRole ur
+        WHERE ur.user.id IN :userIds
+        """)
+    List<UserRoleCodeProjection>
+    findRoleCodesByUserIds(List<UUID> userIds);
+
+    @Query("""
+        SELECT COUNT(ur) > 0
+        FROM UserRole ur
+        WHERE ur.user.id = :userId
+          AND ur.role.code = :roleCode
+        """)
+    boolean hasRole(
+        UUID userId,
+        String roleCode
+    );
+
 }
