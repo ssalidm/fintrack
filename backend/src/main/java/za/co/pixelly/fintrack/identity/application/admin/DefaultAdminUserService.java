@@ -41,14 +41,11 @@ public class DefaultAdminUserService implements AdminUserService {
     @Override
     @Transactional(readOnly = true)
     public PageResponse<AdminUserResponse> findUsers(int page, int size) {
-        int safePage = Math.max(page, 0);
-        int safeSize = size <= 0 ? DEFAULT_SIZE : Math.min(size, MAX_SIZE);
-
         Page<User> users = userRepository
             .findAllByOrderByCreatedAtDesc(
                 PageRequest.of(
-                    safePage,
-                    safeSize
+                    page,
+                    size
                 )
             );
 
@@ -272,17 +269,14 @@ public class DefaultAdminUserService implements AdminUserService {
             );
         }
 
-        int safePage = Math.max(page, 0);
-        int safeSize = size <= 0 ? DEFAULT_SIZE : Math.min(size, MAX_SIZE);
-
         Instant now = Instant.now();
 
         Page<AdminUserSessionResponse> sessions = authSessionRepository
             .findAllByUserIdOrderByCreatedAtDesc(
                 targetUserId,
                 PageRequest.of(
-                    safePage,
-                    safeSize
+                    page,
+                    size
                 )
             )
             .map(

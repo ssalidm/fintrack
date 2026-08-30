@@ -3,6 +3,8 @@ package za.co.pixelly.fintrack.identity.api.admin;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,8 +36,15 @@ public class AdminUserController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<PageResponse<AdminUserResponse>>> findUsers(
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "25") int size
+        @RequestParam(defaultValue = "0")
+        @Min(value = 0, message = "page must be 0 or greater")
+        int page,
+
+        @RequestParam(defaultValue = "25")
+        @Min(value = 1, message = "size must be at least 1")
+        @Max(value = 100, message = "size must not exceed 100")
+        int size
+
     ) {
         return ResponseEntity.ok(
             ApiResponse.success(
@@ -109,10 +118,14 @@ public class AdminUserController {
     public ResponseEntity<ApiResponse<PageResponse<AdminUserSessionResponse>>> findUserSessions(
         @AuthenticationPrincipal Jwt jwt,
         @PathVariable UUID userId,
+
         @RequestParam(defaultValue = "0")
+        @Min(value = 0, message = "page must be 0 or greater")
         int page,
 
         @RequestParam(defaultValue = "25")
+        @Min(value = 1, message = "size must be at least 1")
+        @Max(value = 100, message = "size must not exceed 100")
         int size
     ) {
         return ResponseEntity.ok(

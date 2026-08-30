@@ -30,8 +30,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(
                     EndpointRequest.to(
-                        "health",
-                        "info"
+                        "health"
                     )
                 ).permitAll()
 

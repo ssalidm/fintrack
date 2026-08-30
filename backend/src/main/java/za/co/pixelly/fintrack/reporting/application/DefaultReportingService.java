@@ -19,8 +19,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DefaultReportingService implements ReportingService {
 
-    private static final int DEFAULT_DUE_LIMIT = 50;
-    private static final int MAX_DUE_LIMIT = 200;
     private static final int DASHBOARD_DUE_LIMIT = 5;
 
     private final ReportingReadRepository reportingReadRepository;
@@ -231,16 +229,8 @@ public class DefaultReportingService implements ReportingService {
     public List<RecurringTransactionDueResponse>
     getRecurringTransactionsDue(
         UUID userId,
-        int requestedLimit
+        int limit
     ) {
-
-        int limit = requestedLimit <= 0
-            ? DEFAULT_DUE_LIMIT
-            : Math.min(
-            requestedLimit,
-            MAX_DUE_LIMIT
-        );
-
         return reportingReadRepository
             .findRecurringTransactionsDue(
                 userId,

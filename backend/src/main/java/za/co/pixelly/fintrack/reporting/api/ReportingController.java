@@ -2,6 +2,8 @@ package za.co.pixelly.fintrack.reporting.api;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -133,7 +135,10 @@ public class ReportingController {
     @GetMapping("/recurring-due")
     public ResponseEntity<ApiResponse<List<RecurringTransactionDueResponse>>> getRecurringTransactionsDue(
         @AuthenticationPrincipal Jwt jwt,
-        @RequestParam(defaultValue = "50") int limit
+        @RequestParam(defaultValue = "50")
+        @Min(value = 1, message = "limit must be at least 1")
+        @Max(value = 200, message = "limit must not exceed 200")
+        int limit
     ) {
         return ResponseEntity.ok(
             ApiResponse.success(
@@ -144,9 +149,6 @@ public class ReportingController {
             )
         );
     }
-
-
-
 
 
     private UUID userId(Jwt jwt) {

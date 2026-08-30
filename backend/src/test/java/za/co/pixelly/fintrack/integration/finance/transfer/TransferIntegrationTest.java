@@ -414,6 +414,12 @@ class TransferIntegrationTest
                 "id"
             );
 
+        Long transferVersion =
+            Long.valueOf(resultField(
+                created,
+                "version"
+            ));
+
 
         mockMvc.perform(
                 post(
@@ -429,9 +435,10 @@ class TransferIntegrationTest
                     )
                     .content("""
                         {
+                          "version": %d,
                           "reason": "Transfer entered incorrectly"
                         }
-                        """)
+                        """.formatted(transferVersion))
             )
             .andExpect(status().isOk())
             .andExpect(
@@ -512,9 +519,16 @@ class TransferIntegrationTest
                 "id"
             );
 
+        String transferVersion =
+            resultField(
+                created,
+                "version"
+            );
+
         voidTransfer(
             user,
-            transferId
+            transferId,
+            Long.parseLong(transferVersion)
         )
             .andExpect(
                 status().isOk()
@@ -522,7 +536,8 @@ class TransferIntegrationTest
 
         voidTransfer(
             user,
-            transferId
+            transferId,
+            Long.parseLong(transferVersion + 1)
         )
             .andExpect(
                 status().isConflict()
@@ -828,7 +843,8 @@ class TransferIntegrationTest
 
     private ResultActions voidTransfer(
         AuthenticatedUser user,
-        String transferId
+        String transferId,
+        long version
     ) throws Exception {
 
         return mockMvc.perform(
@@ -845,9 +861,10 @@ class TransferIntegrationTest
                 )
                 .content("""
                     {
+                      "version": %d,
                       "reason": "Test void"
                     }
-                    """)
+                    """.formatted(version))
         );
     }
 
