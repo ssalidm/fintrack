@@ -28,6 +28,9 @@ public class User {
     @Column(name = "last_name", nullable = false, length = 100)
     private String lastName;
 
+    @Column(name = "time_zone", nullable = false, length = 64)
+    private String timeZone;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 32)
     private UserStatus status;
@@ -69,6 +72,7 @@ public class User {
         this.passwordHash = passwordHash;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.timeZone = "UTC";
         this.status = UserStatus.PENDING_VERIFICATION;
         this.failedLoginAttempts = 0;
         this.createdAt = now;
@@ -81,7 +85,12 @@ public class User {
         String firstName,
         String lastName
     ) {
-        return new User(email, passwordHash, firstName, lastName);
+        return new User(
+            email,
+            passwordHash,
+            firstName,
+            lastName
+        );
     }
 
     public boolean isActive() {
@@ -164,7 +173,8 @@ public class User {
 
     public void updateProfile(
         String firstName,
-        String lastName
+        String lastName,
+        String timeZone
     ) {
         if (firstName != null) {
             this.firstName = firstName.trim();
@@ -173,6 +183,18 @@ public class User {
         if (lastName != null) {
             this.lastName = lastName.trim();
         }
+
+        if (timeZone != null) {
+            this.timeZone = timeZone.trim();
+        }
+    }
+
+    public void updateTimeZone(
+        String timeZone,
+        Instant now
+    ) {
+        this.timeZone = timeZone;
+        this.updatedAt = now;
     }
 
     public void deactivate(

@@ -3,6 +3,7 @@ package za.co.pixelly.fintrack.identity.api;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import za.co.pixelly.fintrack.common.validation.constraints.ValidTimeZone;
 
 public record UpdateUserProfileRequest(
 
@@ -13,7 +14,11 @@ public record UpdateUserProfileRequest(
     String firstName,
 
     @Size(max = 100)
-    String lastName
+    String lastName,
+
+    @Size(max = 64)
+    @ValidTimeZone(message = "Must be a valid IANA time zone ID (e.g., Africa/Johannesburg)")
+    String timeZone
 
 ) {
 
@@ -27,8 +32,13 @@ public record UpdateUserProfileRequest(
         return lastName == null || !lastName.isBlank();
     }
 
+    @AssertTrue(message = "timeZone must not be blank when provided")
+    public boolean isTimeZoneValid() {
+        return timeZone == null || !timeZone.isBlank();
+    }
+
     @AssertTrue(message = "At least one profile field must be provided")
     public boolean isUpdateProvided() {
-        return firstName != null || lastName != null;
+        return firstName != null || lastName != null || timeZone != null;
     }
 }

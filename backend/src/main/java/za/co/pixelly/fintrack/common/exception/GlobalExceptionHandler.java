@@ -7,6 +7,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.exc.InvalidFormatException;
 import za.co.pixelly.fintrack.common.api.ApiResponse;
@@ -31,6 +32,8 @@ import za.co.pixelly.fintrack.finance.transfer.application.exceptions.TransferAc
 import za.co.pixelly.fintrack.finance.transfer.application.exceptions.TransferAlreadyVoidedException;
 import za.co.pixelly.fintrack.finance.transfer.application.exceptions.TransferNotFoundException;
 import za.co.pixelly.fintrack.identity.application.exceptions.*;
+import za.co.pixelly.fintrack.reporting.application.InvalidReportingRangeException;
+import za.co.pixelly.fintrack.reporting.application.ReportingResourceNotFoundException;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -647,6 +650,48 @@ public class GlobalExceptionHandler {
                 ApiResponse.error(
                     HttpStatus.BAD_REQUEST,
                     exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler(InvalidReportingRangeException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleInvalidReportingRange(InvalidReportingRangeException exception) {
+
+        return ResponseEntity
+            .badRequest()
+            .body(
+                ApiResponse.error(
+                    HttpStatus.BAD_REQUEST,
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler(ReportingResourceNotFoundException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleReportingResourceNotFound(ReportingResourceNotFoundException exception) {
+
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(
+                ApiResponse.error(
+                    HttpStatus.NOT_FOUND,
+                    exception.getMessage()
+                )
+            );
+    }
+
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiResponse<Void>>
+    handleNoResourceFound(NoResourceFoundException ex) {
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(
+                ApiResponse.error(
+                    HttpStatus.NOT_FOUND,
+                    "Resource not found: /" + ex.getResourcePath()
                 )
             );
     }

@@ -17,6 +17,7 @@ import za.co.pixelly.fintrack.finance.recurring.persistence.RecurringTransaction
 import za.co.pixelly.fintrack.finance.transaction.api.TransactionResponse;
 import za.co.pixelly.fintrack.finance.transaction.domain.Transaction;
 import za.co.pixelly.fintrack.finance.transaction.persistence.TransactionRepository;
+import za.co.pixelly.fintrack.identity.application.UserTimeService;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -27,22 +28,14 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class RecurringTransactionOccurrenceService {
 
-    private final RecurringTransactionRepository
-        recurringTransactionRepository;
+    private final RecurringTransactionRepository recurringTransactionRepository;
+    private final TransactionRepository transactionRepository;
+    private final AccountRepository accountRepository;
+    private final CategoryRepository categoryRepository;
+    private final RecurrenceDateCalculator recurrenceDateCalculator;
+    private final UserTimeService userTimeService;
 
-    private final TransactionRepository
-        transactionRepository;
-
-    private final AccountRepository
-        accountRepository;
-
-    private final CategoryRepository
-        categoryRepository;
-
-    private final RecurrenceDateCalculator
-        recurrenceDateCalculator;
-
-    private final Clock recurringClock;
+    private final Clock applicationClock;
 
 
     @Transactional
@@ -85,10 +78,7 @@ public class RecurringTransactionOccurrenceService {
             );
         }
 
-        LocalDate today =
-            LocalDate.now(
-                recurringClock
-            );
+        LocalDate today = userTimeService.today(userId);
 
         if (schedule.getNextDueDate() == null
             || schedule
@@ -104,10 +94,9 @@ public class RecurringTransactionOccurrenceService {
             schedule
         );
 
-        Transaction transaction =
-            generateOneOccurrence(
-                schedule
-            );
+        Transaction transaction = generateOneOccurrence(
+            schedule
+        );
 
         recurringTransactionRepository
             .saveAndFlush(schedule);
@@ -126,40 +115,30 @@ public class RecurringTransactionOccurrenceService {
     @Transactional
     public int processAutomaticSchedule(
         UUID scheduleId,
-        LocalDate today,
         int maxOccurrences
     ) {
-        RecurringTransaction schedule =
-            recurringTransactionRepository
-                .findByIdForUpdate(
-                    scheduleId
-                )
-                .orElse(null);
+        RecurringTransaction schedule = recurringTransactionRepository
+            .findByIdForUpdate(scheduleId)
+            .orElse(null);
 
         if (schedule == null
             || schedule.getStatus()
             != RecurringTransactionStatus.ACTIVE
             || !schedule.isAutoPost()
-            || schedule.getNextDueDate() == null
-            || schedule.getNextDueDate()
-            .isAfter(today)) {
+            || schedule.getNextDueDate() == null) {
 
             return 0;
         }
 
-        if (!referencesAreActive(
-            schedule
-        )) {
+        LocalDate today = userTimeService.today(schedule.getUserId());
 
-            /*
-             * The database trigger deliberately
-             * permits ACTIVE -> PAUSED even when
-             * the existing account/category has
-             * since been archived.
-             */
-            schedule.pause(
-                Instant.now(recurringClock)
-            );
+        if (schedule.getNextDueDate().isAfter(today)) {
+            return 0;
+        }
+
+        if (!referencesAreActive(schedule)) {
+
+            schedule.pause(applicationClock.instant());
 
             recurringTransactionRepository
                 .saveAndFlush(schedule);
@@ -179,10 +158,7 @@ public class RecurringTransactionOccurrenceService {
                 .getNextDueDate()
                 .isAfter(today)
         ) {
-            generateOneOccurrence(
-                schedule
-            );
-
+            generateOneOccurrence(schedule);
             generated++;
         }
 
@@ -198,7 +174,7 @@ public class RecurringTransactionOccurrenceService {
     ) {
         LocalDate dueDate = schedule.getNextDueDate();
 
-        Instant now = Instant.now(recurringClock);
+        Instant now = applicationClock.instant();
 
         Transaction transaction = Transaction.createTransaction(
             schedule.getUserId(),

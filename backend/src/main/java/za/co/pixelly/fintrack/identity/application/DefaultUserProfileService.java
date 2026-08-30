@@ -61,7 +61,8 @@ public class DefaultUserProfileService implements UserProfileService {
 
         user.updateProfile(
             request.firstName(),
-            request.lastName()
+            request.lastName(),
+            request.timeZone()
         );
 
         User saved = userRepository.saveAndFlush(user);

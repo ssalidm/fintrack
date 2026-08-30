@@ -30,11 +30,11 @@ public interface RecurringTransactionRepository
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""
-            select schedule
-            from RecurringTransaction schedule
-            where schedule.id = :scheduleId
-              and schedule.userId = :userId
-            """)
+        select schedule
+        from RecurringTransaction schedule
+        where schedule.id = :scheduleId
+          and schedule.userId = :userId
+        """)
     Optional<RecurringTransaction>
     findByIdAndUserIdForUpdate(
         @Param("scheduleId")
@@ -47,10 +47,10 @@ public interface RecurringTransactionRepository
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""
-            select schedule
-            from RecurringTransaction schedule
-            where schedule.id = :scheduleId
-            """)
+        select schedule
+        from RecurringTransaction schedule
+        where schedule.id = :scheduleId
+        """)
     Optional<RecurringTransaction>
     findByIdForUpdate(
         @Param("scheduleId")
@@ -60,18 +60,18 @@ public interface RecurringTransactionRepository
 
     @Query(
         value = """
-                    SELECT EXISTS (
-                        SELECT 1
-                        FROM finance.recurring_transactions r
-                        WHERE r.user_id = :userId
-                          AND lower(btrim(r.name))
-                              = lower(btrim(:name))
-                          AND r.status IN (
-                              'ACTIVE',
-                              'PAUSED'
-                          )
-                    )
-                    """,
+            SELECT EXISTS (
+                SELECT 1
+                FROM finance.recurring_transactions r
+                WHERE r.user_id = :userId
+                  AND lower(btrim(r.name))
+                      = lower(btrim(:name))
+                  AND r.status IN (
+                      'ACTIVE',
+                      'PAUSED'
+                  )
+            )
+            """,
         nativeQuery = true
     )
     boolean existsOpenScheduleWithName(
@@ -85,19 +85,19 @@ public interface RecurringTransactionRepository
 
     @Query(
         value = """
-                    SELECT EXISTS (
-                        SELECT 1
-                        FROM finance.recurring_transactions r
-                        WHERE r.user_id = :userId
-                          AND r.id <> :scheduleId
-                          AND lower(btrim(r.name))
-                              = lower(btrim(:name))
-                          AND r.status IN (
-                              'ACTIVE',
-                              'PAUSED'
-                          )
-                    )
-                    """,
+            SELECT EXISTS (
+                SELECT 1
+                FROM finance.recurring_transactions r
+                WHERE r.user_id = :userId
+                  AND r.id <> :scheduleId
+                  AND lower(btrim(r.name))
+                      = lower(btrim(:name))
+                  AND r.status IN (
+                      'ACTIVE',
+                      'PAUSED'
+                  )
+            )
+            """,
         nativeQuery = true
     )
     boolean existsOpenScheduleWithNameExcluding(
@@ -112,21 +112,27 @@ public interface RecurringTransactionRepository
     );
 
 
-    @Query("""
-            select schedule.id
-            from RecurringTransaction schedule
-            where schedule.status = :status
-              and schedule.autoPost = true
-              and schedule.nextDueDate <= :today
-            order by schedule.nextDueDate asc,
-                     schedule.createdAt asc
-            """)
+    @Query(
+        value = """
+            SELECT r.id
+            FROM finance.recurring_transactions r
+            JOIN identity.users u
+              ON u.id = r.user_id
+            WHERE r.status = :status
+              AND r.auto_post = true
+              AND r.next_due_date IS NOT NULL
+              AND r.next_due_date <= (
+                  CURRENT_TIMESTAMP AT TIME ZONE u.time_zone
+              )::date
+            ORDER BY
+                r.next_due_date ASC,
+                r.created_at ASC
+            """,
+        nativeQuery = true
+    )
     List<UUID> findDueAutomaticScheduleIds(
         @Param("status")
-        RecurringTransactionStatus status,
-
-        @Param("today")
-        LocalDate today,
+        String status,
 
         Pageable pageable
     );

@@ -18,6 +18,7 @@ import za.co.pixelly.fintrack.finance.recurring.application.exceptions.Recurring
 import za.co.pixelly.fintrack.finance.recurring.application.exceptions.RecurringTransactionValidationException;
 import za.co.pixelly.fintrack.finance.recurring.domain.*;
 import za.co.pixelly.fintrack.finance.recurring.persistence.RecurringTransactionRepository;
+import za.co.pixelly.fintrack.identity.application.UserTimeService;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -35,7 +36,8 @@ public class DefaultRecurringTransactionService
     private final CategoryRepository categoryRepository;
     private final RecurringTransactionOccurrenceService occurrenceService;
     private final RecurrenceDateCalculator recurrenceDateCalculator;
-    private final Clock recurringClock;
+    private final Clock applicationClock;
+    private final UserTimeService userTimeService;
 
 
     @Override
@@ -44,17 +46,15 @@ public class DefaultRecurringTransactionService
         UUID userId,
         CreateRecurringTransactionRequest request
     ) {
-        Account account =
-            findOwnedAccount(
-                userId,
-                request.accountId()
-            );
+        Account account = findOwnedAccount(
+            userId,
+            request.accountId()
+        );
 
-        Category category =
-            findOwnedCategory(
-                userId,
-                request.categoryId()
-            );
+        Category category = findOwnedCategory(
+            userId,
+            request.categoryId()
+        );
 
         requireActiveAccount(account);
         requireActiveCategory(category);
@@ -75,7 +75,7 @@ public class DefaultRecurringTransactionService
             );
         }
 
-        LocalDate today = LocalDate.now(recurringClock);
+        LocalDate today = userTimeService.today(userId);
 
         LocalDate initialNextDueDate = switch (request.catchUpMode()) {
             case GENERATE_MISSED -> request.startDate();
@@ -111,7 +111,7 @@ public class DefaultRecurringTransactionService
                 initialNextDueDate,
                 request.endDate(),
                 request.autoPost(),
-                Instant.now(recurringClock)
+                applicationClock.instant()
             );
 
         try {
