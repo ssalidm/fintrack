@@ -39,7 +39,6 @@ fintrack:
 
   recurring:
     processing-cron: "0 0 * * * *"
-    zone: "Africa/Johannesburg"
     schedule-batch-size: 100
     max-catch-up-per-schedule: 100
 

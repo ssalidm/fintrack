@@ -156,4 +156,21 @@ public final class ApiMessage {
         public static final String RESUMED = "Recurring transaction resumed successfully";
         public static final String OCCURRENCE_POSTED = "Recurring transaction occurrence posted successfully";
     }
+
+    /*
+     * REPORTING
+     */
+    public static final class Reporting {
+        private Reporting() {
+        }
+
+        public static final String ACCOUNT_BALANCES_FETCHED = "Account balances retrieved successfully";
+        public static final String NET_WORTH_FETCHED = "Net worth retrieved successfully";
+        public static final String CASH_FLOW_FETCHED = "Monthly cash flow retrieved successfully";
+        public static final String CATEGORY_SPENDING_FETCHED = "Monthly category spending retrieved successfully";
+        public static final String BUDGET_PERFORMANCE_FETCHED = "Budget performance retrieved successfully";
+        public static final String GOAL_PROGRESS_FETCHED = "Savings goal progress retrieved successfully";
+        public static final String DUE_RECURRING_FETCHED = "Due recurring transactions retrieved successfully";
+        public static final String DASHBOARD_SUMMARY_FETCHED = "Dashboard summary retrieved successfully";
+    }
 }

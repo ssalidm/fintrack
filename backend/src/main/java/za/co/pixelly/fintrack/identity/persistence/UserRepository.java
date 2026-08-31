@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import za.co.pixelly.fintrack.identity.domain.User;
 
+import javax.swing.text.html.Option;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -21,11 +22,20 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""
-            SELECT user
-            FROM User user
-            WHERE user.id = :userId
+        SELECT user
+        FROM User user
+        WHERE user.id = :userId
         """)
     Optional<User> findByIdForUpdate(
         @Param("userId") UUID userId
+    );
+
+    @Query("""
+        SELECT user.timeZone
+        FROM User user
+        WHERE user.id = :userId
+        """)
+    Optional<String> findTimeZoneById(
+        UUID userId
     );
 }

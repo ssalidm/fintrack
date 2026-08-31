@@ -19,10 +19,7 @@ import za.co.pixelly.fintrack.finance.transfer.api.CreateTransferRequest;
 import za.co.pixelly.fintrack.finance.transfer.api.TransferQuery;
 import za.co.pixelly.fintrack.finance.transfer.api.TransferResponse;
 import za.co.pixelly.fintrack.finance.transfer.api.VoidTransferRequest;
-import za.co.pixelly.fintrack.finance.transfer.application.exceptions.InactiveTransferAccountException;
-import za.co.pixelly.fintrack.finance.transfer.application.exceptions.TransferAccountCurrencyMismatchException;
-import za.co.pixelly.fintrack.finance.transfer.application.exceptions.TransferAlreadyVoidedException;
-import za.co.pixelly.fintrack.finance.transfer.application.exceptions.TransferNotFoundException;
+import za.co.pixelly.fintrack.finance.transfer.application.exceptions.*;
 import za.co.pixelly.fintrack.finance.transfer.domain.Transfer;
 import za.co.pixelly.fintrack.finance.transfer.domain.TransferStatus;
 import za.co.pixelly.fintrack.finance.transfer.persistence.TransferCommandRepository;
@@ -113,11 +110,15 @@ public class DefaultTransferService implements TransferService {
     @Transactional
     public TransferResponse voidTransfer(UUID userId, UUID transferId, VoidTransferRequest request) {
         Transfer transfer = transferRepository.findByIdAndUserId(
-                transferId,
-                userId
-            )
-            .orElseThrow(TransferNotFoundException::new
+            transferId,
+            userId
+        ).orElseThrow(TransferNotFoundException::new);
+
+        if (transfer.getVersion() != request.version()) {
+            throw new TransferConflictException(
+                "The transfer has changed since it was last retrieved"
             );
+        }
 
         if (transfer.getStatus() == TransferStatus.VOIDED) {
             throw new TransferAlreadyVoidedException();

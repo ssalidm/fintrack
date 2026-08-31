@@ -5,8 +5,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.exc.InvalidFormatException;
 import za.co.pixelly.fintrack.common.api.ApiResponse;
@@ -26,11 +30,10 @@ import za.co.pixelly.fintrack.finance.recurring.application.exceptions.Recurring
 import za.co.pixelly.fintrack.finance.recurring.application.exceptions.RecurringTransactionNotFoundException;
 import za.co.pixelly.fintrack.finance.recurring.application.exceptions.RecurringTransactionValidationException;
 import za.co.pixelly.fintrack.finance.transaction.application.exceptions.*;
-import za.co.pixelly.fintrack.finance.transfer.application.exceptions.InactiveTransferAccountException;
-import za.co.pixelly.fintrack.finance.transfer.application.exceptions.TransferAccountCurrencyMismatchException;
-import za.co.pixelly.fintrack.finance.transfer.application.exceptions.TransferAlreadyVoidedException;
-import za.co.pixelly.fintrack.finance.transfer.application.exceptions.TransferNotFoundException;
+import za.co.pixelly.fintrack.finance.transfer.application.exceptions.*;
 import za.co.pixelly.fintrack.identity.application.exceptions.*;
+import za.co.pixelly.fintrack.reporting.application.InvalidReportingRangeException;
+import za.co.pixelly.fintrack.reporting.application.ReportingResourceNotFoundException;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -539,6 +542,17 @@ public class GlobalExceptionHandler {
             );
     }
 
+    @ExceptionHandler(TransferConflictException.class)
+    ResponseEntity<ApiResponse<Void>> handleBudgetConflict(TransferConflictException exception) {
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(ApiResponse.error(
+                    HttpStatus.CONFLICT,
+                    exception.getMessage()
+                )
+            );
+    }
+
     @ExceptionHandler(BudgetConflictException.class)
     ResponseEntity<ApiResponse<Void>> handleBudgetConflict(BudgetConflictException exception) {
         return ResponseEntity
@@ -647,6 +661,104 @@ public class GlobalExceptionHandler {
                 ApiResponse.error(
                     HttpStatus.BAD_REQUEST,
                     exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler(InvalidReportingRangeException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleInvalidReportingRange(InvalidReportingRangeException exception) {
+
+        return ResponseEntity
+            .badRequest()
+            .body(
+                ApiResponse.error(
+                    HttpStatus.BAD_REQUEST,
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler(ReportingResourceNotFoundException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleReportingResourceNotFound(ReportingResourceNotFoundException exception) {
+
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(
+                ApiResponse.error(
+                    HttpStatus.NOT_FOUND,
+                    exception.getMessage()
+                )
+            );
+    }
+
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiResponse<Void>>
+    handleNoResourceFound(NoResourceFoundException ex) {
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(
+                ApiResponse.error(
+                    HttpStatus.NOT_FOUND,
+                    "Resource not found: /" + ex.getResourcePath()
+                )
+            );
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException exception) {
+
+        String message =
+            "Invalid value for parameter '%s'"
+                .formatted(
+                    exception.getName()
+                );
+
+        return ResponseEntity
+            .badRequest()
+            .body(
+                ApiResponse.validation(
+                    HttpStatus.BAD_REQUEST,
+                    "Invalid request parameter",
+                    Map.of(
+                        exception.getName(),
+                        message
+                    )
+                )
+            );
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleMissingRequestParameter(MissingServletRequestParameterException exception) {
+
+        return ResponseEntity
+            .badRequest()
+            .body(
+                ApiResponse.validation(
+                    HttpStatus.BAD_REQUEST,
+                    "Missing required parameter",
+                    Map.of(
+                        exception.getParameterName(),
+                        "Required parameter is missing"
+                    )
+                )
+            );
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleMethodValidation(HandlerMethodValidationException exception) {
+
+        return ResponseEntity
+            .badRequest()
+            .body(
+                ApiResponse.error(
+                    HttpStatus.BAD_REQUEST,
+                    "Request validation failed"
                 )
             );
     }

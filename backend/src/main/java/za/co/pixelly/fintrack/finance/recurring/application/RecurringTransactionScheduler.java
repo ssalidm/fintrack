@@ -9,8 +9,6 @@ import org.springframework.stereotype.Component;
 import za.co.pixelly.fintrack.finance.recurring.domain.RecurringTransactionStatus;
 import za.co.pixelly.fintrack.finance.recurring.persistence.RecurringTransactionRepository;
 
-import java.time.Clock;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,7 +19,6 @@ public class RecurringTransactionScheduler {
 
     private final RecurringTransactionRepository recurringTransactionRepository;
     private final RecurringTransactionOccurrenceService occurrenceService;
-    private final Clock recurringClock;
 
     @Value("${fintrack.recurring.schedule-batch-size:100}")
     private int scheduleBatchSize;
@@ -32,34 +29,29 @@ public class RecurringTransactionScheduler {
 
     @Scheduled(
         cron = "${fintrack.recurring.processing-cron:0 0 * * * *}",
-        zone = "${fintrack.recurring.zone:Africa/Johannesburg}"
+        zone = "UTC"
     )
     public void processDueSchedules() {
 
-        LocalDate today = LocalDate.now(
-            recurringClock
-        );
+        List<UUID> dueScheduleIds =
+            recurringTransactionRepository
+                .findDueAutomaticScheduleIds(
+                    RecurringTransactionStatus.ACTIVE.name(),
+                    PageRequest.of(
+                        0,
+                        scheduleBatchSize
+                    )
+                );
 
-        List<UUID> dueScheduleIds = recurringTransactionRepository
-            .findDueAutomaticScheduleIds(
-                RecurringTransactionStatus.ACTIVE,
-                today,
-                PageRequest.of(
-                    0,
-                    scheduleBatchSize
-                )
-            );
-
-        for (UUID scheduleId
-            : dueScheduleIds) {
+        for (UUID scheduleId : dueScheduleIds) {
 
             try {
-                int generated = occurrenceService
-                    .processAutomaticSchedule(
-                        scheduleId,
-                        today,
-                        maxCatchUpPerSchedule
-                    );
+                int generated =
+                    occurrenceService
+                        .processAutomaticSchedule(
+                            scheduleId,
+                            maxCatchUpPerSchedule
+                        );
 
                 if (generated > 0) {
                     log.info(
@@ -71,10 +63,6 @@ public class RecurringTransactionScheduler {
 
             } catch (RuntimeException exception) {
 
-                /*
-                 * One broken schedule must not stop
-                 * every other user's due schedules.
-                 */
                 log.error(
                     "Failed to process recurring transaction schedule {}",
                     scheduleId,

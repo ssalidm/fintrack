@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import za.co.pixelly.fintrack.common.api.ApiMessage;
 import za.co.pixelly.fintrack.common.api.ApiResponse;
@@ -32,7 +31,6 @@ import static za.co.pixelly.fintrack.config.OpenApiConfig.BEARER_AUTH;
 @RestController
 @RequestMapping("/api/v1/budgets")
 @RequiredArgsConstructor
-@Validated
 public class BudgetController {
 
     private final BudgetService budgetService;
