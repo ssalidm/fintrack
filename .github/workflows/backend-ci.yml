@@ -52,3 +52,11 @@ jobs:
 
       - name: Verify backend
         run: ./mvnw --batch-mode clean verify
+
+      - name: Build backend Docker image
+        working-directory: ..
+        run: |
+          docker build \
+            -f backend/Dockerfile \
+            -t fintrack-backend:ci \
+            .
