@@ -31,10 +31,6 @@ jobs:
     name: Verify backend
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: backend
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -48,13 +44,14 @@ jobs:
           cache-dependency-path: backend/pom.xml
 
       - name: Make Maven wrapper executable
+        working-directory: backend
         run: chmod +x mvnw
 
       - name: Verify backend
+        working-directory: backend
         run: ./mvnw --batch-mode clean verify
 
       - name: Build backend Docker image
-        working-directory: ..
         run: |
           docker build \
             -f backend/Dockerfile \
