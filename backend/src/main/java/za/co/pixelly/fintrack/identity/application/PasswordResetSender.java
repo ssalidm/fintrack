@@ -6,6 +6,7 @@ public interface PasswordResetSender {
 
     void sendPasswordReset(
         String email,
+        String firstName,
         String rawToken,
         Instant expiresAt
     );

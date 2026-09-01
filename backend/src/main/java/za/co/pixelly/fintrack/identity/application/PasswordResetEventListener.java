@@ -18,6 +18,7 @@ public class PasswordResetEventListener {
 
         sender.sendPasswordReset(
             event.email(),
+            event.firstName(),
             event.rawToken(),
             event.expiresAt()
         );

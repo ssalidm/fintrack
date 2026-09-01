@@ -12,6 +12,18 @@ spring:
     clean-disabled: true
     validate-on-migrate: true
 
+  mail:
+    host: ${FINTRACK_MAIL_HOST:localhost}
+    port: ${FINTRACK_MAIL_PORT:1025}
+    username: ${FINTRACK_MAIL_USERNAME:}
+    password: ${FINTRACK_MAIL_PASSWORD:}
+    properties:
+      "[mail.smtp.auth]": ${FINTRACK_MAIL_SMTP_AUTH:false}
+      "[mail.smtp.starttls.enable]": ${FINTRACK_MAIL_STARTTLS:false}
+      "[mail.smtp.connectiontimeout]": 5000
+      "[mail.smtp.timeout]": 5000
+      "[mail.smtp.writetimeout]": 5000
+
 management:
   endpoints:
     web:
@@ -41,6 +53,12 @@ fintrack:
     processing-cron: "0 0 * * * *"
     schedule-batch-size: 100
     max-catch-up-per-schedule: 100
+
+  email:
+    enabled: ${FINTRACK_EMAIL_ENABLED:false}
+    from: ${FINTRACK_EMAIL_FROM:no-reply@fintrack.local}
+    from-name: ${FINTRACK_EMAIL_FROM_NAME:FinTrack}
+    frontend-base-url: ${FINTRACK_FRONTEND_BASE_URL:http://localhost:5173}
 
 springdoc:
   api-docs:

@@ -107,6 +107,7 @@ public class EmailVerificationService {
         eventPublisher.publishEvent(
             new EmailVerificationRequested(
                 user.getEmail(),
+                user.getFirstName(),
                 rawToken,
                 expiresAt
             )
