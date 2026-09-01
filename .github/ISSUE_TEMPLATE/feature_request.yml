@@ -1,0 +1,75 @@
+name: Feature request
+description: Propose a new capability or improvement
+title: "[Feature]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the user problem before describing the proposed technical solution.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or need
+      description: What user or engineering problem should this feature solve?
+      placeholder: Users currently cannot...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the expected behaviour at a high level.
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: List the conditions that would make the feature complete.
+      placeholder: |
+        - A user can...
+        - The system rejects...
+        - The response displays...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Primary area
+      options:
+        - Backend
+        - Frontend
+        - Database
+        - Authentication and security
+        - Reporting
+        - CI/CD
+        - Documentation
+        - Cross-cutting
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Describe any simpler or different approaches that were considered.
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Add mock-ups, diagrams, examples, or related issue references.
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      options:
+        - label: I searched the existing issues before submitting this request.
+          required: true
+        - label: This request describes a focused problem rather than several unrelated features.
+          required: true

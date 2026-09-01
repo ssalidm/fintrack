@@ -1,0 +1,23 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+  flyway:
+    enabled: true
+    clean-disabled: true
+    validate-on-migrate: true
+    locations: classpath:db/migration
+
+fintrack:
+  security:
+    jwt:
+      secret: NOSUIDDGICbMmX4Uzu4LDrp/IRMT7CSstm+cXl9UOQ4=
+
+  email:
+    enabled: false
+
+  recurring:
+    processing-cron: "-"
+    schedule-batch-size: 100
+    max-catch-up-per-schedule: 100

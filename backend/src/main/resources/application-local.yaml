@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: ${FINTRACK_DB_URL:jdbc:postgresql://localhost:5432/fintrack_db}
+    username: ${FINTRACK_APPLICATION_USER:fintrack_application}
+    password: ${FINTRACK_APPLICATION_PASSWORD}
+
+  flyway:
+    url: ${FINTRACK_DB_URL:jdbc:postgresql://localhost:5432/fintrack_db}
+    user: ${FINTRACK_MIGRATION_USER:fintrack_migration}
+    password: ${FINTRACK_MIGRATION_PASSWORD}
+    default-schema: infra
+
+management:
+  endpoint:
+    health:
+      show-components: always
+      show-details: never
+
+fintrack:
+  security:
+    jwt:
+      secret: ${FINTRACK_JWT_SECRET}
+
+  recurring:
+    processing-cron: "0 0/10 * * * *"
