@@ -15,6 +15,7 @@ public class TestPasswordResetSender
     @Override
     public void sendPasswordReset(
         String email,
+        String firstName,
         String rawToken,
         Instant expiresAt
     ) {

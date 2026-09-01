@@ -1,33 +1,29 @@
 package za.co.pixelly.fintrack.identity.application;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 
-@Slf4j
 @Component
-@Profile("local")
-public class LoggingPasswordResetSender
-    implements PasswordResetSender {
+@Profile("!test")
+@RequiredArgsConstructor
+public class SmtpPasswordResetSender implements PasswordResetSender {
+
+    private final AccountEmailService accountEmailService;
 
     @Override
     public void sendPasswordReset(
         String email,
+        String firstName,
         String rawToken,
         Instant expiresAt
     ) {
-        log.info(
-            """
-            LOCAL PASSWORD RESET
-            email={}
-            token={}
-            expiresAt={}
-            """,
+        accountEmailService.sendPasswordResetEmail(
             email,
-            rawToken,
-            expiresAt
+            firstName,
+            rawToken
         );
     }
 }

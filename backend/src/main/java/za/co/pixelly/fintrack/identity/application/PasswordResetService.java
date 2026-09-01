@@ -22,8 +22,7 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class PasswordResetService {
 
-    private static final String PASSWORD_RESET_REASON =
-        "PASSWORD_RESET";
+    private static final String PASSWORD_RESET_REASON = "PASSWORD_RESET";
 
     private final PasswordResetTokenRepository tokenRepository;
     private final UserRepository userRepository;
@@ -140,6 +139,7 @@ public class PasswordResetService {
         eventPublisher.publishEvent(
             new PasswordResetRequested(
                 user.getEmail(),
+                user.getFirstName(),
                 rawToken,
                 expiresAt
             )

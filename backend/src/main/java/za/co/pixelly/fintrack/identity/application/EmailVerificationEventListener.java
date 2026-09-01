@@ -19,6 +19,7 @@ public class EmailVerificationEventListener {
     ) {
         sender.sendVerificationEmail(
             event.email(),
+            event.firstName(),
             event.rawToken(),
             event.expiresAt()
         );

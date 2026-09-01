@@ -15,6 +15,7 @@ public class TestEmailVerificationSender
     @Override
     public void sendVerificationEmail(
         String email,
+        String firstName,
         String rawToken,
         Instant expiresAt
     ) {
