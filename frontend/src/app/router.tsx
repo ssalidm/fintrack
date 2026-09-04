@@ -10,6 +10,7 @@ import VerifyEmailPage from "../features/auth/pages/VerifyEmailPage.tsx";
 import ResendVerificationPage from "../features/auth/pages/ResendVerificationPage.tsx";
 import ForgotPasswordPage from "../features/auth/pages/ForgotPasswordPage.tsx";
 import ResetPasswordPage from "../features/auth/pages/ResetPasswordPage.tsx";
+import DashboardLayout from "../features/dashboard/layouts/DashboardLayout.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -49,8 +50,13 @@ export const router = createBrowserRouter([
     element: <ProtectedRoute/>,
     children: [
       {
-        path: 'dashboard',
-        element: <DashboardPage/>,
+        element: <DashboardLayout/>,
+        children: [
+          {
+            path: 'dashboard',
+            element: <DashboardPage/>,
+          },
+        ]
       },
     ],
   },
