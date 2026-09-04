@@ -13,6 +13,8 @@ import {
   type AuthContextValue,
   type AuthStatus,
 } from './AuthContext'
+import {queryClient} from "../../../api/queryClient.ts";
+
 
 const REFRESH_TOKEN_KEY = 'salif.auth.refreshToken'
 
@@ -38,6 +40,7 @@ export default function AuthProvider({children}: AuthProviderProps) {
     sessionVersion.current += 1
     setAccessToken(null)
     sessionStorage.removeItem(REFRESH_TOKEN_KEY)
+    queryClient.clear()
     setStatus('unauthenticated')
   }, [])
 
