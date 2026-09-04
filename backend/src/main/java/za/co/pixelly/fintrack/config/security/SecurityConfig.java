@@ -3,12 +3,18 @@ package za.co.pixelly.fintrack.config.security;
 import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration(proxyBeanMethods = false)
 public class SecurityConfig {
@@ -18,9 +24,13 @@ public class SecurityConfig {
         HttpSecurity http,
         JwtAuthenticationConverter jwtAuthenticationConverter,
         RestAuthenticationEntryPoint authenticationEntryPoint,
-        RestAccessDeniedHandler accessDeniedHandler
+        RestAccessDeniedHandler accessDeniedHandler,
+        UrlBasedCorsConfigurationSource corsConfigurationSource
     ) throws Exception {
         http
+            .cors(cors ->
+                cors.configurationSource(corsConfigurationSource)
+            )
             .csrf(AbstractHttpConfigurer::disable)
 
             .sessionManagement(session ->
@@ -86,5 +96,44 @@ public class SecurityConfig {
             );
 
         return http.build();
+    }
+
+    @Bean
+    UrlBasedCorsConfigurationSource corsConfigurationSource(
+        CorsProperties corsProperties
+    ) {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.setAllowedOrigins(
+            corsProperties.allowedOrigins()
+        );
+
+        configuration.setAllowedMethods(List.of(
+            HttpMethod.GET.name(),
+            HttpMethod.POST.name(),
+            HttpMethod.PUT.name(),
+            HttpMethod.PATCH.name(),
+            HttpMethod.DELETE.name(),
+            HttpMethod.OPTIONS.name()
+        ));
+
+        configuration.setAllowedHeaders(List.of(
+            HttpHeaders.AUTHORIZATION,
+            HttpHeaders.CONTENT_TYPE,
+            HttpHeaders.ACCEPT
+        ));
+
+        configuration.setAllowCredentials(false);
+        configuration.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source =
+            new UrlBasedCorsConfigurationSource();
+
+        source.registerCorsConfiguration(
+            "/api/**",
+            configuration
+        );
+
+        return source;
     }
 }
