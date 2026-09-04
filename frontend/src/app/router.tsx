@@ -1,16 +1,22 @@
-import {createBrowserRouter} from "react-router";
-import HomePage from "../pages/HomePage.tsx";
-import NotFoundPage from "../pages/NotFoundPage.tsx";
+import {createBrowserRouter} from "react-router"
+
+import ProtectedRoute from "../features/auth/components/ProtectedRoute.tsx"
+import DashboardLayout from "../features/dashboard/layouts/DashboardLayout.tsx"
 import AuthLayout from "../features/auth/layouts/AuthLayout.tsx";
-import RegisterPage from "../features/auth/pages/RegisterPage.tsx";
-import LoginPage from "../features/auth/pages/LoginPage.tsx";
-import ProtectedRoute from "../features/auth/components/ProtectedRoute.tsx";
-import DashboardPage from "../pages/DashboardPage.tsx";
-import VerifyEmailPage from "../features/auth/pages/VerifyEmailPage.tsx";
-import ResendVerificationPage from "../features/auth/pages/ResendVerificationPage.tsx";
-import ForgotPasswordPage from "../features/auth/pages/ForgotPasswordPage.tsx";
-import ResetPasswordPage from "../features/auth/pages/ResetPasswordPage.tsx";
-import DashboardLayout from "../features/dashboard/layouts/DashboardLayout.tsx";
+import {
+  AccountsPage,
+  DashboardPage,
+  ForgotPasswordPage,
+  HomePage,
+  LoginPage,
+  NotFoundPage,
+  RegisterPage,
+  ResendVerificationPage,
+  ResetPasswordPage,
+  TransactionsPage,
+  VerifyEmailPage,
+} from './lazyPages'
+
 
 export const router = createBrowserRouter([
   {
@@ -56,6 +62,14 @@ export const router = createBrowserRouter([
             path: 'dashboard',
             element: <DashboardPage/>,
           },
+          {
+            path: 'accounts',
+            element: <AccountsPage/>
+          },
+          {
+            path: 'transactions',
+            element: <TransactionsPage/>
+          }
         ]
       },
     ],

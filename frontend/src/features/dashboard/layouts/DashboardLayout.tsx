@@ -1,4 +1,4 @@
-import {useState, type ComponentType} from 'react'
+import {useState} from 'react'
 import {
   ArrowLeftRight,
   LayoutDashboard,
@@ -25,26 +25,6 @@ function SalifLogo() {
     </div>
   )
 }
-
-interface DisabledNavigationItem {
-  label: string
-  icon: ComponentType<{ size?: number; 'aria-hidden'?: boolean }>
-}
-
-const upcomingNavigation: DisabledNavigationItem[] = [
-  {
-    label: 'Money in motion',
-    icon: ArrowLeftRight,
-  },
-  {
-    label: 'Accounts',
-    icon: Landmark,
-  },
-  {
-    label: 'Goals',
-    icon: Target,
-  },
-]
 
 interface SidebarContentProps {
   onNavigate?: () => void
@@ -117,21 +97,52 @@ function SidebarContent({
           Overview
         </NavLink>
 
-        {upcomingNavigation.map(({label, icon: Icon}) => (
-          <button
-            key={label}
-            type="button"
-            disabled
-            title="Coming in a later module"
-            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium text-[#d5e4dd]/70"
-          >
-            <Icon size={19} aria-hidden/>
-            <span className="flex-1">{label}</span>
-            <span className="text-[10px] uppercase tracking-wider">
-              Soon
-            </span>
-          </button>
-        ))}
+        <NavLink
+          to="/transactions"
+          onClick={onNavigate}
+          className={({isActive}) =>
+            [
+              'flex items-center gap-3 rounded-xl px-4 py-3 text-sm',
+              'font-medium transition-colors',
+              isActive
+                ? 'bg-white/10 text-white'
+                : 'text-[#d5e4dd] hover:bg-white/5 hover:text-white',
+            ].join(' ')
+          }
+        >
+          <ArrowLeftRight size={19} aria-hidden/>
+          Money in motion
+        </NavLink>
+
+        <NavLink
+          to="/accounts"
+          onClick={onNavigate}
+          className={({isActive}) =>
+            [
+              'flex items-center gap-3 rounded-xl px-4 py-3 text-sm',
+              'font-medium transition-colors',
+              isActive
+                ? 'bg-white/10 text-white'
+                : 'text-[#d5e4dd] hover:bg-white/5 hover:text-white',
+            ].join(' ')
+          }
+        >
+          <Landmark size={19} aria-hidden/>
+          Accounts
+        </NavLink>
+
+        <button
+          type="button"
+          disabled
+          title="Coming in a later module"
+          className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium text-[#d5e4dd]/70"
+        >
+          <Target size={19} aria-hidden/>
+          <span className="flex-1">Goals</span>
+          <span className="text-[10px] uppercase tracking-wider">
+      Soon
+    </span>
+        </button>
       </nav>
 
       <div className="mt-auto space-y-2">
@@ -182,7 +193,7 @@ export default function DashboardLayout() {
         className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-[#dedbd2] bg-[#f7f5ef]/95 px-5 backdrop-blur lg:hidden">
 
         <div className="rounded-lg bg-[#174f43] px-2">
-          <SalifLogo />
+          <SalifLogo/>
         </div>
 
         <button
