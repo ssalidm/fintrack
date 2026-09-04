@@ -49,6 +49,9 @@ fintrack:
       max-failed-attempts: 5
       lock-duration: PT15M
 
+    cors:
+      allowed-origins: []
+
   recurring:
     processing-cron: "0 0 * * * *"
     schedule-batch-size: 100
@@ -56,8 +59,8 @@ fintrack:
 
   email:
     enabled: ${FINTRACK_EMAIL_ENABLED:false}
-    from: ${FINTRACK_EMAIL_FROM:no-reply@fintrack.local}
-    from-name: ${FINTRACK_EMAIL_FROM_NAME:FinTrack}
+    from: ${FINTRACK_EMAIL_FROM:no-reply@salif.local}
+    from-name: ${FINTRACK_EMAIL_FROM_NAME:Salif}
     frontend-base-url: ${FINTRACK_FRONTEND_BASE_URL:http://localhost:5173}
 
 springdoc:

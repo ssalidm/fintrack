@@ -19,7 +19,7 @@ public record UserProfileResponse(
     Instant emailVerifiedAt,
     List<String> roles,
     Instant lastLoginAt,
-    Instant createAt,
+    Instant createdAt,
     Instant updatedAt,
     Long version
 ) {

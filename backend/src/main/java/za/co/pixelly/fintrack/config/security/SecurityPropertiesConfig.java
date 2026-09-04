@@ -8,7 +8,8 @@ import org.springframework.context.annotation.Configuration;
     JwtProperties.class,
     EmailVerificationProperties.class,
     PasswordResetProperties.class,
-    LoginSecurityProperties.class
+    LoginSecurityProperties.class,
+    CorsProperties.class
 })
 public class SecurityPropertiesConfig {
 }
