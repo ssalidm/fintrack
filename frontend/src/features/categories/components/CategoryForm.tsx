@@ -28,10 +28,10 @@ function getDefaultValues(
 }
 
 export default function CategoryForm({
-                                       category,
-                                       onCancel,
-                                       onSuccess,
-                                     }: CategoryFormProps) {
+  category,
+  onCancel,
+  onSuccess,
+}: CategoryFormProps) {
   const createCategory = useCreateCategory()
   const updateCategory = useUpdateCategory()
 
@@ -180,7 +180,8 @@ export default function CategoryForm({
           max={32767}
           step={1}
           {...register('displayOrder', {
-            valueAsNumber: true,
+            setValueAs: (value) =>
+              value === '' ? 0 : Number(value),
           })}
           className="w-full rounded-xl border border-[#d8d4c9] bg-white px-4 py-3 text-[#173c32] outline-none transition focus:border-[#2b7d67] focus:ring-2 focus:ring-[#2b7d67]/15"
         />

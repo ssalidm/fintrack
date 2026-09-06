@@ -245,11 +245,11 @@ export default function TransactionsPage() {
         <header className="flex flex-wrap items-end justify-between gap-6">
           <div>
             <p className="text-xs font-semibold tracking-[0.16em] text-[#657972]">
-              EVERYDAY ACTIVITY
+              MONEY IN MOTION
             </p>
 
             <h1 className="mt-4 font-serif text-5xl tracking-[-0.03em] text-[#173c32]">
-              Money in motion
+              Transactions
             </h1>
 
             <p className="mt-3 max-w-xl text-sm leading-6 text-[#657972]">

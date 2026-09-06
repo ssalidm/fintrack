@@ -1,6 +1,5 @@
 import {
   ArrowRight,
-  Check,
   RefreshCw,
   Sparkles,
 } from 'lucide-react'
@@ -10,6 +9,8 @@ import CashFlowChart from '../features/dashboard/components/CashFlowChart'
 import TopSpendingCard from '../features/dashboard/components/TopSpendingCard'
 import { useDashboardSummary } from '../features/dashboard/hooks/useDashboardSummary'
 import { useProfile } from '../features/profile/hooks/useProfile'
+import RecentTransactionsCard from '../features/dashboard/components/RecentTransactionsCard'
+import PaymentsToWatch from '../features/dashboard/components/PaymentToWatch'
 
 function formatMoney(amount: number, currencyCode: string) {
   return new Intl.NumberFormat('en-ZA', {
@@ -25,13 +26,6 @@ function parseLocalDate(value: string) {
   return new Date(year, month - 1, day)
 }
 
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat('en-ZA', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  }).format(parseLocalDate(value))
-}
 
 function formatHeaderDate(value: string) {
   return new Intl.DateTimeFormat('en-ZA', {
@@ -71,9 +65,8 @@ function getDashboardInsight(summary: DashboardSummary) {
     const count = summary.dueRecurringTransactionCount
 
     return {
-      title: `${count} recurring ${
-        count === 1 ? 'payment needs' : 'payments need'
-      } your attention.`,
+      title: `${count} recurring ${count === 1 ? 'payment needs' : 'payments need'
+        } your attention.`,
       description:
         'Take a look below so that nothing important catches you by surprise.',
     }
@@ -232,10 +225,10 @@ function DashboardContent({
     summary.totalAccountCount === 0
       ? 0
       : Math.round(
-          (summary.activeAccountCount /
-            summary.totalAccountCount) *
-            100,
-        )
+        (summary.activeAccountCount /
+          summary.totalAccountCount) *
+        100,
+      )
 
   return (
     <>
@@ -416,115 +409,11 @@ function DashboardContent({
         <TopSpendingCard />
       </section>
 
-      <section className="mt-10">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p className="text-xs font-semibold tracking-[0.15em] text-[#657972]">
-              COMING UP
-            </p>
+      <RecentTransactionsCard />
 
-            <h2 className="mt-3 font-serif text-3xl tracking-[-0.02em] text-[#173c32] sm:text-4xl">
-              Payments to watch
-            </h2>
-          </div>
-
-          <p className="text-sm text-[#9a6828]">
-            {summary.dueRecurringTransactionCount}{' '}
-            {summary.dueRecurringTransactionCount === 1
-              ? 'payment'
-              : 'payments'}{' '}
-            due
-          </p>
-        </div>
-
-        <div className="mt-5 border-y border-[#dedbd2]">
-          {summary.dueRecurringTransactions.length === 0 ? (
-            <div className="flex items-center gap-4 py-8">
-              <span className="grid size-10 place-items-center rounded-full bg-[#dfece3] text-[#37745e]">
-                <Check size={19} aria-hidden />
-              </span>
-
-              <div>
-                <p className="font-semibold text-[#173c32]">
-                  You’re all caught up
-                </p>
-
-                <p className="mt-1 text-sm text-[#657972]">
-                  No recurring payments currently need attention.
-                </p>
-              </div>
-            </div>
-          ) : (
-            summary.dueRecurringTransactions.map(
-              (item, index) => (
-                <article
-                  key={item.recurringTransactionId}
-                  className={[
-                    'grid gap-4 py-6 sm:grid-cols-[1fr_auto]',
-                    'sm:items-center',
-                    index > 0
-                      ? 'border-t border-[#dedbd2]'
-                      : '',
-                  ].join(' ')}
-                >
-                  <div className="flex items-start gap-4">
-                    <span
-                      className={[
-                        'mt-2 size-2 shrink-0 rounded-full',
-                        item.daysOverdue > 0
-                          ? 'bg-[#bb6b4d]'
-                          : 'bg-[#8fb69b]',
-                      ].join(' ')}
-                      aria-hidden
-                    />
-
-                    <div>
-                      <p className="font-semibold text-[#173c32]">
-                        {item.name}
-                      </p>
-
-                      <p className="mt-1 text-sm text-[#657972]">
-                        {item.categoryName ?? 'Uncategorised'}
-                        {' · '}
-                        {item.accountName}
-                        {' · '}
-                        {item.daysOverdue > 0
-                          ? `${item.daysOverdue} ${
-                              item.daysOverdue === 1
-                                ? 'day'
-                                : 'days'
-                            } overdue`
-                          : `due ${formatDate(
-                              item.nextDueDate,
-                            )}`}
-                      </p>
-
-                      {item.autoPost && (
-                        <span className="mt-2 inline-block text-xs font-medium text-[#37745e]">
-                          Posts automatically
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="pl-6 text-left sm:pl-0 sm:text-right">
-                    <p className="font-semibold text-[#173c32]">
-                      {formatMoney(
-                        item.amount,
-                        item.currencyCode,
-                      )}
-                    </p>
-
-                    <p className="mt-1 text-xs text-[#657972]">
-                      {item.frequency.toLowerCase()}
-                    </p>
-                  </div>
-                </article>
-              ),
-            )
-          )}
-        </div>
-      </section>
+      <PaymentsToWatch
+        dueTransactions={summary.dueRecurringTransactions}
+      />
     </>
   )
 }

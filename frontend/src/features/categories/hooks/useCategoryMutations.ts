@@ -29,7 +29,7 @@ export function useCreateCategory() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(payload),
+        body: payload,
       })
 
       return response.data
@@ -58,7 +58,7 @@ export function useUpdateCategory() {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(payload),
+          body: payload,
         },
       )
 
@@ -88,7 +88,7 @@ export function useArchiveCategory() {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(payload),
+          body: payload,
         },
       )
 
