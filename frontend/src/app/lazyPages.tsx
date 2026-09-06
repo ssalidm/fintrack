@@ -1,4 +1,4 @@
-import { lazy } from 'react'
+import {lazy} from 'react'
 
 export const HomePage = lazy(
   () => import('../pages/HomePage.tsx'),
@@ -47,4 +47,9 @@ export const AccountsPage = lazy(
 export const TransactionsPage = lazy(
   () =>
     import('../features/transactions/pages/TransactionsPage.tsx'),
+)
+
+export const CategoriesPage = lazy(
+  () =>
+    import('../features/categories/pages/CategoriesPage.tsx'),
 )

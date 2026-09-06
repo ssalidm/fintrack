@@ -6,6 +6,7 @@ import {
   LogOut,
   Menu,
   Settings,
+  Tags,
   Target,
   X,
 } from 'lucide-react'
@@ -112,6 +113,23 @@ function SidebarContent({
         >
           <ArrowLeftRight size={19} aria-hidden/>
           Money in motion
+        </NavLink>
+
+        <NavLink
+          to="/categories"
+          onClick={onNavigate}
+          className={({isActive}) =>
+            [
+              'flex items-center gap-3 rounded-xl px-4 py-3 text-sm',
+              'font-medium transition-colors',
+              isActive
+                ? 'bg-white/10 text-white'
+                : 'text-[#d5e4dd] hover:bg-white/5 hover:text-white',
+            ].join(' ')
+          }
+        >
+          <Tags size={19} aria-hidden/>
+          Categories
         </NavLink>
 
         <NavLink

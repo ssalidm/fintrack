@@ -15,6 +15,7 @@ import {
   ResetPasswordPage,
   TransactionsPage,
   VerifyEmailPage,
+  CategoriesPage
 } from './lazyPages'
 
 
@@ -69,6 +70,10 @@ export const router = createBrowserRouter([
           {
             path: 'transactions',
             element: <TransactionsPage/>
+          },
+          {
+            path: 'categories',
+            element: <CategoriesPage/>
           }
         ]
       },
