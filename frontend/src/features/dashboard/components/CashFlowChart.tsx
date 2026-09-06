@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import {
-  BarChart3,
   LoaderCircle,
   RefreshCw,
 } from 'lucide-react'
@@ -11,12 +10,14 @@ interface CashFlowPoint {
   monthStart: string
   totalIncome: number
   totalExpenses: number
-  netCashFlow: number
 }
 
 function formatMonthStart(date: Date) {
   const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(
+    2,
+    '0',
+  )
 
   return `${year}-${month}-01`
 }
@@ -38,14 +39,19 @@ function getLastSixMonths() {
 }
 
 function getMonthLabel(monthStart: string) {
-  const [year, month] = monthStart.split('-').map(Number)
+  const [year, month] = monthStart
+    .split('-')
+    .map(Number)
 
   return new Intl.DateTimeFormat('en-ZA', {
     month: 'short',
   }).format(new Date(year, month - 1, 1))
 }
 
-function formatMoney(amount: number, currencyCode: string) {
+function formatMoney(
+  amount: number,
+  currencyCode: string,
+) {
   return new Intl.NumberFormat('en-ZA', {
     style: 'currency',
     currency: currencyCode,
@@ -80,8 +86,9 @@ function buildCashFlowPoints(
     return {
       monthStart,
       totalIncome: Number(row?.totalIncome ?? 0),
-      totalExpenses: Number(row?.totalExpenses ?? 0),
-      netCashFlow: Number(row?.netCashFlow ?? 0),
+      totalExpenses: Number(
+        row?.totalExpenses ?? 0,
+      ),
     }
   })
 }
@@ -108,9 +115,9 @@ export default function CashFlowChart() {
 
   const points = activeCurrency
     ? buildCashFlowPoints(
-      cashFlowQuery.data ?? [],
-      activeCurrency,
-    )
+        cashFlowQuery.data ?? [],
+        activeCurrency,
+      )
     : []
 
   const maximumAmount = Math.max(
@@ -134,186 +141,153 @@ export default function CashFlowChart() {
   const totalNetFlow = totalIncome - totalExpenses
 
   return (
-    <section className="overflow-hidden rounded-3xl border border-[#dedbd2] bg-[#fffdf8]">
-      <header className="flex flex-col gap-5 border-b border-[#e5e1d8] px-6 py-6 sm:flex-row sm:items-start sm:justify-between sm:px-8">
+    <article className="flex min-h-[330px] flex-col overflow-hidden rounded-3xl border border-[#dedbd2] bg-[#fffdf8]">
+      <header className="flex items-start justify-between gap-4 px-6 pt-6">
         <div>
           <p className="text-xs font-semibold tracking-[0.15em] text-[#657972]">
             SIX-MONTH VIEW
           </p>
 
-          <h2 className="mt-3 font-serif text-3xl tracking-[-0.02em] text-[#173c32] sm:text-4xl">
-            Your cash flow
+          <h2 className="mt-2 font-serif text-2xl text-[#173c32]">
+            Cash flow
           </h2>
-
-          <p className="mt-2 text-sm text-[#657972]">
-            Income and expenses across the last six months.
-          </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          {currencyCodes.length > 1 && (
-            <select
-              value={activeCurrency}
-              onChange={(event) =>
-                setSelectedCurrency(event.target.value)
-              }
-              aria-label="Cash-flow currency"
-              className="cursor-pointer rounded-full border border-[#d7d3c9] bg-white py-2 pr-10 pl-4 text-xs font-semibold text-[#173c32] outline-none focus:border-[#2b7d67]"
-            >
-              {currencyCodes.map((currencyCode) => (
-                <option
-                  key={currencyCode}
-                  value={currencyCode}
-                >
-                  {currencyCode}
-                </option>
-              ))}
-            </select>
-          )}
-
-          <span className="grid size-11 place-items-center rounded-2xl bg-[#deebe1] text-[#276b56]">
-            <BarChart3 size={20} aria-hidden />
-          </span>
-        </div>
+        {currencyCodes.length > 1 && (
+          <select
+            value={activeCurrency}
+            onChange={(event) =>
+              setSelectedCurrency(event.target.value)
+            }
+            aria-label="Cash-flow currency"
+            className="cursor-pointer rounded-full border border-[#d7d3c9] bg-white py-2 pr-9 pl-3 text-xs font-semibold text-[#173c32]"
+          >
+            {currencyCodes.map((currencyCode) => (
+              <option
+                key={currencyCode}
+                value={currencyCode}
+              >
+                {currencyCode}
+              </option>
+            ))}
+          </select>
+        )}
       </header>
 
       {cashFlowQuery.isPending && (
-        <div className="grid min-h-80 place-items-center">
-          <div className="text-center text-[#657972]">
-            <LoaderCircle
-              className="mx-auto animate-spin"
-              size={27}
-              aria-hidden
-            />
-
-            <p className="mt-3 text-sm">
-              Building your cash-flow view…
-            </p>
-          </div>
+        <div className="grid flex-1 place-items-center text-[#657972]">
+          <LoaderCircle
+            className="animate-spin"
+            size={25}
+            aria-label="Loading cash flow"
+          />
         </div>
       )}
 
       {cashFlowQuery.isError && (
-        <div className="m-6 rounded-2xl border border-[#e8c8bf] bg-[#fff4f1] px-5 py-4">
-          <p className="font-semibold text-[#8f3f30]">
-            We couldn’t load your cash flow.
-          </p>
+        <div className="grid flex-1 place-items-center px-6 text-center">
+          <div>
+            <p className="text-sm text-[#8f3f30]">
+              Cash flow could not be loaded.
+            </p>
 
-          <p className="mt-1 text-sm text-[#9b5a4d]">
-            {cashFlowQuery.error instanceof Error
-              ? cashFlowQuery.error.message
-              : 'Please try again.'}
-          </p>
-
-          <button
-            type="button"
-            onClick={() => {
-              void cashFlowQuery.refetch()
-            }}
-            className="mt-4 inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-[#174f43] underline underline-offset-4"
-          >
-            <RefreshCw size={14} aria-hidden />
-            Try again
-          </button>
+            <button
+              type="button"
+              onClick={() => {
+                void cashFlowQuery.refetch()
+              }}
+              className="mt-3 inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-[#174f43] underline"
+            >
+              <RefreshCw size={14} aria-hidden />
+              Try again
+            </button>
+          </div>
         </div>
       )}
 
       {cashFlowQuery.isSuccess &&
         currencyCodes.length === 0 && (
-          <div className="grid min-h-80 place-items-center px-6 text-center">
-            <div>
-              <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-[#e4ede7] text-[#276b56]">
-                <BarChart3 size={24} aria-hidden />
-              </span>
-
-              <h3 className="mt-5 font-serif text-2xl text-[#173c32]">
-                Your graph is ready
-              </h3>
-
-              <p className="mt-2 max-w-md text-sm leading-6 text-[#657972]">
-                Add income and expense transactions to begin
-                building your six-month cash-flow history.
-              </p>
-            </div>
+          <div className="grid flex-1 place-items-center px-6 text-center">
+            <p className="max-w-sm text-sm leading-6 text-[#657972]">
+              Add income and expense transactions to begin
+              building your cash-flow history.
+            </p>
           </div>
         )}
 
       {cashFlowQuery.isSuccess && activeCurrency && (
-        <div className="px-6 py-7 sm:px-8">
-          <div className="grid gap-5 border-b border-[#e5e1d8] pb-6 sm:grid-cols-3">
+        <div className="flex flex-1 flex-col px-6 pt-5 pb-6">
+          <div className="grid grid-cols-3 gap-3">
             <div>
-              <p className="text-xs text-[#657972]">
-                Total income
+              <p className="text-[10px] uppercase tracking-wide text-[#657972]">
+                Income
               </p>
 
-              <p className="mt-1 font-semibold text-[#36775d]">
-                {formatMoney(totalIncome, activeCurrency)}
+              <p className="mt-1 text-sm font-semibold text-[#36775d]">
+                {formatCompactMoney(
+                  totalIncome,
+                  activeCurrency,
+                )}
               </p>
             </div>
 
             <div>
-              <p className="text-xs text-[#657972]">
-                Total expenses
+              <p className="text-[10px] uppercase tracking-wide text-[#657972]">
+                Expenses
               </p>
 
-              <p className="mt-1 font-semibold text-[#a85e49]">
-                {formatMoney(totalExpenses, activeCurrency)}
+              <p className="mt-1 text-sm font-semibold text-[#a85e49]">
+                {formatCompactMoney(
+                  totalExpenses,
+                  activeCurrency,
+                )}
               </p>
             </div>
 
             <div>
-              <p className="text-xs text-[#657972]">
+              <p className="text-[10px] uppercase tracking-wide text-[#657972]">
                 Net flow
               </p>
 
               <p
                 className={[
-                  'mt-1 font-semibold',
+                  'mt-1 text-sm font-semibold',
                   totalNetFlow >= 0
                     ? 'text-[#36775d]'
                     : 'text-[#a85e49]',
                 ].join(' ')}
               >
-                {formatMoney(totalNetFlow, activeCurrency)}
+                {formatCompactMoney(
+                  totalNetFlow,
+                  activeCurrency,
+                )}
               </p>
             </div>
           </div>
 
-          <div className="mt-7 flex items-center gap-5 text-xs text-[#657972]">
-            <span className="inline-flex items-center gap-2">
-              <span className="size-2.5 rounded-full bg-[#4f8d71]" />
-              Income
-            </span>
-
-            <span className="inline-flex items-center gap-2">
-              <span className="size-2.5 rounded-full bg-[#c98767]" />
-              Expenses
-            </span>
-          </div>
-
-          <div className="overflow-x-auto">
-            <div className="mt-6 min-w-[600px]">
-              <div className="grid h-64 grid-cols-6 gap-4 border-b border-[#d9d6cd]">
+          <div className="mt-5 overflow-x-auto">
+            <div className="min-w-[480px]">
+              <div className="grid h-44 grid-cols-6 gap-3 border-b border-[#d9d6cd]">
                 {points.map((point) => {
                   const incomeHeight =
                     point.totalIncome === 0
                       ? 1
                       : Math.max(
-                        (point.totalIncome /
-                          maximumAmount) *
-                        100,
-                        4,
-                      )
+                          (point.totalIncome /
+                            maximumAmount) *
+                            100,
+                          4,
+                        )
 
                   const expenseHeight =
                     point.totalExpenses === 0
                       ? 1
                       : Math.max(
-                        (point.totalExpenses /
-                          maximumAmount) *
-                        100,
-                        4,
-                      )
+                          (point.totalExpenses /
+                            maximumAmount) *
+                            100,
+                          4,
+                        )
 
                   return (
                     <div
@@ -321,7 +295,7 @@ export default function CashFlowChart() {
                       className="flex h-full flex-col"
                     >
                       <div
-                        className="flex min-h-0 flex-1 items-end justify-center gap-2"
+                        className="flex min-h-0 flex-1 items-end justify-center gap-1.5"
                         aria-label={`${getMonthLabel(
                           point.monthStart,
                         )}: income ${formatMoney(
@@ -337,7 +311,7 @@ export default function CashFlowChart() {
                             point.totalIncome,
                             activeCurrency,
                           )}`}
-                          className="w-5 rounded-t-md bg-[#4f8d71] transition-[height] duration-500"
+                          className="w-3.5 rounded-t bg-[#4f8d71] transition-[height] duration-500"
                           style={{
                             height: `${incomeHeight}%`,
                           }}
@@ -348,29 +322,17 @@ export default function CashFlowChart() {
                             point.totalExpenses,
                             activeCurrency,
                           )}`}
-                          className="w-5 rounded-t-md bg-[#c98767] transition-[height] duration-500"
+                          className="w-3.5 rounded-t bg-[#c98767] transition-[height] duration-500"
                           style={{
                             height: `${expenseHeight}%`,
                           }}
                         />
                       </div>
 
-                      <div className="h-16 pt-3 text-center">
-                        <p className="text-xs font-semibold text-[#173c32]">
-                          {getMonthLabel(point.monthStart)}
-                        </p>
-
-                        <p
-                          className={[
-                            'mt-1 text-[10px] font-medium',
-                            point.netCashFlow >= 0
-                              ? 'text-[#36775d]'
-                              : 'text-[#a85e49]',
-                          ].join(' ')}
-                        >
-                          {formatCompactMoney(
-                            point.netCashFlow,
-                            activeCurrency,
+                      <div className="h-11 pt-2 text-center">
+                        <p className="text-xs font-semibold text-[#657972]">
+                          {getMonthLabel(
+                            point.monthStart,
                           )}
                         </p>
                       </div>
@@ -382,6 +344,6 @@ export default function CashFlowChart() {
           </div>
         </div>
       )}
-    </section>
+    </article>
   )
 }

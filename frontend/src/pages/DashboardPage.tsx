@@ -4,11 +4,12 @@ import {
   RefreshCw,
   Sparkles,
 } from 'lucide-react'
-import {ApiClientError} from '../api/ApiClientError'
-import type {DashboardSummary} from '../features/dashboard/api/types'
-import {useDashboardSummary} from '../features/dashboard/hooks/useDashboardSummary'
-import {useProfile} from '../features/profile/hooks/useProfile'
+import { ApiClientError } from '../api/ApiClientError'
+import type { DashboardSummary } from '../features/dashboard/api/types'
 import CashFlowChart from '../features/dashboard/components/CashFlowChart'
+import TopSpendingCard from '../features/dashboard/components/TopSpendingCard'
+import { useDashboardSummary } from '../features/dashboard/hooks/useDashboardSummary'
+import { useProfile } from '../features/profile/hooks/useProfile'
 
 function formatMoney(amount: number, currencyCode: string) {
   return new Intl.NumberFormat('en-ZA', {
@@ -101,15 +102,19 @@ function getDashboardInsight(summary: DashboardSummary) {
 
 function DashboardSkeleton() {
   return (
-    <div className="mt-10 animate-pulse">
-      <div className="h-24 rounded-2xl bg-[#e5e8e1]"/>
+    <div className="mt-8 animate-pulse">
+      <div className="h-20 rounded-2xl bg-[#e5e8e1]" />
 
-      <div className="mt-8 grid gap-6 xl:grid-cols-[2fr_0.95fr]">
-        <div className="h-96 rounded-3xl bg-[#e5e8e1]"/>
-        <div className="h-96 rounded-3xl bg-[#e5e8e1]"/>
+      <div className="mt-6 grid gap-5 xl:grid-cols-12">
+        <div className="h-48 rounded-3xl bg-[#e5e8e1] xl:col-span-5" />
+        <div className="h-48 rounded-3xl bg-[#e5e8e1] xl:col-span-4" />
+        <div className="h-48 rounded-3xl bg-[#e5e8e1] xl:col-span-3" />
       </div>
 
-      <div className="mt-12 h-72 rounded-3xl bg-[#e5e8e1]"/>
+      <div className="mt-6 grid gap-5 xl:grid-cols-[2fr_0.9fr]">
+        <div className="h-[330px] rounded-3xl bg-[#e5e8e1]" />
+        <div className="h-[330px] rounded-3xl bg-[#e5e8e1]" />
+      </div>
     </div>
   )
 }
@@ -123,7 +128,7 @@ export default function DashboardPage() {
     refetch,
   } = useDashboardSummary()
 
-  const {data: profile} = useProfile()
+  const { data: profile } = useProfile()
 
   const firstName = profile?.firstName ?? 'there'
 
@@ -143,8 +148,7 @@ export default function DashboardPage() {
                 : 'YOUR FINANCIAL OVERVIEW'}
             </p>
 
-            <h1
-              className="mt-5 font-serif text-4xl leading-none tracking-[-0.03em] text-[#173c32] sm:text-5xl lg:text-6xl">
+            <h1 className="mt-5 font-serif text-4xl leading-none tracking-[-0.03em] text-[#173c32] sm:text-5xl lg:text-6xl">
               {getGreeting()}, {firstName}.
             </h1>
           </div>
@@ -153,9 +157,11 @@ export default function DashboardPage() {
             type="button"
             disabled={isFetching}
             onClick={() => void refetch()}
-            className="flex items-center gap-3 rounded-full border border-[#dedbd2] bg-[#fffdf8] px-5 py-3 text-sm font-medium text-[#173c32] transition hover:border-[#bd9460] hover:text-[#9a6828] disabled:opacity-60"
+            className="flex cursor-pointer items-center gap-3 rounded-full border border-[#dedbd2] bg-[#fffdf8] px-5 py-3 text-sm font-medium text-[#173c32] transition hover:border-[#bd9460] hover:text-[#9a6828] disabled:cursor-not-allowed disabled:opacity-60"
           >
-            <span>{isFetching ? 'Refreshing…' : 'Refresh'}</span>
+            <span>
+              {isFetching ? 'Refreshing…' : 'Refresh'}
+            </span>
 
             <RefreshCw
               size={15}
@@ -165,11 +171,11 @@ export default function DashboardPage() {
           </button>
         </header>
 
-        {isPending && <DashboardSkeleton/>}
+        {isPending && <DashboardSkeleton />}
 
         {error && (
           <section
-            className="mt-10 rounded-2xl border border-red-200 bg-red-50 p-7"
+            className="mt-8 rounded-2xl border border-red-200 bg-red-50 p-7"
             role="alert"
           >
             <h2 className="font-serif text-2xl text-red-950">
@@ -183,21 +189,23 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => void refetch()}
-              className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-red-800 underline underline-offset-4"
+              className="mt-5 inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-red-800 underline underline-offset-4"
             >
               Try again
-              <ArrowRight size={15} aria-hidden/>
+              <ArrowRight size={15} aria-hidden />
             </button>
           </section>
         )}
 
         {summary && (
           <>
-            <DashboardContent summary={summary}/>
+            <DashboardContent summary={summary} />
 
-            <footer
-              className="mt-16 flex flex-wrap items-center justify-between gap-3 border-t border-[#dedbd2] py-6 text-xs text-[#657972]">
-              <p>Salif keeps your financial information private and secure.</p>
+            <footer className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-[#dedbd2] py-6 text-xs text-[#657972]">
+              <p>
+                Salif keeps your financial information private
+                and secure.
+              </p>
 
               <p>
                 Last synced just now
@@ -216,25 +224,24 @@ interface DashboardContentProps {
 }
 
 function DashboardContent({
-                            summary,
-                          }: DashboardContentProps) {
+  summary,
+}: DashboardContentProps) {
   const insight = getDashboardInsight(summary)
 
   const activePercentage =
     summary.totalAccountCount === 0
       ? 0
       : Math.round(
-        (summary.activeAccountCount /
-          summary.totalAccountCount) *
-        100,
-      )
+          (summary.activeAccountCount /
+            summary.totalAccountCount) *
+            100,
+        )
 
   return (
     <>
-      <section
-        className="mt-10 flex items-start gap-4 rounded-2xl bg-[#dfece3] px-6 py-5 text-[#173c32] sm:px-7">
+      <section className="mt-8 flex items-start gap-4 rounded-2xl bg-[#dfece3] px-6 py-4 text-[#173c32]">
         <Sparkles
-          size={19}
+          size={18}
           className="mt-0.5 shrink-0 text-[#bd8539]"
           aria-hidden
         />
@@ -250,150 +257,166 @@ function DashboardContent({
         </div>
       </section>
 
-      <section className="mt-8 grid gap-6 xl:grid-cols-[2fr_0.95fr]">
-        <article className="rounded-3xl border border-[#dedbd2] bg-[#fffdf8] p-6 sm:p-8">
-          <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold tracking-[0.15em] text-[#657972]">
-              NET WORTH
-            </p>
-
-            <span className="text-xl tracking-[0.18em] text-[#657972]">
-              ···
-            </span>
-          </div>
+      <section className="mt-6 grid gap-5 lg:grid-cols-2 xl:grid-cols-12">
+        <article className="min-h-[190px] rounded-3xl border border-[#dedbd2] bg-[#fffdf8] p-6 xl:col-span-5">
+          <p className="text-xs font-semibold tracking-[0.15em] text-[#657972]">
+            NET WORTH
+          </p>
 
           {summary.netWorthByCurrency.length === 0 ? (
-            <div className="grid min-h-72 place-items-center text-center">
-              <div>
-                <p className="font-serif text-3xl text-[#173c32]">
-                  No accounts yet
-                </p>
+            <div className="mt-7">
+              <p className="font-serif text-2xl text-[#173c32]">
+                No accounts yet
+              </p>
 
-                <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-[#657972]">
-                  Add an account and Salif will begin calculating
-                  your net worth.
-                </p>
-              </div>
+              <p className="mt-2 text-sm leading-6 text-[#657972]">
+                Add an account to calculate your net worth.
+              </p>
             </div>
           ) : (
-            <div className="mt-8">
-              <div className="grid gap-7 sm:grid-cols-2">
-                {summary.netWorthByCurrency.map((item) => (
-                  <div key={item.currencyCode}>
-                    <p className="text-xs font-semibold tracking-[0.12em] text-[#657972]">
-                      {item.currencyCode}
-                    </p>
+            <div className="mt-5 space-y-4">
+              {summary.netWorthByCurrency
+                .slice(0, 2)
+                .map((item) => (
+                  <div
+                    key={item.currencyCode}
+                    className="flex items-end justify-between gap-4"
+                  >
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold text-[#657972]">
+                        {item.currencyCode}
+                      </p>
 
-                    <p
-                      className="mt-2 font-serif text-4xl tracking-[-0.03em] text-[#173c32] sm:text-5xl">
-                      {formatMoney(
-                        item.netWorth,
-                        item.currencyCode,
-                      )}
-                    </p>
+                      <p className="mt-1 truncate font-serif text-3xl tracking-[-0.03em] text-[#173c32]">
+                        {formatMoney(
+                          item.netWorth,
+                          item.currencyCode,
+                        )}
+                      </p>
+                    </div>
 
-                    <p className="mt-3 text-sm text-[#657972]">
+                    <p className="shrink-0 text-xs text-[#657972]">
                       {item.includeAccountCount}{' '}
                       {item.includeAccountCount === 1
                         ? 'account'
-                        : 'accounts'}{' '}
-                      included
+                        : 'accounts'}
                     </p>
                   </div>
                 ))}
-              </div>
 
-              <div className="mt-12 border-t border-[#e5e1d8] pt-7">
-                <div className="grid gap-6 sm:grid-cols-3">
-                  <div>
-                    <p className="text-xs text-[#657972]">
-                      Total accounts
-                    </p>
-
-                    <p className="mt-2 font-serif text-3xl text-[#173c32]">
-                      {summary.totalAccountCount}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-xs text-[#657972]">
-                      Active
-                    </p>
-
-                    <p className="mt-2 font-serif text-3xl text-[#37745e]">
-                      {summary.activeAccountCount}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-xs text-[#657972]">
-                      Archived
-                    </p>
-
-                    <p className="mt-2 font-serif text-3xl text-[#8a7460]">
-                      {summary.archivedAccountCount}
-                    </p>
-                  </div>
-                </div>
-              </div>
+              {summary.netWorthByCurrency.length > 2 && (
+                <p className="text-xs text-[#657972]">
+                  Plus{' '}
+                  {summary.netWorthByCurrency.length - 2}{' '}
+                  more currencies
+                </p>
+              )}
             </div>
           )}
         </article>
 
-        <article className="rounded-3xl border border-[#dedbd2] bg-[#fffdf8] p-6 sm:p-8">
+        <article className="min-h-[190px] rounded-3xl border border-[#dedbd2] bg-[#fffdf8] p-6 xl:col-span-4">
           <p className="text-xs font-semibold tracking-[0.15em] text-[#657972]">
-            PORTFOLIO HEALTH
+            THIS MONTH
           </p>
 
-          <div className="mt-7 flex justify-center">
-            <div
-              className="grid size-44 place-items-center rounded-full p-3"
-              style={{
-                background: `conic-gradient(
-                  #79a486 ${activePercentage * 3.6}deg,
-                  #e4ebe3 0deg
-                )`,
-              }}
-            >
-              <div
-                className="grid size-full place-items-center rounded-full border border-[#c8d8ca] bg-[#eef4ec] text-center">
-                <div>
-                  <p className="font-serif text-4xl text-[#2d684f]">
-                    {activePercentage}%
-                  </p>
+          {summary.currentMonthCashFlow.length === 0 ? (
+            <div className="mt-7">
+              <p className="font-serif text-2xl text-[#173c32]">
+                No movement yet
+              </p>
 
-                  <p className="mt-1 text-xs text-[#657972]">
-                    active
-                  </p>
-                </div>
-              </div>
+              <p className="mt-2 text-sm leading-6 text-[#657972]">
+                Transactions will build your monthly picture.
+              </p>
             </div>
+          ) : (
+            <div className="mt-5 space-y-4">
+              {summary.currentMonthCashFlow
+                .slice(0, 2)
+                .map((item) => (
+                  <div key={item.currencyCode}>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-xs font-bold text-[#657972]">
+                        {item.currencyCode}
+                      </span>
+
+                      <span
+                        className={[
+                          'font-serif text-2xl',
+                          item.netCashFlow >= 0
+                            ? 'text-[#36775d]'
+                            : 'text-[#a85e49]',
+                        ].join(' ')}
+                      >
+                        {formatMoney(
+                          item.netCashFlow,
+                          item.currencyCode,
+                        )}
+                      </span>
+                    </div>
+
+                    <p className="mt-1 text-xs text-[#657972]">
+                      {formatMoney(
+                        item.totalIncome,
+                        item.currencyCode,
+                      )}{' '}
+                      in
+                      <span aria-hidden> · </span>
+                      {formatMoney(
+                        item.totalExpenses,
+                        item.currencyCode,
+                      )}{' '}
+                      out
+                    </p>
+                  </div>
+                ))}
+            </div>
+          )}
+        </article>
+
+        <article className="min-h-[190px] rounded-3xl border border-[#dedbd2] bg-[#fffdf8] p-6 lg:col-span-2 xl:col-span-3">
+          <p className="text-xs font-semibold tracking-[0.15em] text-[#657972]">
+            ACCOUNTS
+          </p>
+
+          <div className="mt-5 flex items-end justify-between gap-3">
+            <p className="font-serif text-4xl text-[#173c32]">
+              {summary.activeAccountCount}
+            </p>
+
+            <p className="text-right text-xs text-[#657972]">
+              of {summary.totalAccountCount}
+              <br />
+              active
+            </p>
           </div>
 
-          <p className="mt-7 text-center font-serif text-2xl text-[#173c32]">
-            {activePercentage >= 75
-              ? 'Looking healthy'
-              : activePercentage > 0
-                ? 'Taking shape'
-                : 'Ready to begin'}
-          </p>
+          <div className="mt-5 h-2 overflow-hidden rounded-full bg-[#e4ebe3]">
+            <div
+              className="h-full rounded-full bg-[#79a486]"
+              style={{
+                width: `${activePercentage}%`,
+              }}
+            />
+          </div>
 
-          <p className="mt-3 text-center text-sm leading-6 text-[#657972]">
-            {summary.activeAccountCount} of your{' '}
-            {summary.totalAccountCount}{' '}
-            {summary.totalAccountCount === 1
-              ? 'account is'
-              : 'accounts are'}{' '}
-            active.
+          <p className="mt-5 text-sm leading-5 text-[#657972]">
+            {activePercentage >= 75
+              ? 'Your accounts are in good shape.'
+              : activePercentage > 0
+                ? 'Your portfolio is taking shape.'
+                : 'Add an account to begin.'}
           </p>
         </article>
       </section>
 
-      <div className="mt-12">
+      <section className="mt-6 grid gap-5 xl:grid-cols-[minmax(0,2fr)_minmax(290px,0.9fr)]">
         <CashFlowChart />
-      </div>
+        <TopSpendingCard />
+      </section>
 
-      <section className="mt-12">
+      <section className="mt-10">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-xs font-semibold tracking-[0.15em] text-[#657972]">
@@ -414,12 +437,11 @@ function DashboardContent({
           </p>
         </div>
 
-        <div className="mt-6 border-y border-[#dedbd2]">
+        <div className="mt-5 border-y border-[#dedbd2]">
           {summary.dueRecurringTransactions.length === 0 ? (
             <div className="flex items-center gap-4 py-8">
-              <span
-                className="grid size-10 place-items-center rounded-full bg-[#dfece3] text-[#37745e]">
-                <Check size={19} aria-hidden/>
+              <span className="grid size-10 place-items-center rounded-full bg-[#dfece3] text-[#37745e]">
+                <Check size={19} aria-hidden />
               </span>
 
               <div>
@@ -433,64 +455,73 @@ function DashboardContent({
               </div>
             </div>
           ) : (
-            summary.dueRecurringTransactions.map((item, index) => (
-              <article
-                key={item.recurringTransactionId}
-                className={`grid gap-4 py-6 sm:grid-cols-[1fr_auto] sm:items-center ${
-                  index > 0 ? 'border-t border-[#dedbd2]' : ''
-                }`}
-              >
-                <div className="flex items-start gap-4">
-                  <span
-                    className={`mt-2 size-2 shrink-0 rounded-full ${
-                      item.daysOverdue > 0
-                        ? 'bg-[#bb6b4d]'
-                        : 'bg-[#8fb69b]'
-                    }`}
-                    aria-hidden
-                  />
+            summary.dueRecurringTransactions.map(
+              (item, index) => (
+                <article
+                  key={item.recurringTransactionId}
+                  className={[
+                    'grid gap-4 py-6 sm:grid-cols-[1fr_auto]',
+                    'sm:items-center',
+                    index > 0
+                      ? 'border-t border-[#dedbd2]'
+                      : '',
+                  ].join(' ')}
+                >
+                  <div className="flex items-start gap-4">
+                    <span
+                      className={[
+                        'mt-2 size-2 shrink-0 rounded-full',
+                        item.daysOverdue > 0
+                          ? 'bg-[#bb6b4d]'
+                          : 'bg-[#8fb69b]',
+                      ].join(' ')}
+                      aria-hidden
+                    />
 
-                  <div>
-                    <p className="font-semibold text-[#173c32]">
-                      {item.name}
-                    </p>
+                    <div>
+                      <p className="font-semibold text-[#173c32]">
+                        {item.name}
+                      </p>
 
-                    <p className="mt-1 text-sm text-[#657972]">
-                      {item.categoryName ?? 'Uncategorised'}
-                      {' · '}
-                      {item.accountName}
-                      {' · '}
-                      {item.daysOverdue > 0
-                        ? `${item.daysOverdue} ${
-                          item.daysOverdue === 1
-                            ? 'day'
-                            : 'days'
-                        } overdue`
-                        : `due ${formatDate(item.nextDueDate)}`}
-                    </p>
+                      <p className="mt-1 text-sm text-[#657972]">
+                        {item.categoryName ?? 'Uncategorised'}
+                        {' · '}
+                        {item.accountName}
+                        {' · '}
+                        {item.daysOverdue > 0
+                          ? `${item.daysOverdue} ${
+                              item.daysOverdue === 1
+                                ? 'day'
+                                : 'days'
+                            } overdue`
+                          : `due ${formatDate(
+                              item.nextDueDate,
+                            )}`}
+                      </p>
 
-                    {item.autoPost && (
-                      <span className="mt-2 inline-block text-xs font-medium text-[#37745e]">
-                        Posts automatically
-                      </span>
-                    )}
+                      {item.autoPost && (
+                        <span className="mt-2 inline-block text-xs font-medium text-[#37745e]">
+                          Posts automatically
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                <div className="pl-6 text-left sm:pl-0 sm:text-right">
-                  <p className="font-semibold text-[#173c32]">
-                    {formatMoney(
-                      item.amount,
-                      item.currencyCode,
-                    )}
-                  </p>
+                  <div className="pl-6 text-left sm:pl-0 sm:text-right">
+                    <p className="font-semibold text-[#173c32]">
+                      {formatMoney(
+                        item.amount,
+                        item.currencyCode,
+                      )}
+                    </p>
 
-                  <p className="mt-1 text-xs text-[#657972]">
-                    {item.frequency.toLowerCase()}
-                  </p>
-                </div>
-              </article>
-            ))
+                    <p className="mt-1 text-xs text-[#657972]">
+                      {item.frequency.toLowerCase()}
+                    </p>
+                  </div>
+                </article>
+              ),
+            )
           )}
         </div>
       </section>
