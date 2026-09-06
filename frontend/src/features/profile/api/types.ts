@@ -1,4 +1,8 @@
-import type {UserStatus} from '../../auth/api/types'
+export type UserStatus =
+  | 'PENDING_VERIFICATION'
+  | 'ACTIVE'
+  | 'LOCKED'
+  | 'DEACTIVATED'
 
 export interface UserProfile {
   readonly id: string
@@ -14,4 +18,16 @@ export interface UserProfile {
   readonly createdAt: string
   readonly updatedAt: string
   readonly version: number
+}
+
+export interface UpdateUserProfileRequest {
+  version: number
+  firstName: string
+  lastName: string
+  timeZone: string
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string
+  newPassword: string
 }

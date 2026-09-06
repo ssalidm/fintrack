@@ -1,4 +1,4 @@
-import {createBrowserRouter} from 'react-router'
+import { createBrowserRouter } from 'react-router'
 import ProtectedRoute from '../features/auth/components/ProtectedRoute.tsx'
 import AuthLayout from '../features/auth/layouts/AuthLayout.tsx'
 import DashboardLayout from '../features/dashboard/layouts/DashboardLayout.tsx'
@@ -18,75 +18,80 @@ import {
   TransactionsPage,
   TransfersPage,
   VerifyEmailPage,
+  ProfilePage
 } from './lazyPages'
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <HomePage/>,
+    element: <HomePage />,
   },
   {
-    element: <AuthLayout/>,
+    element: <AuthLayout />,
     children: [
       {
         path: '/login',
-        element: <LoginPage/>,
+        element: <LoginPage />,
       },
       {
         path: '/register',
-        element: <RegisterPage/>,
+        element: <RegisterPage />,
       },
       {
         path: '/verify-email',
-        element: <VerifyEmailPage/>,
+        element: <VerifyEmailPage />,
       },
       {
         path: '/resend-verification',
-        element: <ResendVerificationPage/>,
+        element: <ResendVerificationPage />,
       },
       {
         path: '/forgot-password',
-        element: <ForgotPasswordPage/>,
+        element: <ForgotPasswordPage />,
       },
       {
         path: '/reset-password',
-        element: <ResetPasswordPage/>,
+        element: <ResetPasswordPage />,
       },
     ],
   },
   {
-    element: <ProtectedRoute/>,
+    element: <ProtectedRoute />,
     children: [
       {
-        element: <DashboardLayout/>,
+        element: <DashboardLayout />,
         children: [
           {
             path: '/dashboard',
-            element: <DashboardPage/>,
+            element: <DashboardPage />,
           },
           {
             path: '/money-in-motion',
-            element: <MoneyInMotionPage/>,
+            element: <MoneyInMotionPage />,
           },
           {
             path: '/transactions',
-            element: <TransactionsPage/>,
+            element: <TransactionsPage />,
           },
           {
             path: '/transfers',
-            element: <TransfersPage/>,
+            element: <TransfersPage />,
           },
           {
             path: '/recurring',
-            element: <RecurringTransactionsPage/>,
+            element: <RecurringTransactionsPage />,
           },
           {
             path: '/categories',
-            element: <CategoriesPage/>,
+            element: <CategoriesPage />,
           },
           {
             path: '/accounts',
-            element: <AccountsPage/>,
+            element: <AccountsPage />,
+          },
+          {
+            path: '/profile',
+            element: <ProfilePage />,
           },
         ],
       },
@@ -94,6 +99,6 @@ export const router = createBrowserRouter([
   },
   {
     path: '*',
-    element: <NotFoundPage/>,
+    element: <NotFoundPage />,
   },
 ])

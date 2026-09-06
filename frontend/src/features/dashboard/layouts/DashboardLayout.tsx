@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import { useState } from 'react'
 import {
   ArrowLeftRight,
   CalendarClock,
@@ -10,7 +10,7 @@ import {
   Menu,
   ReceiptText,
   Repeat2,
-  Settings,
+  UserRound,
   Shapes,
   Target,
   X,
@@ -22,8 +22,8 @@ import {
   useNavigate,
 } from 'react-router'
 import salifLogoLight from '../../../assets/brand/salif-logo-light.png'
-import {useAuth} from '../../auth/context/useAuth'
-import {useProfile} from '../../profile/hooks/useProfile'
+import { useAuth } from '../../auth/context/useAuth'
+import { useProfile } from '../../profile/hooks/useProfile'
 
 const moneyMovementPaths = [
   '/money-in-motion',
@@ -35,7 +35,7 @@ const moneyMovementPaths = [
 const moneyMovementItems = [
   {
     to: '/money-in-motion',
-    label: 'Overview',
+    label: 'Money Hub',
     icon: CircleGauge,
   },
   {
@@ -85,8 +85,8 @@ interface SidebarContentProps {
 }
 
 function SidebarContent({
-                          onNavigate,
-                        }: SidebarContentProps) {
+  onNavigate,
+}: SidebarContentProps) {
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -101,8 +101,8 @@ function SidebarContent({
     setCollapsedActiveMovementPath,
   ] = useState<string | null>(null)
 
-  const {data: profile} = useProfile()
-  const {logout} = useAuth()
+  const { data: profile } = useProfile()
+  const { logout } = useAuth()
 
   const isMoneyMovementActive =
     moneyMovementPaths.includes(location.pathname)
@@ -142,7 +142,7 @@ function SidebarContent({
     setIsLoggingOut(true)
     await logout()
     onNavigate?.()
-    navigate('/login', {replace: true})
+    navigate('/login', { replace: true })
   }
 
   const navigationClassName =
@@ -152,7 +152,7 @@ function SidebarContent({
   return (
     <div className="flex h-full flex-col bg-[#174f43] px-5 py-7 text-[#f7f3e9]">
       <div className="px-2">
-        <SalifLogo/>
+        <SalifLogo />
       </div>
 
       <div className="mt-12 flex items-center gap-3 px-2">
@@ -179,7 +179,7 @@ function SidebarContent({
           to="/dashboard"
           end
           onClick={onNavigate}
-          className={({isActive}) =>
+          className={({ isActive }) =>
             [
               navigationClassName,
               isActive
@@ -188,17 +188,16 @@ function SidebarContent({
             ].join(' ')
           }
         >
-          <LayoutDashboard size={18} aria-hidden/>
+          <LayoutDashboard size={18} aria-hidden />
           Overview
         </NavLink>
 
         <div>
           <div
-            className={`flex items-center rounded-xl transition-colors ${
-              isMoneyMovementActive
+            className={`flex items-center rounded-xl transition-colors ${isMoneyMovementActive
                 ? 'bg-white/10 text-white'
                 : 'text-[#d5e4dd] hover:bg-white/5 hover:text-white'
-            }`}
+              }`}
           >
             <NavLink
               to="/money-in-motion"
@@ -229,11 +228,10 @@ function SidebarContent({
             >
               <ChevronDown
                 size={16}
-                className={`transition-transform duration-200 ${
-                  isMoneyMovementExpanded
+                className={`transition-transform duration-200 ${isMoneyMovementExpanded
                     ? 'rotate-180'
                     : ''
-                }`}
+                  }`}
                 aria-hidden
               />
             </button>
@@ -251,7 +249,7 @@ function SidebarContent({
                       to={item.to}
                       end
                       onClick={onNavigate}
-                      className={({isActive}) =>
+                      className={({ isActive }) =>
                         [
                           'flex cursor-pointer items-center gap-3',
                           'rounded-lg px-3 py-2 text-sm transition-colors',
@@ -261,7 +259,7 @@ function SidebarContent({
                         ].join(' ')
                       }
                     >
-                      <Icon size={15} aria-hidden/>
+                      <Icon size={15} aria-hidden />
                       {item.label}
                     </NavLink>
                   )
@@ -279,7 +277,7 @@ function SidebarContent({
               key={item.to}
               to={item.to}
               onClick={onNavigate}
-              className={({isActive}) =>
+              className={({ isActive }) =>
                 [
                   navigationClassName,
                   isActive
@@ -288,7 +286,7 @@ function SidebarContent({
                 ].join(' ')
               }
             >
-              <Icon size={18} aria-hidden/>
+              <Icon size={18} aria-hidden />
               {item.label}
             </NavLink>
           )
@@ -300,7 +298,7 @@ function SidebarContent({
           title="Coming in a later module"
           className="flex w-full cursor-not-allowed items-center gap-3 rounded-xl px-4 py-2.5 text-left text-sm font-medium text-[#d5e4dd]/60"
         >
-          <Target size={18} aria-hidden/>
+          <Target size={18} aria-hidden />
 
           <span className="flex-1">Goals</span>
 
@@ -311,15 +309,21 @@ function SidebarContent({
       </nav>
 
       <div className="mt-auto space-y-2">
-        <button
-          type="button"
-          disabled
-          title="Coming in a later module"
-          className="flex w-full cursor-not-allowed items-center gap-3 rounded-xl px-4 py-2.5 text-left text-sm font-medium text-[#d5e4dd]/60"
+        <NavLink
+          to="/profile"
+          onClick={onNavigate}
+          className={({ isActive }) =>
+            [
+              navigationClassName,
+              isActive
+                ? 'bg-white/10 text-white'
+                : 'text-[#d5e4dd] hover:bg-white/5 hover:text-white',
+            ].join(' ')
+          }
         >
-          <Settings size={18} aria-hidden/>
-          Settings
-        </button>
+          <UserRound size={18} aria-hidden />
+          Profile
+        </NavLink>
 
         <button
           type="button"
@@ -327,7 +331,7 @@ function SidebarContent({
           onClick={() => void handleLogout()}
           className="flex w-full cursor-pointer items-center gap-3 rounded-xl border border-white/15 px-4 py-2.5 text-left text-sm font-semibold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          <LogOut size={18} aria-hidden/>
+          <LogOut size={18} aria-hidden />
 
           {isLoggingOut
             ? 'Signing out…'
@@ -355,12 +359,12 @@ export default function DashboardLayout() {
   return (
     <div className="min-h-screen bg-[#f7f5ef] text-[#173c32]">
       <aside className="fixed inset-y-0 left-0 hidden w-[18.5rem] lg:block">
-        <SidebarContent/>
+        <SidebarContent />
       </aside>
 
       <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-[#dedbd2] bg-[#f7f5ef]/95 px-5 backdrop-blur lg:hidden">
         <div className="rounded-lg bg-[#174f43] px-2">
-          <SalifLogo/>
+          <SalifLogo />
         </div>
 
         <button
@@ -370,12 +374,12 @@ export default function DashboardLayout() {
           aria-label="Open navigation"
           aria-expanded={isMenuOpen}
         >
-          <Menu size={23} aria-hidden/>
+          <Menu size={23} aria-hidden />
         </button>
       </header>
 
       <div className="lg:pl-[18.5rem]">
-        <Outlet/>
+        <Outlet />
       </div>
 
       {isMenuOpen && (
@@ -394,7 +398,7 @@ export default function DashboardLayout() {
               className="absolute top-5 right-4 z-10 cursor-pointer rounded-lg p-2 text-white transition hover:bg-white/10"
               aria-label="Close navigation"
             >
-              <X size={21} aria-hidden/>
+              <X size={21} aria-hidden />
             </button>
 
             <SidebarContent
