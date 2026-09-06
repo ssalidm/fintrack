@@ -1,19 +1,72 @@
 import {useState} from 'react'
 import {
   ArrowLeftRight,
-  LayoutDashboard,
+  CalendarClock,
+  ChevronDown,
+  CircleGauge,
   Landmark,
+  LayoutDashboard,
   LogOut,
   Menu,
+  ReceiptText,
+  Repeat2,
   Settings,
-  Tags,
+  Shapes,
   Target,
   X,
 } from 'lucide-react'
-import {NavLink, Outlet, useNavigate} from 'react-router'
+import {
+  NavLink,
+  Outlet,
+  useLocation,
+  useNavigate,
+} from 'react-router'
+import salifLogoLight from '../../../assets/brand/salif-logo-light.png'
 import {useAuth} from '../../auth/context/useAuth'
 import {useProfile} from '../../profile/hooks/useProfile'
-import salifLogoLight from '../../../assets/brand/salif-logo-light.png'
+
+const moneyMovementPaths = [
+  '/money-in-motion',
+  '/transactions',
+  '/transfers',
+  '/recurring',
+]
+
+const moneyMovementItems = [
+  {
+    to: '/money-in-motion',
+    label: 'Overview',
+    icon: CircleGauge,
+  },
+  {
+    to: '/transactions',
+    label: 'Transactions',
+    icon: ReceiptText,
+  },
+  {
+    to: '/transfers',
+    label: 'Transfers',
+    icon: Repeat2,
+  },
+  {
+    to: '/recurring',
+    label: 'Recurring',
+    icon: CalendarClock,
+  },
+]
+
+const primaryNavigationItems = [
+  {
+    to: '/categories',
+    label: 'Categories',
+    icon: Shapes,
+  },
+  {
+    to: '/accounts',
+    label: 'Accounts',
+    icon: Landmark,
+  },
+]
 
 function SalifLogo() {
   return (
@@ -34,11 +87,33 @@ interface SidebarContentProps {
 function SidebarContent({
                           onNavigate,
                         }: SidebarContentProps) {
-  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  const [isLoggingOut, setIsLoggingOut] =
+    useState(false)
+
+  const [isMoneyMenuOpen, setIsMoneyMenuOpen] =
+    useState(false)
+
+  const [
+    collapsedActiveMovementPath,
+    setCollapsedActiveMovementPath,
+  ] = useState<string | null>(null)
 
   const {data: profile} = useProfile()
   const {logout} = useAuth()
-  const navigate = useNavigate()
+
+  const isMoneyMovementActive =
+    moneyMovementPaths.includes(location.pathname)
+
+  const isMoneyMovementExpanded =
+    isMoneyMenuOpen ||
+    (
+      isMoneyMovementActive &&
+      collapsedActiveMovementPath !==
+      location.pathname
+    )
 
   const displayName = profile
     ? `${profile.firstName} ${profile.lastName}`
@@ -49,6 +124,20 @@ function SidebarContent({
       .toUpperCase()
     : 'S'
 
+  function toggleMoneyMovement() {
+    if (isMoneyMovementExpanded) {
+      setIsMoneyMenuOpen(false)
+      setCollapsedActiveMovementPath(
+        location.pathname,
+      )
+
+      return
+    }
+
+    setIsMoneyMenuOpen(true)
+    setCollapsedActiveMovementPath(null)
+  }
+
   async function handleLogout() {
     setIsLoggingOut(true)
     await logout()
@@ -56,15 +145,18 @@ function SidebarContent({
     navigate('/login', {replace: true})
   }
 
+  const navigationClassName =
+    'flex cursor-pointer items-center gap-3 rounded-xl ' +
+    'px-4 py-2.5 text-sm font-medium transition-colors'
+
   return (
     <div className="flex h-full flex-col bg-[#174f43] px-5 py-7 text-[#f7f3e9]">
       <div className="px-2">
         <SalifLogo/>
       </div>
 
-      <div className="mt-16 flex items-center gap-3 px-2">
-        <span
-          className="grid size-11 shrink-0 place-items-center rounded-full bg-[#bcd9c5] text-sm font-bold text-[#174f43]">
+      <div className="mt-12 flex items-center gap-3 px-2">
+        <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#bcd9c5] text-sm font-bold text-[#174f43]">
           {initials}
         </span>
 
@@ -79,87 +171,142 @@ function SidebarContent({
         </div>
       </div>
 
-      <nav className="mt-11 space-y-2" aria-label="Main navigation">
+      <nav
+        className="mt-9 space-y-1.5"
+        aria-label="Main navigation"
+      >
         <NavLink
           to="/dashboard"
           end
           onClick={onNavigate}
           className={({isActive}) =>
             [
-              'flex items-center gap-3 rounded-xl px-4 py-3 text-sm',
-              'font-medium transition-colors',
+              navigationClassName,
               isActive
                 ? 'bg-white/10 text-white'
                 : 'text-[#d5e4dd] hover:bg-white/5 hover:text-white',
             ].join(' ')
           }
         >
-          <LayoutDashboard size={19} aria-hidden/>
+          <LayoutDashboard size={18} aria-hidden/>
           Overview
         </NavLink>
 
-        <NavLink
-          to="/transactions"
-          onClick={onNavigate}
-          className={({isActive}) =>
-            [
-              'flex items-center gap-3 rounded-xl px-4 py-3 text-sm',
-              'font-medium transition-colors',
-              isActive
+        <div>
+          <div
+            className={`flex items-center rounded-xl transition-colors ${
+              isMoneyMovementActive
                 ? 'bg-white/10 text-white'
-                : 'text-[#d5e4dd] hover:bg-white/5 hover:text-white',
-            ].join(' ')
-          }
-        >
-          <ArrowLeftRight size={19} aria-hidden/>
-          Money in motion
-        </NavLink>
+                : 'text-[#d5e4dd] hover:bg-white/5 hover:text-white'
+            }`}
+          >
+            <NavLink
+              to="/money-in-motion"
+              onClick={onNavigate}
+              className="flex min-w-0 flex-1 cursor-pointer items-center gap-3 px-4 py-2.5 text-sm font-medium"
+            >
+              <ArrowLeftRight
+                size={18}
+                className="shrink-0"
+                aria-hidden
+              />
 
-        <NavLink
-          to="/categories"
-          onClick={onNavigate}
-          className={({isActive}) =>
-            [
-              'flex items-center gap-3 rounded-xl px-4 py-3 text-sm',
-              'font-medium transition-colors',
-              isActive
-                ? 'bg-white/10 text-white'
-                : 'text-[#d5e4dd] hover:bg-white/5 hover:text-white',
-            ].join(' ')
-          }
-        >
-          <Tags size={19} aria-hidden/>
-          Categories
-        </NavLink>
+              <span className="truncate">
+                Money in motion
+              </span>
+            </NavLink>
 
-        <NavLink
-          to="/accounts"
-          onClick={onNavigate}
-          className={({isActive}) =>
-            [
-              'flex items-center gap-3 rounded-xl px-4 py-3 text-sm',
-              'font-medium transition-colors',
-              isActive
-                ? 'bg-white/10 text-white'
-                : 'text-[#d5e4dd] hover:bg-white/5 hover:text-white',
-            ].join(' ')
-          }
-        >
-          <Landmark size={19} aria-hidden/>
-          Accounts
-        </NavLink>
+            <button
+              type="button"
+              onClick={toggleMoneyMovement}
+              aria-expanded={isMoneyMovementExpanded}
+              aria-label={
+                isMoneyMovementExpanded
+                  ? 'Collapse money in motion menu'
+                  : 'Expand money in motion menu'
+              }
+              className="mr-2 grid size-8 shrink-0 cursor-pointer place-items-center rounded-lg transition hover:bg-white/10"
+            >
+              <ChevronDown
+                size={16}
+                className={`transition-transform duration-200 ${
+                  isMoneyMovementExpanded
+                    ? 'rotate-180'
+                    : ''
+                }`}
+                aria-hidden
+              />
+            </button>
+          </div>
+
+          {isMoneyMovementExpanded && (
+            <div className="ml-6 mt-1.5 border-l border-white/15 pl-3">
+              <div className="space-y-1">
+                {moneyMovementItems.map((item) => {
+                  const Icon = item.icon
+
+                  return (
+                    <NavLink
+                      key={item.to}
+                      to={item.to}
+                      end
+                      onClick={onNavigate}
+                      className={({isActive}) =>
+                        [
+                          'flex cursor-pointer items-center gap-3',
+                          'rounded-lg px-3 py-2 text-sm transition-colors',
+                          isActive
+                            ? 'bg-white/10 font-semibold text-white'
+                            : 'text-[#bed2c9] hover:bg-white/5 hover:text-white',
+                        ].join(' ')
+                      }
+                    >
+                      <Icon size={15} aria-hidden/>
+                      {item.label}
+                    </NavLink>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {primaryNavigationItems.map((item) => {
+          const Icon = item.icon
+
+          return (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              onClick={onNavigate}
+              className={({isActive}) =>
+                [
+                  navigationClassName,
+                  isActive
+                    ? 'bg-white/10 text-white'
+                    : 'text-[#d5e4dd] hover:bg-white/5 hover:text-white',
+                ].join(' ')
+              }
+            >
+              <Icon size={18} aria-hidden/>
+              {item.label}
+            </NavLink>
+          )
+        })}
 
         <button
           type="button"
           disabled
           title="Coming in a later module"
-          className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium text-[#d5e4dd]/70"
+          className="flex w-full cursor-not-allowed items-center gap-3 rounded-xl px-4 py-2.5 text-left text-sm font-medium text-[#d5e4dd]/60"
         >
-          <Target size={19} aria-hidden/>
+          <Target size={18} aria-hidden/>
+
           <span className="flex-1">Goals</span>
+
           <span className="text-[10px] uppercase tracking-wider">
-      Soon
-    </span>
+            Soon
+          </span>
         </button>
       </nav>
 
@@ -168,9 +315,9 @@ function SidebarContent({
           type="button"
           disabled
           title="Coming in a later module"
-          className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium text-[#d5e4dd]/70"
+          className="flex w-full cursor-not-allowed items-center gap-3 rounded-xl px-4 py-2.5 text-left text-sm font-medium text-[#d5e4dd]/60"
         >
-          <Settings size={19} aria-hidden/>
+          <Settings size={18} aria-hidden/>
           Settings
         </button>
 
@@ -178,10 +325,13 @@ function SidebarContent({
           type="button"
           disabled={isLoggingOut}
           onClick={() => void handleLogout()}
-          className="flex w-full items-center gap-3 rounded-xl border border-white/15 px-4 py-3 text-left text-sm font-semibold text-white transition hover:bg-white/10 disabled:opacity-60"
+          className="flex w-full cursor-pointer items-center gap-3 rounded-xl border border-white/15 px-4 py-2.5 text-left text-sm font-semibold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          <LogOut size={19} aria-hidden/>
-          {isLoggingOut ? 'Signing out…' : 'Sign out'}
+          <LogOut size={18} aria-hidden/>
+
+          {isLoggingOut
+            ? 'Signing out…'
+            : 'Sign out'}
         </button>
 
         <div className="mt-5 border-t border-white/15 px-4 pt-5">
@@ -199,7 +349,8 @@ function SidebarContent({
 }
 
 export default function DashboardLayout() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] =
+    useState(false)
 
   return (
     <div className="min-h-screen bg-[#f7f5ef] text-[#173c32]">
@@ -207,9 +358,7 @@ export default function DashboardLayout() {
         <SidebarContent/>
       </aside>
 
-      <header
-        className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-[#dedbd2] bg-[#f7f5ef]/95 px-5 backdrop-blur lg:hidden">
-
+      <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-[#dedbd2] bg-[#f7f5ef]/95 px-5 backdrop-blur lg:hidden">
         <div className="rounded-lg bg-[#174f43] px-2">
           <SalifLogo/>
         </div>
@@ -217,11 +366,11 @@ export default function DashboardLayout() {
         <button
           type="button"
           onClick={() => setIsMenuOpen(true)}
-          className="rounded-lg p-2 text-[#173c32] hover:bg-[#e7ece7]"
+          className="cursor-pointer rounded-lg p-2 text-[#173c32] transition hover:bg-[#e7ece7]"
           aria-label="Open navigation"
           aria-expanded={isMenuOpen}
         >
-          <Menu size={23}/>
+          <Menu size={23} aria-hidden/>
         </button>
       </header>
 
@@ -233,7 +382,7 @@ export default function DashboardLayout() {
         <div className="fixed inset-0 z-50 lg:hidden">
           <button
             type="button"
-            className="absolute inset-0 bg-black/35"
+            className="absolute inset-0 cursor-pointer bg-black/35"
             onClick={() => setIsMenuOpen(false)}
             aria-label="Close navigation"
           />
@@ -242,10 +391,10 @@ export default function DashboardLayout() {
             <button
               type="button"
               onClick={() => setIsMenuOpen(false)}
-              className="absolute top-5 right-4 z-10 rounded-lg p-2 text-white hover:bg-white/10"
+              className="absolute top-5 right-4 z-10 cursor-pointer rounded-lg p-2 text-white transition hover:bg-white/10"
               aria-label="Close navigation"
             >
-              <X size={21}/>
+              <X size={21} aria-hidden/>
             </button>
 
             <SidebarContent
