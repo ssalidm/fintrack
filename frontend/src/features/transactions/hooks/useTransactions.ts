@@ -15,6 +15,8 @@ import type {
   UpdateTransactionRequest,
   VoidTransactionRequest,
 } from '../api/types'
+import { categorySpendingQueryKeys } from '../../categories/hooks/useCategorySpending'
+import { cashFlowQueryKeys } from '../../dashboard/hooks/useCashFlowReport'
 
 export const defaultTransactionFilters: TransactionFilters = {
   status: 'POSTED',
@@ -73,6 +75,12 @@ async function invalidateFinancialData(
     queryClient.invalidateQueries({
       queryKey: dashboardSummaryQueryKey,
     }),
+    queryClient.invalidateQueries({
+      queryKey: cashFlowQueryKeys.all,
+    }),
+    queryClient.invalidateQueries({
+      queryKey: categorySpendingQueryKeys.all,
+    }),
   ])
 }
 
@@ -128,9 +136,9 @@ export function useUpdateTransaction() {
 
   return useMutation({
     mutationFn: async ({
-                         transactionId,
-                         payload,
-                       }: UpdateTransactionVariables) => {
+      transactionId,
+      payload,
+    }: UpdateTransactionVariables) => {
       const response = await request<Transaction>(
         `/transactions/${transactionId}`,
         {
@@ -158,9 +166,9 @@ export function useVoidTransaction() {
 
   return useMutation({
     mutationFn: async ({
-                         transactionId,
-                         payload,
-                       }: VoidTransactionVariables) => {
+      transactionId,
+      payload,
+    }: VoidTransactionVariables) => {
       const response = await request<Transaction>(
         `/transactions/${transactionId}/void`,
         {

@@ -8,6 +8,7 @@ import {ApiClientError} from '../api/ApiClientError'
 import type {DashboardSummary} from '../features/dashboard/api/types'
 import {useDashboardSummary} from '../features/dashboard/hooks/useDashboardSummary'
 import {useProfile} from '../features/profile/hooks/useProfile'
+import CashFlowChart from '../features/dashboard/components/CashFlowChart'
 
 function formatMoney(amount: number, currencyCode: string) {
   return new Intl.NumberFormat('en-ZA', {
@@ -388,102 +389,9 @@ function DashboardContent({
         </article>
       </section>
 
-      <section className="mt-12">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p className="text-xs font-semibold tracking-[0.15em] text-[#657972]">
-              THE FULL PICTURE
-            </p>
-
-            <h2 className="mt-3 font-serif text-3xl tracking-[-0.02em] text-[#173c32] sm:text-4xl">
-              This month’s cash flow
-            </h2>
-          </div>
-
-          <p className="text-sm text-[#657972]">
-            Income, expenses and what remains
-          </p>
-        </div>
-
-        <div className="mt-6 overflow-hidden rounded-3xl border border-[#dedbd2] bg-[#fffdf8]">
-          {summary.currentMonthCashFlow.length === 0 ? (
-            <div className="px-6 py-12 text-center">
-              <p className="font-serif text-2xl text-[#173c32]">
-                No movement yet
-              </p>
-
-              <p className="mt-2 text-sm text-[#657972]">
-                This month’s activity will appear here.
-              </p>
-            </div>
-          ) : (
-            summary.currentMonthCashFlow.map((item, index) => (
-              <article
-                key={item.currencyCode}
-                className={`grid gap-5 px-6 py-6 sm:grid-cols-[1fr_repeat(3,minmax(8rem,auto))] sm:items-center sm:px-8 ${
-                  index > 0 ? 'border-t border-[#e5e1d8]' : ''
-                }`}
-              >
-                <div>
-                  <span
-                    className="inline-flex rounded-full bg-[#e4eee7] px-3 py-1 text-xs font-bold tracking-wide text-[#2d684f]">
-                    {item.currencyCode}
-                  </span>
-
-                  <p className="mt-2 text-sm text-[#657972]">
-                    Since {formatDate(item.monthStart)}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-xs text-[#657972]">
-                    Income
-                  </p>
-
-                  <p className="mt-1 font-semibold text-[#36775d]">
-                    {formatMoney(
-                      item.totalIncome,
-                      item.currencyCode,
-                    )}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-xs text-[#657972]">
-                    Expenses
-                  </p>
-
-                  <p className="mt-1 font-semibold text-[#a85e49]">
-                    {formatMoney(
-                      item.totalExpenses,
-                      item.currencyCode,
-                    )}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-xs text-[#657972]">
-                    Net flow
-                  </p>
-
-                  <p
-                    className={`mt-1 font-semibold ${
-                      item.netCashFlow >= 0
-                        ? 'text-[#2d684f]'
-                        : 'text-[#a85e49]'
-                    }`}
-                  >
-                    {formatMoney(
-                      item.netCashFlow,
-                      item.currencyCode,
-                    )}
-                  </p>
-                </div>
-              </article>
-            ))
-          )}
-        </div>
-      </section>
+      <div className="mt-12">
+        <CashFlowChart />
+      </div>
 
       <section className="mt-12">
         <div className="flex flex-wrap items-end justify-between gap-4">
