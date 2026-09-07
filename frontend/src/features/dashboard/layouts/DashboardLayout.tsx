@@ -14,6 +14,7 @@ import {
   Shapes,
   Target,
   X,
+  ChartPie,
 } from 'lucide-react'
 import {
   NavLink,
@@ -70,6 +71,11 @@ const primaryNavigationItems = [
     to: '/goals',
     label: 'Goals',
     icon: Target,
+  },
+  {
+    to: '/budgets',
+    label: 'Budgets',
+    icon: ChartPie,
   },
 ]
 

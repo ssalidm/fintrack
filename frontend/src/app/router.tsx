@@ -20,7 +20,8 @@ import {
   RecurringTransactionsPage,
   TransfersPage,
   GoalsPage,
-  
+  BudgetsPage
+
 } from './lazyPages'
 
 export const router = createBrowserRouter([
@@ -101,6 +102,10 @@ export const router = createBrowserRouter([
           {
             path: '/goals',
             element: <GoalsPage />,
+          },
+          {
+            path: '/budgets',
+            element: <BudgetsPage />,
           },
         ],
       },

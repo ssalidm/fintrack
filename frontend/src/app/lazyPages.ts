@@ -86,3 +86,10 @@ export const GoalsPage = lazy(
       '../features/goals/pages/GoalsPage'
     ),
 )
+
+export const BudgetsPage = lazy(
+  () =>
+    import(
+      '../features/budgets/pages/BudgetsPage'
+    ),
+)

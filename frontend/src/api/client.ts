@@ -1,21 +1,32 @@
-import { env } from '../config/env'
-import { ApiClientError } from './ApiClientError'
-import type { ApiResponse, ApiResult } from './types'
+import {env} from '../config/env'
+import {ApiClientError} from './ApiClientError'
+import type {
+  ApiResponse,
+  ApiResult,
+} from './types'
 
-export interface ApiRequestOptions extends Omit<RequestInit, 'body'> {
+export interface ApiRequestOptions
+  extends Omit<RequestInit, 'body'> {
   readonly body?: unknown
   readonly accessToken?: string
 }
 
 function buildUrl(path: string): string {
-  const normalizedPath = path.startsWith('/') ? path : `/${path}`
+  const normalizedPath =
+    path.startsWith('/')
+      ? path
+      : `/${path}`
 
   return `${env.apiBaseUrl}${normalizedPath}`
 }
 
-async function parseResponse<T>(response: Response): Promise<ApiResponse<T>> {
+async function parseResponse<T>(
+  response: Response,
+): Promise<ApiResponse<T>> {
   try {
-    return (await response.json()) as ApiResponse<T>
+    return (
+      await response.json()
+    ) as ApiResponse<T>
   } catch {
     throw new ApiClientError(
       'The server returned an invalid response.',
@@ -35,27 +46,44 @@ export async function apiRequest<T>(
     ...requestOptions
   } = options
 
-  const headers = new Headers(customHeaders)
+  const headers =
+    new Headers(customHeaders)
+
   headers.set('Accept', 'application/json')
 
   if (body !== undefined) {
-    headers.set('Content-Type', 'application/json')
+    headers.set(
+      'Content-Type',
+      'application/json',
+    )
   }
 
   if (accessToken) {
-    headers.set('Authorization', `Bearer ${accessToken}`)
+    headers.set(
+      'Authorization',
+      `Bearer ${accessToken}`,
+    )
   }
 
   let response: Response
 
   try {
-    response = await fetch(buildUrl(path), {
-      ...requestOptions,
-      headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
-    })
+    response = await fetch(
+      buildUrl(path),
+      {
+        ...requestOptions,
+        headers,
+        body:
+          body === undefined
+            ? undefined
+            : JSON.stringify(body),
+      },
+    )
   } catch (error) {
-    if (error instanceof DOMException && error.name === 'AbortError') {
+    if (
+      error instanceof DOMException &&
+      error.name === 'AbortError'
+    ) {
       throw error
     }
 
@@ -65,11 +93,28 @@ export async function apiRequest<T>(
     )
   }
 
-  const apiResponse = await parseResponse<T>(response)
+  if (response.status === 204) {
+    return {
+      data: undefined as T,
+      status: response.status,
+      message:
+        response.statusText ||
+        'Request completed successfully.',
+      timestamp:
+        new Date().toISOString(),
+    }
+  }
 
-  if (!response.ok || !apiResponse.success) {
+  const apiResponse =
+    await parseResponse<T>(response)
+
+  if (
+    !response.ok ||
+    !apiResponse.success
+  ) {
     throw new ApiClientError(
-      apiResponse.message || 'The request could not be completed.',
+      apiResponse.message ||
+        'The request could not be completed.',
       response.status,
       apiResponse.errors,
     )
