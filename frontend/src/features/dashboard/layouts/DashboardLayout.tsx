@@ -66,6 +66,11 @@ const primaryNavigationItems = [
     label: 'Accounts',
     icon: Landmark,
   },
+  {
+    to: '/goals',
+    label: 'Goals',
+    icon: Target,
+  },
 ]
 
 function SalifLogo() {
@@ -291,21 +296,6 @@ function SidebarContent({
             </NavLink>
           )
         })}
-
-        <button
-          type="button"
-          disabled
-          title="Coming in a later module"
-          className="flex w-full cursor-not-allowed items-center gap-3 rounded-xl px-4 py-2.5 text-left text-sm font-medium text-[#d5e4dd]/60"
-        >
-          <Target size={18} aria-hidden />
-
-          <span className="flex-1">Goals</span>
-
-          <span className="text-[10px] uppercase tracking-wider">
-            Soon
-          </span>
-        </button>
       </nav>
 
       <div className="mt-auto space-y-2">

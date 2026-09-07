@@ -3,22 +3,24 @@ import ProtectedRoute from '../features/auth/components/ProtectedRoute.tsx'
 import AuthLayout from '../features/auth/layouts/AuthLayout.tsx'
 import DashboardLayout from '../features/dashboard/layouts/DashboardLayout.tsx'
 import {
-  AccountsPage,
-  CategoriesPage,
-  DashboardPage,
-  ForgotPasswordPage,
   HomePage,
   LoginPage,
-  MoneyInMotionPage,
-  NotFoundPage,
-  RecurringTransactionsPage,
   RegisterPage,
-  ResendVerificationPage,
-  ResetPasswordPage,
-  TransactionsPage,
-  TransfersPage,
   VerifyEmailPage,
-  ProfilePage
+  ResendVerificationPage,
+  ForgotPasswordPage,
+  ResetPasswordPage,
+  NotFoundPage,
+  DashboardPage,
+  ProfilePage,
+  AccountsPage,
+  CategoriesPage,
+  MoneyInMotionPage,
+  TransactionsPage,
+  RecurringTransactionsPage,
+  TransfersPage,
+  GoalsPage,
+  
 } from './lazyPages'
 
 export const router = createBrowserRouter([
@@ -55,6 +57,9 @@ export const router = createBrowserRouter([
       },
     ],
   },
+  // **********************************
+  // Protected routes
+  // **********************************
   {
     element: <ProtectedRoute />,
     children: [
@@ -64,6 +69,10 @@ export const router = createBrowserRouter([
           {
             path: '/dashboard',
             element: <DashboardPage />,
+          },
+          {
+            path: '/profile',
+            element: <ProfilePage />,
           },
           {
             path: '/money-in-motion',
@@ -90,8 +99,8 @@ export const router = createBrowserRouter([
             element: <AccountsPage />,
           },
           {
-            path: '/profile',
-            element: <ProfilePage />,
+            path: '/goals',
+            element: <GoalsPage />,
           },
         ],
       },

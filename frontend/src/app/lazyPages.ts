@@ -79,3 +79,10 @@ export const ProfilePage = lazy(
       '../features/profile/pages/ProfilePage'
     ),
 )
+
+export const GoalsPage = lazy(
+  () =>
+    import(
+      '../features/goals/pages/GoalsPage'
+    ),
+)
