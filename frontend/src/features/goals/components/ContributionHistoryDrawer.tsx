@@ -42,18 +42,54 @@ const statusOptions = [
   label: string
 }>
 
+const contributionPageSize = 5
+
+function visiblePageNumbers(
+  currentPage: number,
+  totalPages: number,
+) {
+  const visibleCount = Math.min(
+    totalPages,
+    5,
+  )
+
+  const maximumStart = Math.max(
+    totalPages - visibleCount,
+    0,
+  )
+
+  const start = Math.min(
+    Math.max(
+      currentPage -
+        Math.floor(visibleCount / 2),
+      0,
+    ),
+    maximumStart,
+  )
+
+  return Array.from(
+    {length: visibleCount},
+    (_, index) => start + index,
+  )
+}
+
 function formatMoney(
   amount: number,
   currencyCode: string,
 ) {
-  return new Intl.NumberFormat('en-ZA', {
-    style: 'currency',
-    currency: currencyCode,
-    maximumFractionDigits: 2,
-  }).format(amount)
+  return new Intl.NumberFormat(
+    'en-ZA',
+    {
+      style: 'currency',
+      currency: currencyCode,
+      maximumFractionDigits: 2,
+    },
+  ).format(amount)
 }
 
-function parseLocalDate(value: string) {
+function parseLocalDate(
+  value: string,
+) {
   const [year, month, day] = value
     .split('-')
     .map(Number)
@@ -76,7 +112,9 @@ function formatDate(value: string) {
   ).format(parseLocalDate(value))
 }
 
-function formatTimestamp(value: string) {
+function formatTimestamp(
+  value: string,
+) {
   return new Intl.DateTimeFormat(
     'en-ZA',
     {
@@ -95,7 +133,8 @@ export default function ContributionHistoryDrawer({
       'POSTED',
     )
 
-  const [page, setPage] = useState(0)
+  const [page, setPage] =
+    useState(0)
 
   const [
     editingContribution,
@@ -116,10 +155,39 @@ export default function ContributionHistoryDrawer({
       goal.id,
       status,
       page,
+      contributionPageSize,
     )
 
   const contributions =
     contributionsQuery.data?.items ?? []
+
+  const pagination =
+    contributionsQuery.data
+
+  const pageNumbers = pagination
+    ? visiblePageNumbers(
+        pagination.page,
+        pagination.totalPages,
+      )
+    : []
+
+  const firstVisibleContribution =
+    pagination &&
+    pagination.totalElements > 0
+      ? pagination.page *
+          pagination.size +
+        1
+      : 0
+
+  const lastVisibleContribution =
+    pagination
+      ? Math.min(
+          firstVisibleContribution +
+            pagination.items.length -
+            1,
+          pagination.totalElements,
+        )
+      : 0
 
   useEffect(() => {
     function handleEscape(
@@ -152,7 +220,8 @@ export default function ContributionHistoryDrawer({
   ])
 
   function changeStatus(
-    nextStatus: GoalContributionStatus,
+    nextStatus:
+      GoalContributionStatus,
   ) {
     setStatus(nextStatus)
     setPage(0)
@@ -197,6 +266,7 @@ export default function ContributionHistoryDrawer({
               onClick={onClose}
               className="cursor-pointer rounded-full border border-[#d8d6ce] p-2 text-[#657972] transition hover:bg-[#ebe9e3] hover:text-[#173c32]"
               aria-label="Close"
+              title="Close history"
             >
               <X size={20}/>
             </button>
@@ -233,22 +303,26 @@ export default function ContributionHistoryDrawer({
 
         <div className="flex items-center justify-between gap-4 border-b border-[#dedbd2] px-6 sm:px-8">
           <div className="flex gap-6">
-            {statusOptions.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() =>
-                  changeStatus(option.value)
-                }
-                className={`cursor-pointer border-b-2 py-4 text-sm font-semibold transition ${
-                  status === option.value
-                    ? 'border-[#39725d] text-[#173c32]'
-                    : 'border-transparent text-[#7a8984] hover:text-[#173c32]'
-                }`}
-              >
-                {option.label}
-              </button>
-            ))}
+            {statusOptions.map(
+              (option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() =>
+                    changeStatus(
+                      option.value,
+                    )
+                  }
+                  className={`cursor-pointer border-b-2 py-4 text-sm font-semibold transition ${
+                    status === option.value
+                      ? 'border-[#39725d] text-[#173c32]'
+                      : 'border-transparent text-[#7a8984] hover:text-[#173c32]'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ),
+            )}
           </div>
 
           <button
@@ -261,6 +335,7 @@ export default function ContributionHistoryDrawer({
             }
             className="cursor-pointer rounded-full p-2 text-[#657972] transition hover:bg-[#e7ece7] hover:text-[#39725d] disabled:cursor-not-allowed disabled:opacity-60"
             aria-label="Refresh contributions"
+            title="Refresh contribution history"
           >
             <RefreshCw
               size={17}
@@ -397,6 +472,7 @@ export default function ContributionHistoryDrawer({
                               }
                               className="cursor-pointer rounded-full p-2 text-[#657972] transition hover:bg-[#e6efe9] hover:text-[#39725d]"
                               aria-label="Edit contribution"
+                              title="Edit contribution"
                             >
                               <Pencil
                                 size={17}
@@ -413,6 +489,7 @@ export default function ContributionHistoryDrawer({
                               }
                               className="cursor-pointer rounded-full p-2 text-[#657972] transition hover:bg-[#f2e7df] hover:text-[#9b5845]"
                               aria-label="Void contribution"
+                              title="Void contribution"
                             >
                               <Ban
                                 size={17}
@@ -437,7 +514,9 @@ export default function ContributionHistoryDrawer({
                           </p>
 
                           <p className="mt-2 text-sm text-[#76574f]">
-                            {contribution.voidReason}
+                            {
+                              contribution.voidReason
+                            }
                           </p>
 
                           {contribution.voidedAt && (
@@ -456,60 +535,99 @@ export default function ContributionHistoryDrawer({
             )}
         </div>
 
-        {contributionsQuery.data &&
-          contributionsQuery.data.totalPages >
-            1 && (
-            <footer className="flex items-center justify-between border-t border-[#dedbd2] bg-[#fffdf8] px-6 py-4 sm:px-8">
-              <p className="text-xs text-[#657972]">
-                Page {page + 1} of{' '}
-                {
-                  contributionsQuery.data
-                    .totalPages
-                }
-              </p>
+        {pagination &&
+          pagination.totalElements > 0 && (
+            <footer className="border-t border-[#dedbd2] bg-[#fffdf8] px-6 py-4 sm:px-8">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-xs text-[#657972]">
+                  Showing{' '}
+                  {firstVisibleContribution}–
+                  {lastVisibleContribution}{' '}
+                  of {pagination.totalElements}
+                </p>
 
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setPage(
-                      (current) =>
-                        current - 1,
-                    )
-                  }
-                  disabled={
-                    contributionsQuery.data
-                      .first
-                  }
-                  className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#d8d6ce] px-4 py-2 text-sm font-semibold text-[#173c32] transition hover:bg-[#efede7] disabled:cursor-not-allowed disabled:opacity-40"
+                <nav
+                  aria-label="Contribution history pages"
+                  className="flex items-center gap-1.5"
                 >
-                  <ArrowLeft
-                    size={16}
-                    aria-hidden
-                  />
-                  Previous
-                </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setPage(
+                        (current) =>
+                          Math.max(
+                            current - 1,
+                            0,
+                          ),
+                      )
+                    }
+                    disabled={
+                      pagination.first
+                    }
+                    className="grid size-9 cursor-pointer place-items-center rounded-full border border-[#d8d6ce] text-[#173c32] transition hover:bg-[#efede7] disabled:cursor-not-allowed disabled:opacity-40"
+                    aria-label="Previous page"
+                    title="Previous page"
+                  >
+                    <ArrowLeft
+                      size={16}
+                      aria-hidden
+                    />
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() =>
-                    setPage(
-                      (current) =>
-                        current + 1,
-                    )
-                  }
-                  disabled={
-                    contributionsQuery.data
-                      .last
-                  }
-                  className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#d8d6ce] px-4 py-2 text-sm font-semibold text-[#173c32] transition hover:bg-[#efede7] disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  Next
-                  <ArrowRight
-                    size={16}
-                    aria-hidden
-                  />
-                </button>
+                  {pageNumbers.map(
+                    (pageNumber) => (
+                      <button
+                        key={pageNumber}
+                        type="button"
+                        onClick={() =>
+                          setPage(
+                            pageNumber,
+                          )
+                        }
+                        aria-current={
+                          pagination.page ===
+                          pageNumber
+                            ? 'page'
+                            : undefined
+                        }
+                        aria-label={`Page ${pageNumber + 1}`}
+                        className={`grid size-9 cursor-pointer place-items-center rounded-full text-sm font-semibold transition ${
+                          pagination.page ===
+                          pageNumber
+                            ? 'bg-[#174f43] text-white'
+                            : 'text-[#657972] hover:bg-[#efede7] hover:text-[#173c32]'
+                        }`}
+                      >
+                        {pageNumber + 1}
+                      </button>
+                    ),
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setPage(
+                        (current) =>
+                          Math.min(
+                            current + 1,
+                            pagination.totalPages -
+                              1,
+                          ),
+                      )
+                    }
+                    disabled={
+                      pagination.last
+                    }
+                    className="grid size-9 cursor-pointer place-items-center rounded-full border border-[#d8d6ce] text-[#173c32] transition hover:bg-[#efede7] disabled:cursor-not-allowed disabled:opacity-40"
+                    aria-label="Next page"
+                    title="Next page"
+                  >
+                    <ArrowRight
+                      size={16}
+                      aria-hidden
+                    />
+                  </button>
+                </nav>
               </div>
             </footer>
           )}
@@ -522,7 +640,9 @@ export default function ContributionHistoryDrawer({
             editingContribution
           }
           onClose={() =>
-            setEditingContribution(null)
+            setEditingContribution(
+              null,
+            )
           }
         />
       )}
@@ -534,7 +654,9 @@ export default function ContributionHistoryDrawer({
             voidingContribution
           }
           onClose={() =>
-            setVoidingContribution(null)
+            setVoidingContribution(
+              null,
+            )
           }
         />
       )}

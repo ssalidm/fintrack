@@ -365,6 +365,7 @@ export default function GoalsPage() {
               }
               className="cursor-pointer rounded-full border border-[#d8d6ce] bg-[#fffdf8] p-3 text-[#657972] transition hover:border-[#bd9460] hover:text-[#9a6828] disabled:cursor-not-allowed disabled:opacity-60"
               aria-label="Refresh goals"
+              title="Refresh goals"
             >
               <RefreshCw
                 size={18}
@@ -600,6 +601,7 @@ export default function GoalsPage() {
                           }
                           className="cursor-pointer rounded-full p-2 text-[#657972] transition hover:bg-[#edf2ee] hover:text-[#39725d]"
                           aria-label={`View contribution history for ${goal.name}`}
+                          title="Contribution history"
                         >
                           <History
                             size={17}
@@ -615,6 +617,7 @@ export default function GoalsPage() {
                             }
                             className="cursor-pointer rounded-full p-2 text-[#657972] transition hover:bg-[#edf2ee] hover:text-[#39725d]"
                             aria-label={`Edit ${goal.name}`}
+                            title="Edit goal"
                           >
                             <Pencil
                               size={17}
@@ -634,6 +637,7 @@ export default function GoalsPage() {
                             }
                             className="cursor-pointer rounded-full p-2 text-[#657972] transition hover:bg-[#f2e7df] hover:text-[#9b5845]"
                             aria-label={`Archive ${goal.name}`}
+                            title="Archive goal"
                           >
                             <Archive
                               size={17}
@@ -775,7 +779,7 @@ export default function GoalsPage() {
           }
         />
       )}
-      
+
       {isGoalModalOpen && (
         <GoalModal
           goal={editingGoal ?? undefined}
