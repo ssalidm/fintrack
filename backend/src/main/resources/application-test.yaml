@@ -14,6 +14,14 @@ fintrack:
     jwt:
       secret: NOSUIDDGICbMmX4Uzu4LDrp/IRMT7CSstm+cXl9UOQ4=
 
+    mfa:
+      encryption-key: ZGJrM4MSG1zQyXXeHuCN0K7a/qvQFS97FbseZOY5cr4=
+      issuer: salif
+      challenge-ttl: PT5M
+      challenge-retention-duration: PT24H
+      max-attempts: 5
+      lockout-duration: PT15M
+
     cors:
       allowed-origins:
         - http://localhost:5173

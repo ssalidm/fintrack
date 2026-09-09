@@ -49,6 +49,14 @@ fintrack:
       max-failed-attempts: 5
       lock-duration: PT15M
 
+    mfa:
+      encryption-key: ${FINTRACK_MFA_ENCRYPTION_KEY:}
+      issuer: salif
+      challenge-ttl: PT5M
+      challenge-retention-duration: PT24H
+      max-attempts: 5
+      lockout-duration: PT15M
+
     cors:
       allowed-origins: []
 
