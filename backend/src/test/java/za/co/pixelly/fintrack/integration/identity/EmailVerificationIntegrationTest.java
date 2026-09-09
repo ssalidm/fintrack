@@ -273,7 +273,12 @@ class EmailVerificationIntegrationTest
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath(
-                    "$.result.accessToken"
+                    "$.result.status"
+                ).value("AUTHENTICATED")
+            )
+            .andExpect(
+                jsonPath(
+                    "$.result.tokens.accessToken"
                 ).isNotEmpty()
             );
     }

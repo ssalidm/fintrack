@@ -7,18 +7,16 @@ import org.springframework.transaction.annotation.Transactional;
 import za.co.pixelly.fintrack.common.Util;
 import za.co.pixelly.fintrack.finance.account.application.exceptions.AccountNotActiveException;
 import za.co.pixelly.fintrack.config.security.JwtProperties;
-import za.co.pixelly.fintrack.identity.api.LoginRequest;
-import za.co.pixelly.fintrack.identity.api.RefreshRequest;
-import za.co.pixelly.fintrack.identity.api.TokenResponse;
+import za.co.pixelly.fintrack.identity.api.*;
 import za.co.pixelly.fintrack.identity.application.exceptions.InvalidCredentialsException;
 import za.co.pixelly.fintrack.identity.application.exceptions.InvalidRefreshTokenException;
+import za.co.pixelly.fintrack.identity.application.mfa.IssuedMfaChallenge;
+import za.co.pixelly.fintrack.identity.application.mfa.MfaChallengeService;
 import za.co.pixelly.fintrack.identity.domain.AuthSession;
+import za.co.pixelly.fintrack.identity.domain.MfaStatus;
 import za.co.pixelly.fintrack.identity.domain.RefreshToken;
 import za.co.pixelly.fintrack.identity.domain.User;
-import za.co.pixelly.fintrack.identity.persistence.AuthSessionRepository;
-import za.co.pixelly.fintrack.identity.persistence.RefreshTokenRepository;
-import za.co.pixelly.fintrack.identity.persistence.UserRepository;
-import za.co.pixelly.fintrack.identity.persistence.UserRoleRepository;
+import za.co.pixelly.fintrack.identity.persistence.*;
 
 import java.time.Instant;
 import java.util.List;
@@ -33,6 +31,9 @@ public class DefaultAuthenticationService implements AuthenticationService {
     private final AuthSessionRepository sessionRepository;
     private final LoginAttemptService loginAttemptService;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final UserMfaRepository userMfaRepository;
+    private final MfaChallengeService mfaChallengeService;
+    private final AuthenticatedSessionService authenticatedSessionService;
 
     private final PasswordEncoder passwordEncoder;
     private final OpaqueTokenCodec refreshTokenCodec;
@@ -42,7 +43,7 @@ public class DefaultAuthenticationService implements AuthenticationService {
 
     @Override
     @Transactional
-    public TokenResponse login(
+    public LoginResponse login(
         LoginRequest request,
         String userAgent
     ) {
@@ -83,50 +84,33 @@ public class DefaultAuthenticationService implements AuthenticationService {
             throw new InvalidCredentialsException();
         }
 
-        Instant sessionExpiresAt =
-            now.plus(jwtProperties.RefreshTokenTtl());
-
-        AuthSession session = AuthSession.open(
-            user.getId(),
-            now,
-            sessionExpiresAt,
-            userAgent
-        );
-
-        sessionRepository.saveAndFlush(session);
-
-        List<String> roles =
-            userRoleRepository.findRoleCodesByUserId(
-                user.getId()
-            );
-
-        String rawRefreshToken =
-            refreshTokenCodec.generate();
-
-        RefreshToken refreshToken = RefreshToken.issue(
-            session.getId(),
-            user.getId(),
-            refreshTokenCodec.hash(rawRefreshToken),
-            now,
-            sessionExpiresAt
-        );
-
-        refreshTokenRepository.save(refreshToken);
-
-        AccessTokenService.IssuedAccessToken accessToken =
-            accessTokenService.issue(
+        boolean mfaEnabled =
+            userMfaRepository.existsByUserIdAndStatus(
                 user.getId(),
-                session.getId(),
-                roles,
-                now
+                MfaStatus.ENABLED
             );
 
-        user.recordSuccessfulLogin(now);
+        if (mfaEnabled) {
+            IssuedMfaChallenge challenge =
+                mfaChallengeService.issue(
+                    user.getId(),
+                    userAgent
+                );
 
-        return response(
-            accessToken,
-            rawRefreshToken,
-            now
+            return LoginResponse.mfaRequired(
+                new MfaChallengeResponse(
+                    challenge.rawToken(),
+                    challenge.expiresAt()
+                )
+            );
+        }
+
+        return LoginResponse.authenticated(
+            authenticatedSessionService.issue(
+                user,
+                userAgent,
+                now
+            )
         );
     }
 

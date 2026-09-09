@@ -177,6 +177,19 @@ public class GlobalExceptionHandler {
             );
     }
 
+    @ExceptionHandler(UserNotFoundException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleUserNotFound(UserNotFoundException exception) {
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(
+                ApiResponse.error(
+                    HttpStatus.NOT_FOUND,
+                    exception.getMessage()
+                )
+            );
+    }
+
     @ExceptionHandler(AdminUserNotFoundException.class)
     ResponseEntity<ApiResponse<Void>>
     handleAdminUserNotFound(AdminUserNotFoundException exception) {
@@ -759,6 +772,76 @@ public class GlobalExceptionHandler {
                 ApiResponse.error(
                     HttpStatus.BAD_REQUEST,
                     "Request validation failed"
+                )
+            );
+    }
+
+    @ExceptionHandler({
+        MfaAlreadyEnabledException.class,
+        MfaSetupNotStartedException.class
+    })
+    ResponseEntity<ApiResponse<Void>>
+    handleMfaStateConflict(RuntimeException exception) {
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(
+                ApiResponse.error(
+                    HttpStatus.CONFLICT,
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler(InvalidMfaCodeException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleInvalidMfaCode(InvalidMfaCodeException exception) {
+        return ResponseEntity
+            .badRequest()
+            .body(
+                ApiResponse.error(
+                    HttpStatus.BAD_REQUEST,
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler(
+        InvalidMfaAuthenticationException.class
+    )
+    ResponseEntity<ApiResponse<Void>>
+    handleInvalidMfaAuthentication(InvalidMfaAuthenticationException exception) {
+        return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
+            .body(
+                ApiResponse.error(
+                    HttpStatus.UNAUTHORIZED,
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler(MfaNotEnabledException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleMfaNotEnabled(MfaNotEnabledException exception) {
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(
+                ApiResponse.error(
+                    HttpStatus.CONFLICT,
+                    exception.getMessage()
+                )
+            );
+    }
+
+    @ExceptionHandler(MfaRateLimitExceededException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleMfaRateLimitExceeded(MfaRateLimitExceededException exception) {
+        return ResponseEntity
+            .status(HttpStatus.TOO_MANY_REQUESTS)
+            .body(
+                ApiResponse.error(
+                    HttpStatus.TOO_MANY_REQUESTS,
+                    exception.getMessage()
                 )
             );
     }

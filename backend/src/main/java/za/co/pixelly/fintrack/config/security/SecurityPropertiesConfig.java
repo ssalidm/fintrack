@@ -9,7 +9,8 @@ import org.springframework.context.annotation.Configuration;
     EmailVerificationProperties.class,
     PasswordResetProperties.class,
     LoginSecurityProperties.class,
-    CorsProperties.class
+    CorsProperties.class,
+    MfaProperties.class
 })
 public class SecurityPropertiesConfig {
 }

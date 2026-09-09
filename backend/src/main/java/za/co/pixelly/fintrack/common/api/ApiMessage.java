@@ -15,6 +15,11 @@ public final class ApiMessage {
         public static final String REGISTER_SUCCESS = "User registered successfully";
         public static final String LOGIN_SUCCESS = "Login successful";
         public static final String LOGOUT_SUCCESS = "Logged out successfully";
+        public static final String TFA_SETUP = "Two-factor authentication setup started";
+        public static final String TFA_REQUIRED = "Two-factor authentication required";
+        public static final String TFA_STATUS_FETCHED = "Two-factor authentication status retrieved";
+        public static final String TFA_DISABLED = "Two-factor authentication disabled";
+        public static final String TFA_CODES_GENERATED = "Recovery codes regenerated";
         public static final String REFRESH_SUCCESS = "Token refreshed successfully";
         public static final String VERIFY_SUCCESS = "Email verified successfully";
         public static final String RESEND_VERIFY = "If an eligible account exists, a verification email will be sent";
