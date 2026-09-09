@@ -145,19 +145,20 @@ public class IdentityTestClient {
         Map<String, Object> response =
             (Map<String, Object>) root.get("result");
 
+        Map<String, Object> tokens =
+            (Map<String, Object>) response.get("tokens");
+
         String accessToken =
-            (String) response.get("accessToken");
+            (String) tokens.get("accessToken");
 
         String refreshToken =
-            (String) response.get("refreshToken");
+            (String) tokens.get("refreshToken");
 
-        Jwt jwt =
-            jwtDecoder.decode(accessToken);
+        Jwt jwt = jwtDecoder.decode(accessToken);
 
-        UUID userId =
-            UUID.fromString(
-                Objects.requireNonNull(jwt.getSubject())
-            );
+        UUID userId = UUID.fromString(
+            Objects.requireNonNull(jwt.getSubject())
+        );
 
         return new AuthenticatedUser(
             userId,

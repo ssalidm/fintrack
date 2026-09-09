@@ -573,8 +573,12 @@ class UserProfileIntegrationTest extends AbstractIntegrationTest {
             (Map<String, Object>)
                 root.get("result");
 
+        Map<String, Object> tokens =
+            (Map<String, Object>)
+                response.get("tokens");
+
         return (String)
-            response.get(
+            tokens.get(
                 "accessToken"
             );
     }
