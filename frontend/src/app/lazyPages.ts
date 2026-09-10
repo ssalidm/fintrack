@@ -16,6 +16,10 @@ export const LoginPage = lazy(
   () => import('../features/auth/pages/LoginPage'),
 )
 
+export const MfaChallengePage = lazy(
+  () => import('../features/auth/pages/MfaChallengePage'),
+)
+
 export const VerifyEmailPage = lazy(
   () => import('../features/auth/pages/VerifyEmailPage'),
 )

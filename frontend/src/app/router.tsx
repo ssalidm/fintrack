@@ -5,6 +5,7 @@ import DashboardLayout from '../features/dashboard/layouts/DashboardLayout.tsx'
 import {
   HomePage,
   LoginPage,
+  MfaChallengePage,
   RegisterPage,
   VerifyEmailPage,
   ResendVerificationPage,
@@ -24,6 +25,7 @@ import {
 
 } from './lazyPages'
 
+
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -35,6 +37,10 @@ export const router = createBrowserRouter([
       {
         path: '/login',
         element: <LoginPage />,
+      },
+      {
+        path: '/login/mfa',
+        element: <MfaChallengePage />,
       },
       {
         path: '/register',
