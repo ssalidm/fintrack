@@ -44,8 +44,11 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(DuplicateEmailException.class)
-    ResponseEntity<ApiResponse<Void>> handleDuplicateEmail(DuplicateEmailException exception) {
+    @ExceptionHandler({
+        DuplicateEmailException.class,
+        EmailUnchangedException.class
+    })
+    ResponseEntity<ApiResponse<Void>> handleDuplicateEmail(RuntimeException exception) {
         return ResponseEntity
             .status(HttpStatus.CONFLICT)
             .body(ApiResponse.error(

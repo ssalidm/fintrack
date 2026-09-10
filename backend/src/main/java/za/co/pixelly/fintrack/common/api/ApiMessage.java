@@ -25,6 +25,7 @@ public final class ApiMessage {
         public static final String RESEND_VERIFY = "If an eligible account exists, a verification email will be sent";
         public static final String FORGOT_PASSWORD = "If an eligible account exists, password reset instructions will be sent";
         public static final String RESET_SUCCESS = "Password reset successfully. Please log in again";
+        public static final String EMAIL_CHANGED = "Email address changed successfully";
     }
 
     /*
@@ -37,6 +38,7 @@ public final class ApiMessage {
         public static final String FETCHED = "Profile retrieved successfully";
         public static final String UPDATED = "Profile updated successfully";
         public static final String PASSWORD_UPDATED = "Password changed successfully";
+        public static final String EMAIL_CHANGE_REQUESTED = "Email change verification sent";
     }
 
     /*
