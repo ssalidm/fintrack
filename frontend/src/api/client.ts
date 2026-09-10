@@ -88,7 +88,7 @@ export async function apiRequest<T>(
     }
 
     throw new ApiClientError(
-      'Unable to connect to the server. Please try again.',
+      'We couldn’t connect to Salif right now. Please try again in a moment.',
       0,
     )
   }

@@ -81,7 +81,7 @@ export default function VerifyEmailChangePage() {
         setMessage(
           error instanceof ApiClientError
             ? error.isNetworkError
-              ? 'Unable to reach Salif. Check that the backend is running.'
+              ? 'We couldn’t connect to Salif right now. Please try again in a moment.'
               : error.message
             : 'We could not confirm your new email address.',
         )

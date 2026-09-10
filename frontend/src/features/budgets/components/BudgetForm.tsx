@@ -207,7 +207,7 @@ export default function BudgetForm({
       if (!hasFieldError) {
         setSubmitError(
           error.isNetworkError
-            ? 'Unable to reach Salif. Check that the backend is running.'
+            ? 'We couldn’t connect to Salif right now. Please try again in a moment.'
             : error.message,
         )
       }
