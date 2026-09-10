@@ -32,6 +32,12 @@ export interface ChangePasswordRequest {
   newPassword: string
 }
 
+export interface ChangeEmailRequest {
+  newEmail: string
+  currentPassword: string
+  mfaCode?: string
+}
+
 export interface MfaStatus {
   readonly enabled: boolean
   readonly setupPending: boolean

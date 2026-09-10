@@ -77,3 +77,7 @@ export interface ResetPasswordRequest {
   readonly token: string
   readonly newPassword: string
 }
+
+export interface ConfirmEmailChangeRequest {
+  readonly token: string
+}

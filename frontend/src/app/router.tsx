@@ -21,7 +21,8 @@ import {
   RecurringTransactionsPage,
   TransfersPage,
   GoalsPage,
-  BudgetsPage
+  BudgetsPage,
+  VerifyEmailChangePage
 
 } from './lazyPages'
 
@@ -61,6 +62,10 @@ export const router = createBrowserRouter([
       {
         path: '/reset-password',
         element: <ResetPasswordPage />,
+      },
+      {
+        path: '/verify-email-change',
+        element: <VerifyEmailChangePage />,
       },
     ],
   },

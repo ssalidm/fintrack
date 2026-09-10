@@ -20,6 +20,7 @@ import PasswordChangedDialog from '../components/PasswordChangedDialog'
 import ProfileDetailsForm from '../components/ProfileDetailsForm'
 import TwoFactorAuthenticationCard from '../components/TwoFactorAuthenticationCard'
 import { useProfile } from '../hooks/useProfile'
+import ChangeEmailForm from '../components/ChangeEmailForm'
 
 function formatDate(value: string | null) {
   if (!value) {
@@ -281,11 +282,11 @@ export default function ProfilePage() {
           <TwoFactorAuthenticationCard />
         </div>
 
-        <div className="mt-6">
+        <div className="mt-6 grid items-stretch gap-6 lg:grid-cols-2">
+          <ChangeEmailForm currentEmail={profile.email} />
+
           <ChangePasswordForm
-            onPasswordChanged={
-              handlePasswordChanged
-            }
+            onPasswordChanged={handlePasswordChanged}
           />
         </div>
       </div>

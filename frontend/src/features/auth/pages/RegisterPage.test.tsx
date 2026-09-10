@@ -1,8 +1,19 @@
-import {beforeEach, describe, expect, it, vi} from 'vitest'
-import {render, screen, waitFor} from '@testing-library/react'
+import {
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from 'vitest'
+import {
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {createMemoryRouter} from 'react-router'
 import {RouterProvider} from 'react-router/dom'
+
 import {authApi} from '../api/authApi'
 import RegisterPage from './RegisterPage'
 
@@ -41,19 +52,35 @@ function renderRegisterPage() {
 async function completeRegistrationForm() {
   const user = userEvent.setup()
 
-  await user.type(screen.getByLabelText('First name'), 'David')
-  await user.type(screen.getByLabelText('Last name'), 'Ssali')
+  await user.type(
+    screen.getByLabelText('First name'),
+    'David',
+  )
+
+  await user.type(
+    screen.getByLabelText('Last name'),
+    'Ssali',
+  )
+
   await user.type(
     screen.getByLabelText('Email'),
     'david@example.com',
   )
+
   await user.type(
     screen.getByLabelText('Password'),
     'SalifSecure1!',
   )
+
   await user.type(
     screen.getByLabelText('Confirm password'),
     'SalifSecure1!',
+  )
+
+  await user.click(
+    screen.getByRole('checkbox', {
+      name: /I agree to Salif’s/i,
+    }),
   )
 
   return user
@@ -62,6 +89,7 @@ async function completeRegistrationForm() {
 describe('RegisterPage', () => {
   beforeEach(() => {
     registerMock.mockReset()
+    window.sessionStorage.clear()
   })
 
   it('does not call the API when the form is invalid', async () => {
@@ -76,7 +104,9 @@ describe('RegisterPage', () => {
     )
 
     expect(
-      await screen.findByText('Email is required'),
+      await screen.findByText(
+        'Email is required',
+      ),
     ).toBeInTheDocument()
 
     expect(
@@ -105,7 +135,8 @@ describe('RegisterPage', () => {
 
     renderRegisterPage()
 
-    const user = await completeRegistrationForm()
+    const user =
+      await completeRegistrationForm()
 
     await user.click(
       screen.getByRole('button', {
@@ -124,15 +155,15 @@ describe('RegisterPage', () => {
 
     expect(registerMock).toHaveBeenCalledTimes(1)
 
-    // confirmPassword must never be sent to the backend.
     expect(registerMock).not.toHaveBeenCalledWith(
       expect.objectContaining({
         confirmPassword: expect.anything(),
+        acceptTerms: expect.anything(),
       }),
     )
   })
 
-  it('shows the verification-email state after registration', async () => {
+  it('shows the verification-email cooldown after registration', async () => {
     registerMock.mockResolvedValue({
       data: {
         id: '54acfe58-a81b-4c87-8b38-0d7e931766fb',
@@ -149,7 +180,8 @@ describe('RegisterPage', () => {
 
     renderRegisterPage()
 
-    const user = await completeRegistrationForm()
+    const user =
+      await completeRegistrationForm()
 
     await user.click(
       screen.getByRole('button', {
@@ -168,12 +200,60 @@ describe('RegisterPage', () => {
     ).toBeInTheDocument()
 
     expect(
-      screen.getByRole('link', {
+      screen.getByRole('button', {
+        name: /Resend available in 1:00/i,
+      }),
+    ).toBeDisabled()
+
+    expect(
+      screen.queryByRole('link', {
         name: 'Resend verification email',
       }),
-    ).toHaveAttribute(
-      'href',
-      '/resend-verification?email=david%40example.com',
+    ).not.toBeInTheDocument()
+  })
+
+  it('requires the terms to be accepted', async () => {
+    const user = userEvent.setup()
+
+    renderRegisterPage()
+
+    await user.type(
+      screen.getByLabelText('First name'),
+      'David',
     )
+
+    await user.type(
+      screen.getByLabelText('Last name'),
+      'Ssali',
+    )
+
+    await user.type(
+      screen.getByLabelText('Email'),
+      'david@example.com',
+    )
+
+    await user.type(
+      screen.getByLabelText('Password'),
+      'SalifSecure1!',
+    )
+
+    await user.type(
+      screen.getByLabelText('Confirm password'),
+      'SalifSecure1!',
+    )
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Create account',
+      }),
+    )
+
+    expect(
+      await screen.findByText(
+        'You must accept the Terms and Privacy Policy',
+      ),
+    ).toBeInTheDocument()
+
+    expect(registerMock).not.toHaveBeenCalled()
   })
 })

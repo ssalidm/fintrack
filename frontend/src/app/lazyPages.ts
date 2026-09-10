@@ -97,3 +97,10 @@ export const BudgetsPage = lazy(
       '../features/budgets/pages/BudgetsPage'
     ),
 )
+
+export const VerifyEmailChangePage = lazy(
+  () =>
+    import(
+      '../features/auth/pages/VerifyEmailChangePage'
+    ),
+)

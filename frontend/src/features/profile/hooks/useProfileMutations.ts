@@ -5,6 +5,7 @@ import {
 
 import {useAuthenticatedRequest} from '../../auth/hooks/useAuthenticatedRequest'
 import type {
+  ChangeEmailRequest,
   ChangePasswordRequest,
   UpdateUserProfileRequest,
   UserProfile,
@@ -52,6 +53,21 @@ export function useChangePassword() {
           body: payload,
         },
       )
+    },
+  })
+}
+
+export function useChangeEmail() {
+  const request = useAuthenticatedRequest()
+
+  return useMutation({
+    mutationFn: async (
+      payload: ChangeEmailRequest,
+    ) => {
+      await request<void>('/profile/change-email', {
+        method: 'POST',
+        body: payload,
+      })
     },
   })
 }

@@ -1,6 +1,7 @@
 import { apiRequest } from '../../../api/client'
 
 import type {
+  ConfirmEmailChangeRequest,
   ForgotPasswordRequest,
   LoginRequest,
   LoginResponse,
@@ -115,6 +116,17 @@ export const authApi = {
   ) {
     return apiRequest<void>(
       '/auth/reset-password',
+      {
+        method: 'POST',
+        body: request,
+      },
+    )
+  },
+  
+  confirmEmailChange(
+    request: ConfirmEmailChangeRequest) {
+    return apiRequest<void>(
+      '/auth/change-email/confirm',
       {
         method: 'POST',
         body: request,
