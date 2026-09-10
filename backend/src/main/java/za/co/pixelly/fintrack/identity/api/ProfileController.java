@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import za.co.pixelly.fintrack.common.api.ApiMessage;
 import za.co.pixelly.fintrack.common.api.ApiResponse;
 import za.co.pixelly.fintrack.identity.application.UserProfileService;
+import za.co.pixelly.fintrack.identity.application.emailchange.EmailChangeService;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -29,6 +30,7 @@ import static za.co.pixelly.fintrack.config.OpenApiConfig.BEARER_AUTH;
 public class ProfileController {
 
     private final UserProfileService userProfileService;
+    private final EmailChangeService emailChangeService;
 
 
     @GetMapping
@@ -74,6 +76,30 @@ public class ProfileController {
             ApiResponse.success(
                 HttpStatus.OK,
                 ApiMessage.Profile.PASSWORD_UPDATED,
+                null
+            )
+        );
+    }
+
+
+    @PostMapping("/change-email")
+    public ResponseEntity<ApiResponse<Void>> changeEmail(
+        @AuthenticationPrincipal Jwt jwt,
+        @Valid
+        @RequestBody
+        EmailChangeRequestDto request
+    ) {
+        emailChangeService.initiate(
+            userId(jwt),
+            request.newEmail(),
+            request.currentPassword(),
+            request.mfaCode()
+        );
+
+        return ResponseEntity.ok(
+            ApiResponse.success(
+                HttpStatus.OK,
+                ApiMessage.Profile.EMAIL_CHANGE_REQUESTED,
                 null
             )
         );

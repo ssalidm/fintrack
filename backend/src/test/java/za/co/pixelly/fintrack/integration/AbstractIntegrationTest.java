@@ -14,10 +14,8 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.postgresql.PostgreSQLContainer;
-import za.co.pixelly.fintrack.integration.support.AuthenticatedUser;
-import za.co.pixelly.fintrack.integration.support.IdentityTestClient;
-import za.co.pixelly.fintrack.integration.support.TestEmailVerificationSender;
-import za.co.pixelly.fintrack.integration.support.TestPasswordResetSender;
+import za.co.pixelly.fintrack.identity.application.EmailChangeSender;
+import za.co.pixelly.fintrack.integration.support.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -94,12 +92,17 @@ public abstract class AbstractIntegrationTest {
     protected TestPasswordResetSender passwordResetSender;
 
     @Autowired
+    protected TestEmailChangeSender emailChangeSender;
+
+    @Autowired
     protected JwtDecoder jwtDecoder;
 
     protected IdentityTestClient identityTestClient;
 
     @BeforeEach
     void configureIdentityTestClient() {
+
+        emailChangeSender.clear();
 
         identityTestClient =
             new IdentityTestClient(
@@ -170,5 +173,9 @@ public abstract class AbstractIntegrationTest {
             return new TestPasswordResetSender();
         }
 
+        @Bean
+        TestEmailChangeSender emailChangeSender() {
+            return new TestEmailChangeSender();
+        }
     }
 }
