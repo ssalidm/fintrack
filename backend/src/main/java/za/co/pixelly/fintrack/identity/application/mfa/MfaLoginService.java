@@ -20,7 +20,7 @@ import za.co.pixelly.fintrack.identity.persistence.UserRepository;
 
 import java.time.Clock;
 import java.time.Instant;
-import java.util.Arrays;
+import java.util.OptionalLong;
 
 @Service
 @RequiredArgsConstructor
@@ -33,8 +33,7 @@ public class MfaLoginService {
 
     private final OpaqueTokenCodec tokenCodec;
     private final MfaRecoveryCodeCodec recoveryCodeCodec;
-    private final TotpSecretCipher totpSecretCipher;
-    private final TotpService totpService;
+    private final MfaTotpVerifier mfaTotpVerifier;
 
     private final AuthenticatedSessionService authenticatedSessionService;
 
@@ -63,52 +62,14 @@ public class MfaLoginService {
         UserMfa userMfa =
             context.userMfa();
 
-        EncryptedTotpSecret encryptedSecret =
-            new EncryptedTotpSecret(
-                userMfa.getTotpSecretCiphertext(),
-                userMfa.getTotpSecretIv()
-            );
-
-        byte[] rawSecret =
-            totpSecretCipher.decrypt(
+        OptionalLong verifiedTimeStep =
+            mfaTotpVerifier.verifyFresh(
                 challenge.getUserId(),
-                encryptedSecret
-            );
-
-        TotpVerificationResult verification;
-
-        try {
-            verification =
-                totpService.verify(
-                    rawSecret,
-                    code
-                );
-        } finally {
-            Arrays.fill(
-                rawSecret,
-                (byte) 0
-            );
-        }
-
-        if (!verification.valid()) {
-            failAuthentication(
-                challenge,
                 userMfa,
-                now
+                code
             );
-        }
 
-        long verifiedTimeStep =
-            verification.timeStep()
-                .orElseThrow();
-
-        /*
-         * Prevent reuse of a TOTP that has already
-         * successfully authenticated.
-         */
-        if (!userMfa.canUseTimeStep(
-            verifiedTimeStep
-        )) {
+        if (verifiedTimeStep.isEmpty()) {
             failAuthentication(
                 challenge,
                 userMfa,
@@ -123,7 +84,7 @@ public class MfaLoginService {
             );
 
         userMfa.recordUsedTimeStep(
-            verifiedTimeStep,
+            verifiedTimeStep.getAsLong(),
             now
         );
 

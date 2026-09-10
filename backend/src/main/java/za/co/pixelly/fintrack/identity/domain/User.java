@@ -189,6 +189,15 @@ public class User {
         }
     }
 
+    public void changeEmail(
+        String newEmail,
+        Instant now
+    ) {
+        this.email = newEmail;
+        this.emailVerifiedAt = now;
+        this.updatedAt = now;
+    }
+
     public void updateTimeZone(
         String timeZone,
         Instant now

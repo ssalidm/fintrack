@@ -15,6 +15,7 @@ import za.co.pixelly.fintrack.identity.application.AuthenticationService;
 import za.co.pixelly.fintrack.identity.application.EmailVerificationService;
 import za.co.pixelly.fintrack.identity.application.PasswordResetService;
 import za.co.pixelly.fintrack.identity.application.UserRegistrationService;
+import za.co.pixelly.fintrack.identity.application.emailchange.EmailChangeService;
 import za.co.pixelly.fintrack.identity.application.mfa.MfaLoginService;
 import za.co.pixelly.fintrack.identity.application.mfa.MfaManagementService;
 import za.co.pixelly.fintrack.identity.application.mfa.MfaSetupService;
@@ -40,6 +41,7 @@ public class AuthController {
     private final MfaSetupService mfaSetupService;
     private final MfaLoginService mfaLoginService;
     private final MfaManagementService mfaManagementService;
+    private final EmailChangeService emailChangeService;
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<RegisterResponse>> register(
@@ -196,6 +198,26 @@ public class AuthController {
             ApiResponse.success(
                 HttpStatus.OK,
                 ApiMessage.Auth.RESET_SUCCESS,
+                null
+            )
+        );
+    }
+
+
+    @PostMapping("/change-email/confirm")
+    public ResponseEntity<ApiResponse<Void>> confirmEmailChange(
+        @Valid
+        @RequestBody
+        ConfirmEmailChangeRequest request
+    ) {
+        emailChangeService.confirm(
+            request.token()
+        );
+
+        return ResponseEntity.ok(
+            ApiResponse.success(
+                HttpStatus.OK,
+                ApiMessage.Auth.EMAIL_CHANGED,
                 null
             )
         );
