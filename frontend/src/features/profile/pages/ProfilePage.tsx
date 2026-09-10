@@ -16,9 +16,10 @@ import { useNavigate } from 'react-router'
 import { ApiClientError } from '../../../api/ApiClientError'
 import { useAuth } from '../../auth/context/useAuth'
 import ChangePasswordForm from '../components/ChangePasswordForm'
-import ProfileDetailsForm from '../components/ProfileDetailsForm'
-import { useProfile } from '../hooks/useProfile'
 import PasswordChangedDialog from '../components/PasswordChangedDialog'
+import ProfileDetailsForm from '../components/ProfileDetailsForm'
+import TwoFactorAuthenticationCard from '../components/TwoFactorAuthenticationCard'
+import { useProfile } from '../hooks/useProfile'
 
 function formatDate(value: string | null) {
   if (!value) {
@@ -85,10 +86,14 @@ export default function ProfilePage() {
       <main className="min-h-screen px-5 py-8 sm:px-8 lg:px-12 lg:py-12 xl:px-16">
         <div className="mx-auto max-w-[1180px] animate-pulse">
           <div className="h-3 w-32 rounded bg-[#dfe5df]" />
+
           <div className="mt-5 h-14 w-72 rounded bg-[#dfe5df]" />
+
           <div className="mt-10 h-40 rounded-3xl bg-[#e7ebe6]" />
+
           <div className="mt-6 grid gap-6 lg:grid-cols-[1.5fr_0.8fr]">
             <div className="h-[430px] rounded-3xl bg-[#e7ebe6]" />
+
             <div className="h-[330px] rounded-3xl bg-[#e7ebe6]" />
           </div>
         </div>
@@ -137,8 +142,9 @@ export default function ProfilePage() {
           </h1>
 
           <p className="mt-4 max-w-2xl text-sm leading-6 text-[#657972]">
-            Manage the personal details and security
-            protecting your Salif account.
+            Manage the personal details and
+            security protecting your Salif
+            account.
           </p>
         </header>
 
@@ -161,12 +167,20 @@ export default function ProfilePage() {
 
             <div className="flex flex-wrap gap-2 lg:justify-end">
               <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs font-semibold">
-                <ShieldCheck size={15} aria-hidden />
+                <ShieldCheck
+                  size={15}
+                  aria-hidden
+                />
+
                 {formatStatus(profile.status)}
               </span>
 
               <span className="inline-flex items-center gap-2 rounded-full bg-[#d8b56d]/20 px-4 py-2 text-xs font-semibold text-[#f1d79d]">
-                <BadgeCheck size={15} aria-hidden />
+                <BadgeCheck
+                  size={15}
+                  aria-hidden
+                />
+
                 {profile.emailVerified
                   ? 'Email verified'
                   : 'Email unverified'}
@@ -204,7 +218,9 @@ export default function ProfilePage() {
                   </p>
 
                   <p className="mt-1 text-sm text-[#657972]">
-                    {formatDate(profile.createdAt)}
+                    {formatDate(
+                      profile.createdAt,
+                    )}
                   </p>
                 </div>
               </div>
@@ -224,7 +240,9 @@ export default function ProfilePage() {
                   </p>
 
                   <p className="mt-1 text-sm text-[#657972]">
-                    {formatDate(profile.lastLoginAt)}
+                    {formatDate(
+                      profile.lastLoginAt,
+                    )}
                   </p>
                 </div>
               </div>
@@ -246,7 +264,10 @@ export default function ProfilePage() {
                   <p className="mt-1 text-sm text-[#657972]">
                     {profile.roles
                       .map((role) =>
-                        role.replace('ROLE_', ''),
+                        role.replace(
+                          'ROLE_',
+                          '',
+                        ),
                       )
                       .join(', ')}
                   </p>
@@ -254,6 +275,10 @@ export default function ProfilePage() {
               </div>
             </div>
           </aside>
+        </div>
+
+        <div className="mt-6">
+          <TwoFactorAuthenticationCard />
         </div>
 
         <div className="mt-6">
