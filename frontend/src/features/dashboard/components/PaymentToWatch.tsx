@@ -1,15 +1,15 @@
-import {useMemo} from 'react'
+import { useMemo } from 'react'
 import {
   AlertTriangle,
   ArrowRight,
   CalendarDays,
   Check,
-  Sparkles,
 } from 'lucide-react'
-import {Link} from 'react-router'
-import {useAccounts} from '../../accounts/hooks/useAccounts'
-import type {RecurringTransactionDue} from '../api/types'
-import {useRecurringTransactions} from '../../recurring/hooks/useRecurringTransactions'
+import { Link } from 'react-router'
+
+import { useAccounts } from '../../accounts/hooks/useAccounts'
+import { useRecurringTransactions } from '../../recurring/hooks/useRecurringTransactions'
+import type { RecurringTransactionDue } from '../api/types'
 
 interface PaymentsToWatchProps {
   dueTransactions: RecurringTransactionDue[]
@@ -18,13 +18,14 @@ interface PaymentsToWatchProps {
 function getToday() {
   const today = new Date()
   const year = today.getFullYear()
+
   const month = String(
     today.getMonth() + 1,
   ).padStart(2, '0')
-  const day = String(today.getDate()).padStart(
-    2,
-    '0',
-  )
+
+  const day = String(
+    today.getDate(),
+  ).padStart(2, '0')
 
   return `${year}-${month}-${day}`
 }
@@ -33,7 +34,11 @@ function parseLocalDate(value: string) {
   const [year, month, day] =
     value.split('-').map(Number)
 
-  return new Date(year, month - 1, day)
+  return new Date(
+    year,
+    month - 1,
+    day,
+  )
 }
 
 function differenceInDays(
@@ -57,7 +62,7 @@ function differenceInDays(
 
   return Math.round(
     (endUtc - startUtc) /
-    (1000 * 60 * 60 * 24),
+      (1000 * 60 * 60 * 24),
   )
 }
 
@@ -66,24 +71,31 @@ function formatMoney(
   currencyCode?: string,
 ) {
   if (!currencyCode) {
-    return new Intl.NumberFormat('en-ZA', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(amount)
+    return new Intl.NumberFormat(
+      'en-ZA',
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      },
+    ).format(amount)
   }
 
-  return new Intl.NumberFormat('en-ZA', {
-    style: 'currency',
-    currency: currencyCode,
-    maximumFractionDigits: 2,
-  }).format(amount)
+  return new Intl.NumberFormat(
+    'en-ZA',
+    {
+      style: 'currency',
+      currency: currencyCode,
+      maximumFractionDigits: 2,
+    },
+  ).format(amount)
 }
 
 function formatRelativeDate(
   date: string,
   today: string,
 ) {
-  const difference = differenceInDays(today, date)
+  const difference =
+    differenceInDays(today, date)
 
   if (difference === 0) {
     return 'Due today'
@@ -100,33 +112,43 @@ function getDateParts(value: string) {
   const date = parseLocalDate(value)
 
   return {
-    day: new Intl.DateTimeFormat('en-ZA', {
-      day: '2-digit',
-    }).format(date),
+    day: new Intl.DateTimeFormat(
+      'en-ZA',
+      {
+        day: '2-digit',
+      },
+    ).format(date),
 
-    month: new Intl.DateTimeFormat('en-ZA', {
-      month: 'short',
-    })
+    month: new Intl.DateTimeFormat(
+      'en-ZA',
+      {
+        month: 'short',
+      },
+    )
       .format(date)
       .toUpperCase(),
   }
 }
 
 export default function PaymentsToWatch({
-                                          dueTransactions,
-                                        }: PaymentsToWatchProps) {
+  dueTransactions,
+}: PaymentsToWatchProps) {
   const today = getToday()
 
   const schedulesQuery =
     useRecurringTransactions('ACTIVE')
 
-  const accountsQuery = useAccounts('ACTIVE')
+  const accountsQuery =
+    useAccounts('ACTIVE')
 
   const accountById = useMemo(
     () =>
       new Map(
         (accountsQuery.data ?? []).map(
-          (account) => [account.id, account],
+          (account) => [
+            account.id,
+            account,
+          ],
         ),
       ),
     [accountsQuery.data],
@@ -138,15 +160,14 @@ export default function PaymentsToWatch({
         .filter(
           (transaction) =>
             transaction.transactionType ===
-            'EXPENSE' &&
+              'EXPENSE' &&
             transaction.daysOverdue > 0,
         )
         .sort(
           (first, second) =>
             second.daysOverdue -
             first.daysOverdue,
-        )
-        .slice(0, 4),
+        ),
     [dueTransactions],
   )
 
@@ -156,7 +177,7 @@ export default function PaymentsToWatch({
         .filter(
           (schedule) =>
             schedule.transactionType ===
-            'EXPENSE' &&
+              'EXPENSE' &&
             schedule.status === 'ACTIVE' &&
             schedule.nextDueDate !== null &&
             schedule.nextDueDate >= today,
@@ -190,246 +211,271 @@ export default function PaymentsToWatch({
           className="inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-[#9a6828] hover:underline hover:underline-offset-4"
         >
           Manage schedules
-          <ArrowRight size={15} aria-hidden/>
+          <ArrowRight
+            size={15}
+            aria-hidden
+          />
         </Link>
       </div>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-        <article className="relative overflow-hidden rounded-3xl border border-[#e1c6b9] bg-[#f8ede7] p-6 sm:p-7">
+      <div className="mt-6 overflow-hidden rounded-[2rem] shadow-[0_18px_50px_rgba(34,57,48,0.09)] xl:grid xl:grid-cols-[0.85fr_1.15fr]">
+        <article className="relative overflow-hidden bg-[#94513f] px-6 py-7 text-[#fff8f2] sm:px-8 sm:py-9">
           <div
-            className="absolute -top-16 -right-12 size-40 rounded-full border border-[#dcae99]/30"
+            className="absolute -right-20 -top-24 size-64 rounded-full border border-white/10"
             aria-hidden
           />
 
           <div
-            className="absolute top-5 right-7 size-20 rounded-full bg-[#efcfc0]/25"
+            className="absolute -right-6 -top-10 size-36 rounded-full bg-white/5"
             aria-hidden
           />
 
           <div className="relative flex items-start justify-between gap-5">
-            <div className="flex items-start gap-4">
-              <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#a85e49] text-white shadow-[0_8px_20px_rgba(168,94,73,0.18)]">
-                <AlertTriangle size={19} aria-hidden/>
+            <div>
+              <span className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.15em] text-[#f0c8b8]">
+                <AlertTriangle
+                  size={16}
+                  aria-hidden
+                />
+                NEEDS ATTENTION
               </span>
 
-              <div>
-                <p className="text-xs font-bold tracking-[0.14em] text-[#9a5d49]">
-                  NEEDS ATTENTION
-                </p>
+              <h3 className="mt-3 font-serif text-3xl tracking-[-0.025em]">
+                Overdue
+              </h3>
 
-                <h3 className="mt-2 font-serif text-3xl tracking-[-0.02em] text-[#6e382c]">
-                  Overdue payments
-                </h3>
-              </div>
+              <p className="mt-2 max-w-sm text-sm leading-6 text-[#efd8cf]">
+                Payments that have passed
+                their scheduled date.
+              </p>
             </div>
 
             <div className="relative text-right">
-              <p className="font-serif text-5xl leading-none text-[#a85e49]">
+              <p className="font-serif text-6xl leading-none">
                 {overduePayments.length}
               </p>
 
-              <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-[#9a5d49]">
-                overdue
+              <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.14em] text-[#f0c8b8]">
+                outstanding
               </p>
             </div>
           </div>
 
           {overduePayments.length === 0 ? (
-            <div className="relative mt-8 flex items-center gap-4 rounded-2xl border border-[#e5cfc5] bg-white/55 px-5 py-5">
-              <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#e0ece4] text-[#2d684f]">
-                <Check size={18} aria-hidden/>
+            <div className="relative mt-8 flex items-center gap-4 border-t border-white/20 pt-6">
+              <span className="grid size-10 shrink-0 place-items-center rounded-full bg-white/12 text-white">
+                <Check
+                  size={18}
+                  aria-hidden
+                />
               </span>
 
               <div>
-                <p className="font-semibold text-[#173c32]">
+                <p className="font-semibold">
                   Nothing overdue
                 </p>
 
-                <p className="mt-1 text-xs leading-5 text-[#657972]">
-                  Your scheduled payments are currently
-                  on track.
+                <p className="mt-1 text-sm text-[#efd8cf]">
+                  Your scheduled payments
+                  are currently on track.
                 </p>
               </div>
             </div>
           ) : (
-            <div className="relative mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
-              {overduePayments.map((payment) => (
-                <div
-                  key={payment.recurringTransactionId}
-                  className="rounded-2xl border border-[#e4cbbf] bg-white/65 p-4 backdrop-blur-sm"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <span className="mt-1 size-2 shrink-0 rounded-full bg-[#bb6b4d]"/>
+            <div className="relative mt-7 divide-y divide-white/15 border-t border-white/20">
+              {overduePayments
+                .slice(0, 4)
+                .map((payment) => (
+                  <div
+                    key={
+                      payment.recurringTransactionId
+                    }
+                    className="grid gap-3 py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+                  >
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="size-2 shrink-0 rounded-full bg-[#ffd2bf]" />
 
-                    <span className="rounded-full bg-[#f3d8cd] px-2 py-1 text-[10px] font-bold text-[#98513d]">
-                      {payment.daysOverdue}{' '}
-                      {payment.daysOverdue === 1
-                        ? 'day'
-                        : 'days'}{' '}
-                      late
-                    </span>
+                        <p className="truncate font-semibold">
+                          {payment.name}
+                        </p>
+                      </div>
+
+                      <p className="mt-1 truncate pl-4 text-xs text-[#efd8cf]">
+                        {payment.accountName}
+                        <span aria-hidden>
+                          {' '}·{' '}
+                        </span>
+                        {payment.categoryName ??
+                          'Scheduled expense'}
+                      </p>
+                    </div>
+
+                    <div className="pl-4 sm:pl-0 sm:text-right">
+                      <p className="font-serif text-xl">
+                        {formatMoney(
+                          payment.amount,
+                          payment.currencyCode,
+                        )}
+                      </p>
+
+                      <p className="mt-1 text-xs font-semibold text-[#ffd2bf]">
+                        {payment.daysOverdue}{' '}
+                        {payment.daysOverdue ===
+                        1
+                          ? 'day'
+                          : 'days'}{' '}
+                        late
+                      </p>
+                    </div>
                   </div>
-
-                  <p className="mt-4 truncate font-semibold text-[#542f27]">
-                    {payment.name}
-                  </p>
-
-                  <p className="mt-1 truncate text-xs text-[#8b695f]">
-                    {payment.categoryName ?? 'Scheduled expense'}
-                  </p>
-
-                  <p className="mt-4 font-serif text-xl text-[#a85e49]">
-                    {formatMoney(
-                      payment.amount,
-                      payment.currencyCode,
-                    )}
-                  </p>
-
-                  <p className="mt-1 truncate text-xs text-[#8b695f]">
-                    {payment.accountName}
-                  </p>
-                </div>
-              ))}
+                ))}
             </div>
           )}
         </article>
 
-        <article className="relative overflow-hidden rounded-3xl border border-[#cdddcf] bg-[#e8f0e9] p-6 sm:p-7">
-          <div
-            className="absolute -bottom-20 -right-12 size-52 rounded-full border border-[#a9c6b0]/35"
-            aria-hidden
-          />
-
-          <div
-            className="absolute -bottom-7 right-12 size-28 rounded-full bg-white/20"
-            aria-hidden
-          />
-
-          <div className="relative flex items-start justify-between gap-5">
-            <div className="flex items-start gap-4">
-              <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#2d684f] text-white shadow-[0_8px_20px_rgba(45,104,79,0.18)]">
-                <CalendarDays size={19} aria-hidden/>
+        <article className="bg-[#edf2ec] px-6 py-7 text-[#173c32] sm:px-8 sm:py-9">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <span className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.15em] text-[#527064]">
+                <CalendarDays
+                  size={16}
+                  aria-hidden
+                />
+                ON THE HORIZON
               </span>
 
-              <div>
-                <p className="text-xs font-bold tracking-[0.14em] text-[#567267]">
-                  ON THE HORIZON
-                </p>
+              <h3 className="mt-3 font-serif text-3xl tracking-[-0.025em]">
+                Coming up
+              </h3>
 
-                <h3 className="mt-2 font-serif text-3xl tracking-[-0.02em] text-[#173c32]">
-                  Coming up
-                </h3>
-              </div>
+              <p className="mt-2 text-sm leading-6 text-[#657972]">
+                The next scheduled expenses
+                on your calendar.
+              </p>
             </div>
 
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/55 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide text-[#2d684f]">
-              <Sparkles size={11} aria-hidden/>
+            <p className="rounded-full border border-[#cad9ce] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[#39725d]">
               Next four
-            </span>
+            </p>
           </div>
 
           {schedulesQuery.isPending ? (
-            <div className="relative mt-7 grid animate-pulse gap-3 sm:grid-cols-2">
-              {Array.from({length: 4}).map(
-                (_, index) => (
-                  <div
-                    key={index}
-                    className="h-28 rounded-2xl bg-white/45"
-                  />
-                ),
-              )}
+            <div className="mt-7 divide-y divide-[#ced9d1] border-t border-[#ced9d1]">
+              {Array.from({
+                length: 4,
+              }).map((_, index) => (
+                <div
+                  key={index}
+                  className="h-20 animate-pulse bg-white/20"
+                />
+              ))}
             </div>
           ) : schedulesQuery.error ? (
-            <div
+            <p
               role="alert"
-              className="relative mt-7 rounded-2xl border border-red-200 bg-red-50/80 px-5 py-5 text-sm text-red-700"
+              className="mt-7 border-t border-[#ced9d1] pt-6 text-sm text-[#9a4f3f]"
             >
-              Upcoming payments could not be loaded.
-            </div>
-          ) : upcomingPayments.length === 0 ? (
-            <div className="relative mt-8 flex items-center gap-4 rounded-2xl border border-[#cdddcf] bg-white/45 px-5 py-5">
+              Upcoming payments could not
+              be loaded.
+            </p>
+          ) : upcomingPayments.length ===
+            0 ? (
+            <div className="mt-8 flex items-center gap-4 border-t border-[#ced9d1] pt-6">
               <span className="grid size-10 shrink-0 place-items-center rounded-full bg-white/70 text-[#2d684f]">
-                <Check size={18} aria-hidden/>
+                <Check
+                  size={18}
+                  aria-hidden
+                />
               </span>
 
               <div>
-                <p className="font-semibold text-[#173c32]">
+                <p className="font-semibold">
                   A quiet calendar
                 </p>
 
-                <p className="mt-1 text-xs leading-5 text-[#657972]">
-                  No upcoming expense schedules were
-                  found.
+                <p className="mt-1 text-sm text-[#657972]">
+                  No upcoming expense
+                  schedules were found.
                 </p>
               </div>
             </div>
           ) : (
-            <div className="relative mt-7 grid gap-3 sm:grid-cols-2">
-              {upcomingPayments.map((payment) => {
-                const account = accountById.get(
-                  payment.accountId,
-                )
+            <div className="mt-7 divide-y divide-[#ced9d1] border-t border-[#ced9d1]">
+              {upcomingPayments.map(
+                (payment) => {
+                  const account =
+                    accountById.get(
+                      payment.accountId,
+                    )
 
-                const dateParts = getDateParts(
-                  payment.nextDueDate!,
-                )
+                  const dateParts =
+                    getDateParts(
+                      payment.nextDueDate!,
+                    )
 
-                return (
-                  <div
-                    key={payment.id}
-                    className="flex items-center gap-4 rounded-2xl border border-[#cbdccf] bg-white/55 p-4 backdrop-blur-sm transition hover:bg-white/75"
-                  >
-                    <div className="grid size-14 shrink-0 place-items-center rounded-2xl border border-[#c8dbcd] bg-[#f7faf6] text-center">
-                      <div>
-                        <p className="text-[9px] font-bold tracking-[0.12em] text-[#668175]">
+                  return (
+                    <div
+                      key={payment.id}
+                      className="grid grid-cols-[3.5rem_minmax(0,1fr)] gap-4 py-4 sm:grid-cols-[3.5rem_minmax(0,1fr)_auto] sm:items-center"
+                    >
+                      <div className="border-r border-[#c3d2c7] pr-4 text-center">
+                        <p className="text-[9px] font-bold tracking-[0.14em] text-[#668175]">
                           {dateParts.month}
                         </p>
 
-                        <p className="font-serif text-xl leading-none text-[#173c32]">
+                        <p className="mt-1 font-serif text-2xl leading-none">
                           {dateParts.day}
                         </p>
                       </div>
-                    </div>
 
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <p className="truncate font-semibold text-[#173c32]">
-                          {payment.name}
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="truncate font-semibold">
+                            {payment.name}
+                          </p>
+
+                          {payment.autoPost && (
+                            <span
+                              title="Posts automatically"
+                              className="size-2 shrink-0 rounded-full bg-[#bd8539]"
+                            />
+                          )}
+                        </div>
+
+                        <p className="mt-1 truncate text-xs text-[#657972]">
+                          {payment.merchantName ??
+                            account?.name ??
+                            'Scheduled expense'}
                         </p>
 
-                        {payment.autoPost && (
-                          <span
-                            title="Posts automatically"
-                            className="size-2 shrink-0 rounded-full bg-[#bd8539]"
-                          />
-                        )}
-                      </div>
-
-                      <p className="mt-1 truncate text-xs text-[#657972]">
-                        {payment.merchantName ??
-                          account?.name ??
-                          'Scheduled expense'}
-                      </p>
-
-                      <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-                        <p className="text-xs font-semibold text-[#2d684f]">
+                        <p className="mt-1 text-xs font-semibold text-[#39725d] sm:hidden">
                           {formatRelativeDate(
                             payment.nextDueDate!,
                             today,
                           )}
                         </p>
+                      </div>
 
-                        <p className="font-serif text-lg text-[#173c32]">
+                      <div className="col-start-2 sm:col-start-auto sm:text-right">
+                        <p className="font-serif text-xl">
                           {formatMoney(
                             payment.amount,
                             account?.currencyCode,
                           )}
                         </p>
+
+                        <p className="mt-1 hidden text-xs font-semibold text-[#39725d] sm:block">
+                          {formatRelativeDate(
+                            payment.nextDueDate!,
+                            today,
+                          )}
+                        </p>
                       </div>
                     </div>
-                  </div>
-                )
-              })}
+                  )
+                },
+              )}
             </div>
           )}
         </article>
