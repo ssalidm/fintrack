@@ -4,7 +4,6 @@ import {
   Landmark,
   Pencil,
   Plus,
-  RefreshCw,
   WalletCards,
 } from 'lucide-react'
 
@@ -22,6 +21,7 @@ import {
   useAccounts,
   useArchiveAccount,
 } from '../hooks/useAccounts'
+import RefreshButton from '../../../components/actions/RefreshButton'
 
 const accountTypeLabels = {
   CASH: 'Cash',
@@ -148,22 +148,12 @@ export default function AccountsPage() {
         description="See where your money lives and how each account contributes to your overall position."
         actions={
           <>
-            <button
-              type="button"
-              disabled={isRefreshing}
-              onClick={() => void refreshAccounts()}
-              className="rounded-full border border-[#d8d6ce] bg-[#fffdf8] p-3 text-[#657972] transition hover:border-[#bd9460] hover:text-[#9a6828] disabled:opacity-60"
-              aria-label="Refresh accounts"
-            >
-              <RefreshCw
-                size={18}
-                className={
-                  isRefreshing
-                    ? 'animate-spin'
-                    : ''
-                }
-              />
-            </button>
+            <RefreshButton
+              isRefreshing={isRefreshing}
+              onRefresh={refreshAccounts}
+              label="Refresh accounts"
+              iconOnly
+            />
 
             <button
               type="button"
@@ -190,11 +180,10 @@ export default function AccountsPage() {
             onClick={() =>
               setStatus(accountStatus)
             }
-            className={`border-b-2 px-1 pb-4 text-sm font-semibold transition ${
-              status === accountStatus
+            className={`border-b-2 px-1 pb-4 text-sm font-semibold transition ${status === accountStatus
                 ? 'border-[#39725d] text-[#173c32]'
                 : 'border-transparent text-[#7a8984] hover:text-[#173c32]'
-            }`}
+              }`}
           >
             {accountStatus === 'ACTIVE'
               ? 'Active accounts'
@@ -290,19 +279,17 @@ export default function AccountsPage() {
                 return (
                   <article
                     key={account.id}
-                    className={`grid gap-5 px-5 py-6 sm:grid-cols-[1fr_auto] sm:items-center sm:px-7 ${
-                      index > 0
+                    className={`grid gap-5 px-5 py-6 sm:grid-cols-[1fr_auto] sm:items-center sm:px-7 ${index > 0
                         ? 'border-t border-[#dedbd2]'
                         : ''
-                    }`}
+                      }`}
                   >
                     <div className="flex min-w-0 items-start gap-4">
                       <span
-                        className={`grid size-11 shrink-0 place-items-center rounded-xl ${
-                          accountTypeColours[
-                            account.accountType
+                        className={`grid size-11 shrink-0 place-items-center rounded-xl ${accountTypeColours[
+                          account.accountType
                           ]
-                        }`}
+                          }`}
                       >
                         <Landmark
                           size={19}
@@ -326,7 +313,7 @@ export default function AccountsPage() {
                         <p className="mt-1 text-sm text-[#657972]">
                           {
                             accountTypeLabels[
-                              account.accountType
+                            account.accountType
                             ]
                           }
                           {' · '}

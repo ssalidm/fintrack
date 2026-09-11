@@ -11,7 +11,6 @@ import {
   Clock3,
   Pencil,
   Plus,
-  RefreshCw,
   RotateCcw,
   Sparkles,
   X,
@@ -34,6 +33,7 @@ import {
   useRecurringTransactions,
   useResumeRecurringTransaction,
 } from '../hooks/useRecurringTransactions'
+import RefreshButton from '../../../components/actions/RefreshButton'
 
 const statuses: RecurringTransactionStatus[] = [
   'ACTIVE',
@@ -378,7 +378,7 @@ export default function RecurringTransactionsPage() {
 
   const queryErrorMessage =
     schedulesQuery.error instanceof
-    ApiClientError
+      ApiClientError
       ? schedulesQuery.error.message
       : 'Unable to load your recurring transactions.'
 
@@ -563,12 +563,11 @@ export default function RecurringTransactionsPage() {
                     )
                     setActionError(null)
                   }}
-                  className={`cursor-pointer rounded-full px-4 py-2 text-xs font-semibold transition ${
-                    status ===
-                    filterStatus
+                  className={`cursor-pointer rounded-full px-4 py-2 text-xs font-semibold transition ${status ===
+                      filterStatus
                       ? 'bg-[#174f43] text-white shadow-sm'
                       : 'text-[#657972] hover:text-[#173c32]'
-                  }`}
+                    }`}
                 >
                   {statusLabel(
                     filterStatus,
@@ -578,28 +577,10 @@ export default function RecurringTransactionsPage() {
             )}
           </div>
 
-          <button
-            type="button"
-            disabled={
-              schedulesQuery.isFetching
-            }
-            onClick={() =>
-              void schedulesQuery.refetch()
-            }
-            className="inline-flex cursor-pointer items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-[#173c32] transition hover:bg-[#eef1eb] disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <RefreshCw
-              size={15}
-              className={
-                schedulesQuery.isFetching
-                  ? 'animate-spin'
-                  : ''
-              }
-              aria-hidden
-            />
-
-            Refresh
-          </button>
+          <RefreshButton
+            isRefreshing={schedulesQuery.isFetching}
+            onRefresh={schedulesQuery.refetch}
+          />
         </section>
 
         {actionError && (
@@ -677,29 +658,29 @@ export default function RecurringTransactionsPage() {
                 {status === 'ACTIVE'
                   ? 'Create a schedule for income or expenses that repeat over time.'
                   : `You do not have any ${statusLabel(
-                      status,
-                    ).toLowerCase()} recurring transactions.`}
+                    status,
+                  ).toLowerCase()} recurring transactions.`}
               </p>
 
               {status ===
                 'ACTIVE' && (
-                <button
-                  type="button"
-                  onClick={() =>
-                    setIsCreateOpen(
-                      true,
-                    )
-                  }
-                  className="mt-6 inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#216353]"
-                >
-                  <Plus
-                    size={17}
-                    aria-hidden
-                  />
-                  Create your first
-                  schedule
-                </button>
-              )}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setIsCreateOpen(
+                        true,
+                      )
+                    }
+                    className="mt-6 inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#216353]"
+                  >
+                    <Plus
+                      size={17}
+                      aria-hidden
+                    />
+                    Create your first
+                    schedule
+                  </button>
+                )}
             </section>
           )}
 
@@ -723,11 +704,11 @@ export default function RecurringTransactionsPage() {
 
                 const isDue =
                   schedule.status ===
-                    'ACTIVE' &&
+                  'ACTIVE' &&
                   schedule.nextDueDate !==
-                    null &&
+                  null &&
                   schedule.nextDueDate <=
-                    today
+                  today
 
                 const canPostManually =
                   isDue &&
@@ -741,15 +722,14 @@ export default function RecurringTransactionsPage() {
                     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
                       <div className="flex min-w-0 items-start gap-4">
                         <span
-                          className={`grid size-12 shrink-0 place-items-center rounded-2xl ${
-                            schedule.transactionType ===
-                            'INCOME'
+                          className={`grid size-12 shrink-0 place-items-center rounded-2xl ${schedule.transactionType ===
+                              'INCOME'
                               ? 'bg-[#dfece3] text-[#2d684f]'
                               : 'bg-[#f4e7df] text-[#a85e49]'
-                          }`}
+                            }`}
                         >
                           {schedule.transactionType ===
-                          'INCOME' ? (
+                            'INCOME' ? (
                             <CirclePlay
                               size={21}
                               aria-hidden
@@ -771,15 +751,14 @@ export default function RecurringTransactionsPage() {
                             </h2>
 
                             <span
-                              className={`rounded-full px-2.5 py-1 text-[10px] font-bold tracking-wide ${
-                                schedule.status ===
-                                'ACTIVE'
+                              className={`rounded-full px-2.5 py-1 text-[10px] font-bold tracking-wide ${schedule.status ===
+                                  'ACTIVE'
                                   ? 'bg-[#e2eee5] text-[#2d684f]'
                                   : schedule.status ===
-                                      'PAUSED'
+                                    'PAUSED'
                                     ? 'bg-[#f1e7d3] text-[#9a6828]'
                                     : 'bg-[#ece9e2] text-[#756a61]'
-                              }`}
+                                }`}
                             >
                               {
                                 schedule.status
@@ -820,12 +799,11 @@ export default function RecurringTransactionsPage() {
 
                       <div className="lg:text-right">
                         <p
-                          className={`font-serif text-3xl ${
-                            schedule.transactionType ===
-                            'INCOME'
+                          className={`font-serif text-3xl ${schedule.transactionType ===
+                              'INCOME'
                               ? 'text-[#2d684f]'
                               : 'text-[#173c32]'
-                          }`}
+                            }`}
                         >
                           {formatMoney(
                             schedule.amount,
@@ -865,11 +843,11 @@ export default function RecurringTransactionsPage() {
                             {schedule.nextDueDate
                               ? isDue
                                 ? `Due ${formatDate(
-                                    schedule.nextDueDate,
-                                  )}`
+                                  schedule.nextDueDate,
+                                )}`
                                 : `Next ${formatDate(
-                                    schedule.nextDueDate,
-                                  )}`
+                                  schedule.nextDueDate,
+                                )}`
                               : 'Schedule completed'}
                           </span>
                         </div>
@@ -893,114 +871,114 @@ export default function RecurringTransactionsPage() {
 
                       {schedule.status !==
                         'ARCHIVED' && (
-                        <div className="flex flex-wrap justify-end gap-2">
-                          {canPostManually && (
-                            <button
-                              type="button"
-                              disabled={
-                                isBusy
-                              }
-                              onClick={() =>
-                                void handlePostDue(
-                                  schedule,
-                                )
-                              }
-                              className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#216353] disabled:cursor-not-allowed disabled:opacity-50"
-                            >
-                              <CheckCircle2
-                                size={14}
-                                aria-hidden
-                              />
-                              Post due
-                            </button>
-                          )}
+                          <div className="flex flex-wrap justify-end gap-2">
+                            {canPostManually && (
+                              <button
+                                type="button"
+                                disabled={
+                                  isBusy
+                                }
+                                onClick={() =>
+                                  void handlePostDue(
+                                    schedule,
+                                  )
+                                }
+                                className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#216353] disabled:cursor-not-allowed disabled:opacity-50"
+                              >
+                                <CheckCircle2
+                                  size={14}
+                                  aria-hidden
+                                />
+                                Post due
+                              </button>
+                            )}
 
-                          {(schedule.status ===
-                            'ACTIVE' ||
-                            schedule.status ===
+                            {(schedule.status ===
+                              'ACTIVE' ||
+                              schedule.status ===
                               'PAUSED') && (
+                                <button
+                                  type="button"
+                                  disabled={
+                                    isBusy
+                                  }
+                                  onClick={() =>
+                                    setScheduleToEdit(
+                                      schedule,
+                                    )
+                                  }
+                                  className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#d8d5cc] px-4 py-2 text-xs font-semibold text-[#173c32] transition hover:bg-[#f4f2ec] disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                  <Pencil
+                                    size={14}
+                                    aria-hidden
+                                  />
+                                  Edit
+                                </button>
+                              )}
+
+                            {schedule.status ===
+                              'ACTIVE' && (
+                                <button
+                                  type="button"
+                                  disabled={
+                                    isBusy
+                                  }
+                                  onClick={() =>
+                                    void handlePause(
+                                      schedule,
+                                    )
+                                  }
+                                  className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#d8d5cc] px-4 py-2 text-xs font-semibold text-[#173c32] transition hover:bg-[#f4f2ec] disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                  <CirclePause
+                                    size={14}
+                                    aria-hidden
+                                  />
+                                  Pause
+                                </button>
+                              )}
+
+                            {schedule.status ===
+                              'PAUSED' && (
+                                <button
+                                  type="button"
+                                  disabled={
+                                    isBusy
+                                  }
+                                  onClick={() =>
+                                    void handleResume(
+                                      schedule,
+                                    )
+                                  }
+                                  className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#b8cdbd] px-4 py-2 text-xs font-semibold text-[#2d684f] transition hover:bg-[#eef5f0] disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                  <RotateCcw
+                                    size={14}
+                                    aria-hidden
+                                  />
+                                  Resume
+                                </button>
+                              )}
+
                             <button
                               type="button"
-                              disabled={
-                                isBusy
-                              }
+                              disabled={isBusy}
                               onClick={() =>
-                                setScheduleToEdit(
+                                setScheduleToArchive(
                                   schedule,
                                 )
                               }
-                              className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#d8d5cc] px-4 py-2 text-xs font-semibold text-[#173c32] transition hover:bg-[#f4f2ec] disabled:cursor-not-allowed disabled:opacity-50"
+                              className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#e0c9bf] px-4 py-2 text-xs font-semibold text-[#a85e49] transition hover:bg-[#f8ebe6] disabled:cursor-not-allowed disabled:opacity-50"
                             >
-                              <Pencil
+                              <Archive
                                 size={14}
                                 aria-hidden
                               />
-                              Edit
+                              Archive
                             </button>
-                          )}
-
-                          {schedule.status ===
-                            'ACTIVE' && (
-                            <button
-                              type="button"
-                              disabled={
-                                isBusy
-                              }
-                              onClick={() =>
-                                void handlePause(
-                                  schedule,
-                                )
-                              }
-                              className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#d8d5cc] px-4 py-2 text-xs font-semibold text-[#173c32] transition hover:bg-[#f4f2ec] disabled:cursor-not-allowed disabled:opacity-50"
-                            >
-                              <CirclePause
-                                size={14}
-                                aria-hidden
-                              />
-                              Pause
-                            </button>
-                          )}
-
-                          {schedule.status ===
-                            'PAUSED' && (
-                            <button
-                              type="button"
-                              disabled={
-                                isBusy
-                              }
-                              onClick={() =>
-                                void handleResume(
-                                  schedule,
-                                )
-                              }
-                              className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#b8cdbd] px-4 py-2 text-xs font-semibold text-[#2d684f] transition hover:bg-[#eef5f0] disabled:cursor-not-allowed disabled:opacity-50"
-                            >
-                              <RotateCcw
-                                size={14}
-                                aria-hidden
-                              />
-                              Resume
-                            </button>
-                          )}
-
-                          <button
-                            type="button"
-                            disabled={isBusy}
-                            onClick={() =>
-                              setScheduleToArchive(
-                                schedule,
-                              )
-                            }
-                            className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#e0c9bf] px-4 py-2 text-xs font-semibold text-[#a85e49] transition hover:bg-[#f8ebe6] disabled:cursor-not-allowed disabled:opacity-50"
-                          >
-                            <Archive
-                              size={14}
-                              aria-hidden
-                            />
-                            Archive
-                          </button>
-                        </div>
-                      )}
+                          </div>
+                        )}
                     </div>
                   </article>
                 )

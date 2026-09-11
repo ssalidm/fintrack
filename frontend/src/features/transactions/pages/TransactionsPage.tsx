@@ -8,7 +8,6 @@ import {
   CircleSlash2,
   Pencil,
   Plus,
-  RefreshCw,
 } from 'lucide-react'
 
 import { ApiClientError } from '../../../api/ApiClientError'
@@ -26,6 +25,7 @@ import {
   useTransactions,
   useVoidTransaction,
 } from '../hooks/useTransactions'
+import RefreshButton from '../../../components/actions/RefreshButton'
 
 const transactionTypeLabels = {
   INCOME: 'Income',
@@ -99,11 +99,11 @@ function TransactionIcon({
 
       {(type === 'TRANSFER_IN' ||
         type === 'TRANSFER_OUT') && (
-        <ArrowLeftRight
-          size={19}
-          aria-hidden
-        />
-      )}
+          <ArrowLeftRight
+            size={19}
+            aria-hidden
+          />
+        )}
     </span>
   )
 }
@@ -297,28 +297,12 @@ export default function TransactionsPage() {
           description="Follow every income, expense and transfer across your accounts."
           actions={
             <>
-              <button
-                type="button"
-                disabled={
-                  transactionsQuery.isFetching
-                }
-                onClick={() =>
-                  void transactionsQuery.refetch()
-                }
-                className="cursor-pointer rounded-full border border-[#d8d6ce] bg-[#fffdf8] p-3 text-[#657972] transition hover:border-[#bd9460] hover:text-[#9a6828] disabled:cursor-not-allowed disabled:opacity-60"
-                aria-label="Refresh transactions"
-                title="Refresh transactions"
-              >
-                <RefreshCw
-                  size={18}
-                  aria-hidden
-                  className={
-                    transactionsQuery.isFetching
-                      ? 'animate-spin'
-                      : ''
-                  }
-                />
-              </button>
+              <RefreshButton
+                isRefreshing={transactionsQuery.isFetching}
+                onRefresh={transactionsQuery.refetch}
+                label="Refresh transactions"
+                iconOnly
+              />
 
               <button
                 type="button"
@@ -347,8 +331,8 @@ export default function TransactionsPage() {
                     type:
                       (event.target.value ||
                         undefined) as
-                        | TransactionType
-                        | undefined,
+                      | TransactionType
+                      | undefined,
                   })
                 }
                 className="mt-2 block w-full cursor-pointer rounded-xl border border-[#d8d6ce] bg-white px-3 py-2.5 pr-10 text-sm text-[#173c32]"
@@ -507,9 +491,9 @@ export default function TransactionsPage() {
 
             <p className="mt-2 text-sm text-red-700">
               {transactionsQuery.error instanceof
-              ApiClientError
+                ApiClientError
                 ? transactionsQuery.error
-                    .message
+                  .message
                 : 'Please try again.'}
             </p>
           </section>
@@ -555,30 +539,29 @@ export default function TransactionsPage() {
                   const category =
                     transaction.categoryId
                       ? categoriesById.get(
-                          transaction.categoryId,
-                        )
+                        transaction.categoryId,
+                      )
                       : undefined
 
                   const isIncoming =
                     transaction.transactionType ===
-                      'INCOME' ||
+                    'INCOME' ||
                     transaction.transactionType ===
-                      'TRANSFER_IN'
+                    'TRANSFER_IN'
 
                   const canModify =
                     transaction.status ===
-                      'POSTED' &&
+                    'POSTED' &&
                     transaction.transferId ===
-                      null
+                    null
 
                   return (
                     <article
                       key={transaction.id}
-                      className={`grid gap-4 px-5 py-5 sm:grid-cols-[1fr_auto] sm:items-center sm:px-7 ${
-                        index > 0
+                      className={`grid gap-4 px-5 py-5 sm:grid-cols-[1fr_auto] sm:items-center sm:px-7 ${index > 0
                           ? 'border-t border-[#dedbd2]'
                           : ''
-                      }`}
+                        }`}
                     >
                       <div className="flex min-w-0 items-start gap-4">
                         <TransactionIcon
@@ -593,24 +576,24 @@ export default function TransactionsPage() {
                               {transaction.merchantName ||
                                 transaction.description ||
                                 transactionTypeLabels[
-                                  transaction
-                                    .transactionType
+                                transaction
+                                  .transactionType
                                 ]}
                             </h2>
 
                             {transaction.status ===
                               'VOIDED' && (
-                              <span className="rounded-full bg-[#eceae4] px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-[#657972]">
-                                Voided
-                              </span>
-                            )}
+                                <span className="rounded-full bg-[#eceae4] px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-[#657972]">
+                                  Voided
+                                </span>
+                              )}
                           </div>
 
                           <p className="mt-1 text-sm text-[#657972]">
                             {category?.name ??
                               transactionTypeLabels[
-                                transaction
-                                  .transactionType
+                              transaction
+                                .transactionType
                               ]}
                             {' · '}
                             {account?.name ??
@@ -625,14 +608,13 @@ export default function TransactionsPage() {
 
                       <div className="flex items-center justify-between gap-5 pl-15 sm:justify-end sm:pl-0">
                         <p
-                          className={`font-semibold ${
-                            transaction.status ===
-                            'VOIDED'
+                          className={`font-semibold ${transaction.status ===
+                              'VOIDED'
                               ? 'text-[#8b9692] line-through'
                               : isIncoming
                                 ? 'text-[#39725d]'
                                 : 'text-[#9b5845]'
-                          }`}
+                            }`}
                         >
                           {isIncoming
                             ? '+'

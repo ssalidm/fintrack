@@ -7,8 +7,7 @@ import {
   ArrowRight,
   ArrowRightLeft,
   Ban,
-  Plus,
-  RefreshCw,
+  Plus
 } from 'lucide-react'
 
 import { ApiClientError } from '../../../api/ApiClientError'
@@ -21,6 +20,7 @@ import {
   defaultTransferFilters,
   useTransfers,
 } from '../hooks/useTransfers'
+import RefreshButton from '../../../components/actions/RefreshButton'
 
 function parseLocalDate(value: string) {
   const [year, month, day] =
@@ -136,7 +136,7 @@ export default function TransfersPage() {
 
   const errorMessage =
     transfersQuery.error instanceof
-    ApiClientError
+      ApiClientError
       ? transfersQuery.error.message
       : 'Unable to load your transfers.'
 
@@ -197,15 +197,14 @@ export default function TransfersPage() {
                         }),
                       )
                     }
-                    className={`cursor-pointer rounded-full px-4 py-2 text-xs font-semibold transition ${
-                      filters.status ===
-                      status
+                    className={`cursor-pointer rounded-full px-4 py-2 text-xs font-semibold transition ${filters.status ===
+                        status
                         ? 'bg-[#174f43] text-white shadow-sm'
                         : 'text-[#657972] hover:text-[#173c32]'
-                    }`}
+                      }`}
                   >
                     {status ===
-                    'POSTED'
+                      'POSTED'
                       ? 'Posted'
                       : 'Voided'}
                   </button>
@@ -362,30 +361,10 @@ export default function TransfersPage() {
             </h2>
           </div>
 
-          <button
-            type="button"
-            disabled={
-              transfersQuery.isFetching
-            }
-            onClick={() =>
-              void transfersQuery.refetch()
-            }
-            className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#dedbd2] bg-[#fffdf8] px-4 py-2.5 text-sm font-medium text-[#173c32] transition hover:border-[#8da397] disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <RefreshCw
-              size={15}
-              className={
-                transfersQuery.isFetching
-                  ? 'animate-spin'
-                  : ''
-              }
-              aria-hidden
-            />
-
-            {transfersQuery.isFetching
-              ? 'Refreshing…'
-              : 'Refresh'}
-          </button>
+          <RefreshButton
+            isRefreshing={transfersQuery.isFetching}
+            onRefresh={transfersQuery.refetch}
+          />
         </div>
 
         {transfersQuery.isPending && (
@@ -434,29 +413,29 @@ export default function TransfersPage() {
 
               <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#657972]">
                 {filters.status ===
-                'POSTED'
+                  'POSTED'
                   ? 'Move money between two accounts and your transfer history will appear here.'
                   : 'There are no voided transfers matching these filters.'}
               </p>
 
               {filters.status ===
                 'POSTED' && (
-                <button
-                  type="button"
-                  onClick={() =>
-                    setIsCreateOpen(
-                      true,
-                    )
-                  }
-                  className="mt-6 inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#216353]"
-                >
-                  <Plus
-                    size={17}
-                    aria-hidden
-                  />
-                  Make a transfer
-                </button>
-              )}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setIsCreateOpen(
+                        true,
+                      )
+                    }
+                    className="mt-6 inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#216353]"
+                  >
+                    <Plus
+                      size={17}
+                      aria-hidden
+                    />
+                    Make a transfer
+                  </button>
+                )}
             </section>
           )}
 
@@ -489,20 +468,18 @@ export default function TransfersPage() {
                 return (
                   <article
                     key={transfer.id}
-                    className={`grid gap-5 px-5 py-5 sm:px-7 lg:grid-cols-[minmax(0,1fr)_auto_auto] lg:items-center ${
-                      index > 0
+                    className={`grid gap-5 px-5 py-5 sm:px-7 lg:grid-cols-[minmax(0,1fr)_auto_auto] lg:items-center ${index > 0
                         ? 'border-t border-[#e5e1d8]'
                         : ''
-                    }`}
+                      }`}
                   >
                     <div className="flex min-w-0 items-start gap-4">
                       <span
-                        className={`mt-0.5 grid size-11 shrink-0 place-items-center rounded-full ${
-                          transfer.status ===
-                          'POSTED'
+                        className={`mt-0.5 grid size-11 shrink-0 place-items-center rounded-full ${transfer.status ===
+                            'POSTED'
                             ? 'bg-[#e0ece4] text-[#2d684f]'
                             : 'bg-[#eeeae3] text-[#85786e]'
-                        }`}
+                          }`}
                       >
                         <ArrowRightLeft
                           size={19}
@@ -562,12 +539,11 @@ export default function TransfersPage() {
                       </p>
 
                       <span
-                        className={`mt-1 inline-flex rounded-full px-2.5 py-1 text-[11px] font-bold tracking-wide ${
-                          transfer.status ===
-                          'POSTED'
+                        className={`mt-1 inline-flex rounded-full px-2.5 py-1 text-[11px] font-bold tracking-wide ${transfer.status ===
+                            'POSTED'
                             ? 'bg-[#e2eee5] text-[#2d684f]'
                             : 'bg-[#eeeae3] text-[#756a61]'
-                        }`}
+                          }`}
                       >
                         {transfer.status}
                       </span>
@@ -575,7 +551,7 @@ export default function TransfersPage() {
 
                     <div className="flex justify-end">
                       {transfer.status ===
-                      'POSTED' ? (
+                        'POSTED' ? (
                         <button
                           type="button"
                           onClick={() =>

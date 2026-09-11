@@ -3,7 +3,6 @@ import {
   CalendarRange,
   Pencil,
   Plus,
-  RefreshCw,
   WalletCards,
 } from 'lucide-react'
 import {
@@ -32,6 +31,7 @@ import {
   useBudgets,
   useDeleteBudgetLimit,
 } from '../hooks/useBudgets'
+import RefreshButton from '../../../components/actions/RefreshButton'
 
 interface LimitModalTarget {
   limit?: BudgetCategoryLimit
@@ -40,15 +40,15 @@ interface LimitModalTarget {
 
 type ActionTarget =
   | {
-      kind: 'ARCHIVE_BUDGET'
-      budget: BudgetSummary
-    }
+    kind: 'ARCHIVE_BUDGET'
+    budget: BudgetSummary
+  }
   | {
-      kind: 'REMOVE_LIMIT'
-      budgetId: string
-      limit: BudgetCategoryLimit
-      categoryName: string
-    }
+    kind: 'REMOVE_LIMIT'
+    budgetId: string
+    limit: BudgetCategoryLimit
+    categoryName: string
+  }
 
 const statusOptions = [
   {
@@ -328,10 +328,10 @@ export default function BudgetsPage() {
 
   const actionSubjectName =
     actionTarget?.kind ===
-    'ARCHIVE_BUDGET'
+      'ARCHIVE_BUDGET'
       ? actionTarget.budget.name
       : actionTarget?.kind ===
-          'REMOVE_LIMIT'
+        'REMOVE_LIMIT'
         ? actionTarget.categoryName
         : ''
 
@@ -343,24 +343,10 @@ export default function BudgetsPage() {
         description="Set useful boundaries, notice where money drifts, and adjust without turning the month into a punishment."
         actions={
           <>
-            <button
-              type="button"
-              disabled={isRefreshing}
-              onClick={() => {
-                void refreshPage()
-              }}
-              className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#d8d6ce] bg-[#fffdf8] px-4 py-2.5 text-sm font-semibold text-[#173c32] transition hover:bg-[#efede7] disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              <RefreshCw
-                size={16}
-                className={
-                  isRefreshing
-                    ? 'animate-spin'
-                    : ''
-                }
-              />
-              Refresh
-            </button>
+            <RefreshButton
+              isRefreshing={isRefreshing}
+              onRefresh={refreshPage}
+            />
 
             <button
               type="button"
@@ -393,12 +379,11 @@ export default function BudgetsPage() {
                       '',
                     )
                   }}
-                  className={`cursor-pointer rounded-full px-4 py-2 text-sm font-semibold transition ${
-                    status ===
-                    option.value
+                  className={`cursor-pointer rounded-full px-4 py-2 text-sm font-semibold transition ${status ===
+                      option.value
                       ? 'bg-[#fffdf8] text-[#173c32] shadow-sm'
                       : 'text-[#657972] hover:text-[#173c32]'
-                  }`}
+                    }`}
                 >
                   {option.label}
                 </button>
