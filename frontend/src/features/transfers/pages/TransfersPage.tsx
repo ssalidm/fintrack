@@ -58,7 +58,7 @@ function fallbackAccountName(accountId: string) {
 
 function TransfersSkeleton() {
   return (
-    <div className="mt-8 animate-pulse space-y-4">
+    <div className="feature-reveal feature-reveal-delay-3 mt-8 animate-pulse space-y-4">
       <div className="h-24 rounded-2xl bg-[#e5e8e1]"/>
       <div className="h-28 rounded-2xl bg-[#e5e8e1]"/>
       <div className="h-28 rounded-2xl bg-[#e5e8e1]"/>
@@ -120,7 +120,7 @@ export default function TransfersPage() {
   return (
     <main className="min-h-screen px-5 py-8 sm:px-8 lg:px-12 lg:py-12 xl:px-16">
       <div className="mx-auto max-w-[1280px]">
-        <header className="flex flex-wrap items-end justify-between gap-6">
+        <header className="feature-reveal flex flex-wrap items-end justify-between gap-6">
           <div>
             <p className="text-xs font-semibold tracking-[0.16em] text-[#657972]">
               MONEY IN MOTION
@@ -146,7 +146,7 @@ export default function TransfersPage() {
           </button>
         </header>
 
-        <section className="mt-8 rounded-2xl border border-[#dedbd2] bg-[#fffdf8] p-4 sm:p-5">
+        <section className="feature-reveal feature-reveal-delay-1 mt-8 rounded-2xl border border-[#dedbd2] bg-[#fffdf8] p-4 sm:p-5">
           <div className="grid gap-4 lg:grid-cols-[auto_1fr_1fr_auto_auto] lg:items-end">
             <div>
               <p className="mb-2 text-xs font-semibold tracking-[0.12em] text-[#657972]">
@@ -289,7 +289,7 @@ export default function TransfersPage() {
           </div>
         </section>
 
-        <div className="mt-8 flex flex-wrap items-end justify-between gap-4">
+        <div className="feature-reveal feature-reveal-delay-2 mt-8 flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-xs font-semibold tracking-[0.15em] text-[#657972]">
               TRANSFER HISTORY
@@ -329,7 +329,7 @@ export default function TransfersPage() {
         {transfersQuery.error && (
           <section
             role="alert"
-            className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-6"
+            className="feature-reveal feature-reveal-delay-3 mt-6 rounded-2xl border border-red-200 bg-red-50 p-6"
           >
             <h2 className="font-serif text-2xl text-red-950">
               We couldn’t load your transfers
@@ -350,7 +350,7 @@ export default function TransfersPage() {
         )}
 
         {page && transfers.length === 0 && (
-          <section className="mt-6 rounded-3xl border border-dashed border-[#cfcac0] bg-[#fffdf8] px-6 py-14 text-center">
+          <section className="feature-reveal feature-reveal-delay-3 mt-6 rounded-3xl border border-dashed border-[#cfcac0] bg-[#fffdf8] px-6 py-14 text-center">
             <span className="mx-auto grid size-14 place-items-center rounded-full bg-[#e0ece4] text-[#2d684f]">
               <ArrowRightLeft size={23} aria-hidden/>
             </span>
@@ -379,7 +379,7 @@ export default function TransfersPage() {
         )}
 
         {transfers.length > 0 && (
-          <section className="mt-6 overflow-hidden rounded-3xl border border-[#dedbd2] bg-[#fffdf8]">
+          <section className="feature-reveal feature-reveal-delay-3 mt-6 overflow-hidden rounded-3xl border border-[#dedbd2] bg-[#fffdf8]">
             {transfers.map((transfer, index) => {
               const sourceAccount = accountById.get(
                 transfer.sourceAccountId,
@@ -505,7 +505,7 @@ export default function TransfersPage() {
         {page && page.totalPages > 1 && (
           <nav
             aria-label="Transfer history pages"
-            className="mt-6 flex flex-wrap items-center justify-between gap-4"
+            className="feature-reveal feature-reveal-delay-3 mt-6 flex flex-wrap items-center justify-between gap-4"
           >
             <p className="text-sm text-[#657972]">
               Page {page.page + 1} of {page.totalPages}

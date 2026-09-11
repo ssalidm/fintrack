@@ -9,16 +9,17 @@ import {
   Plus,
   Tags,
 } from 'lucide-react'
+
+import PageShell from '../../../components/layout/PageShell'
 import type {
   Category,
   CategoryStatus,
   CategoryType,
 } from '../api/types'
 import CategoryModal from '../components/CategoryModal'
-import { useArchiveCategory } from '../hooks/useCategoryMutations'
-import { useCategories } from '../hooks/useCategories'
 import CategorySpendingChart from '../components/CategorySpendingChart'
-import PageShell from '../../../components/layout/PageShell'
+import { useCategories } from '../hooks/useCategories'
+import { useArchiveCategory } from '../hooks/useCategoryMutations'
 
 interface CategoryRowProps {
   category: Category
@@ -31,7 +32,8 @@ function CategoryRow({
   onArchive,
   onEdit,
 }: CategoryRowProps) {
-  const isArchived = category.status === 'ARCHIVED'
+  const isArchived =
+    category.status === 'ARCHIVED'
 
   return (
     <li className="flex flex-col gap-4 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
@@ -39,15 +41,23 @@ function CategoryRow({
         <span
           className={[
             'grid size-11 shrink-0 place-items-center rounded-2xl',
-            category.categoryType === 'INCOME'
+            category.categoryType ===
+            'INCOME'
               ? 'bg-[#deeee3] text-[#276b56]'
               : 'bg-[#f3e6ce] text-[#98712f]',
           ].join(' ')}
         >
-          {category.categoryType === 'INCOME' ? (
-            <CircleArrowUp size={20} aria-hidden />
+          {category.categoryType ===
+          'INCOME' ? (
+            <CircleArrowUp
+              size={20}
+              aria-hidden
+            />
           ) : (
-            <CircleArrowDown size={20} aria-hidden />
+            <CircleArrowDown
+              size={20}
+              aria-hidden
+            />
           )}
         </span>
 
@@ -71,11 +81,17 @@ function CategoryRow({
           </div>
 
           <p className="mt-1 text-sm text-[#738079]">
-            {category.categoryType === 'INCOME'
+            {category.categoryType ===
+            'INCOME'
               ? 'Money coming in'
               : 'Money going out'}
-            <span aria-hidden> · </span>
-            Position {category.displayOrder}
+
+            <span aria-hidden>
+              {' · '}
+            </span>
+
+            Position{' '}
+            {category.displayOrder}
           </p>
         </div>
       </div>
@@ -84,19 +100,29 @@ function CategoryRow({
         <div className="flex items-center gap-2 self-end sm:self-auto">
           <button
             type="button"
-            onClick={() => onEdit(category)}
+            onClick={() =>
+              onEdit(category)
+            }
             className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#d7d3c9] px-4 py-2 text-sm font-semibold text-[#173c32] transition hover:bg-[#efede6]"
           >
-            <Pencil size={15} aria-hidden />
+            <Pencil
+              size={15}
+              aria-hidden
+            />
             Edit
           </button>
 
           <button
             type="button"
-            onClick={() => onArchive(category)}
+            onClick={() =>
+              onArchive(category)
+            }
             className="inline-flex cursor-pointer items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-[#9b4f3f] transition hover:bg-[#f7e9e5]"
           >
-            <Archive size={15} aria-hidden />
+            <Archive
+              size={15}
+              aria-hidden
+            />
             Archive
           </button>
         </div>
@@ -106,25 +132,48 @@ function CategoryRow({
 }
 
 export default function CategoriesPage() {
-  const [categoryType, setCategoryType] =
-    useState<CategoryType>('EXPENSE')
+  const [
+    categoryType,
+    setCategoryType,
+  ] = useState<CategoryType>(
+    'EXPENSE',
+  )
+
   const [status, setStatus] =
     useState<CategoryStatus>('ACTIVE')
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedCategory, setSelectedCategory] =
-    useState<Category | null>(null)
-  const [archiveTarget, setArchiveTarget] =
-    useState<Category | null>(null)
 
-  const categoriesQuery = useCategories(categoryType, status)
-  const archiveCategory = useArchiveCategory()
+  const [
+    isModalOpen,
+    setIsModalOpen,
+  ] = useState(false)
+
+  const [
+    selectedCategory,
+    setSelectedCategory,
+  ] = useState<Category | null>(null)
+
+  const [
+    archiveTarget,
+    setArchiveTarget,
+  ] = useState<Category | null>(null)
+
+  const categoriesQuery =
+    useCategories(
+      categoryType,
+      status,
+    )
+
+  const archiveCategory =
+    useArchiveCategory()
 
   function openCreateModal() {
     setSelectedCategory(null)
     setIsModalOpen(true)
   }
 
-  function openEditModal(category: Category) {
+  function openEditModal(
+    category: Category,
+  ) {
     setSelectedCategory(category)
     setIsModalOpen(true)
   }
@@ -141,9 +190,11 @@ export default function CategoriesPage() {
 
     try {
       await archiveCategory.mutateAsync({
-        categoryId: archiveTarget.id,
+        categoryId:
+          archiveTarget.id,
         request: {
-          version: archiveTarget.version,
+          version:
+            archiveTarget.version,
         },
       })
 
@@ -154,7 +205,8 @@ export default function CategoriesPage() {
   }
 
   const archiveError =
-    archiveCategory.error instanceof Error
+    archiveCategory.error instanceof
+    Error
       ? archiveCategory.error.message
       : archiveCategory.error
         ? 'The category could not be archived.'
@@ -162,7 +214,7 @@ export default function CategoriesPage() {
 
   return (
     <PageShell>
-      <header className="feature-fade-in flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+      <header className="feature-reveal flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6c7973]">
             Your money, your language
@@ -173,7 +225,8 @@ export default function CategoriesPage() {
           </h1>
 
           <p className="mt-3 max-w-2xl text-sm leading-6 text-[#69756f] sm:text-base">
-            Keep income and spending organised in a way that feels
+            Keep income and spending
+            organised in a way that feels
             natural to you.
           </p>
         </div>
@@ -183,18 +236,22 @@ export default function CategoriesPage() {
           onClick={openCreateModal}
           className="inline-flex cursor-pointer items-center justify-center gap-2 self-start rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#216555]"
         >
-          <Plus size={18} aria-hidden />
+          <Plus
+            size={18}
+            aria-hidden
+          />
           New category
         </button>
       </header>
 
-      {categoryType === 'EXPENSE' && status === 'ACTIVE' && (
-        <div className="feature-fade-in feature-fade-in-delay-1 mt-8">
-          <CategorySpendingChart />
-        </div>
-      )}
+      {categoryType === 'EXPENSE' &&
+        status === 'ACTIVE' && (
+          <div className="feature-reveal feature-reveal-delay-1 mt-8">
+            <CategorySpendingChart />
+          </div>
+        )}
 
-      <section className="feature-fade-in feature-fade-in-delay-2 mt-10 overflow-hidden rounded-[1.75rem] border border-[#dedbd2] bg-[#fbfaf6] shadow-[0_14px_40px_rgba(36,64,54,0.04)]">
+      <section className="feature-reveal feature-reveal-delay-2 mt-10 overflow-hidden rounded-[1.75rem] border border-[#dedbd2] bg-[#fbfaf6] shadow-[0_14px_40px_rgba(36,64,54,0.04)]">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e5e1d7] px-5 py-5 sm:px-6">
           <div className="max-w-full overflow-x-auto">
             <div
@@ -202,26 +259,38 @@ export default function CategoriesPage() {
               role="tablist"
               aria-label="Category type"
             >
-              {(['EXPENSE', 'INCOME'] as CategoryType[]).map(
-                (type) => (
-                  <button
-                    key={type}
-                    type="button"
-                    role="tab"
-                    aria-selected={categoryType === type}
-                    onClick={() => setCategoryType(type)}
-                    className={[
-                      'cursor-pointer whitespace-nowrap rounded-full px-4 py-2',
-                      'text-xs font-semibold transition',
-                      categoryType === type
-                        ? 'bg-[#174f43] text-white shadow-sm'
-                        : 'text-[#69756f] hover:text-[#173c32]',
-                    ].join(' ')}
-                  >
-                    {type === 'EXPENSE' ? 'Expenses' : 'Income'}
-                  </button>
-                ),
-              )}
+              {(
+                [
+                  'EXPENSE',
+                  'INCOME',
+                ] as CategoryType[]
+              ).map((type) => (
+                <button
+                  key={type}
+                  type="button"
+                  role="tab"
+                  aria-selected={
+                    categoryType ===
+                    type
+                  }
+                  onClick={() =>
+                    setCategoryType(
+                      type,
+                    )
+                  }
+                  className={[
+                    'cursor-pointer whitespace-nowrap rounded-full px-4 py-2',
+                    'text-xs font-semibold transition',
+                    categoryType === type
+                      ? 'bg-[#174f43] text-white shadow-sm'
+                      : 'text-[#69756f] hover:text-[#173c32]',
+                  ].join(' ')}
+                >
+                  {type === 'EXPENSE'
+                    ? 'Expenses'
+                    : 'Income'}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -229,22 +298,38 @@ export default function CategoriesPage() {
             className="inline-flex rounded-full border border-[#dedbd2] bg-white p-1"
             aria-label="Category status"
           >
-            {(['ACTIVE', 'ARCHIVED'] as CategoryStatus[]).map(
+            {(
+              [
+                'ACTIVE',
+                'ARCHIVED',
+              ] as CategoryStatus[]
+            ).map(
               (categoryStatus) => (
                 <button
-                  key={categoryStatus}
+                  key={
+                    categoryStatus
+                  }
                   type="button"
-                  aria-pressed={status === categoryStatus}
-                  onClick={() => setStatus(categoryStatus)}
+                  aria-pressed={
+                    status ===
+                    categoryStatus
+                  }
+                  onClick={() =>
+                    setStatus(
+                      categoryStatus,
+                    )
+                  }
                   className={[
                     'cursor-pointer rounded-full px-3.5 py-2',
                     'text-xs font-semibold transition',
-                    status === categoryStatus
+                    status ===
+                    categoryStatus
                       ? 'bg-[#deebe1] text-[#174f43]'
                       : 'text-[#748079] hover:text-[#173c32]',
                   ].join(' ')}
                 >
-                  {categoryStatus === 'ACTIVE'
+                  {categoryStatus ===
+                  'ACTIVE'
                     ? 'Active'
                     : 'Archived'}
                 </button>
@@ -261,8 +346,10 @@ export default function CategoriesPage() {
                 size={28}
                 aria-hidden
               />
+
               <p className="mt-3 text-sm">
-                Gathering your categories…
+                Gathering your
+                categories…
               </p>
             </div>
           </div>
@@ -271,12 +358,15 @@ export default function CategoriesPage() {
         {categoriesQuery.isError && (
           <div className="m-6 rounded-2xl border border-[#e8c8bf] bg-[#fff4f1] px-5 py-4">
             <p className="font-semibold text-[#8f3f30]">
-              We couldn’t load your categories.
+              We couldn’t load your
+              categories.
             </p>
 
             <p className="mt-1 text-sm text-[#9b5a4d]">
-              {categoriesQuery.error instanceof Error
-                ? categoriesQuery.error.message
+              {categoriesQuery.error instanceof
+              Error
+                ? categoriesQuery.error
+                    .message
                 : 'Please try again.'}
             </p>
 
@@ -293,15 +383,21 @@ export default function CategoriesPage() {
         )}
 
         {categoriesQuery.isSuccess &&
-          categoriesQuery.data.length === 0 && (
+          categoriesQuery.data
+            .length === 0 && (
             <div className="grid min-h-72 place-items-center px-6 py-12 text-center">
               <div>
                 <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-[#e4ede7] text-[#276b56]">
-                  <Tags size={24} aria-hidden />
+                  <Tags
+                    size={24}
+                    aria-hidden
+                  />
                 </span>
 
                 <h2 className="mt-5 font-serif text-2xl text-[#173c32]">
-                  No {status.toLowerCase()} categories
+                  No{' '}
+                  {status.toLowerCase()}{' '}
+                  categories
                 </h2>
 
                 <p className="mt-2 max-w-sm text-sm leading-6 text-[#69756f]">
@@ -314,24 +410,33 @@ export default function CategoriesPage() {
           )}
 
         {categoriesQuery.isSuccess &&
-          categoriesQuery.data.length > 0 && (
+          categoriesQuery.data
+            .length > 0 && (
             <ul className="divide-y divide-[#e5e1d7]">
-              {categoriesQuery.data.map((category) => (
-                <CategoryRow
-                  key={category.id}
-                  category={category}
-                  onEdit={openEditModal}
-                  onArchive={(target) => {
-                    archiveCategory.reset()
-                    setArchiveTarget(target)
-                  }}
-                />
-              ))}
+              {categoriesQuery.data.map(
+                (category) => (
+                  <CategoryRow
+                    key={category.id}
+                    category={category}
+                    onEdit={
+                      openEditModal
+                    }
+                    onArchive={(
+                      target,
+                    ) => {
+                      archiveCategory.reset()
+                      setArchiveTarget(
+                        target,
+                      )
+                    }}
+                  />
+                ),
+              )}
             </ul>
           )}
       </section>
 
-      <aside className="feature-fade-in feature-fade-in-delay-3 mt-6 flex items-start gap-3 rounded-2xl bg-[#deebe1] px-5 py-4 text-[#275f50]">
+      <aside className="feature-reveal feature-reveal-delay-3 mt-6 flex items-start gap-3 rounded-2xl bg-[#deebe1] px-5 py-4 text-[#275f50]">
         <BadgeDollarSign
           className="mt-0.5 shrink-0"
           size={19}
@@ -339,8 +444,10 @@ export default function CategoriesPage() {
         />
 
         <p className="text-sm leading-6">
-          Default Salif categories can be renamed or reordered, but
-          their income or expense type cannot be changed.
+          Default Salif categories can be
+          renamed or reordered, but their
+          income or expense type cannot be
+          changed.
         </p>
       </aside>
 
@@ -359,19 +466,26 @@ export default function CategoriesPage() {
             className="w-full max-w-md rounded-[1.75rem] border border-[#dedbd2] bg-[#fbfaf6] p-7 shadow-2xl"
           >
             <span className="grid size-12 place-items-center rounded-2xl bg-[#f7e6e1] text-[#9b4f3f]">
-              <Archive size={21} aria-hidden />
+              <Archive
+                size={21}
+                aria-hidden
+              />
             </span>
 
             <h2
               id="archive-category-title"
               className="mt-5 font-serif text-3xl text-[#173c32]"
             >
-              Archive {archiveTarget.name}?
+              Archive{' '}
+              {archiveTarget.name}?
             </h2>
 
             <p className="mt-3 text-sm leading-6 text-[#69756f]">
-              It will no longer be available for new transactions.
-              Existing transaction history will remain unchanged.
+              It will no longer be
+              available for new
+              transactions. Existing
+              transaction history will
+              remain unchanged.
             </p>
 
             {archiveError && (
@@ -386,8 +500,12 @@ export default function CategoriesPage() {
             <div className="mt-7 flex justify-end gap-3">
               <button
                 type="button"
-                disabled={archiveCategory.isPending}
-                onClick={() => setArchiveTarget(null)}
+                disabled={
+                  archiveCategory.isPending
+                }
+                onClick={() =>
+                  setArchiveTarget(null)
+                }
                 className="cursor-pointer rounded-full border border-[#cbc7bc] px-5 py-2.5 text-sm font-semibold text-[#173c32] transition hover:bg-[#efede6] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Keep category
@@ -395,7 +513,9 @@ export default function CategoriesPage() {
 
               <button
                 type="button"
-                disabled={archiveCategory.isPending}
+                disabled={
+                  archiveCategory.isPending
+                }
                 onClick={() => {
                   void confirmArchive()
                 }}

@@ -249,7 +249,7 @@ function DashboardContent({
 
   return (
     <>
-      <section className="mt-8 flex items-start gap-4 rounded-2xl bg-[#dfece3] px-6 py-4 text-[#173c32]">
+      <section className="dashboard-reveal dashboard-reveal-delay-1 mt-8 flex items-start gap-4 rounded-2xl bg-[#dfece3] px-6 py-4 text-[#173c32]">
         <Sparkles
           size={18}
           className="mt-0.5 shrink-0 text-[#bd8539]"
@@ -267,7 +267,7 @@ function DashboardContent({
         </div>
       </section>
 
-      <section className="mt-6 grid gap-5 lg:grid-cols-2 xl:grid-cols-12">
+      <section className="dashboard-reveal dashboard-reveal-delay-2 mt-6 grid gap-5 lg:grid-cols-2 xl:grid-cols-12">
         <div className="xl:col-span-5">
           <NetWorthCard
             items={
@@ -289,7 +289,7 @@ function DashboardContent({
         </div>
       </section>
 
-      <section className="mt-6 grid gap-5 xl:grid-cols-[minmax(0,2fr)_minmax(290px,0.9fr)]">
+      <section className="dashboard-reveal dashboard-reveal-delay-3 mt-6 grid gap-5 xl:grid-cols-[minmax(0,2fr)_minmax(290px,0.9fr)]">
         <CashFlowChart />
         <TopSpendingCard />
       </section>

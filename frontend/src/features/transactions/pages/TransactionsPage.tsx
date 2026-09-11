@@ -242,7 +242,7 @@ export default function TransactionsPage() {
   return (
     <main className="min-h-screen px-5 py-8 sm:px-8 lg:px-12 lg:py-12 xl:px-16">
       <div className="mx-auto max-w-[1280px]">
-        <header className="flex flex-wrap items-end justify-between gap-6">
+        <header className="feature-reveal flex flex-wrap items-end justify-between gap-6">
           <div>
             <p className="text-xs font-semibold tracking-[0.16em] text-[#657972]">
               MONEY IN MOTION
@@ -289,7 +289,7 @@ export default function TransactionsPage() {
           </div>
         </header>
 
-        <section className="mt-10 rounded-3xl border border-[#dedbd2] bg-[#fffdf8] p-5">
+        <section className="feature-reveal feature-reveal-delay-1 mt-10 rounded-3xl border border-[#dedbd2] bg-[#fffdf8] p-5">
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
             <label className="text-xs font-semibold text-[#657972]">
               Type
@@ -403,7 +403,7 @@ export default function TransactionsPage() {
         </section>
 
         {transactionsQuery.isPending && (
-          <div className="mt-8 animate-pulse overflow-hidden rounded-3xl border border-[#dedbd2]">
+          <div className="feature-reveal feature-reveal-delay-2 mt-8 animate-pulse overflow-hidden rounded-3xl border border-[#dedbd2]">
             {[1, 2, 3, 4].map((item) => (
               <div
                 key={item}
@@ -415,7 +415,7 @@ export default function TransactionsPage() {
 
         {transactionsQuery.error && (
           <section
-            className="mt-8 rounded-2xl border border-red-200 bg-red-50 p-6"
+            className="feature-reveal feature-reveal-delay-2 mt-8 rounded-2xl border border-red-200 bg-red-50 p-6"
             role="alert"
           >
             <h2 className="font-serif text-2xl text-red-950">
@@ -434,7 +434,7 @@ export default function TransactionsPage() {
         {!transactionsQuery.isPending &&
           !transactionsQuery.error &&
           transactions.length === 0 && (
-            <section className="mt-8 rounded-3xl border border-[#dedbd2] bg-[#fffdf8] px-6 py-16 text-center">
+            <section className="feature-reveal feature-reveal-delay-2 mt-8 rounded-3xl border border-[#dedbd2] bg-[#fffdf8] px-6 py-16 text-center">
               <span className="mx-auto grid size-14 place-items-center rounded-full bg-[#dfece3] text-[#39725d]">
                 <ArrowLeftRight size={25} />
               </span>
@@ -454,7 +454,7 @@ export default function TransactionsPage() {
         {!transactionsQuery.isPending &&
           !transactionsQuery.error &&
           transactions.length > 0 && (
-            <section className="mt-8 overflow-hidden rounded-3xl border border-[#dedbd2] bg-[#fffdf8]">
+            <section className="feature-reveal feature-reveal-delay-2 mt-8 overflow-hidden rounded-3xl border border-[#dedbd2] bg-[#fffdf8]">
               {transactions.map((transaction, index) => {
                 const account = accountsById.get(
                   transaction.accountId,
@@ -576,7 +576,7 @@ export default function TransactionsPage() {
         {transactionsQuery.data &&
           transactionsQuery.data.totalPages > 1 && (
             <nav
-              className="mt-6 flex items-center justify-between"
+              className="feature-reveal feature-reveal-delay-3 mt-6 flex items-center justify-between"
               aria-label="Transaction pages"
             >
               <button

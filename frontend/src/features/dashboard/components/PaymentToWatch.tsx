@@ -194,7 +194,7 @@ export default function PaymentsToWatch({
   )
 
   return (
-    <section className="mt-11">
+    <section className="dashboard-reveal dashboard-reveal-delay-5 mt-11">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-xs font-semibold tracking-[0.15em] text-[#657972]">

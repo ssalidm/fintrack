@@ -86,7 +86,7 @@ export default function ProfilePage() {
   if (isPending) {
     return (
       <PageShell>
-        <div className="animate-pulse">
+        <div className="feature-reveal animate-pulse">
           <div className="h-3 w-32 rounded bg-[#dfe5df]" />
 
           <div className="mt-5 h-14 w-72 rounded bg-[#dfe5df]" />
@@ -133,7 +133,7 @@ export default function ProfilePage() {
 
   return (
     <PageShell>
-      <header>
+      <header className="feature-reveal">
         <p className="text-xs font-semibold tracking-[0.16em] text-[#657972]">
           YOUR ACCOUNT
         </p>
@@ -149,7 +149,7 @@ export default function ProfilePage() {
         </p>
       </header>
 
-      <section className="mt-10 overflow-hidden rounded-3xl bg-[#174f43] text-white">
+      <section className="feature-reveal feature-reveal-delay-1 mt-10 overflow-hidden rounded-3xl bg-[#174f43] text-white">
         <div className="grid gap-7 p-7 sm:p-9 lg:grid-cols-[auto_1fr_auto] lg:items-center">
           <span className="grid size-20 place-items-center rounded-full bg-[#bcd9c5] font-serif text-3xl text-[#174f43]">
             {initials}
@@ -190,7 +190,7 @@ export default function ProfilePage() {
         </div>
       </section>
 
-      <div className="mt-6 grid items-start gap-6 lg:grid-cols-[1.5fr_0.8fr]">
+      <div className="feature-reveal feature-reveal-delay-2 mt-6 grid items-start gap-6 lg:grid-cols-[1.5fr_0.8fr]">
         <ProfileDetailsForm
           key={profile.version}
           profile={profile}
@@ -278,11 +278,11 @@ export default function ProfilePage() {
         </aside>
       </div>
 
-      <div className="mt-6">
+      <div className="feature-reveal feature-reveal-delay-3 mt-6">
         <TwoFactorAuthenticationCard />
       </div>
 
-      <div className="mt-6 grid items-stretch gap-6 lg:grid-cols-2">
+      <div className="feature-reveal feature-reveal-delay-3 mt-6 grid items-stretch gap-6 lg:grid-cols-2">
         <ChangeEmailForm currentEmail={profile.email} />
 
         <ChangePasswordForm

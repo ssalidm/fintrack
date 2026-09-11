@@ -145,7 +145,7 @@ function getErrorMessage(
 
 function RecurringPageSkeleton() {
   return (
-    <div className="mt-8 animate-pulse space-y-4">
+    <div className="feature-reveal feature-reveal-delay-3 mt-8 animate-pulse space-y-4">
       <div className="h-24 rounded-2xl bg-[#e5e8e1]" />
       <div className="h-36 rounded-3xl bg-[#e5e8e1]" />
       <div className="h-36 rounded-3xl bg-[#e5e8e1]" />
@@ -430,7 +430,7 @@ export default function RecurringTransactionsPage() {
   return (
     <main className="min-h-screen px-5 py-8 sm:px-8 lg:px-12 lg:py-12 xl:px-16">
       <div className="mx-auto max-w-[1280px]">
-        <header className="flex flex-wrap items-end justify-between gap-6">
+        <header className="feature-reveal flex flex-wrap items-end justify-between gap-6">
           <div>
             <p className="text-xs font-semibold tracking-[0.16em] text-[#657972]">
               MONEY IN MOTION
@@ -456,7 +456,7 @@ export default function RecurringTransactionsPage() {
           </button>
         </header>
 
-        <section className="mt-8 grid gap-4 sm:grid-cols-3">
+        <section className="feature-reveal feature-reveal-delay-1 mt-8 grid gap-4 sm:grid-cols-3">
           <article className="rounded-2xl border border-[#dedbd2] bg-[#fffdf8] px-5 py-4">
             <p className="text-xs font-semibold tracking-[0.12em] text-[#657972]">
               {status}
@@ -502,7 +502,7 @@ export default function RecurringTransactionsPage() {
           </article>
         </section>
 
-        <section className="mt-7 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#dedbd2] bg-[#fffdf8] p-4">
+        <section className="feature-reveal feature-reveal-delay-2 mt-7 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#dedbd2] bg-[#fffdf8] p-4">
           <div className="flex flex-wrap gap-1 rounded-full bg-[#eef0ea] p-1">
             {statuses.map((filterStatus) => (
               <button
@@ -569,7 +569,7 @@ export default function RecurringTransactionsPage() {
         {schedulesQuery.error && (
           <section
             role="alert"
-            className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-6"
+            className="feature-reveal feature-reveal-delay-3 mt-6 rounded-2xl border border-red-200 bg-red-50 p-6"
           >
             <h2 className="font-serif text-2xl text-red-950">
               We couldn’t load your schedules
@@ -593,7 +593,7 @@ export default function RecurringTransactionsPage() {
 
         {schedulesQuery.data &&
           schedules.length === 0 && (
-            <section className="mt-6 rounded-3xl border border-dashed border-[#cfcac0] bg-[#fffdf8] px-6 py-14 text-center">
+            <section className="feature-reveal feature-reveal-delay-3 mt-6 rounded-3xl border border-dashed border-[#cfcac0] bg-[#fffdf8] px-6 py-14 text-center">
               <span className="mx-auto grid size-14 place-items-center rounded-full bg-[#e3e9ed] text-[#557587]">
                 <CalendarClock size={24} aria-hidden />
               </span>
@@ -625,7 +625,7 @@ export default function RecurringTransactionsPage() {
           )}
 
         {schedules.length > 0 && (
-          <section className="mt-6 space-y-4">
+          <section className="feature-reveal feature-reveal-delay-3 mt-6 space-y-4">
             {schedules.map((schedule) => {
               const account = accountById.get(
                 schedule.accountId,

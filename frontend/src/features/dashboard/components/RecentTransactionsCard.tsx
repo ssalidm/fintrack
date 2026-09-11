@@ -170,7 +170,7 @@ export default function RecentTransactionsCard() {
       : 'Unable to load recent transactions.'
 
   return (
-    <section className="mt-11">
+    <section className="dashboard-reveal dashboard-reveal-delay-4 mt-11">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-xs font-semibold tracking-[0.15em] text-[#657972]">
