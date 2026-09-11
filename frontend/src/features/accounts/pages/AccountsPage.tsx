@@ -135,7 +135,7 @@ export default function AccountsPage() {
 
   return (
     <PageShell>
-      <header className="flex flex-wrap items-end justify-between gap-6">
+      <header className="feature-fade-in flex flex-wrap items-end justify-between gap-6">
         <div>
           <p className="text-xs font-semibold tracking-[0.16em] text-[#657972]">
             THE FULL PICTURE
@@ -178,7 +178,7 @@ export default function AccountsPage() {
         </div>
       </header>
 
-      <div className="mt-10 flex gap-7 border-b border-[#dedbd2]">
+      <div className="feature-fade-in feature-fade-in-delay-1 mt-10 flex gap-7 border-b border-[#dedbd2]">
         {(['ACTIVE', 'ARCHIVED'] as const).map(
           (accountStatus) => (
             <button
@@ -186,8 +186,8 @@ export default function AccountsPage() {
               type="button"
               onClick={() => setStatus(accountStatus)}
               className={`border-b-2 px-1 pb-4 text-sm font-semibold transition ${status === accountStatus
-                  ? 'border-[#39725d] text-[#173c32]'
-                  : 'border-transparent text-[#7a8984] hover:text-[#173c32]'
+                ? 'border-[#39725d] text-[#173c32]'
+                : 'border-transparent text-[#7a8984] hover:text-[#173c32]'
                 }`}
             >
               {accountStatus === 'ACTIVE'
@@ -199,7 +199,7 @@ export default function AccountsPage() {
       </div>
 
       {isPending && (
-        <div className="mt-8 animate-pulse overflow-hidden rounded-3xl border border-[#dedbd2]">
+        <div className="feature-fade-in feature-fade-in-delay-2 mt-8 animate-pulse overflow-hidden rounded-3xl border border-[#dedbd2]">
           {[1, 2, 3].map((item) => (
             <div
               key={item}
@@ -211,7 +211,7 @@ export default function AccountsPage() {
 
       {loadError && (
         <section
-          className="mt-8 rounded-2xl border border-red-200 bg-red-50 p-6"
+          className="feature-fade-in feature-fade-in-delay-2 mt-8 rounded-2xl border border-red-200 bg-red-50 p-6"
           role="alert"
         >
           <h2 className="font-serif text-2xl text-red-950">
@@ -235,7 +235,7 @@ export default function AccountsPage() {
       )}
 
       {!isPending && !loadError && accounts.length === 0 && (
-        <section className="mt-8 rounded-3xl border border-[#dedbd2] bg-[#fffdf8] px-6 py-16 text-center">
+        <section className="feature-fade-in feature-fade-in-delay-2 mt-8 rounded-3xl border border-[#dedbd2] bg-[#fffdf8] px-6 py-16 text-center">
           <span className="mx-auto grid size-14 place-items-center rounded-full bg-[#dfece3] text-[#39725d]">
             <WalletCards size={25} />
           </span>
@@ -266,7 +266,7 @@ export default function AccountsPage() {
       )}
 
       {!isPending && !loadError && accounts.length > 0 && (
-        <section className="mt-8 overflow-hidden rounded-3xl border border-[#dedbd2] bg-[#fffdf8]">
+        <section className="feature-fade-in feature-fade-in-delay-2 mt-8 overflow-hidden rounded-3xl border border-[#dedbd2] bg-[#fffdf8]">
           {accounts.map((account, index) => {
             const balance =
               balancesByAccountId.get(account.id)
@@ -279,15 +279,15 @@ export default function AccountsPage() {
               <article
                 key={account.id}
                 className={`grid gap-5 px-5 py-6 sm:grid-cols-[1fr_auto] sm:items-center sm:px-7 ${index > 0
-                    ? 'border-t border-[#dedbd2]'
-                    : ''
+                  ? 'border-t border-[#dedbd2]'
+                  : ''
                   }`}
               >
                 <div className="flex min-w-0 items-start gap-4">
                   <span
                     className={`grid size-11 shrink-0 place-items-center rounded-xl ${accountTypeColours[
                       account.accountType
-                      ]
+                    ]
                       }`}
                   >
                     <Landmark size={19} aria-hidden />
