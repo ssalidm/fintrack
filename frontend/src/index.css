@@ -160,3 +160,7 @@ select {
     animation: none;
   }
 }
+
+.feature-fade-in-delay-3 {
+  animation-delay: 210ms;
+}

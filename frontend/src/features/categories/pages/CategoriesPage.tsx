@@ -161,188 +161,188 @@ export default function CategoriesPage() {
         : null
 
   return (
-    <PageShell>        
-        <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6c7973]">
-              Your money, your language
-            </p>
+    <PageShell>
+      <header className="feature-fade-in flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6c7973]">
+            Your money, your language
+          </p>
 
-            <h1 className="mt-3 font-serif text-4xl tracking-tight text-[#173c32] sm:text-5xl">
-              Categories
-            </h1>
+          <h1 className="mt-3 font-serif text-4xl tracking-tight text-[#173c32] sm:text-5xl">
+            Categories
+          </h1>
 
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-[#69756f] sm:text-base">
-              Keep income and spending organised in a way that feels
-              natural to you.
-            </p>
-          </div>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#69756f] sm:text-base">
+            Keep income and spending organised in a way that feels
+            natural to you.
+          </p>
+        </div>
 
-          <button
-            type="button"
-            onClick={openCreateModal}
-            className="inline-flex cursor-pointer items-center justify-center gap-2 self-start rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#216555]"
-          >
-            <Plus size={18} aria-hidden />
-            New category
-          </button>
-        </header>
+        <button
+          type="button"
+          onClick={openCreateModal}
+          className="inline-flex cursor-pointer items-center justify-center gap-2 self-start rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#216555]"
+        >
+          <Plus size={18} aria-hidden />
+          New category
+        </button>
+      </header>
 
-        {categoryType === 'EXPENSE' && status === 'ACTIVE' && (
-          <div className="mt-8">
-            <CategorySpendingChart />
-          </div>
-        )}
+      {categoryType === 'EXPENSE' && status === 'ACTIVE' && (
+        <div className="feature-fade-in feature-fade-in-delay-1 mt-8">
+          <CategorySpendingChart />
+        </div>
+      )}
 
-        <section className="mt-10 overflow-hidden rounded-[1.75rem] border border-[#dedbd2] bg-[#fbfaf6] shadow-[0_14px_40px_rgba(36,64,54,0.04)]">
-  <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e5e1d7] px-5 py-5 sm:px-6">
-            <div className="max-w-full overflow-x-auto">
-              <div
-                className="inline-flex w-max rounded-full bg-[#eceae2] p-1"
-                role="tablist"
-                aria-label="Category type"
-              >
-                {(['EXPENSE', 'INCOME'] as CategoryType[]).map(
-                  (type) => (
-                    <button
-                      key={type}
-                      type="button"
-                      role="tab"
-                      aria-selected={categoryType === type}
-                      onClick={() => setCategoryType(type)}
-                      className={[
-                        'cursor-pointer whitespace-nowrap rounded-full px-4 py-2',
-                        'text-xs font-semibold transition',
-                        categoryType === type
-                          ? 'bg-[#174f43] text-white shadow-sm'
-                          : 'text-[#69756f] hover:text-[#173c32]',
-                      ].join(' ')}
-                    >
-                      {type === 'EXPENSE' ? 'Expenses' : 'Income'}
-                    </button>
-                  ),
-                )}
-              </div>
-            </div>
-
+      <section className="feature-fade-in feature-fade-in-delay-2 mt-10 overflow-hidden rounded-[1.75rem] border border-[#dedbd2] bg-[#fbfaf6] shadow-[0_14px_40px_rgba(36,64,54,0.04)]">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e5e1d7] px-5 py-5 sm:px-6">
+          <div className="max-w-full overflow-x-auto">
             <div
-              className="inline-flex rounded-full border border-[#dedbd2] bg-white p-1"
-              aria-label="Category status"
+              className="inline-flex w-max rounded-full bg-[#eceae2] p-1"
+              role="tablist"
+              aria-label="Category type"
             >
-              {(['ACTIVE', 'ARCHIVED'] as CategoryStatus[]).map(
-                (categoryStatus) => (
+              {(['EXPENSE', 'INCOME'] as CategoryType[]).map(
+                (type) => (
                   <button
-                    key={categoryStatus}
+                    key={type}
                     type="button"
-                    aria-pressed={status === categoryStatus}
-                    onClick={() => setStatus(categoryStatus)}
+                    role="tab"
+                    aria-selected={categoryType === type}
+                    onClick={() => setCategoryType(type)}
                     className={[
-                      'cursor-pointer rounded-full px-3.5 py-2',
+                      'cursor-pointer whitespace-nowrap rounded-full px-4 py-2',
                       'text-xs font-semibold transition',
-                      status === categoryStatus
-                        ? 'bg-[#deebe1] text-[#174f43]'
-                        : 'text-[#748079] hover:text-[#173c32]',
+                      categoryType === type
+                        ? 'bg-[#174f43] text-white shadow-sm'
+                        : 'text-[#69756f] hover:text-[#173c32]',
                     ].join(' ')}
                   >
-                    {categoryStatus === 'ACTIVE'
-                      ? 'Active'
-                      : 'Archived'}
+                    {type === 'EXPENSE' ? 'Expenses' : 'Income'}
                   </button>
                 ),
               )}
             </div>
           </div>
 
-          {categoriesQuery.isPending && (
-            <div className="grid min-h-72 place-items-center">
-              <div className="text-center text-[#66746e]">
-                <LoaderCircle
-                  className="mx-auto animate-spin"
-                  size={28}
-                  aria-hidden
-                />
-                <p className="mt-3 text-sm">
-                  Gathering your categories…
+          <div
+            className="inline-flex rounded-full border border-[#dedbd2] bg-white p-1"
+            aria-label="Category status"
+          >
+            {(['ACTIVE', 'ARCHIVED'] as CategoryStatus[]).map(
+              (categoryStatus) => (
+                <button
+                  key={categoryStatus}
+                  type="button"
+                  aria-pressed={status === categoryStatus}
+                  onClick={() => setStatus(categoryStatus)}
+                  className={[
+                    'cursor-pointer rounded-full px-3.5 py-2',
+                    'text-xs font-semibold transition',
+                    status === categoryStatus
+                      ? 'bg-[#deebe1] text-[#174f43]'
+                      : 'text-[#748079] hover:text-[#173c32]',
+                  ].join(' ')}
+                >
+                  {categoryStatus === 'ACTIVE'
+                    ? 'Active'
+                    : 'Archived'}
+                </button>
+              ),
+            )}
+          </div>
+        </div>
+
+        {categoriesQuery.isPending && (
+          <div className="grid min-h-72 place-items-center">
+            <div className="text-center text-[#66746e]">
+              <LoaderCircle
+                className="mx-auto animate-spin"
+                size={28}
+                aria-hidden
+              />
+              <p className="mt-3 text-sm">
+                Gathering your categories…
+              </p>
+            </div>
+          </div>
+        )}
+
+        {categoriesQuery.isError && (
+          <div className="m-6 rounded-2xl border border-[#e8c8bf] bg-[#fff4f1] px-5 py-4">
+            <p className="font-semibold text-[#8f3f30]">
+              We couldn’t load your categories.
+            </p>
+
+            <p className="mt-1 text-sm text-[#9b5a4d]">
+              {categoriesQuery.error instanceof Error
+                ? categoriesQuery.error.message
+                : 'Please try again.'}
+            </p>
+
+            <button
+              type="button"
+              onClick={() => {
+                void categoriesQuery.refetch()
+              }}
+              className="mt-3 cursor-pointer text-sm font-semibold text-[#174f43] underline underline-offset-4"
+            >
+              Try again
+            </button>
+          </div>
+        )}
+
+        {categoriesQuery.isSuccess &&
+          categoriesQuery.data.length === 0 && (
+            <div className="grid min-h-72 place-items-center px-6 py-12 text-center">
+              <div>
+                <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-[#e4ede7] text-[#276b56]">
+                  <Tags size={24} aria-hidden />
+                </span>
+
+                <h2 className="mt-5 font-serif text-2xl text-[#173c32]">
+                  No {status.toLowerCase()} categories
+                </h2>
+
+                <p className="mt-2 max-w-sm text-sm leading-6 text-[#69756f]">
+                  {status === 'ACTIVE'
+                    ? 'Create a category to start organising your transactions.'
+                    : 'Categories you archive will appear here.'}
                 </p>
               </div>
             </div>
           )}
 
-          {categoriesQuery.isError && (
-            <div className="m-6 rounded-2xl border border-[#e8c8bf] bg-[#fff4f1] px-5 py-4">
-              <p className="font-semibold text-[#8f3f30]">
-                We couldn’t load your categories.
-              </p>
-
-              <p className="mt-1 text-sm text-[#9b5a4d]">
-                {categoriesQuery.error instanceof Error
-                  ? categoriesQuery.error.message
-                  : 'Please try again.'}
-              </p>
-
-              <button
-                type="button"
-                onClick={() => {
-                  void categoriesQuery.refetch()
-                }}
-                className="mt-3 cursor-pointer text-sm font-semibold text-[#174f43] underline underline-offset-4"
-              >
-                Try again
-              </button>
-            </div>
+        {categoriesQuery.isSuccess &&
+          categoriesQuery.data.length > 0 && (
+            <ul className="divide-y divide-[#e5e1d7]">
+              {categoriesQuery.data.map((category) => (
+                <CategoryRow
+                  key={category.id}
+                  category={category}
+                  onEdit={openEditModal}
+                  onArchive={(target) => {
+                    archiveCategory.reset()
+                    setArchiveTarget(target)
+                  }}
+                />
+              ))}
+            </ul>
           )}
+      </section>
 
-          {categoriesQuery.isSuccess &&
-            categoriesQuery.data.length === 0 && (
-              <div className="grid min-h-72 place-items-center px-6 py-12 text-center">
-                <div>
-                  <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-[#e4ede7] text-[#276b56]">
-                    <Tags size={24} aria-hidden />
-                  </span>
+      <aside className="feature-fade-in feature-fade-in-delay-3 mt-6 flex items-start gap-3 rounded-2xl bg-[#deebe1] px-5 py-4 text-[#275f50]">
+        <BadgeDollarSign
+          className="mt-0.5 shrink-0"
+          size={19}
+          aria-hidden
+        />
 
-                  <h2 className="mt-5 font-serif text-2xl text-[#173c32]">
-                    No {status.toLowerCase()} categories
-                  </h2>
-
-                  <p className="mt-2 max-w-sm text-sm leading-6 text-[#69756f]">
-                    {status === 'ACTIVE'
-                      ? 'Create a category to start organising your transactions.'
-                      : 'Categories you archive will appear here.'}
-                  </p>
-                </div>
-              </div>
-            )}
-
-          {categoriesQuery.isSuccess &&
-            categoriesQuery.data.length > 0 && (
-              <ul className="divide-y divide-[#e5e1d7]">
-                {categoriesQuery.data.map((category) => (
-                  <CategoryRow
-                    key={category.id}
-                    category={category}
-                    onEdit={openEditModal}
-                    onArchive={(target) => {
-                      archiveCategory.reset()
-                      setArchiveTarget(target)
-                    }}
-                  />
-                ))}
-              </ul>
-            )}
-        </section>
-
-        <aside className="mt-6 flex items-start gap-3 rounded-2xl bg-[#deebe1] px-5 py-4 text-[#275f50]">
-          <BadgeDollarSign
-            className="mt-0.5 shrink-0"
-            size={19}
-            aria-hidden
-          />
-
-          <p className="text-sm leading-6">
-            Default Salif categories can be renamed or reordered, but
-            their income or expense type cannot be changed.
-          </p>
-        </aside>
+        <p className="text-sm leading-6">
+          Default Salif categories can be renamed or reordered, but
+          their income or expense type cannot be changed.
+        </p>
+      </aside>
 
       <CategoryModal
         category={selectedCategory}
