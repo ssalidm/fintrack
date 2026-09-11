@@ -12,7 +12,7 @@ import {
 } from 'react'
 
 import { ApiClientError } from '../../../api/ApiClientError'
-
+import PageShell from '../../../components/layout/PageShell'
 import type {
   BudgetCategoryLimit,
   BudgetStatus,
@@ -31,7 +31,6 @@ import {
   useBudgets,
   useDeleteBudgetLimit,
 } from '../hooks/useBudgets'
-import PageShell from '../../../components/layout/PageShell'
 
 interface LimitModalTarget {
   limit?: BudgetCategoryLimit
@@ -40,15 +39,15 @@ interface LimitModalTarget {
 
 type ActionTarget =
   | {
-    kind: 'ARCHIVE_BUDGET'
-    budget: BudgetSummary
-  }
+      kind: 'ARCHIVE_BUDGET'
+      budget: BudgetSummary
+    }
   | {
-    kind: 'REMOVE_LIMIT'
-    budgetId: string
-    limit: BudgetCategoryLimit
-    categoryName: string
-  }
+      kind: 'REMOVE_LIMIT'
+      budgetId: string
+      limit: BudgetCategoryLimit
+      categoryName: string
+    }
 
 const statusOptions = [
   {
@@ -99,8 +98,10 @@ function preferredBudgetId(
 
   const currentBudget = budgets.find(
     (budget) =>
-      budget.budgetMonth.slice(0, 7) ===
-      currentMonth,
+      budget.budgetMonth.slice(
+        0,
+        7,
+      ) === currentMonth,
   )
 
   if (currentBudget) {
@@ -110,8 +111,10 @@ function preferredBudgetId(
   const latestPastBudget = budgets
     .filter(
       (budget) =>
-        budget.budgetMonth.slice(0, 7) <
-        currentMonth,
+        budget.budgetMonth.slice(
+          0,
+          7,
+        ) < currentMonth,
     )
     .toSorted((left, right) =>
       right.budgetMonth.localeCompare(
@@ -181,9 +184,10 @@ export default function BudgetsPage() {
   const [
     limitModalTarget,
     setLimitModalTarget,
-  ] = useState<LimitModalTarget | null>(
-    null,
-  )
+  ] =
+    useState<LimitModalTarget | null>(
+      null,
+    )
 
   const [
     actionTarget,
@@ -213,7 +217,8 @@ export default function BudgetsPage() {
   const activeBudgetId =
     budgets.some(
       (budget) =>
-        budget.id === selectedBudgetId,
+        budget.id ===
+        selectedBudgetId,
     )
       ? selectedBudgetId
       : preferredBudgetId(budgets)
@@ -305,7 +310,8 @@ export default function BudgetsPage() {
             actionTarget.limit.id,
 
           version:
-            actionTarget.limit.version,
+            actionTarget.limit
+              .version,
         })
       }
 
@@ -321,16 +327,16 @@ export default function BudgetsPage() {
 
   const actionSubjectName =
     actionTarget?.kind ===
-      'ARCHIVE_BUDGET'
+    'ARCHIVE_BUDGET'
       ? actionTarget.budget.name
       : actionTarget?.kind ===
-        'REMOVE_LIMIT'
+          'REMOVE_LIMIT'
         ? actionTarget.categoryName
         : ''
 
   return (
     <PageShell>
-      <header className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+      <header className="feature-reveal flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="text-xs font-semibold tracking-[0.16em] text-[#657972]">
             SPEND WITH INTENTION
@@ -341,10 +347,10 @@ export default function BudgetsPage() {
           </h1>
 
           <p className="mt-3 max-w-2xl text-sm leading-6 text-[#657972] sm:text-base">
-            Set useful boundaries, notice
-            where money drifts, and adjust
-            without turning the month into
-            a punishment.
+            Set useful boundaries,
+            notice where money drifts,
+            and adjust without turning
+            the month into a punishment.
           </p>
         </div>
 
@@ -381,7 +387,7 @@ export default function BudgetsPage() {
         </div>
       </header>
 
-      <section className="mt-8 rounded-[1.5rem] border border-[#dedbd2] bg-[#fffdf8] p-4 sm:p-5">
+      <section className="feature-reveal feature-reveal-delay-1 mt-8 rounded-[1.5rem] border border-[#dedbd2] bg-[#fffdf8] p-4 sm:p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="inline-flex w-fit rounded-full bg-[#eceae3] p-1">
             {statusOptions.map(
@@ -393,14 +399,17 @@ export default function BudgetsPage() {
                     setStatus(
                       option.value,
                     )
+
                     setSelectedBudgetId(
                       '',
                     )
                   }}
-                  className={`cursor-pointer rounded-full px-4 py-2 text-sm font-semibold transition ${status === option.value
-                    ? 'bg-[#fffdf8] text-[#173c32] shadow-sm'
-                    : 'text-[#657972] hover:text-[#173c32]'
-                    }`}
+                  className={`cursor-pointer rounded-full px-4 py-2 text-sm font-semibold transition ${
+                    status ===
+                    option.value
+                      ? 'bg-[#fffdf8] text-[#173c32] shadow-sm'
+                      : 'text-[#657972] hover:text-[#173c32]'
+                  }`}
                 >
                   {option.label}
                 </button>
@@ -441,7 +450,9 @@ export default function BudgetsPage() {
                         budget.budgetMonth,
                       )}{' '}
                       · {budget.name} ·{' '}
-                      {budget.currencyCode}
+                      {
+                        budget.currencyCode
+                      }
                     </option>
                   ),
                 )}
@@ -452,19 +463,21 @@ export default function BudgetsPage() {
       </section>
 
       {budgetsQuery.isPending ? (
-        <div className="mt-6 space-y-5">
+        <div className="feature-reveal feature-reveal-delay-2 mt-6 space-y-5">
           <div className="h-28 animate-pulse rounded-[1.75rem] bg-[#e9e7e0]" />
+
           <div className="h-72 animate-pulse rounded-[1.75rem] bg-[#e9e7e0]" />
         </div>
       ) : budgetsQuery.isError ? (
-        <section className="mt-6 rounded-[1.75rem] border border-[#e8c8bf] bg-[#fff8f4] p-8 text-center">
+        <section className="feature-reveal feature-reveal-delay-2 mt-6 rounded-[1.75rem] border border-[#e8c8bf] bg-[#fff8f4] p-8 text-center">
           <h2 className="font-serif text-2xl text-[#173c32]">
-            Your budgets could not be loaded
+            Your budgets could not
+            be loaded
           </h2>
 
           <p className="mt-2 text-sm text-[#657972]">
-            Check the connection and try
-            again.
+            Check the connection and
+            try again.
           </p>
 
           <button
@@ -478,7 +491,7 @@ export default function BudgetsPage() {
           </button>
         </section>
       ) : budgets.length === 0 ? (
-        <section className="mt-6 rounded-[1.75rem] border border-dashed border-[#cfcac0] bg-[#fffdf8] px-6 py-16 text-center">
+        <section className="feature-reveal feature-reveal-delay-2 mt-6 rounded-[1.75rem] border border-dashed border-[#cfcac0] bg-[#fffdf8] px-6 py-16 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#e7efe9] text-[#236a58]">
             <WalletCards size={25} />
           </div>
@@ -519,9 +532,10 @@ export default function BudgetsPage() {
           )}
         </section>
       ) : budgetQuery.isError ? (
-        <section className="mt-6 rounded-[1.75rem] border border-[#e8c8bf] bg-[#fff8f4] p-8 text-center">
+        <section className="feature-reveal feature-reveal-delay-2 mt-6 rounded-[1.75rem] border border-[#e8c8bf] bg-[#fff8f4] p-8 text-center">
           <h2 className="font-serif text-2xl text-[#173c32]">
-            This budget could not be opened
+            This budget could not be
+            opened
           </h2>
 
           <button
@@ -536,12 +550,13 @@ export default function BudgetsPage() {
         </section>
       ) : budgetQuery.isPending ||
         !selectedBudget ? (
-        <div className="mt-6 space-y-5">
+        <div className="feature-reveal feature-reveal-delay-2 mt-6 space-y-5">
           <div className="h-28 animate-pulse rounded-[1.75rem] bg-[#e9e7e0]" />
+
           <div className="h-72 animate-pulse rounded-[1.75rem] bg-[#e9e7e0]" />
         </div>
       ) : (
-        <div className="mt-6 space-y-6">
+        <div className="feature-reveal feature-reveal-delay-2 mt-6 space-y-6">
           <section className="flex flex-col gap-5 rounded-[1.75rem] border border-[#dedbd2] bg-[#f1eee6] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-7">
             <div className="flex items-start gap-4">
               <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#dfece4] text-[#236a58]">
@@ -570,8 +585,9 @@ export default function BudgetsPage() {
                 {selectedBudget.status ===
                   'ARCHIVED' && (
                     <p className="mt-2 text-sm text-[#8a5f20]">
-                      This plan is archived
-                      and read-only.
+                      This plan is
+                      archived and
+                      read-only.
                     </p>
                   )}
               </div>
@@ -589,7 +605,9 @@ export default function BudgetsPage() {
                     }
                     className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#cbc7bc] bg-[#fffdf8] px-4 py-2.5 text-sm font-semibold text-[#173c32] transition hover:bg-white"
                   >
-                    <Pencil size={15} />
+                    <Pencil
+                      size={15}
+                    />
                     Rename
                   </button>
 
@@ -607,7 +625,9 @@ export default function BudgetsPage() {
                     }}
                     className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#e0c8bf] bg-[#fffdf8] px-4 py-2.5 text-sm font-semibold text-[#9a4c3a] transition hover:bg-[#fff1ec]"
                   >
-                    <Archive size={15} />
+                    <Archive
+                      size={15}
+                    />
                     Archive
                   </button>
                 </div>
@@ -678,7 +698,9 @@ export default function BudgetsPage() {
       {limitModalTarget &&
         selectedBudget && (
           <BudgetLimitModal
-            budgetId={selectedBudget.id}
+            budgetId={
+              selectedBudget.id
+            }
             currencyCode={
               selectedBudget.currencyCode
             }
@@ -710,9 +732,7 @@ export default function BudgetsPage() {
             deleteLimit.isPending
           }
           errorMessage={actionError}
-          onCancel={
-            closeActionDialog
-          }
+          onCancel={closeActionDialog}
           onConfirm={() => {
             void confirmAction()
           }}
