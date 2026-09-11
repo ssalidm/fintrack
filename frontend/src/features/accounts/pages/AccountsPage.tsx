@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 
 import { ApiClientError } from '../../../api/ApiClientError'
+import PageHeader from '../../../components/layout/PageHeader'
 import PageShell from '../../../components/layout/PageShell'
 import type {
   Account,
@@ -141,50 +142,40 @@ export default function AccountsPage() {
 
   return (
     <PageShell>
-      <header className="feature-reveal flex flex-wrap items-end justify-between gap-6">
-        <div>
-          <p className="text-xs font-semibold tracking-[0.16em] text-[#657972]">
-            THE FULL PICTURE
-          </p>
+      <PageHeader
+        eyebrow="The full picture"
+        title="Your accounts"
+        description="See where your money lives and how each account contributes to your overall position."
+        actions={
+          <>
+            <button
+              type="button"
+              disabled={isRefreshing}
+              onClick={() => void refreshAccounts()}
+              className="rounded-full border border-[#d8d6ce] bg-[#fffdf8] p-3 text-[#657972] transition hover:border-[#bd9460] hover:text-[#9a6828] disabled:opacity-60"
+              aria-label="Refresh accounts"
+            >
+              <RefreshCw
+                size={18}
+                className={
+                  isRefreshing
+                    ? 'animate-spin'
+                    : ''
+                }
+              />
+            </button>
 
-          <h1 className="mt-4 font-serif text-5xl tracking-[-0.03em] text-[#173c32]">
-            Your accounts
-          </h1>
-
-          <p className="mt-3 max-w-xl text-sm leading-6 text-[#657972]">
-            See where your money lives and how each account
-            contributes to your overall position.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            disabled={isRefreshing}
-            onClick={() => void refreshAccounts()}
-            className="rounded-full border border-[#d8d6ce] bg-[#fffdf8] p-3 text-[#657972] transition hover:border-[#bd9460] hover:text-[#9a6828] disabled:opacity-60"
-            aria-label="Refresh accounts"
-          >
-            <RefreshCw
-              size={18}
-              className={
-                isRefreshing
-                  ? 'animate-spin'
-                  : ''
-              }
-            />
-          </button>
-
-          <button
-            type="button"
-            onClick={openCreateForm}
-            className="inline-flex items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#236a58]"
-          >
-            <Plus size={18} aria-hidden />
-            Add account
-          </button>
-        </div>
-      </header>
+            <button
+              type="button"
+              onClick={openCreateForm}
+              className="inline-flex items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#236a58]"
+            >
+              <Plus size={18} aria-hidden />
+              Add account
+            </button>
+          </>
+        }
+      />
 
       <div className="feature-reveal feature-reveal-delay-1 mt-10 flex gap-7 border-b border-[#dedbd2]">
         {(
@@ -309,8 +300,7 @@ export default function AccountsPage() {
                       <span
                         className={`grid size-11 shrink-0 place-items-center rounded-xl ${
                           accountTypeColours[
-                            account
-                              .accountType
+                            account.accountType
                           ]
                         }`}
                       >
@@ -328,8 +318,7 @@ export default function AccountsPage() {
 
                           {!account.includeInNetWorth && (
                             <span className="rounded-full bg-[#eceae4] px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-[#657972]">
-                              Excluded from
-                              net worth
+                              Excluded from net worth
                             </span>
                           )}
                         </div>
@@ -337,14 +326,11 @@ export default function AccountsPage() {
                         <p className="mt-1 text-sm text-[#657972]">
                           {
                             accountTypeLabels[
-                              account
-                                .accountType
+                              account.accountType
                             ]
                           }
                           {' · '}
-                          {
-                            account.currencyCode
-                          }
+                          {account.currencyCode}
                           {' · '}
                           {balance?.postedTransactionCount ??
                             0}{' '}
@@ -367,41 +353,29 @@ export default function AccountsPage() {
                         </p>
                       </div>
 
-                      {status ===
-                        'ACTIVE' && (
+                      {status === 'ACTIVE' && (
                         <div className="flex items-center gap-1">
                           <button
                             type="button"
                             onClick={() =>
-                              openEditForm(
-                                account,
-                              )
+                              openEditForm(account)
                             }
                             className="rounded-full p-2 text-[#657972] transition hover:bg-[#e5ece7] hover:text-[#39725d]"
                             aria-label={`Edit ${account.name}`}
                           >
-                            <Pencil
-                              size={17}
-                            />
+                            <Pencil size={17} />
                           </button>
 
                           <button
                             type="button"
                             onClick={() => {
-                              setArchiveError(
-                                null,
-                              )
-
-                              setArchiveTarget(
-                                account,
-                              )
+                              setArchiveError(null)
+                              setArchiveTarget(account)
                             }}
                             className="rounded-full p-2 text-[#657972] transition hover:bg-[#f2e7df] hover:text-[#9b5845]"
                             aria-label={`Archive ${account.name}`}
                           >
-                            <Archive
-                              size={17}
-                            />
+                            <Archive size={17} />
                           </button>
                         </div>
                       )}
@@ -415,13 +389,8 @@ export default function AccountsPage() {
 
       {isFormOpen && (
         <AccountModal
-          key={
-            editingAccount?.id ??
-            'new-account'
-          }
-          account={
-            editingAccount ?? undefined
-          }
+          key={editingAccount?.id ?? 'new-account'}
+          account={editingAccount ?? undefined}
           onClose={closeForm}
         />
       )}
@@ -458,9 +427,8 @@ export default function AccountsPage() {
               <strong className="text-[#173c32]">
                 {archiveTarget.name}
               </strong>{' '}
-              will be removed from your
-              active accounts but retained
-              for historical reporting.
+              will be removed from your active accounts but
+              retained for historical reporting.
             </p>
 
             {archiveError && (
@@ -475,9 +443,7 @@ export default function AccountsPage() {
             <div className="mt-7 flex justify-end gap-3">
               <button
                 type="button"
-                disabled={
-                  archiveAccount.isPending
-                }
+                disabled={archiveAccount.isPending}
                 onClick={() =>
                   setArchiveTarget(null)
                 }
@@ -488,9 +454,7 @@ export default function AccountsPage() {
 
               <button
                 type="button"
-                disabled={
-                  archiveAccount.isPending
-                }
+                disabled={archiveAccount.isPending}
                 onClick={() =>
                   void confirmArchive()
                 }

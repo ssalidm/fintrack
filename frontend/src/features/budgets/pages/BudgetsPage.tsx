@@ -12,6 +12,7 @@ import {
 } from 'react'
 
 import { ApiClientError } from '../../../api/ApiClientError'
+import PageHeader from '../../../components/layout/PageHeader'
 import PageShell from '../../../components/layout/PageShell'
 import type {
   BudgetCategoryLimit,
@@ -336,56 +337,44 @@ export default function BudgetsPage() {
 
   return (
     <PageShell>
-      <header className="feature-reveal flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <p className="text-xs font-semibold tracking-[0.16em] text-[#657972]">
-            SPEND WITH INTENTION
-          </p>
+      <PageHeader
+        eyebrow="Spend with intention"
+        title="Budgets"
+        description="Set useful boundaries, notice where money drifts, and adjust without turning the month into a punishment."
+        actions={
+          <>
+            <button
+              type="button"
+              disabled={isRefreshing}
+              onClick={() => {
+                void refreshPage()
+              }}
+              className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#d8d6ce] bg-[#fffdf8] px-4 py-2.5 text-sm font-semibold text-[#173c32] transition hover:bg-[#efede7] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <RefreshCw
+                size={16}
+                className={
+                  isRefreshing
+                    ? 'animate-spin'
+                    : ''
+                }
+              />
+              Refresh
+            </button>
 
-          <h1 className="mt-3 font-serif text-4xl tracking-[-0.035em] text-[#173c32] sm:text-5xl">
-            Budgets
-          </h1>
-
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#657972] sm:text-base">
-            Set useful boundaries,
-            notice where money drifts,
-            and adjust without turning
-            the month into a punishment.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap gap-3">
-          <button
-            type="button"
-            disabled={isRefreshing}
-            onClick={() => {
-              void refreshPage()
-            }}
-            className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#d8d6ce] bg-[#fffdf8] px-4 py-2.5 text-sm font-semibold text-[#173c32] transition hover:bg-[#efede7] disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            <RefreshCw
-              size={16}
-              className={
-                isRefreshing
-                  ? 'animate-spin'
-                  : ''
+            <button
+              type="button"
+              onClick={() =>
+                setIsCreateOpen(true)
               }
-            />
-            Refresh
-          </button>
-
-          <button
-            type="button"
-            onClick={() =>
-              setIsCreateOpen(true)
-            }
-            className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#236a58]"
-          >
-            <Plus size={17} />
-            New budget
-          </button>
-        </div>
-      </header>
+              className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#236a58]"
+            >
+              <Plus size={17} />
+              New budget
+            </button>
+          </>
+        }
+      />
 
       <section className="feature-reveal feature-reveal-delay-1 mt-8 rounded-[1.5rem] border border-[#dedbd2] bg-[#fffdf8] p-4 sm:p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">

@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 
 import { ApiClientError } from '../../../api/ApiClientError'
+import PageHeader from '../../../components/layout/PageHeader'
 import PageShell from '../../../components/layout/PageShell'
 import type {
   SavingsGoal,
@@ -357,61 +358,50 @@ export default function GoalsPage() {
 
   return (
     <PageShell>
-      <header className="feature-reveal flex flex-wrap items-end justify-between gap-6">
-        <div>
-          <p className="text-xs font-semibold tracking-[0.16em] text-[#657972]">
-            ROOM FOR WHAT MATTERS
-          </p>
-
-          <h1 className="mt-4 font-serif text-5xl tracking-[-0.03em] text-[#173c32]">
-            Your goals
-          </h1>
-
-          <p className="mt-3 max-w-xl text-sm leading-6 text-[#657972]">
-            Turn the things you care
-            about into steady, visible
-            progress.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() =>
-              void goalsQuery.refetch()
-            }
-            disabled={
-              goalsQuery.isFetching
-            }
-            className="cursor-pointer rounded-full border border-[#d8d6ce] bg-[#fffdf8] p-3 text-[#657972] transition hover:border-[#bd9460] hover:text-[#9a6828] disabled:cursor-not-allowed disabled:opacity-60"
-            aria-label="Refresh goals"
-            title="Refresh goals"
-          >
-            <RefreshCw
-              size={18}
-              aria-hidden
-              className={
-                goalsQuery.isFetching
-                  ? 'animate-spin'
-                  : ''
+      <PageHeader
+        eyebrow="Room for what matters"
+        title="Your goals"
+        description="Turn the things you care about into steady, visible progress."
+        actions={
+          <>
+            <button
+              type="button"
+              onClick={() =>
+                void goalsQuery.refetch()
               }
-            />
-          </button>
+              disabled={
+                goalsQuery.isFetching
+              }
+              className="cursor-pointer rounded-full border border-[#d8d6ce] bg-[#fffdf8] p-3 text-[#657972] transition hover:border-[#bd9460] hover:text-[#9a6828] disabled:cursor-not-allowed disabled:opacity-60"
+              aria-label="Refresh goals"
+              title="Refresh goals"
+            >
+              <RefreshCw
+                size={18}
+                aria-hidden
+                className={
+                  goalsQuery.isFetching
+                    ? 'animate-spin'
+                    : ''
+                }
+              />
+            </button>
 
-          <button
-            type="button"
-            onClick={openCreateGoal}
-            className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#236a58]"
-          >
-            <Plus
-              size={18}
-              aria-hidden
-            />
+            <button
+              type="button"
+              onClick={openCreateGoal}
+              className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#236a58]"
+            >
+              <Plus
+                size={18}
+                aria-hidden
+              />
 
-            New goal
-          </button>
-        </div>
-      </header>
+              New goal
+            </button>
+          </>
+        }
+      />
 
       <section className="feature-reveal feature-reveal-delay-1 mt-9 grid overflow-hidden rounded-3xl border border-[#d8ded8] bg-[#eaf0e9] md:grid-cols-[1.35fr_0.8fr_0.9fr]">
         <div className="p-6 sm:p-7">

@@ -9,14 +9,16 @@ import {
   CirclePause,
   CirclePlay,
   Clock3,
-  Plus,
   Pencil,
+  Plus,
   RefreshCw,
   RotateCcw,
   Sparkles,
   X,
 } from 'lucide-react'
+
 import { ApiClientError } from '../../../api/ApiClientError'
+import PageHeader from '../../../components/layout/PageHeader'
 import { useAccounts } from '../../accounts/hooks/useAccounts'
 import { useCategories } from '../../categories/hooks/useCategories'
 import type {
@@ -67,14 +69,16 @@ const frequencyUnits: Record<
 
 function getToday() {
   const today = new Date()
+
   const year = today.getFullYear()
+
   const month = String(
     today.getMonth() + 1,
   ).padStart(2, '0')
-  const day = String(today.getDate()).padStart(
-    2,
-    '0',
-  )
+
+  const day = String(
+    today.getDate(),
+  ).padStart(2, '0')
 
   return `${year}-${month}-${day}`
 }
@@ -99,10 +103,13 @@ function formatMoney(
   currencyCode?: string,
 ) {
   if (!currencyCode) {
-    return new Intl.NumberFormat('en-ZA', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(amount)
+    return new Intl.NumberFormat(
+      'en-ZA',
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      },
+    ).format(amount)
   }
 
   return new Intl.NumberFormat('en-ZA', {
@@ -116,7 +123,8 @@ function formatFrequency(
   frequency: RecurringFrequency,
   intervalCount: number,
 ) {
-  const units = frequencyUnits[frequency]
+  const units =
+    frequencyUnits[frequency]
 
   if (intervalCount === 1) {
     return `Every ${units.singular}`
@@ -188,7 +196,10 @@ function ArchiveConfirmation({
       >
         <div className="flex items-start justify-between gap-4">
           <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#f4e7df] text-[#a85e49]">
-            <Archive size={19} aria-hidden />
+            <Archive
+              size={19}
+              aria-hidden
+            />
           </span>
 
           <button
@@ -198,7 +209,10 @@ function ArchiveConfirmation({
             aria-label="Close archive confirmation"
             className="cursor-pointer rounded-full p-2 text-[#657972] transition hover:bg-[#eef1eb] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <X size={19} aria-hidden />
+            <X
+              size={19}
+              aria-hidden
+            />
           </button>
         </div>
 
@@ -213,8 +227,9 @@ function ArchiveConfirmation({
           <strong className="font-semibold text-[#173c32]">
             {schedule.name}
           </strong>{' '}
-          will stop generating transactions and move to
-          your archived schedules.
+          will stop generating
+          transactions and move to your
+          archived schedules.
         </p>
 
         <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
@@ -245,37 +260,58 @@ function ArchiveConfirmation({
 
 export default function RecurringTransactionsPage() {
   const [status, setStatus] =
-    useState<RecurringTransactionStatus>('ACTIVE')
+    useState<RecurringTransactionStatus>(
+      'ACTIVE',
+    )
 
-  const [isCreateOpen, setIsCreateOpen] =
-    useState(false)
+  const [
+    isCreateOpen,
+    setIsCreateOpen,
+  ] = useState(false)
 
-  const [scheduleToArchive, setScheduleToArchive] =
-    useState<RecurringTransaction | null>(null)
+  const [
+    scheduleToArchive,
+    setScheduleToArchive,
+  ] =
+    useState<RecurringTransaction | null>(
+      null,
+    )
 
-  const [scheduleToEdit, setScheduleToEdit] =
-    useState<RecurringTransaction | null>(null)
+  const [
+    scheduleToEdit,
+    setScheduleToEdit,
+  ] =
+    useState<RecurringTransaction | null>(
+      null,
+    )
 
-  const [busyScheduleId, setBusyScheduleId] =
-    useState<string | null>(null)
+  const [
+    busyScheduleId,
+    setBusyScheduleId,
+  ] = useState<string | null>(null)
 
-  const [actionError, setActionError] =
-    useState<string | null>(null)
+  const [
+    actionError,
+    setActionError,
+  ] = useState<string | null>(null)
 
   const schedulesQuery =
     useRecurringTransactions(status)
 
-  const accountsQuery = useAccounts('ACTIVE')
+  const accountsQuery =
+    useAccounts('ACTIVE')
 
-  const incomeCategoriesQuery = useCategories(
-    'INCOME',
-    'ACTIVE',
-  )
+  const incomeCategoriesQuery =
+    useCategories(
+      'INCOME',
+      'ACTIVE',
+    )
 
-  const expenseCategoriesQuery = useCategories(
-    'EXPENSE',
-    'ACTIVE',
-  )
+  const expenseCategoriesQuery =
+    useCategories(
+      'EXPENSE',
+      'ACTIVE',
+    )
 
   const pauseSchedule =
     usePauseRecurringTransaction()
@@ -292,17 +328,22 @@ export default function RecurringTransactionsPage() {
   const accountById = useMemo(
     () =>
       new Map(
-        (accountsQuery.data ?? []).map(
-          (account) => [account.id, account],
-        ),
+        (
+          accountsQuery.data ?? []
+        ).map((account) => [
+          account.id,
+          account,
+        ]),
       ),
     [accountsQuery.data],
   )
 
   const categoryById = useMemo(() => {
     const categories = [
-      ...(incomeCategoriesQuery.data ?? []),
-      ...(expenseCategoriesQuery.data ?? []),
+      ...(incomeCategoriesQuery.data ??
+        []),
+      ...(expenseCategoriesQuery.data ??
+        []),
     ]
 
     return new Map(
@@ -316,22 +357,28 @@ export default function RecurringTransactionsPage() {
     incomeCategoriesQuery.data,
   ])
 
-  const schedules = schedulesQuery.data ?? []
+  const schedules =
+    schedulesQuery.data ?? []
+
   const today = getToday()
 
-  const dueScheduleCount = schedules.filter(
-    (schedule) =>
-      schedule.status === 'ACTIVE' &&
-      schedule.nextDueDate !== null &&
-      schedule.nextDueDate <= today,
-  ).length
+  const dueScheduleCount =
+    schedules.filter(
+      (schedule) =>
+        schedule.status === 'ACTIVE' &&
+        schedule.nextDueDate !== null &&
+        schedule.nextDueDate <= today,
+    ).length
 
-  const automaticScheduleCount = schedules.filter(
-    (schedule) => schedule.autoPost,
-  ).length
+  const automaticScheduleCount =
+    schedules.filter(
+      (schedule) =>
+        schedule.autoPost,
+    ).length
 
   const queryErrorMessage =
-    schedulesQuery.error instanceof ApiClientError
+    schedulesQuery.error instanceof
+    ApiClientError
       ? schedulesQuery.error.message
       : 'Unable to load your recurring transactions.'
 
@@ -348,7 +395,10 @@ export default function RecurringTransactionsPage() {
       return true
     } catch (error) {
       setActionError(
-        getErrorMessage(error, fallbackError),
+        getErrorMessage(
+          error,
+          fallbackError,
+        ),
       )
 
       return false
@@ -410,17 +460,20 @@ export default function RecurringTransactionsPage() {
       return
     }
 
-    const wasSuccessful = await runAction(
-      scheduleToArchive.id,
-      () =>
-        archiveSchedule.mutateAsync({
-          scheduleId: scheduleToArchive.id,
-          payload: {
-            version: scheduleToArchive.version,
-          },
-        }),
-      'The schedule could not be archived.',
-    )
+    const wasSuccessful =
+      await runAction(
+        scheduleToArchive.id,
+        () =>
+          archiveSchedule.mutateAsync({
+            scheduleId:
+              scheduleToArchive.id,
+            payload: {
+              version:
+                scheduleToArchive.version,
+            },
+          }),
+        'The schedule could not be archived.',
+      )
 
     if (wasSuccessful) {
       setScheduleToArchive(null)
@@ -430,31 +483,26 @@ export default function RecurringTransactionsPage() {
   return (
     <main className="min-h-screen px-5 py-8 sm:px-8 lg:px-12 lg:py-12 xl:px-16">
       <div className="mx-auto max-w-[1280px]">
-        <header className="feature-reveal flex flex-wrap items-end justify-between gap-6">
-          <div>
-            <p className="text-xs font-semibold tracking-[0.16em] text-[#657972]">
-              MONEY IN MOTION
-            </p>
-
-            <h1 className="mt-4 font-serif text-4xl tracking-[-0.03em] text-[#173c32] sm:text-5xl">
-              Recurring
-            </h1>
-
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-[#657972]">
-              Plan repeating income and expenses and decide
-              whether Salif should post them automatically.
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setIsCreateOpen(true)}
-            className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#216353]"
-          >
-            <Plus size={17} aria-hidden />
-            New schedule
-          </button>
-        </header>
+        <PageHeader
+          eyebrow="Money in motion"
+          title="Recurring"
+          description="Plan repeating income and expenses and decide whether Salif should post them automatically."
+          actions={
+            <button
+              type="button"
+              onClick={() =>
+                setIsCreateOpen(true)
+              }
+              className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#216353]"
+            >
+              <Plus
+                size={17}
+                aria-hidden
+              />
+              New schedule
+            </button>
+          }
+        />
 
         <section className="feature-reveal feature-reveal-delay-1 mt-8 grid gap-4 sm:grid-cols-3">
           <article className="rounded-2xl border border-[#dedbd2] bg-[#fffdf8] px-5 py-4">
@@ -504,27 +552,37 @@ export default function RecurringTransactionsPage() {
 
         <section className="feature-reveal feature-reveal-delay-2 mt-7 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#dedbd2] bg-[#fffdf8] p-4">
           <div className="flex flex-wrap gap-1 rounded-full bg-[#eef0ea] p-1">
-            {statuses.map((filterStatus) => (
-              <button
-                key={filterStatus}
-                type="button"
-                onClick={() => {
-                  setStatus(filterStatus)
-                  setActionError(null)
-                }}
-                className={`cursor-pointer rounded-full px-4 py-2 text-xs font-semibold transition ${status === filterStatus
-                  ? 'bg-[#174f43] text-white shadow-sm'
-                  : 'text-[#657972] hover:text-[#173c32]'
+            {statuses.map(
+              (filterStatus) => (
+                <button
+                  key={filterStatus}
+                  type="button"
+                  onClick={() => {
+                    setStatus(
+                      filterStatus,
+                    )
+                    setActionError(null)
+                  }}
+                  className={`cursor-pointer rounded-full px-4 py-2 text-xs font-semibold transition ${
+                    status ===
+                    filterStatus
+                      ? 'bg-[#174f43] text-white shadow-sm'
+                      : 'text-[#657972] hover:text-[#173c32]'
                   }`}
-              >
-                {statusLabel(filterStatus)}
-              </button>
-            ))}
+                >
+                  {statusLabel(
+                    filterStatus,
+                  )}
+                </button>
+              ),
+            )}
           </div>
 
           <button
             type="button"
-            disabled={schedulesQuery.isFetching}
+            disabled={
+              schedulesQuery.isFetching
+            }
             onClick={() =>
               void schedulesQuery.refetch()
             }
@@ -553,11 +611,16 @@ export default function RecurringTransactionsPage() {
 
             <button
               type="button"
-              onClick={() => setActionError(null)}
+              onClick={() =>
+                setActionError(null)
+              }
               aria-label="Dismiss error"
               className="cursor-pointer"
             >
-              <X size={17} aria-hidden />
+              <X
+                size={17}
+                aria-hidden
+              />
             </button>
           </div>
         )}
@@ -572,7 +635,8 @@ export default function RecurringTransactionsPage() {
             className="feature-reveal feature-reveal-delay-3 mt-6 rounded-2xl border border-red-200 bg-red-50 p-6"
           >
             <h2 className="font-serif text-2xl text-red-950">
-              We couldn’t load your schedules
+              We couldn’t load your
+              schedules
             </h2>
 
             <p className="mt-2 text-sm text-red-700">
@@ -595,11 +659,17 @@ export default function RecurringTransactionsPage() {
           schedules.length === 0 && (
             <section className="feature-reveal feature-reveal-delay-3 mt-6 rounded-3xl border border-dashed border-[#cfcac0] bg-[#fffdf8] px-6 py-14 text-center">
               <span className="mx-auto grid size-14 place-items-center rounded-full bg-[#e3e9ed] text-[#557587]">
-                <CalendarClock size={24} aria-hidden />
+                <CalendarClock
+                  size={24}
+                  aria-hidden
+                />
               </span>
 
               <h2 className="mt-5 font-serif text-3xl text-[#173c32]">
-                No {statusLabel(status).toLowerCase()}{' '}
+                No{' '}
+                {statusLabel(
+                  status,
+                ).toLowerCase()}{' '}
                 schedules
               </h2>
 
@@ -607,18 +677,27 @@ export default function RecurringTransactionsPage() {
                 {status === 'ACTIVE'
                   ? 'Create a schedule for income or expenses that repeat over time.'
                   : `You do not have any ${statusLabel(
-                    status,
-                  ).toLowerCase()} recurring transactions.`}
+                      status,
+                    ).toLowerCase()} recurring transactions.`}
               </p>
 
-              {status === 'ACTIVE' && (
+              {status ===
+                'ACTIVE' && (
                 <button
                   type="button"
-                  onClick={() => setIsCreateOpen(true)}
+                  onClick={() =>
+                    setIsCreateOpen(
+                      true,
+                    )
+                  }
                   className="mt-6 inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#216353]"
                 >
-                  <Plus size={17} aria-hidden />
-                  Create your first schedule
+                  <Plus
+                    size={17}
+                    aria-hidden
+                  />
+                  Create your first
+                  schedule
                 </button>
               )}
             </section>
@@ -626,213 +705,251 @@ export default function RecurringTransactionsPage() {
 
         {schedules.length > 0 && (
           <section className="feature-reveal feature-reveal-delay-3 mt-6 space-y-4">
-            {schedules.map((schedule) => {
-              const account = accountById.get(
-                schedule.accountId,
-              )
+            {schedules.map(
+              (schedule) => {
+                const account =
+                  accountById.get(
+                    schedule.accountId,
+                  )
 
-              const category = categoryById.get(
-                schedule.categoryId,
-              )
+                const category =
+                  categoryById.get(
+                    schedule.categoryId,
+                  )
 
-              const isBusy =
-                busyScheduleId === schedule.id
+                const isBusy =
+                  busyScheduleId ===
+                  schedule.id
 
-              const isDue =
-                schedule.status === 'ACTIVE' &&
-                schedule.nextDueDate !== null &&
-                schedule.nextDueDate <= today
+                const isDue =
+                  schedule.status ===
+                    'ACTIVE' &&
+                  schedule.nextDueDate !==
+                    null &&
+                  schedule.nextDueDate <=
+                    today
 
-              const canPostManually =
-                isDue && !schedule.autoPost
+                const canPostManually =
+                  isDue &&
+                  !schedule.autoPost
 
-              return (
-                <article
-                  key={schedule.id}
-                  className="rounded-3xl border border-[#dedbd2] bg-[#fffdf8] p-5 sm:p-7"
-                >
-                  <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
-                    <div className="flex min-w-0 items-start gap-4">
-                      <span
-                        className={`grid size-12 shrink-0 place-items-center rounded-2xl ${schedule.transactionType ===
-                          'INCOME'
-                          ? 'bg-[#dfece3] text-[#2d684f]'
-                          : 'bg-[#f4e7df] text-[#a85e49]'
-                          }`}
-                      >
-                        {schedule.transactionType ===
-                          'INCOME' ? (
-                          <CirclePlay
-                            size={21}
-                            aria-hidden
-                          />
-                        ) : (
-                          <CalendarClock
-                            size={21}
-                            aria-hidden
-                          />
-                        )}
-                      </span>
-
-                      <div className="min-w-0">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h2 className="font-serif text-2xl text-[#173c32]">
-                            {schedule.name}
-                          </h2>
-
-                          <span
-                            className={`rounded-full px-2.5 py-1 text-[10px] font-bold tracking-wide ${schedule.status ===
-                              'ACTIVE'
-                              ? 'bg-[#e2eee5] text-[#2d684f]'
-                              : schedule.status ===
-                                'PAUSED'
-                                ? 'bg-[#f1e7d3] text-[#9a6828]'
-                                : 'bg-[#ece9e2] text-[#756a61]'
-                              }`}
-                          >
-                            {schedule.status}
-                          </span>
-
-                          {schedule.autoPost && (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-[#e3e9ed] px-2.5 py-1 text-[10px] font-bold tracking-wide text-[#557587]">
-                              <Sparkles
-                                size={10}
-                                aria-hidden
-                              />
-                              AUTO
-                            </span>
-                          )}
-                        </div>
-
-                        <p className="mt-2 text-sm text-[#657972]">
-                          {account?.name ??
-                            'Unavailable account'}
-                          {' · '}
-                          {category?.name ??
-                            'Unavailable category'}
-
-                          {schedule.merchantName &&
-                            ` · ${schedule.merchantName}`}
-                        </p>
-
-                        {schedule.description && (
-                          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#657972]">
-                            {schedule.description}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="lg:text-right">
-                      <p
-                        className={`font-serif text-3xl ${schedule.transactionType ===
-                          'INCOME'
-                          ? 'text-[#2d684f]'
-                          : 'text-[#173c32]'
-                          }`}
-                      >
-                        {formatMoney(
-                          schedule.amount,
-                          account?.currencyCode,
-                        )}
-                      </p>
-
-                      <p className="mt-1 text-sm text-[#657972]">
-                        {formatFrequency(
-                          schedule.frequency,
-                          schedule.intervalCount,
-                        )}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 grid gap-4 border-t border-[#e5e1d8] pt-5 sm:grid-cols-[1fr_auto] sm:items-center">
-                    <div className="flex flex-wrap gap-x-7 gap-y-3 text-sm">
-                      <div className="flex items-center gap-2">
-                        <Clock3
-                          size={15}
-                          className={
-                            isDue
-                              ? 'text-[#a85e49]'
-                              : 'text-[#657972]'
-                          }
-                          aria-hidden
-                        />
-
+                return (
+                  <article
+                    key={schedule.id}
+                    className="rounded-3xl border border-[#dedbd2] bg-[#fffdf8] p-5 sm:p-7"
+                  >
+                    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+                      <div className="flex min-w-0 items-start gap-4">
                         <span
-                          className={
-                            isDue
-                              ? 'font-semibold text-[#a85e49]'
-                              : 'text-[#657972]'
-                          }
+                          className={`grid size-12 shrink-0 place-items-center rounded-2xl ${
+                            schedule.transactionType ===
+                            'INCOME'
+                              ? 'bg-[#dfece3] text-[#2d684f]'
+                              : 'bg-[#f4e7df] text-[#a85e49]'
+                          }`}
                         >
-                          {schedule.nextDueDate
-                            ? isDue
-                              ? `Due ${formatDate(
-                                schedule.nextDueDate,
-                              )}`
-                              : `Next ${formatDate(
-                                schedule.nextDueDate,
-                              )}`
-                            : 'Schedule completed'}
-                        </span>
-                      </div>
-
-                      <span className="text-[#657972]">
-                        Started{' '}
-                        {formatDate(schedule.startDate)}
-                      </span>
-
-                      {schedule.endDate && (
-                        <span className="text-[#657972]">
-                          Ends{' '}
-                          {formatDate(schedule.endDate)}
-                        </span>
-                      )}
-                    </div>
-
-                    {schedule.status !== 'ARCHIVED' && (
-                      <div className="flex flex-wrap justify-end gap-2">
-                        {canPostManually && (
-                          <button
-                            type="button"
-                            disabled={isBusy}
-                            onClick={() =>
-                              void handlePostDue(
-                                schedule,
-                              )
-                            }
-                            className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#216353] disabled:cursor-not-allowed disabled:opacity-50"
-                          >
-                            <CheckCircle2
-                              size={14}
+                          {schedule.transactionType ===
+                          'INCOME' ? (
+                            <CirclePlay
+                              size={21}
                               aria-hidden
                             />
-                            Post due
-                          </button>
-                        )}
+                          ) : (
+                            <CalendarClock
+                              size={21}
+                              aria-hidden
+                            />
+                          )}
+                        </span>
 
-                        {(
-                          schedule.status === 'ACTIVE' ||
-                          schedule.status === 'PAUSED'
-                        ) && (
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h2 className="font-serif text-2xl text-[#173c32]">
+                              {
+                                schedule.name
+                              }
+                            </h2>
+
+                            <span
+                              className={`rounded-full px-2.5 py-1 text-[10px] font-bold tracking-wide ${
+                                schedule.status ===
+                                'ACTIVE'
+                                  ? 'bg-[#e2eee5] text-[#2d684f]'
+                                  : schedule.status ===
+                                      'PAUSED'
+                                    ? 'bg-[#f1e7d3] text-[#9a6828]'
+                                    : 'bg-[#ece9e2] text-[#756a61]'
+                              }`}
+                            >
+                              {
+                                schedule.status
+                              }
+                            </span>
+
+                            {schedule.autoPost && (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-[#e3e9ed] px-2.5 py-1 text-[10px] font-bold tracking-wide text-[#557587]">
+                                <Sparkles
+                                  size={10}
+                                  aria-hidden
+                                />
+                                AUTO
+                              </span>
+                            )}
+                          </div>
+
+                          <p className="mt-2 text-sm text-[#657972]">
+                            {account?.name ??
+                              'Unavailable account'}
+                            {' · '}
+                            {category?.name ??
+                              'Unavailable category'}
+
+                            {schedule.merchantName &&
+                              ` · ${schedule.merchantName}`}
+                          </p>
+
+                          {schedule.description && (
+                            <p className="mt-3 max-w-2xl text-sm leading-6 text-[#657972]">
+                              {
+                                schedule.description
+                              }
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="lg:text-right">
+                        <p
+                          className={`font-serif text-3xl ${
+                            schedule.transactionType ===
+                            'INCOME'
+                              ? 'text-[#2d684f]'
+                              : 'text-[#173c32]'
+                          }`}
+                        >
+                          {formatMoney(
+                            schedule.amount,
+                            account?.currencyCode,
+                          )}
+                        </p>
+
+                        <p className="mt-1 text-sm text-[#657972]">
+                          {formatFrequency(
+                            schedule.frequency,
+                            schedule.intervalCount,
+                          )}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mt-6 grid gap-4 border-t border-[#e5e1d8] pt-5 sm:grid-cols-[1fr_auto] sm:items-center">
+                      <div className="flex flex-wrap gap-x-7 gap-y-3 text-sm">
+                        <div className="flex items-center gap-2">
+                          <Clock3
+                            size={15}
+                            className={
+                              isDue
+                                ? 'text-[#a85e49]'
+                                : 'text-[#657972]'
+                            }
+                            aria-hidden
+                          />
+
+                          <span
+                            className={
+                              isDue
+                                ? 'font-semibold text-[#a85e49]'
+                                : 'text-[#657972]'
+                            }
+                          >
+                            {schedule.nextDueDate
+                              ? isDue
+                                ? `Due ${formatDate(
+                                    schedule.nextDueDate,
+                                  )}`
+                                : `Next ${formatDate(
+                                    schedule.nextDueDate,
+                                  )}`
+                              : 'Schedule completed'}
+                          </span>
+                        </div>
+
+                        <span className="text-[#657972]">
+                          Started{' '}
+                          {formatDate(
+                            schedule.startDate,
+                          )}
+                        </span>
+
+                        {schedule.endDate && (
+                          <span className="text-[#657972]">
+                            Ends{' '}
+                            {formatDate(
+                              schedule.endDate,
+                            )}
+                          </span>
+                        )}
+                      </div>
+
+                      {schedule.status !==
+                        'ARCHIVED' && (
+                        <div className="flex flex-wrap justify-end gap-2">
+                          {canPostManually && (
                             <button
                               type="button"
-                              disabled={isBusy}
-                              onClick={() => setScheduleToEdit(schedule)}
+                              disabled={
+                                isBusy
+                              }
+                              onClick={() =>
+                                void handlePostDue(
+                                  schedule,
+                                )
+                              }
+                              className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#216353] disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                              <CheckCircle2
+                                size={14}
+                                aria-hidden
+                              />
+                              Post due
+                            </button>
+                          )}
+
+                          {(schedule.status ===
+                            'ACTIVE' ||
+                            schedule.status ===
+                              'PAUSED') && (
+                            <button
+                              type="button"
+                              disabled={
+                                isBusy
+                              }
+                              onClick={() =>
+                                setScheduleToEdit(
+                                  schedule,
+                                )
+                              }
                               className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#d8d5cc] px-4 py-2 text-xs font-semibold text-[#173c32] transition hover:bg-[#f4f2ec] disabled:cursor-not-allowed disabled:opacity-50"
                             >
-                              <Pencil size={14} aria-hidden />
+                              <Pencil
+                                size={14}
+                                aria-hidden
+                              />
                               Edit
                             </button>
                           )}
-                        {schedule.status ===
-                          'ACTIVE' && (
+
+                          {schedule.status ===
+                            'ACTIVE' && (
                             <button
                               type="button"
-                              disabled={isBusy}
+                              disabled={
+                                isBusy
+                              }
                               onClick={() =>
-                                void handlePause(schedule)
+                                void handlePause(
+                                  schedule,
+                                )
                               }
                               className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#d8d5cc] px-4 py-2 text-xs font-semibold text-[#173c32] transition hover:bg-[#f4f2ec] disabled:cursor-not-allowed disabled:opacity-50"
                             >
@@ -844,13 +961,17 @@ export default function RecurringTransactionsPage() {
                             </button>
                           )}
 
-                        {schedule.status ===
-                          'PAUSED' && (
+                          {schedule.status ===
+                            'PAUSED' && (
                             <button
                               type="button"
-                              disabled={isBusy}
+                              disabled={
+                                isBusy
+                              }
                               onClick={() =>
-                                void handleResume(schedule)
+                                void handleResume(
+                                  schedule,
+                                )
                               }
                               className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#b8cdbd] px-4 py-2 text-xs font-semibold text-[#2d684f] transition hover:bg-[#eef5f0] disabled:cursor-not-allowed disabled:opacity-50"
                             >
@@ -862,34 +983,38 @@ export default function RecurringTransactionsPage() {
                             </button>
                           )}
 
-                        <button
-                          type="button"
-                          disabled={isBusy}
-                          onClick={() =>
-                            setScheduleToArchive(
-                              schedule,
-                            )
-                          }
-                          className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#e0c9bf] px-4 py-2 text-xs font-semibold text-[#a85e49] transition hover:bg-[#f8ebe6] disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                          <Archive
-                            size={14}
-                            aria-hidden
-                          />
-                          Archive
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </article>
-              )
-            })}
+                          <button
+                            type="button"
+                            disabled={isBusy}
+                            onClick={() =>
+                              setScheduleToArchive(
+                                schedule,
+                              )
+                            }
+                            className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#e0c9bf] px-4 py-2 text-xs font-semibold text-[#a85e49] transition hover:bg-[#f8ebe6] disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            <Archive
+                              size={14}
+                              aria-hidden
+                            />
+                            Archive
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </article>
+                )
+              },
+            )}
           </section>
         )}
       </div>
 
       <RecurringTransactionModal
-        isOpen={isCreateOpen || Boolean(scheduleToEdit)}
+        isOpen={
+          isCreateOpen ||
+          Boolean(scheduleToEdit)
+        }
         schedule={scheduleToEdit}
         onClose={() => {
           setIsCreateOpen(false)
@@ -899,7 +1024,9 @@ export default function RecurringTransactionsPage() {
 
       {scheduleToArchive && (
         <ArchiveConfirmation
-          schedule={scheduleToArchive}
+          schedule={
+            scheduleToArchive
+          }
           isPending={
             busyScheduleId ===
             scheduleToArchive.id

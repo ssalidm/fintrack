@@ -10,7 +10,9 @@ import {
   Plus,
   RefreshCw,
 } from 'lucide-react'
+
 import { ApiClientError } from '../../../api/ApiClientError'
+import PageHeader from '../../../components/layout/PageHeader'
 import { useAccounts } from '../../accounts/hooks/useAccounts'
 import { useCategories } from '../../categories/hooks/useCategories'
 import type {
@@ -33,7 +35,8 @@ const transactionTypeLabels = {
 } satisfies Record<TransactionType, string>
 
 function parseLocalDate(value: string) {
-  const [year, month, day] = value.split('-').map(Number)
+  const [year, month, day] =
+    value.split('-').map(Number)
 
   return new Date(year, month - 1, day)
 }
@@ -65,8 +68,8 @@ function formatMoney(
 }
 
 function TransactionIcon({
-                           type,
-                         }: {
+  type,
+}: {
   type: TransactionType
 }) {
   const classes =
@@ -81,16 +84,25 @@ function TransactionIcon({
       className={`grid size-11 shrink-0 place-items-center rounded-xl ${classes}`}
     >
       {type === 'INCOME' && (
-        <ArrowDownLeft size={19} aria-hidden />
+        <ArrowDownLeft
+          size={19}
+          aria-hidden
+        />
       )}
 
       {type === 'EXPENSE' && (
-        <ArrowUpRight size={19} aria-hidden />
+        <ArrowUpRight
+          size={19}
+          aria-hidden
+        />
       )}
 
       {(type === 'TRANSFER_IN' ||
         type === 'TRANSFER_OUT') && (
-        <ArrowLeftRight size={19} aria-hidden />
+        <ArrowLeftRight
+          size={19}
+          aria-hidden
+        />
       )}
     </span>
   )
@@ -102,27 +114,55 @@ export default function TransactionsPage() {
       ...defaultTransactionFilters,
     })
 
-  const [isFormOpen, setIsFormOpen] = useState(false)
-  const [editingTransaction, setEditingTransaction] =
-    useState<Transaction | null>(null)
+  const [
+    isFormOpen,
+    setIsFormOpen,
+  ] = useState(false)
 
-  const [voidTarget, setVoidTarget] =
-    useState<Transaction | null>(null)
-
-  const [voidReason, setVoidReason] = useState('')
-  const [voidError, setVoidError] =
-    useState<string | null>(null)
-
-  const transactionsQuery = useTransactions(filters)
-  const activeAccountsQuery = useAccounts('ACTIVE')
-  const archivedAccountsQuery = useAccounts('ARCHIVED')
-  const activeCategoriesQuery = useCategories()
-  const archivedCategoriesQuery = useCategories(
-    undefined,
-    'ARCHIVED',
+  const [
+    editingTransaction,
+    setEditingTransaction,
+  ] = useState<Transaction | null>(
+    null,
   )
 
-  const voidTransaction = useVoidTransaction()
+  const [
+    voidTarget,
+    setVoidTarget,
+  ] = useState<Transaction | null>(
+    null,
+  )
+
+  const [
+    voidReason,
+    setVoidReason,
+  ] = useState('')
+
+  const [
+    voidError,
+    setVoidError,
+  ] = useState<string | null>(null)
+
+  const transactionsQuery =
+    useTransactions(filters)
+
+  const activeAccountsQuery =
+    useAccounts('ACTIVE')
+
+  const archivedAccountsQuery =
+    useAccounts('ARCHIVED')
+
+  const activeCategoriesQuery =
+    useCategories()
+
+  const archivedCategoriesQuery =
+    useCategories(
+      undefined,
+      'ARCHIVED',
+    )
+
+  const voidTransaction =
+    useVoidTransaction()
 
   const transactions =
     transactionsQuery.data?.items ?? []
@@ -138,7 +178,10 @@ export default function TransactionsPage() {
   ]
 
   const accountsById = new Map(
-    accounts.map((account) => [account.id, account]),
+    accounts.map((account) => [
+      account.id,
+      account,
+    ]),
   )
 
   const categoriesById = new Map(
@@ -169,7 +212,9 @@ export default function TransactionsPage() {
     setIsFormOpen(true)
   }
 
-  function openEditForm(transaction: Transaction) {
+  function openEditForm(
+    transaction: Transaction,
+  ) {
     setEditingTransaction(transaction)
     setIsFormOpen(true)
   }
@@ -179,7 +224,9 @@ export default function TransactionsPage() {
     setEditingTransaction(null)
   }
 
-  function openVoidDialog(transaction: Transaction) {
+  function openVoidDialog(
+    transaction: Transaction,
+  ) {
     setVoidTarget(transaction)
     setVoidReason('')
     setVoidError(null)
@@ -199,7 +246,9 @@ export default function TransactionsPage() {
     const reason = voidReason.trim()
 
     if (!reason) {
-      setVoidError('A reason is required.')
+      setVoidError(
+        'A reason is required.',
+      )
       return
     }
 
@@ -242,57 +291,55 @@ export default function TransactionsPage() {
   return (
     <main className="min-h-screen px-5 py-8 sm:px-8 lg:px-12 lg:py-12 xl:px-16">
       <div className="mx-auto max-w-[1280px]">
-        <header className="feature-reveal flex flex-wrap items-end justify-between gap-6">
-          <div>
-            <p className="text-xs font-semibold tracking-[0.16em] text-[#657972]">
-              MONEY IN MOTION
-            </p>
-
-            <h1 className="mt-4 font-serif text-5xl tracking-[-0.03em] text-[#173c32]">
-              Transactions
-            </h1>
-
-            <p className="mt-3 max-w-xl text-sm leading-6 text-[#657972]">
-              Follow every income, expense and transfer across
-              your accounts.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              disabled={transactionsQuery.isFetching}
-              onClick={() =>
-                void transactionsQuery.refetch()
-              }
-              className="rounded-full border border-[#d8d6ce] bg-[#fffdf8] p-3 text-[#657972] hover:border-[#bd9460] hover:text-[#9a6828] disabled:opacity-60"
-              aria-label="Refresh transactions"
-            >
-              <RefreshCw
-                size={18}
-                className={
+        <PageHeader
+          eyebrow="Money in motion"
+          title="Transactions"
+          description="Follow every income, expense and transfer across your accounts."
+          actions={
+            <>
+              <button
+                type="button"
+                disabled={
                   transactionsQuery.isFetching
-                    ? 'animate-spin'
-                    : ''
                 }
-              />
-            </button>
+                onClick={() =>
+                  void transactionsQuery.refetch()
+                }
+                className="cursor-pointer rounded-full border border-[#d8d6ce] bg-[#fffdf8] p-3 text-[#657972] transition hover:border-[#bd9460] hover:text-[#9a6828] disabled:cursor-not-allowed disabled:opacity-60"
+                aria-label="Refresh transactions"
+                title="Refresh transactions"
+              >
+                <RefreshCw
+                  size={18}
+                  aria-hidden
+                  className={
+                    transactionsQuery.isFetching
+                      ? 'animate-spin'
+                      : ''
+                  }
+                />
+              </button>
 
-            <button
-              type="button"
-              onClick={openCreateForm}
-              className="inline-flex items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white hover:bg-[#236a58]"
-            >
-              <Plus size={18} aria-hidden />
-              Add transaction
-            </button>
-          </div>
-        </header>
+              <button
+                type="button"
+                onClick={openCreateForm}
+                className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#236a58]"
+              >
+                <Plus
+                  size={18}
+                  aria-hidden
+                />
+                Add transaction
+              </button>
+            </>
+          }
+        />
 
         <section className="feature-reveal feature-reveal-delay-1 mt-10 rounded-3xl border border-[#dedbd2] bg-[#fffdf8] p-5">
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
             <label className="text-xs font-semibold text-[#657972]">
               Type
+
               <select
                 value={filters.type ?? ''}
                 onChange={(event) =>
@@ -304,14 +351,24 @@ export default function TransactionsPage() {
                         | undefined,
                   })
                 }
-                className="mt-2 block w-full rounded-xl border border-[#d8d6ce] bg-white px-3 py-2.5 text-sm text-[#173c32]"
+                className="mt-2 block w-full cursor-pointer rounded-xl border border-[#d8d6ce] bg-white px-3 py-2.5 pr-10 text-sm text-[#173c32]"
               >
-                <option value="">All types</option>
-                <option value="INCOME">Income</option>
-                <option value="EXPENSE">Expense</option>
+                <option value="">
+                  All types
+                </option>
+
+                <option value="INCOME">
+                  Income
+                </option>
+
+                <option value="EXPENSE">
+                  Expense
+                </option>
+
                 <option value="TRANSFER_IN">
                   Transfer received
                 </option>
+
                 <option value="TRANSFER_OUT">
                   Transfer sent
                 </option>
@@ -320,55 +377,74 @@ export default function TransactionsPage() {
 
             <label className="text-xs font-semibold text-[#657972]">
               Account
+
               <select
-                value={filters.accountId ?? ''}
+                value={
+                  filters.accountId ?? ''
+                }
                 onChange={(event) =>
                   updateFilters({
                     accountId:
-                      event.target.value || undefined,
+                      event.target.value ||
+                      undefined,
                   })
                 }
-                className="mt-2 block w-full rounded-xl border border-[#d8d6ce] bg-white px-3 py-2.5 text-sm text-[#173c32]"
+                className="mt-2 block w-full cursor-pointer rounded-xl border border-[#d8d6ce] bg-white px-3 py-2.5 pr-10 text-sm text-[#173c32]"
               >
-                <option value="">All accounts</option>
+                <option value="">
+                  All accounts
+                </option>
 
-                {accounts.map((account) => (
-                  <option
-                    key={account.id}
-                    value={account.id}
-                  >
-                    {account.name}
-                  </option>
-                ))}
+                {accounts.map(
+                  (account) => (
+                    <option
+                      key={account.id}
+                      value={account.id}
+                    >
+                      {account.name}
+                    </option>
+                  ),
+                )}
               </select>
             </label>
 
             <label className="text-xs font-semibold text-[#657972]">
               Status
+
               <select
                 value={filters.status}
                 onChange={(event) =>
                   updateFilters({
-                    status: event.target
-                      .value as TransactionFilters['status'],
+                    status:
+                      event.target
+                        .value as TransactionFilters['status'],
                   })
                 }
-                className="mt-2 block w-full rounded-xl border border-[#d8d6ce] bg-white px-3 py-2.5 text-sm text-[#173c32]"
+                className="mt-2 block w-full cursor-pointer rounded-xl border border-[#d8d6ce] bg-white px-3 py-2.5 pr-10 text-sm text-[#173c32]"
               >
-                <option value="POSTED">Posted</option>
-                <option value="VOIDED">Voided</option>
+                <option value="POSTED">
+                  Posted
+                </option>
+
+                <option value="VOIDED">
+                  Voided
+                </option>
               </select>
             </label>
 
             <label className="text-xs font-semibold text-[#657972]">
               From
+
               <input
                 type="date"
-                value={filters.fromDate ?? ''}
+                value={
+                  filters.fromDate ?? ''
+                }
                 onChange={(event) =>
                   updateFilters({
                     fromDate:
-                      event.target.value || undefined,
+                      event.target.value ||
+                      undefined,
                   })
                 }
                 className="mt-2 block w-full rounded-xl border border-[#d8d6ce] bg-white px-3 py-2.5 text-sm text-[#173c32]"
@@ -377,13 +453,17 @@ export default function TransactionsPage() {
 
             <label className="text-xs font-semibold text-[#657972]">
               To
+
               <input
                 type="date"
-                value={filters.toDate ?? ''}
+                value={
+                  filters.toDate ?? ''
+                }
                 onChange={(event) =>
                   updateFilters({
                     toDate:
-                      event.target.value || undefined,
+                      event.target.value ||
+                      undefined,
                   })
                 }
                 className="mt-2 block w-full rounded-xl border border-[#d8d6ce] bg-white px-3 py-2.5 text-sm text-[#173c32]"
@@ -395,7 +475,7 @@ export default function TransactionsPage() {
             <button
               type="button"
               onClick={clearFilters}
-              className="mt-4 text-sm font-semibold text-[#9a6828] underline underline-offset-4"
+              className="mt-4 cursor-pointer text-sm font-semibold text-[#9a6828] underline underline-offset-4"
             >
               Clear filters
             </button>
@@ -404,12 +484,14 @@ export default function TransactionsPage() {
 
         {transactionsQuery.isPending && (
           <div className="feature-reveal feature-reveal-delay-2 mt-8 animate-pulse overflow-hidden rounded-3xl border border-[#dedbd2]">
-            {[1, 2, 3, 4].map((item) => (
-              <div
-                key={item}
-                className="h-24 border-b border-[#dedbd2] bg-[#e7e8e2] last:border-0"
-              />
-            ))}
+            {[1, 2, 3, 4].map(
+              (item) => (
+                <div
+                  key={item}
+                  className="h-24 border-b border-[#dedbd2] bg-[#e7e8e2] last:border-0"
+                />
+              ),
+            )}
           </div>
         )}
 
@@ -419,13 +501,15 @@ export default function TransactionsPage() {
             role="alert"
           >
             <h2 className="font-serif text-2xl text-red-950">
-              We couldn’t load your transactions
+              We couldn’t load your
+              transactions
             </h2>
 
             <p className="mt-2 text-sm text-red-700">
               {transactionsQuery.error instanceof
               ApiClientError
-                ? transactionsQuery.error.message
+                ? transactionsQuery.error
+                    .message
                 : 'Please try again.'}
             </p>
           </section>
@@ -436,7 +520,10 @@ export default function TransactionsPage() {
           transactions.length === 0 && (
             <section className="feature-reveal feature-reveal-delay-2 mt-8 rounded-3xl border border-[#dedbd2] bg-[#fffdf8] px-6 py-16 text-center">
               <span className="mx-auto grid size-14 place-items-center rounded-full bg-[#dfece3] text-[#39725d]">
-                <ArrowLeftRight size={25} />
+                <ArrowLeftRight
+                  size={25}
+                  aria-hidden
+                />
               </span>
 
               <h2 className="mt-5 font-serif text-3xl text-[#173c32]">
@@ -455,126 +542,156 @@ export default function TransactionsPage() {
           !transactionsQuery.error &&
           transactions.length > 0 && (
             <section className="feature-reveal feature-reveal-delay-2 mt-8 overflow-hidden rounded-3xl border border-[#dedbd2] bg-[#fffdf8]">
-              {transactions.map((transaction, index) => {
-                const account = accountsById.get(
-                  transaction.accountId,
-                )
+              {transactions.map(
+                (
+                  transaction,
+                  index,
+                ) => {
+                  const account =
+                    accountsById.get(
+                      transaction.accountId,
+                    )
 
-                const category = transaction.categoryId
-                  ? categoriesById.get(
-                    transaction.categoryId,
-                  )
-                  : undefined
+                  const category =
+                    transaction.categoryId
+                      ? categoriesById.get(
+                          transaction.categoryId,
+                        )
+                      : undefined
 
-                const isIncoming =
-                  transaction.transactionType ===
-                  'INCOME' ||
-                  transaction.transactionType ===
-                  'TRANSFER_IN'
+                  const isIncoming =
+                    transaction.transactionType ===
+                      'INCOME' ||
+                    transaction.transactionType ===
+                      'TRANSFER_IN'
 
-                const canModify =
-                  transaction.status === 'POSTED' &&
-                  transaction.transferId === null
+                  const canModify =
+                    transaction.status ===
+                      'POSTED' &&
+                    transaction.transferId ===
+                      null
 
-                return (
-                  <article
-                    key={transaction.id}
-                    className={`grid gap-4 px-5 py-5 sm:grid-cols-[1fr_auto] sm:items-center sm:px-7 ${
-                      index > 0
-                        ? 'border-t border-[#dedbd2]'
-                        : ''
-                    }`}
-                  >
-                    <div className="flex min-w-0 items-start gap-4">
-                      <TransactionIcon
-                        type={transaction.transactionType}
-                      />
+                  return (
+                    <article
+                      key={transaction.id}
+                      className={`grid gap-4 px-5 py-5 sm:grid-cols-[1fr_auto] sm:items-center sm:px-7 ${
+                        index > 0
+                          ? 'border-t border-[#dedbd2]'
+                          : ''
+                      }`}
+                    >
+                      <div className="flex min-w-0 items-start gap-4">
+                        <TransactionIcon
+                          type={
+                            transaction.transactionType
+                          }
+                        />
 
-                      <div className="min-w-0">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h2 className="truncate font-semibold text-[#173c32]">
-                            {transaction.merchantName ||
-                              transaction.description ||
-                              transactionTypeLabels[
-                                transaction.transactionType
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h2 className="truncate font-semibold text-[#173c32]">
+                              {transaction.merchantName ||
+                                transaction.description ||
+                                transactionTypeLabels[
+                                  transaction
+                                    .transactionType
                                 ]}
-                          </h2>
+                            </h2>
 
-                          {transaction.status ===
-                            'VOIDED' && (
+                            {transaction.status ===
+                              'VOIDED' && (
                               <span className="rounded-full bg-[#eceae4] px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-[#657972]">
-                              Voided
-                            </span>
+                                Voided
+                              </span>
                             )}
-                        </div>
+                          </div>
 
-                        <p className="mt-1 text-sm text-[#657972]">
-                          {category?.name ??
-                            transactionTypeLabels[
-                              transaction.transactionType
+                          <p className="mt-1 text-sm text-[#657972]">
+                            {category?.name ??
+                              transactionTypeLabels[
+                                transaction
+                                  .transactionType
                               ]}
-                          {' · '}
-                          {account?.name ??
-                            'Unknown account'}
-                          {' · '}
-                          {formatDate(
-                            transaction.transactionDate,
+                            {' · '}
+                            {account?.name ??
+                              'Unknown account'}
+                            {' · '}
+                            {formatDate(
+                              transaction.transactionDate,
+                            )}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between gap-5 pl-15 sm:justify-end sm:pl-0">
+                        <p
+                          className={`font-semibold ${
+                            transaction.status ===
+                            'VOIDED'
+                              ? 'text-[#8b9692] line-through'
+                              : isIncoming
+                                ? 'text-[#39725d]'
+                                : 'text-[#9b5845]'
+                          }`}
+                        >
+                          {isIncoming
+                            ? '+'
+                            : '−'}
+
+                          {formatMoney(
+                            transaction.amount,
+                            account?.currencyCode,
                           )}
                         </p>
-                      </div>
-                    </div>
 
-                    <div className="flex items-center justify-between gap-5 pl-15 sm:justify-end sm:pl-0">
-                      <p
-                        className={`font-semibold ${
-                          transaction.status === 'VOIDED'
-                            ? 'text-[#8b9692] line-through'
-                            : isIncoming
-                              ? 'text-[#39725d]'
-                              : 'text-[#9b5845]'
-                        }`}
-                      >
-                        {isIncoming ? '+' : '−'}
-                        {formatMoney(
-                          transaction.amount,
-                          account?.currencyCode,
+                        {canModify && (
+                          <div className="flex gap-1">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                openEditForm(
+                                  transaction,
+                                )
+                              }
+                              className="cursor-pointer rounded-full p-2 text-[#657972] transition hover:bg-[#e5ece7] hover:text-[#39725d]"
+                              aria-label="Edit transaction"
+                              title="Edit transaction"
+                            >
+                              <Pencil
+                                size={17}
+                                aria-hidden
+                              />
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                openVoidDialog(
+                                  transaction,
+                                )
+                              }
+                              className="cursor-pointer rounded-full p-2 text-[#657972] transition hover:bg-[#f2e3de] hover:text-[#9b5845]"
+                              aria-label="Void transaction"
+                              title="Void transaction"
+                            >
+                              <CircleSlash2
+                                size={17}
+                                aria-hidden
+                              />
+                            </button>
+                          </div>
                         )}
-                      </p>
-
-                      {canModify && (
-                        <div className="flex gap-1">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              openEditForm(transaction)
-                            }
-                            className="rounded-full p-2 text-[#657972] hover:bg-[#e5ece7] hover:text-[#39725d]"
-                            aria-label="Edit transaction"
-                          >
-                            <Pencil size={17} />
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() =>
-                              openVoidDialog(transaction)
-                            }
-                            className="rounded-full p-2 text-[#657972] hover:bg-[#f2e3de] hover:text-[#9b5845]"
-                            aria-label="Void transaction"
-                          >
-                            <CircleSlash2 size={17} />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </article>
-                )
-              })}
+                      </div>
+                    </article>
+                  )
+                },
+              )}
             </section>
           )}
 
         {transactionsQuery.data &&
-          transactionsQuery.data.totalPages > 1 && (
+          transactionsQuery.data
+            .totalPages > 1 && (
             <nav
               className="feature-reveal feature-reveal-delay-3 mt-6 flex items-center justify-between"
               aria-label="Transaction pages"
@@ -582,36 +699,54 @@ export default function TransactionsPage() {
               <button
                 type="button"
                 disabled={
-                  !transactionsQuery.data.hasPrevious
+                  !transactionsQuery.data
+                    .hasPrevious
                 }
                 onClick={() =>
                   updateFilters({
-                    page: filters.page - 1,
+                    page:
+                      filters.page - 1,
                   })
                 }
-                className="inline-flex items-center gap-2 rounded-full border border-[#d8d6ce] px-4 py-2 text-sm font-semibold text-[#173c32] disabled:opacity-40"
+                className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#d8d6ce] px-4 py-2 text-sm font-semibold text-[#173c32] disabled:cursor-not-allowed disabled:opacity-40"
               >
-                <ChevronLeft size={17} />
+                <ChevronLeft
+                  size={17}
+                  aria-hidden
+                />
                 Previous
               </button>
 
               <p className="text-sm text-[#657972]">
-                Page {transactionsQuery.data.page + 1} of{' '}
-                {transactionsQuery.data.totalPages}
+                Page{' '}
+                {transactionsQuery.data
+                  .page + 1}{' '}
+                of{' '}
+                {
+                  transactionsQuery.data
+                    .totalPages
+                }
               </p>
 
               <button
                 type="button"
-                disabled={!transactionsQuery.data.hasNext}
+                disabled={
+                  !transactionsQuery.data
+                    .hasNext
+                }
                 onClick={() =>
                   updateFilters({
-                    page: filters.page + 1,
+                    page:
+                      filters.page + 1,
                   })
                 }
-                className="inline-flex items-center gap-2 rounded-full border border-[#d8d6ce] px-4 py-2 text-sm font-semibold text-[#173c32] disabled:opacity-40"
+                className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#d8d6ce] px-4 py-2 text-sm font-semibold text-[#173c32] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Next
-                <ChevronRight size={17} />
+                <ChevronRight
+                  size={17}
+                  aria-hidden
+                />
               </button>
             </nav>
           )}
@@ -619,8 +754,14 @@ export default function TransactionsPage() {
 
       {isFormOpen && (
         <TransactionModal
-          key={editingTransaction?.id ?? 'new'}
-          transaction={editingTransaction ?? undefined}
+          key={
+            editingTransaction?.id ??
+            'new'
+          }
+          transaction={
+            editingTransaction ??
+            undefined
+          }
           onClose={closeForm}
         />
       )}
@@ -629,7 +770,7 @@ export default function TransactionsPage() {
         <div className="fixed inset-0 z-[80] grid place-items-center p-5">
           <button
             type="button"
-            className="absolute inset-0 bg-[#102e27]/45 backdrop-blur-[2px]"
+            className="absolute inset-0 cursor-pointer bg-[#102e27]/45 backdrop-blur-[2px]"
             onClick={closeVoidDialog}
             aria-label="Cancel voiding"
           />
@@ -641,7 +782,10 @@ export default function TransactionsPage() {
             className="relative w-full max-w-md rounded-3xl bg-[#fffdf8] p-7 shadow-2xl"
           >
             <span className="grid size-11 place-items-center rounded-full bg-[#f2e3de] text-[#9b5845]">
-              <CircleSlash2 size={20} />
+              <CircleSlash2
+                size={20}
+                aria-hidden
+              />
             </span>
 
             <h2
@@ -652,18 +796,23 @@ export default function TransactionsPage() {
             </h2>
 
             <p className="mt-3 text-sm leading-6 text-[#657972]">
-              The transaction will remain in your history but will
-              no longer affect the account balance.
+              The transaction will remain
+              in your history but will no
+              longer affect the account
+              balance.
             </p>
 
             <label className="mt-5 block text-sm font-semibold text-[#173c32]">
               Reason
+
               <textarea
                 rows={3}
                 maxLength={255}
                 value={voidReason}
                 onChange={(event) =>
-                  setVoidReason(event.target.value)
+                  setVoidReason(
+                    event.target.value,
+                  )
                 }
                 className="mt-2 block w-full resize-none rounded-xl border border-[#d8d6ce] bg-white px-4 py-3 font-normal outline-none focus:border-[#9b5845] focus:ring-2 focus:ring-[#9b5845]/15"
                 placeholder="Why is this transaction being voided?"
@@ -682,18 +831,24 @@ export default function TransactionsPage() {
             <div className="mt-7 flex justify-end gap-3">
               <button
                 type="button"
-                disabled={voidTransaction.isPending}
+                disabled={
+                  voidTransaction.isPending
+                }
                 onClick={closeVoidDialog}
-                className="rounded-full border border-[#d8d6ce] px-5 py-2.5 text-sm font-semibold text-[#173c32] hover:bg-[#efede7] disabled:opacity-60"
+                className="cursor-pointer rounded-full border border-[#d8d6ce] px-5 py-2.5 text-sm font-semibold text-[#173c32] hover:bg-[#efede7] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Cancel
               </button>
 
               <button
                 type="button"
-                disabled={voidTransaction.isPending}
-                onClick={() => void confirmVoid()}
-                className="rounded-full bg-[#9b5845] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#834937] disabled:opacity-60"
+                disabled={
+                  voidTransaction.isPending
+                }
+                onClick={() =>
+                  void confirmVoid()
+                }
+                className="cursor-pointer rounded-full bg-[#9b5845] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#834937] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {voidTransaction.isPending
                   ? 'Voiding…'

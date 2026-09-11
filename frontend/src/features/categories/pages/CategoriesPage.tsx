@@ -10,6 +10,7 @@ import {
   Tags,
 } from 'lucide-react'
 
+import PageHeader from '../../../components/layout/PageHeader'
 import PageShell from '../../../components/layout/PageShell'
 import type {
   Category,
@@ -90,8 +91,7 @@ function CategoryRow({
               {' · '}
             </span>
 
-            Position{' '}
-            {category.displayOrder}
+            Position {category.displayOrder}
           </p>
         </div>
       </div>
@@ -214,35 +214,24 @@ export default function CategoriesPage() {
 
   return (
     <PageShell>
-      <header className="feature-reveal flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6c7973]">
-            Your money, your language
-          </p>
-
-          <h1 className="mt-3 font-serif text-4xl tracking-tight text-[#173c32] sm:text-5xl">
-            Categories
-          </h1>
-
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#69756f] sm:text-base">
-            Keep income and spending
-            organised in a way that feels
-            natural to you.
-          </p>
-        </div>
-
-        <button
-          type="button"
-          onClick={openCreateModal}
-          className="inline-flex cursor-pointer items-center justify-center gap-2 self-start rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#216555]"
-        >
-          <Plus
-            size={18}
-            aria-hidden
-          />
-          New category
-        </button>
-      </header>
+      <PageHeader
+        eyebrow="Your money, your language"
+        title="Categories"
+        description="Keep income and spending organised in a way that feels natural to you."
+        actions={
+          <button
+            type="button"
+            onClick={openCreateModal}
+            className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#216555]"
+          >
+            <Plus
+              size={18}
+              aria-hidden
+            />
+            New category
+          </button>
+        }
+      />
 
       {categoryType === 'EXPENSE' &&
         status === 'ACTIVE' && (
@@ -348,8 +337,7 @@ export default function CategoriesPage() {
               />
 
               <p className="mt-3 text-sm">
-                Gathering your
-                categories…
+                Gathering your categories…
               </p>
             </div>
           </div>
@@ -358,8 +346,7 @@ export default function CategoriesPage() {
         {categoriesQuery.isError && (
           <div className="m-6 rounded-2xl border border-[#e8c8bf] bg-[#fff4f1] px-5 py-4">
             <p className="font-semibold text-[#8f3f30]">
-              We couldn’t load your
-              categories.
+              We couldn’t load your categories.
             </p>
 
             <p className="mt-1 text-sm text-[#9b5a4d]">

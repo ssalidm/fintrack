@@ -10,9 +10,11 @@ import {
   Plus,
   RefreshCw,
 } from 'lucide-react'
-import {ApiClientError} from '../../../api/ApiClientError'
-import {useAccounts} from '../../accounts/hooks/useAccounts'
-import type {Transfer} from '../api/types'
+
+import { ApiClientError } from '../../../api/ApiClientError'
+import PageHeader from '../../../components/layout/PageHeader'
+import { useAccounts } from '../../accounts/hooks/useAccounts'
+import type { Transfer } from '../api/types'
 import TransferModal from '../components/TransferModal'
 import VoidTransferModal from '../components/VoidTransferModal'
 import {
@@ -21,7 +23,8 @@ import {
 } from '../hooks/useTransfers'
 
 function parseLocalDate(value: string) {
-  const [year, month, day] = value.split('-').map(Number)
+  const [year, month, day] =
+    value.split('-').map(Number)
 
   return new Date(year, month - 1, day)
 }
@@ -52,43 +55,66 @@ function formatAmount(
   }).format(amount)
 }
 
-function fallbackAccountName(accountId: string) {
+function fallbackAccountName(
+  accountId: string,
+) {
   return `Account · ${accountId.slice(0, 8)}`
 }
 
 function TransfersSkeleton() {
   return (
     <div className="feature-reveal feature-reveal-delay-3 mt-8 animate-pulse space-y-4">
-      <div className="h-24 rounded-2xl bg-[#e5e8e1]"/>
-      <div className="h-28 rounded-2xl bg-[#e5e8e1]"/>
-      <div className="h-28 rounded-2xl bg-[#e5e8e1]"/>
-      <div className="h-28 rounded-2xl bg-[#e5e8e1]"/>
+      <div className="h-24 rounded-2xl bg-[#e5e8e1]" />
+      <div className="h-28 rounded-2xl bg-[#e5e8e1]" />
+      <div className="h-28 rounded-2xl bg-[#e5e8e1]" />
+      <div className="h-28 rounded-2xl bg-[#e5e8e1]" />
     </div>
   )
 }
 
 export default function TransfersPage() {
-  const [filters, setFilters] = useState(
-    defaultTransferFilters,
+  const [filters, setFilters] =
+    useState(
+      defaultTransferFilters,
+    )
+
+  const [
+    isCreateOpen,
+    setIsCreateOpen,
+  ] = useState(false)
+
+  const [
+    transferToVoid,
+    setTransferToVoid,
+  ] = useState<Transfer | null>(
+    null,
   )
 
-  const [isCreateOpen, setIsCreateOpen] = useState(false)
-  const [transferToVoid, setTransferToVoid] =
-    useState<Transfer | null>(null)
+  const transfersQuery =
+    useTransfers(filters)
 
-  const transfersQuery = useTransfers(filters)
-  const activeAccountsQuery = useAccounts('ACTIVE')
-  const archivedAccountsQuery = useAccounts('ARCHIVED')
+  const activeAccountsQuery =
+    useAccounts('ACTIVE')
+
+  const archivedAccountsQuery =
+    useAccounts('ARCHIVED')
 
   const accounts = useMemo(() => {
     const accountMap = new Map(
       [
-        ...(activeAccountsQuery.data ?? []),
-        ...(archivedAccountsQuery.data ?? []),
-      ].map((account) => [account.id, account]),
+        ...(activeAccountsQuery.data ??
+          []),
+        ...(archivedAccountsQuery.data ??
+          []),
+      ].map((account) => [
+        account.id,
+        account,
+      ]),
     )
 
-    return Array.from(accountMap.values())
+    return Array.from(
+      accountMap.values(),
+    )
   }, [
     activeAccountsQuery.data,
     archivedAccountsQuery.data,
@@ -97,7 +123,10 @@ export default function TransfersPage() {
   const accountById = useMemo(
     () =>
       new Map(
-        accounts.map((account) => [account.id, account]),
+        accounts.map((account) => [
+          account.id,
+          account,
+        ]),
       ),
     [accounts],
   )
@@ -106,7 +135,8 @@ export default function TransfersPage() {
   const transfers = page?.items ?? []
 
   const errorMessage =
-    transfersQuery.error instanceof ApiClientError
+    transfersQuery.error instanceof
+    ApiClientError
       ? transfersQuery.error.message
       : 'Unable to load your transfers.'
 
@@ -120,31 +150,26 @@ export default function TransfersPage() {
   return (
     <main className="min-h-screen px-5 py-8 sm:px-8 lg:px-12 lg:py-12 xl:px-16">
       <div className="mx-auto max-w-[1280px]">
-        <header className="feature-reveal flex flex-wrap items-end justify-between gap-6">
-          <div>
-            <p className="text-xs font-semibold tracking-[0.16em] text-[#657972]">
-              MONEY IN MOTION
-            </p>
-
-            <h1 className="mt-4 font-serif text-4xl tracking-[-0.03em] text-[#173c32] sm:text-5xl">
-              Transfers
-            </h1>
-
-            <p className="mt-3 max-w-xl text-sm leading-6 text-[#657972]">
-              Move money between your accounts and keep a clear
-              record of every transfer.
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setIsCreateOpen(true)}
-            className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#216353]"
-          >
-            <Plus size={17} aria-hidden/>
-            New transfer
-          </button>
-        </header>
+        <PageHeader
+          eyebrow="Money in motion"
+          title="Transfers"
+          description="Move money between your accounts and keep a clear record of every transfer."
+          actions={
+            <button
+              type="button"
+              onClick={() =>
+                setIsCreateOpen(true)
+              }
+              className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#216353]"
+            >
+              <Plus
+                size={17}
+                aria-hidden
+              />
+              New transfer
+            </button>
+          }
+        />
 
         <section className="feature-reveal feature-reveal-delay-1 mt-8 rounded-2xl border border-[#dedbd2] bg-[#fffdf8] p-4 sm:p-5">
           <div className="grid gap-4 lg:grid-cols-[auto_1fr_1fr_auto_auto] lg:items-end">
@@ -154,30 +179,37 @@ export default function TransfersPage() {
               </p>
 
               <div className="flex rounded-full bg-[#eef0ea] p-1">
-                {(['POSTED', 'VOIDED'] as const).map(
-                  (status) => (
-                    <button
-                      key={status}
-                      type="button"
-                      onClick={() =>
-                        setFilters((current) => ({
+                {(
+                  [
+                    'POSTED',
+                    'VOIDED',
+                  ] as const
+                ).map((status) => (
+                  <button
+                    key={status}
+                    type="button"
+                    onClick={() =>
+                      setFilters(
+                        (current) => ({
                           ...current,
                           status,
                           page: 0,
-                        }))
-                      }
-                      className={`cursor-pointer rounded-full px-4 py-2 text-xs font-semibold transition ${
-                        filters.status === status
-                          ? 'bg-[#174f43] text-white shadow-sm'
-                          : 'text-[#657972] hover:text-[#173c32]'
-                      }`}
-                    >
-                      {status === 'POSTED'
-                        ? 'Posted'
-                        : 'Voided'}
-                    </button>
-                  ),
-                )}
+                        }),
+                      )
+                    }
+                    className={`cursor-pointer rounded-full px-4 py-2 text-xs font-semibold transition ${
+                      filters.status ===
+                      status
+                        ? 'bg-[#174f43] text-white shadow-sm'
+                        : 'text-[#657972] hover:text-[#173c32]'
+                    }`}
+                  >
+                    {status ===
+                    'POSTED'
+                      ? 'Posted'
+                      : 'Voided'}
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -187,27 +219,38 @@ export default function TransfersPage() {
               </span>
 
               <select
-                value={filters.sourceAccountId ?? ''}
+                value={
+                  filters.sourceAccountId ??
+                  ''
+                }
                 onChange={(event) =>
-                  setFilters((current) => ({
-                    ...current,
-                    sourceAccountId:
-                      event.target.value || undefined,
-                    page: 0,
-                  }))
+                  setFilters(
+                    (current) => ({
+                      ...current,
+                      sourceAccountId:
+                        event.target
+                          .value ||
+                        undefined,
+                      page: 0,
+                    }),
+                  )
                 }
                 className="w-full cursor-pointer rounded-xl border border-[#d8d5cc] bg-white px-4 py-2.5 pr-10 text-sm text-[#173c32] outline-none transition focus:border-[#4e806d] focus:ring-4 focus:ring-[#dce9e0]"
               >
-                <option value="">All source accounts</option>
+                <option value="">
+                  All source accounts
+                </option>
 
-                {accounts.map((account) => (
-                  <option
-                    key={account.id}
-                    value={account.id}
-                  >
-                    {account.name}
-                  </option>
-                ))}
+                {accounts.map(
+                  (account) => (
+                    <option
+                      key={account.id}
+                      value={account.id}
+                    >
+                      {account.name}
+                    </option>
+                  ),
+                )}
               </select>
             </label>
 
@@ -218,15 +261,20 @@ export default function TransfersPage() {
 
               <select
                 value={
-                  filters.destinationAccountId ?? ''
+                  filters.destinationAccountId ??
+                  ''
                 }
                 onChange={(event) =>
-                  setFilters((current) => ({
-                    ...current,
-                    destinationAccountId:
-                      event.target.value || undefined,
-                    page: 0,
-                  }))
+                  setFilters(
+                    (current) => ({
+                      ...current,
+                      destinationAccountId:
+                        event.target
+                          .value ||
+                        undefined,
+                      page: 0,
+                    }),
+                  )
                 }
                 className="w-full cursor-pointer rounded-xl border border-[#d8d5cc] bg-white px-4 py-2.5 pr-10 text-sm text-[#173c32] outline-none transition focus:border-[#4e806d] focus:ring-4 focus:ring-[#dce9e0]"
               >
@@ -234,14 +282,16 @@ export default function TransfersPage() {
                   All destination accounts
                 </option>
 
-                {accounts.map((account) => (
-                  <option
-                    key={account.id}
-                    value={account.id}
-                  >
-                    {account.name}
-                  </option>
-                ))}
+                {accounts.map(
+                  (account) => (
+                    <option
+                      key={account.id}
+                      value={account.id}
+                    >
+                      {account.name}
+                    </option>
+                  ),
+                )}
               </select>
             </label>
 
@@ -252,15 +302,21 @@ export default function TransfersPage() {
 
               <input
                 type="date"
-                value={filters.fromDate ?? ''}
+                value={
+                  filters.fromDate ?? ''
+                }
                 max={filters.toDate}
                 onChange={(event) =>
-                  setFilters((current) => ({
-                    ...current,
-                    fromDate:
-                      event.target.value || undefined,
-                    page: 0,
-                  }))
+                  setFilters(
+                    (current) => ({
+                      ...current,
+                      fromDate:
+                        event.target
+                          .value ||
+                        undefined,
+                      page: 0,
+                    }),
+                  )
                 }
                 className="w-full cursor-pointer rounded-xl border border-[#d8d5cc] bg-white px-3 py-2.5 text-sm text-[#173c32] outline-none transition focus:border-[#4e806d] focus:ring-4 focus:ring-[#dce9e0]"
               />
@@ -273,15 +329,21 @@ export default function TransfersPage() {
 
               <input
                 type="date"
-                value={filters.toDate ?? ''}
+                value={
+                  filters.toDate ?? ''
+                }
                 min={filters.fromDate}
                 onChange={(event) =>
-                  setFilters((current) => ({
-                    ...current,
-                    toDate:
-                      event.target.value || undefined,
-                    page: 0,
-                  }))
+                  setFilters(
+                    (current) => ({
+                      ...current,
+                      toDate:
+                        event.target
+                          .value ||
+                        undefined,
+                      page: 0,
+                    }),
+                  )
                 }
                 className="w-full cursor-pointer rounded-xl border border-[#d8d5cc] bg-white px-3 py-2.5 text-sm text-[#173c32] outline-none transition focus:border-[#4e806d] focus:ring-4 focus:ring-[#dce9e0]"
               />
@@ -302,8 +364,12 @@ export default function TransfersPage() {
 
           <button
             type="button"
-            disabled={transfersQuery.isFetching}
-            onClick={() => void transfersQuery.refetch()}
+            disabled={
+              transfersQuery.isFetching
+            }
+            onClick={() =>
+              void transfersQuery.refetch()
+            }
             className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#dedbd2] bg-[#fffdf8] px-4 py-2.5 text-sm font-medium text-[#173c32] transition hover:border-[#8da397] disabled:cursor-not-allowed disabled:opacity-50"
           >
             <RefreshCw
@@ -323,7 +389,7 @@ export default function TransfersPage() {
         </div>
 
         {transfersQuery.isPending && (
-          <TransfersSkeleton/>
+          <TransfersSkeleton />
         )}
 
         {transfersQuery.error && (
@@ -332,7 +398,8 @@ export default function TransfersPage() {
             className="feature-reveal feature-reveal-delay-3 mt-6 rounded-2xl border border-red-200 bg-red-50 p-6"
           >
             <h2 className="font-serif text-2xl text-red-950">
-              We couldn’t load your transfers
+              We couldn’t load your
+              transfers
             </h2>
 
             <p className="mt-2 text-sm text-red-700">
@@ -341,7 +408,9 @@ export default function TransfersPage() {
 
             <button
               type="button"
-              onClick={() => void transfersQuery.refetch()}
+              onClick={() =>
+                void transfersQuery.refetch()
+              }
               className="mt-4 cursor-pointer text-sm font-semibold text-red-800 underline underline-offset-4"
             >
               Try again
@@ -349,205 +418,254 @@ export default function TransfersPage() {
           </section>
         )}
 
-        {page && transfers.length === 0 && (
-          <section className="feature-reveal feature-reveal-delay-3 mt-6 rounded-3xl border border-dashed border-[#cfcac0] bg-[#fffdf8] px-6 py-14 text-center">
-            <span className="mx-auto grid size-14 place-items-center rounded-full bg-[#e0ece4] text-[#2d684f]">
-              <ArrowRightLeft size={23} aria-hidden/>
-            </span>
+        {page &&
+          transfers.length === 0 && (
+            <section className="feature-reveal feature-reveal-delay-3 mt-6 rounded-3xl border border-dashed border-[#cfcac0] bg-[#fffdf8] px-6 py-14 text-center">
+              <span className="mx-auto grid size-14 place-items-center rounded-full bg-[#e0ece4] text-[#2d684f]">
+                <ArrowRightLeft
+                  size={23}
+                  aria-hidden
+                />
+              </span>
 
-            <h2 className="mt-5 font-serif text-3xl text-[#173c32]">
-              No transfers found
-            </h2>
+              <h2 className="mt-5 font-serif text-3xl text-[#173c32]">
+                No transfers found
+              </h2>
 
-            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#657972]">
-              {filters.status === 'POSTED'
-                ? 'Move money between two accounts and your transfer history will appear here.'
-                : 'There are no voided transfers matching these filters.'}
-            </p>
+              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#657972]">
+                {filters.status ===
+                'POSTED'
+                  ? 'Move money between two accounts and your transfer history will appear here.'
+                  : 'There are no voided transfers matching these filters.'}
+              </p>
 
-            {filters.status === 'POSTED' && (
-              <button
-                type="button"
-                onClick={() => setIsCreateOpen(true)}
-                className="mt-6 inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#216353]"
-              >
-                <Plus size={17} aria-hidden/>
-                Make a transfer
-              </button>
+              {filters.status ===
+                'POSTED' && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setIsCreateOpen(
+                      true,
+                    )
+                  }
+                  className="mt-6 inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#216353]"
+                >
+                  <Plus
+                    size={17}
+                    aria-hidden
+                  />
+                  Make a transfer
+                </button>
+              )}
+            </section>
+          )}
+
+        {transfers.length > 0 && (
+          <section className="feature-reveal feature-reveal-delay-3 mt-6 overflow-hidden rounded-3xl border border-[#dedbd2] bg-[#fffdf8]">
+            {transfers.map(
+              (transfer, index) => {
+                const sourceAccount =
+                  accountById.get(
+                    transfer.sourceAccountId,
+                  )
+
+                const destinationAccount =
+                  accountById.get(
+                    transfer.destinationAccountId,
+                  )
+
+                const sourceAccountName =
+                  sourceAccount?.name ??
+                  fallbackAccountName(
+                    transfer.sourceAccountId,
+                  )
+
+                const destinationAccountName =
+                  destinationAccount?.name ??
+                  fallbackAccountName(
+                    transfer.destinationAccountId,
+                  )
+
+                return (
+                  <article
+                    key={transfer.id}
+                    className={`grid gap-5 px-5 py-5 sm:px-7 lg:grid-cols-[minmax(0,1fr)_auto_auto] lg:items-center ${
+                      index > 0
+                        ? 'border-t border-[#e5e1d8]'
+                        : ''
+                    }`}
+                  >
+                    <div className="flex min-w-0 items-start gap-4">
+                      <span
+                        className={`mt-0.5 grid size-11 shrink-0 place-items-center rounded-full ${
+                          transfer.status ===
+                          'POSTED'
+                            ? 'bg-[#e0ece4] text-[#2d684f]'
+                            : 'bg-[#eeeae3] text-[#85786e]'
+                        }`}
+                      >
+                        <ArrowRightLeft
+                          size={19}
+                          aria-hidden
+                        />
+                      </span>
+
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="truncate font-semibold text-[#173c32]">
+                            {
+                              sourceAccountName
+                            }
+                          </p>
+
+                          <ArrowRight
+                            size={15}
+                            className="shrink-0 text-[#bd8539]"
+                            aria-hidden
+                          />
+
+                          <p className="truncate font-semibold text-[#173c32]">
+                            {
+                              destinationAccountName
+                            }
+                          </p>
+                        </div>
+
+                        <p className="mt-1 text-sm text-[#657972]">
+                          {formatDate(
+                            transfer.transactionDate,
+                          )}
+
+                          {transfer.description &&
+                            ` · ${transfer.description}`}
+                        </p>
+
+                        {transfer.status ===
+                          'VOIDED' &&
+                          transfer.voidReason && (
+                            <p className="mt-2 text-xs text-[#9b705f]">
+                              Voided:{' '}
+                              {
+                                transfer.voidReason
+                              }
+                            </p>
+                          )}
+                      </div>
+                    </div>
+
+                    <div className="lg:text-right">
+                      <p className="font-serif text-2xl text-[#173c32]">
+                        {formatAmount(
+                          transfer.amount,
+                          sourceAccount?.currencyCode,
+                        )}
+                      </p>
+
+                      <span
+                        className={`mt-1 inline-flex rounded-full px-2.5 py-1 text-[11px] font-bold tracking-wide ${
+                          transfer.status ===
+                          'POSTED'
+                            ? 'bg-[#e2eee5] text-[#2d684f]'
+                            : 'bg-[#eeeae3] text-[#756a61]'
+                        }`}
+                      >
+                        {transfer.status}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-end">
+                      {transfer.status ===
+                      'POSTED' ? (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setTransferToVoid(
+                              transfer,
+                            )
+                          }
+                          className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#e0c9bf] px-4 py-2 text-sm font-semibold text-[#a85e49] transition hover:bg-[#f8ebe6]"
+                        >
+                          <Ban
+                            size={15}
+                            aria-hidden
+                          />
+                          Void
+                        </button>
+                      ) : (
+                        <span className="text-xs text-[#85786e]">
+                          No actions
+                        </span>
+                      )}
+                    </div>
+                  </article>
+                )
+              },
             )}
           </section>
         )}
 
-        {transfers.length > 0 && (
-          <section className="feature-reveal feature-reveal-delay-3 mt-6 overflow-hidden rounded-3xl border border-[#dedbd2] bg-[#fffdf8]">
-            {transfers.map((transfer, index) => {
-              const sourceAccount = accountById.get(
-                transfer.sourceAccountId,
-              )
+        {page &&
+          page.totalPages > 1 && (
+            <nav
+              aria-label="Transfer history pages"
+              className="feature-reveal feature-reveal-delay-3 mt-6 flex flex-wrap items-center justify-between gap-4"
+            >
+              <p className="text-sm text-[#657972]">
+                Page {page.page + 1} of{' '}
+                {page.totalPages}
+                {' · '}
+                {page.totalElements}{' '}
+                {page.totalElements === 1
+                  ? 'transfer'
+                  : 'transfers'}
+              </p>
 
-              const destinationAccount = accountById.get(
-                transfer.destinationAccountId,
-              )
-
-              const sourceAccountName =
-                sourceAccount?.name ??
-                fallbackAccountName(
-                  transfer.sourceAccountId,
-                )
-
-              const destinationAccountName =
-                destinationAccount?.name ??
-                fallbackAccountName(
-                  transfer.destinationAccountId,
-                )
-
-              return (
-                <article
-                  key={transfer.id}
-                  className={`grid gap-5 px-5 py-5 sm:px-7 lg:grid-cols-[minmax(0,1fr)_auto_auto] lg:items-center ${
-                    index > 0
-                      ? 'border-t border-[#e5e1d8]'
-                      : ''
-                  }`}
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  disabled={
+                    !page.hasPrevious
+                  }
+                  onClick={() =>
+                    updatePage(
+                      page.page - 1,
+                    )
+                  }
+                  className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#dedbd2] bg-[#fffdf8] px-4 py-2.5 text-sm font-semibold text-[#173c32] transition hover:border-[#8da397] disabled:cursor-not-allowed disabled:opacity-40"
                 >
-                  <div className="flex min-w-0 items-start gap-4">
-                    <span
-                      className={`mt-0.5 grid size-11 shrink-0 place-items-center rounded-full ${
-                        transfer.status === 'POSTED'
-                          ? 'bg-[#e0ece4] text-[#2d684f]'
-                          : 'bg-[#eeeae3] text-[#85786e]'
-                      }`}
-                    >
-                      <ArrowRightLeft
-                        size={19}
-                        aria-hidden
-                      />
-                    </span>
+                  <ArrowLeft
+                    size={15}
+                    aria-hidden
+                  />
+                  Previous
+                </button>
 
-                    <div className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <p className="truncate font-semibold text-[#173c32]">
-                          {sourceAccountName}
-                        </p>
-
-                        <ArrowRight
-                          size={15}
-                          className="shrink-0 text-[#bd8539]"
-                          aria-hidden
-                        />
-
-                        <p className="truncate font-semibold text-[#173c32]">
-                          {destinationAccountName}
-                        </p>
-                      </div>
-
-                      <p className="mt-1 text-sm text-[#657972]">
-                        {formatDate(
-                          transfer.transactionDate,
-                        )}
-
-                        {transfer.description &&
-                          ` · ${transfer.description}`}
-                      </p>
-
-                      {transfer.status === 'VOIDED' &&
-                        transfer.voidReason && (
-                          <p className="mt-2 text-xs text-[#9b705f]">
-                            Voided: {transfer.voidReason}
-                          </p>
-                        )}
-                    </div>
-                  </div>
-
-                  <div className="lg:text-right">
-                    <p className="font-serif text-2xl text-[#173c32]">
-                      {formatAmount(
-                        transfer.amount,
-                        sourceAccount?.currencyCode,
-                      )}
-                    </p>
-
-                    <span
-                      className={`mt-1 inline-flex rounded-full px-2.5 py-1 text-[11px] font-bold tracking-wide ${
-                        transfer.status === 'POSTED'
-                          ? 'bg-[#e2eee5] text-[#2d684f]'
-                          : 'bg-[#eeeae3] text-[#756a61]'
-                      }`}
-                    >
-                      {transfer.status}
-                    </span>
-                  </div>
-
-                  <div className="flex justify-end">
-                    {transfer.status === 'POSTED' ? (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setTransferToVoid(transfer)
-                        }
-                        className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#e0c9bf] px-4 py-2 text-sm font-semibold text-[#a85e49] transition hover:bg-[#f8ebe6]"
-                      >
-                        <Ban size={15} aria-hidden/>
-                        Void
-                      </button>
-                    ) : (
-                      <span className="text-xs text-[#85786e]">
-                        No actions
-                      </span>
-                    )}
-                  </div>
-                </article>
-              )
-            })}
-          </section>
-        )}
-
-        {page && page.totalPages > 1 && (
-          <nav
-            aria-label="Transfer history pages"
-            className="feature-reveal feature-reveal-delay-3 mt-6 flex flex-wrap items-center justify-between gap-4"
-          >
-            <p className="text-sm text-[#657972]">
-              Page {page.page + 1} of {page.totalPages}
-              {' · '}
-              {page.totalElements}{' '}
-              {page.totalElements === 1
-                ? 'transfer'
-                : 'transfers'}
-            </p>
-
-            <div className="flex gap-2">
-              <button
-                type="button"
-                disabled={!page.hasPrevious}
-                onClick={() =>
-                  updatePage(page.page - 1)
-                }
-                className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#dedbd2] bg-[#fffdf8] px-4 py-2.5 text-sm font-semibold text-[#173c32] transition hover:border-[#8da397] disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                <ArrowLeft size={15} aria-hidden/>
-                Previous
-              </button>
-
-              <button
-                type="button"
-                disabled={!page.hasNext}
-                onClick={() =>
-                  updatePage(page.page + 1)
-                }
-                className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#dedbd2] bg-[#fffdf8] px-4 py-2.5 text-sm font-semibold text-[#173c32] transition hover:border-[#8da397] disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Next
-                <ArrowRight size={15} aria-hidden/>
-              </button>
-            </div>
-          </nav>
-        )}
+                <button
+                  type="button"
+                  disabled={!page.hasNext}
+                  onClick={() =>
+                    updatePage(
+                      page.page + 1,
+                    )
+                  }
+                  className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#dedbd2] bg-[#fffdf8] px-4 py-2.5 text-sm font-semibold text-[#173c32] transition hover:border-[#8da397] disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Next
+                  <ArrowRight
+                    size={15}
+                    aria-hidden
+                  />
+                </button>
+              </div>
+            </nav>
+          )}
       </div>
 
       <TransferModal
         isOpen={isCreateOpen}
-        onClose={() => setIsCreateOpen(false)}
+        onClose={() =>
+          setIsCreateOpen(false)
+        }
       />
 
       {transferToVoid && (
@@ -569,7 +687,9 @@ export default function TransfersPage() {
               transferToVoid.destinationAccountId,
             )
           }
-          onClose={() => setTransferToVoid(null)}
+          onClose={() =>
+            setTransferToVoid(null)
+          }
         />
       )}
     </main>
