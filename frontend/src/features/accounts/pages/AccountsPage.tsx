@@ -7,7 +7,9 @@ import {
   RefreshCw,
   WalletCards,
 } from 'lucide-react'
+
 import { ApiClientError } from '../../../api/ApiClientError'
+import PageShell from '../../../components/layout/PageShell'
 import type {
   Account,
   AccountStatus,
@@ -19,7 +21,6 @@ import {
   useAccounts,
   useArchiveAccount,
 } from '../hooks/useAccounts'
-import PageShell from '../../../components/layout/PageShell'
 
 const accountTypeLabels = {
   CASH: 'Cash',
@@ -39,7 +40,10 @@ const accountTypeColours = {
   OTHER: 'bg-[#e8e7e2] text-[#657972]',
 } satisfies Record<AccountType, string>
 
-function formatMoney(amount: number, currencyCode: string) {
+function formatMoney(
+  amount: number,
+  currencyCode: string,
+) {
   return new Intl.NumberFormat('en-ZA', {
     style: 'currency',
     currency: currencyCode,
@@ -51,7 +55,9 @@ export default function AccountsPage() {
   const [status, setStatus] =
     useState<AccountStatus>('ACTIVE')
 
-  const [isFormOpen, setIsFormOpen] = useState(false)
+  const [isFormOpen, setIsFormOpen] =
+    useState(false)
+
   const [editingAccount, setEditingAccount] =
     useState<Account | null>(null)
 
@@ -135,7 +141,7 @@ export default function AccountsPage() {
 
   return (
     <PageShell>
-      <header className="feature-fade-in flex flex-wrap items-end justify-between gap-6">
+      <header className="feature-reveal flex flex-wrap items-end justify-between gap-6">
         <div>
           <p className="text-xs font-semibold tracking-[0.16em] text-[#657972]">
             THE FULL PICTURE
@@ -162,7 +168,9 @@ export default function AccountsPage() {
             <RefreshCw
               size={18}
               className={
-                isRefreshing ? 'animate-spin' : ''
+                isRefreshing
+                  ? 'animate-spin'
+                  : ''
               }
             />
           </button>
@@ -178,28 +186,34 @@ export default function AccountsPage() {
         </div>
       </header>
 
-      <div className="feature-fade-in feature-fade-in-delay-1 mt-10 flex gap-7 border-b border-[#dedbd2]">
-        {(['ACTIVE', 'ARCHIVED'] as const).map(
-          (accountStatus) => (
-            <button
-              key={accountStatus}
-              type="button"
-              onClick={() => setStatus(accountStatus)}
-              className={`border-b-2 px-1 pb-4 text-sm font-semibold transition ${status === accountStatus
+      <div className="feature-reveal feature-reveal-delay-1 mt-10 flex gap-7 border-b border-[#dedbd2]">
+        {(
+          [
+            'ACTIVE',
+            'ARCHIVED',
+          ] as const
+        ).map((accountStatus) => (
+          <button
+            key={accountStatus}
+            type="button"
+            onClick={() =>
+              setStatus(accountStatus)
+            }
+            className={`border-b-2 px-1 pb-4 text-sm font-semibold transition ${
+              status === accountStatus
                 ? 'border-[#39725d] text-[#173c32]'
                 : 'border-transparent text-[#7a8984] hover:text-[#173c32]'
-                }`}
-            >
-              {accountStatus === 'ACTIVE'
-                ? 'Active accounts'
-                : 'Archived'}
-            </button>
-          ),
-        )}
+            }`}
+          >
+            {accountStatus === 'ACTIVE'
+              ? 'Active accounts'
+              : 'Archived'}
+          </button>
+        ))}
       </div>
 
       {isPending && (
-        <div className="feature-fade-in feature-fade-in-delay-2 mt-8 animate-pulse overflow-hidden rounded-3xl border border-[#dedbd2]">
+        <div className="feature-reveal feature-reveal-delay-2 mt-8 animate-pulse overflow-hidden rounded-3xl border border-[#dedbd2]">
           {[1, 2, 3].map((item) => (
             <div
               key={item}
@@ -211,7 +225,7 @@ export default function AccountsPage() {
 
       {loadError && (
         <section
-          className="feature-fade-in feature-fade-in-delay-2 mt-8 rounded-2xl border border-red-200 bg-red-50 p-6"
+          className="feature-reveal feature-reveal-delay-2 mt-8 rounded-2xl border border-red-200 bg-red-50 p-6"
           role="alert"
         >
           <h2 className="font-serif text-2xl text-red-950">
@@ -234,144 +248,180 @@ export default function AccountsPage() {
         </section>
       )}
 
-      {!isPending && !loadError && accounts.length === 0 && (
-        <section className="feature-fade-in feature-fade-in-delay-2 mt-8 rounded-3xl border border-[#dedbd2] bg-[#fffdf8] px-6 py-16 text-center">
-          <span className="mx-auto grid size-14 place-items-center rounded-full bg-[#dfece3] text-[#39725d]">
-            <WalletCards size={25} />
-          </span>
+      {!isPending &&
+        !loadError &&
+        accounts.length === 0 && (
+          <section className="feature-reveal feature-reveal-delay-2 mt-8 rounded-3xl border border-[#dedbd2] bg-[#fffdf8] px-6 py-16 text-center">
+            <span className="mx-auto grid size-14 place-items-center rounded-full bg-[#dfece3] text-[#39725d]">
+              <WalletCards size={25} />
+            </span>
 
-          <h2 className="mt-5 font-serif text-3xl text-[#173c32]">
-            {status === 'ACTIVE'
-              ? 'Your accounts will live here'
-              : 'No archived accounts'}
-          </h2>
+            <h2 className="mt-5 font-serif text-3xl text-[#173c32]">
+              {status === 'ACTIVE'
+                ? 'Your accounts will live here'
+                : 'No archived accounts'}
+            </h2>
 
-          <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-[#657972]">
-            {status === 'ACTIVE'
-              ? 'Add your first account to begin tracking balances and building your net worth.'
-              : 'Accounts you archive will remain available here for historical reporting.'}
-          </p>
+            <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-[#657972]">
+              {status === 'ACTIVE'
+                ? 'Add your first account to begin tracking balances and building your net worth.'
+                : 'Accounts you archive will remain available here for historical reporting.'}
+            </p>
 
-          {status === 'ACTIVE' && (
-            <button
-              type="button"
-              onClick={openCreateForm}
-              className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#236a58]"
-            >
-              <Plus size={18} aria-hidden />
-              Add your first account
-            </button>
-          )}
-        </section>
-      )}
-
-      {!isPending && !loadError && accounts.length > 0 && (
-        <section className="feature-fade-in feature-fade-in-delay-2 mt-8 overflow-hidden rounded-3xl border border-[#dedbd2] bg-[#fffdf8]">
-          {accounts.map((account, index) => {
-            const balance =
-              balancesByAccountId.get(account.id)
-
-            const currentBalance =
-              balance?.currentBalance ??
-              account.openingBalance
-
-            return (
-              <article
-                key={account.id}
-                className={`grid gap-5 px-5 py-6 sm:grid-cols-[1fr_auto] sm:items-center sm:px-7 ${index > 0
-                  ? 'border-t border-[#dedbd2]'
-                  : ''
-                  }`}
+            {status === 'ACTIVE' && (
+              <button
+                type="button"
+                onClick={openCreateForm}
+                className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#236a58]"
               >
-                <div className="flex min-w-0 items-start gap-4">
-                  <span
-                    className={`grid size-11 shrink-0 place-items-center rounded-xl ${accountTypeColours[
-                      account.accountType
-                    ]
-                      }`}
+                <Plus size={18} aria-hidden />
+                Add your first account
+              </button>
+            )}
+          </section>
+        )}
+
+      {!isPending &&
+        !loadError &&
+        accounts.length > 0 && (
+          <section className="feature-reveal feature-reveal-delay-2 mt-8 overflow-hidden rounded-3xl border border-[#dedbd2] bg-[#fffdf8]">
+            {accounts.map(
+              (account, index) => {
+                const balance =
+                  balancesByAccountId.get(
+                    account.id,
+                  )
+
+                const currentBalance =
+                  balance?.currentBalance ??
+                  account.openingBalance
+
+                return (
+                  <article
+                    key={account.id}
+                    className={`grid gap-5 px-5 py-6 sm:grid-cols-[1fr_auto] sm:items-center sm:px-7 ${
+                      index > 0
+                        ? 'border-t border-[#dedbd2]'
+                        : ''
+                    }`}
                   >
-                    <Landmark size={19} aria-hidden />
-                  </span>
+                    <div className="flex min-w-0 items-start gap-4">
+                      <span
+                        className={`grid size-11 shrink-0 place-items-center rounded-xl ${
+                          accountTypeColours[
+                            account
+                              .accountType
+                          ]
+                        }`}
+                      >
+                        <Landmark
+                          size={19}
+                          aria-hidden
+                        />
+                      </span>
 
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="truncate font-semibold text-[#173c32]">
-                        {account.name}
-                      </h2>
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h2 className="truncate font-semibold text-[#173c32]">
+                            {account.name}
+                          </h2>
 
-                      {!account.includeInNetWorth && (
-                        <span className="rounded-full bg-[#eceae4] px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-[#657972]">
-                          Excluded from net worth
-                        </span>
-                      )}
+                          {!account.includeInNetWorth && (
+                            <span className="rounded-full bg-[#eceae4] px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-[#657972]">
+                              Excluded from
+                              net worth
+                            </span>
+                          )}
+                        </div>
+
+                        <p className="mt-1 text-sm text-[#657972]">
+                          {
+                            accountTypeLabels[
+                              account
+                                .accountType
+                            ]
+                          }
+                          {' · '}
+                          {
+                            account.currencyCode
+                          }
+                          {' · '}
+                          {balance?.postedTransactionCount ??
+                            0}{' '}
+                          transactions
+                        </p>
+                      </div>
                     </div>
 
-                    <p className="mt-1 text-sm text-[#657972]">
-                      {
-                        accountTypeLabels[
-                        account.accountType
-                        ]
-                      }
-                      {' · '}
-                      {account.currencyCode}
-                      {' · '}
-                      {balance?.postedTransactionCount ?? 0}{' '}
-                      transactions
-                    </p>
-                  </div>
-                </div>
+                    <div className="flex items-center justify-between gap-5 pl-15 sm:justify-end sm:pl-0">
+                      <div className="text-left sm:text-right">
+                        <p className="font-semibold text-[#173c32]">
+                          {formatMoney(
+                            currentBalance,
+                            account.currencyCode,
+                          )}
+                        </p>
 
-                <div className="flex items-center justify-between gap-5 pl-15 sm:justify-end sm:pl-0">
-                  <div className="text-left sm:text-right">
-                    <p className="font-semibold text-[#173c32]">
-                      {formatMoney(
-                        currentBalance,
-                        account.currencyCode,
+                        <p className="mt-1 text-xs text-[#657972]">
+                          Current balance
+                        </p>
+                      </div>
+
+                      {status ===
+                        'ACTIVE' && (
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              openEditForm(
+                                account,
+                              )
+                            }
+                            className="rounded-full p-2 text-[#657972] transition hover:bg-[#e5ece7] hover:text-[#39725d]"
+                            aria-label={`Edit ${account.name}`}
+                          >
+                            <Pencil
+                              size={17}
+                            />
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setArchiveError(
+                                null,
+                              )
+
+                              setArchiveTarget(
+                                account,
+                              )
+                            }}
+                            className="rounded-full p-2 text-[#657972] transition hover:bg-[#f2e7df] hover:text-[#9b5845]"
+                            aria-label={`Archive ${account.name}`}
+                          >
+                            <Archive
+                              size={17}
+                            />
+                          </button>
+                        </div>
                       )}
-                    </p>
-
-                    <p className="mt-1 text-xs text-[#657972]">
-                      Current balance
-                    </p>
-                  </div>
-
-                  {status === 'ACTIVE' && (
-                    <div className="flex items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          openEditForm(account)
-                        }
-                        className="rounded-full p-2 text-[#657972] transition hover:bg-[#e5ece7] hover:text-[#39725d]"
-                        aria-label={`Edit ${account.name}`}
-                      >
-                        <Pencil size={17} />
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setArchiveError(null)
-                          setArchiveTarget(account)
-                        }}
-                        className="rounded-full p-2 text-[#657972] transition hover:bg-[#f2e7df] hover:text-[#9b5845]"
-                        aria-label={`Archive ${account.name}`}
-                      >
-                        <Archive size={17} />
-                      </button>
                     </div>
-                  )}
-                </div>
-              </article>
-            )
-          })}
-        </section>
-      )}
+                  </article>
+                )
+              },
+            )}
+          </section>
+        )}
 
       {isFormOpen && (
         <AccountModal
-          key={editingAccount?.id ?? 'new-account'}
-          account={editingAccount ?? undefined}
+          key={
+            editingAccount?.id ??
+            'new-account'
+          }
+          account={
+            editingAccount ?? undefined
+          }
           onClose={closeForm}
         />
       )}
@@ -381,7 +431,9 @@ export default function AccountsPage() {
           <button
             type="button"
             className="absolute inset-0 bg-[#102e27]/45 backdrop-blur-[2px]"
-            onClick={() => setArchiveTarget(null)}
+            onClick={() =>
+              setArchiveTarget(null)
+            }
             aria-label="Cancel archiving"
           />
 
@@ -406,8 +458,9 @@ export default function AccountsPage() {
               <strong className="text-[#173c32]">
                 {archiveTarget.name}
               </strong>{' '}
-              will be removed from your active accounts but
-              retained for historical reporting.
+              will be removed from your
+              active accounts but retained
+              for historical reporting.
             </p>
 
             {archiveError && (
@@ -422,8 +475,12 @@ export default function AccountsPage() {
             <div className="mt-7 flex justify-end gap-3">
               <button
                 type="button"
-                disabled={archiveAccount.isPending}
-                onClick={() => setArchiveTarget(null)}
+                disabled={
+                  archiveAccount.isPending
+                }
+                onClick={() =>
+                  setArchiveTarget(null)
+                }
                 className="rounded-full border border-[#d8d6ce] px-5 py-2.5 text-sm font-semibold text-[#173c32] hover:bg-[#efede7] disabled:opacity-60"
               >
                 Cancel
@@ -431,8 +488,12 @@ export default function AccountsPage() {
 
               <button
                 type="button"
-                disabled={archiveAccount.isPending}
-                onClick={() => void confirmArchive()}
+                disabled={
+                  archiveAccount.isPending
+                }
+                onClick={() =>
+                  void confirmArchive()
+                }
                 className="rounded-full bg-[#9b5845] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#834937] disabled:opacity-60"
               >
                 {archiveAccount.isPending
