@@ -43,13 +43,6 @@ export const DashboardPage = lazy(
   () => import('../pages/DashboardPage'),
 )
 
-export const MoneyInMotionPage = lazy(
-  () =>
-    import(
-      '../features/money-motion/pages/MoneyInMotionPage'
-    ),
-)
-
 export const AccountsPage = lazy(
   () =>
     import('../features/accounts/pages/AccountsPage'),

@@ -1,12 +1,11 @@
-import {useState} from 'react'
 import {
   ArrowLeftRight,
   CalendarClock,
   ChartPie,
   ChevronDown,
-  CircleGauge,
   Landmark,
   LayoutDashboard,
+  ListTree,
   LogOut,
   Menu,
   ReceiptText,
@@ -14,7 +13,12 @@ import {
   Shapes,
   Target,
   X,
+  type LucideIcon,
 } from 'lucide-react'
+import {
+  useId,
+  useState,
+} from 'react'
 import {
   NavLink,
   Outlet,
@@ -23,22 +27,20 @@ import {
 } from 'react-router'
 
 import salifLogoLight from '../../../assets/brand/salif-logo-light.png'
-import {useAuth} from '../../auth/context/useAuth'
-import {useProfile} from '../../profile/hooks/useProfile'
+import { useAuth } from '../../auth/context/useAuth'
+import { useProfile } from '../../profile/hooks/useProfile'
 
-const moneyMovementPaths = [
-  '/money-in-motion',
-  '/transactions',
-  '/transfers',
-  '/recurring',
-]
+type SidebarSection =
+  | 'money'
+  | 'planning'
 
-const moneyMovementItems = [
-  {
-    to: '/money-in-motion',
-    label: 'Money Hub',
-    icon: CircleGauge,
-  },
+interface NavigationItem {
+  to: string
+  label: string
+  icon: LucideIcon
+}
+
+const moneyMovementItems: NavigationItem[] = [
   {
     to: '/transactions',
     label: 'Transactions',
@@ -56,28 +58,50 @@ const moneyMovementItems = [
   },
 ]
 
-const primaryNavigationItems = [
-  {
-    to: '/categories',
-    label: 'Categories',
-    icon: Shapes,
-  },
+const planningItems: NavigationItem[] = [
   {
     to: '/accounts',
     label: 'Accounts',
     icon: Landmark,
   },
   {
-    to: '/goals',
-    label: 'Goals',
-    icon: Target,
+    to: '/categories',
+    label: 'Categories',
+    icon: Shapes,
   },
   {
     to: '/budgets',
     label: 'Budgets',
     icon: ChartPie,
   },
+  {
+    to: '/goals',
+    label: 'Goals',
+    icon: Target,
+  },
 ]
+
+function activeSectionForPath(
+  pathname: string,
+): SidebarSection | null {
+  if (
+    moneyMovementItems.some(
+      (item) => item.to === pathname,
+    )
+  ) {
+    return 'money'
+  }
+
+  if (
+    planningItems.some(
+      (item) => item.to === pathname,
+    )
+  ) {
+    return 'planning'
+  }
+
+  return null
+}
 
 function SalifLogo() {
   return (
@@ -91,6 +115,109 @@ function SalifLogo() {
   )
 }
 
+interface SidebarGroupProps {
+  label: string
+  icon: LucideIcon
+  items: NavigationItem[]
+  menuId: string
+  isActive: boolean
+  isExpanded: boolean
+  onToggle: () => void
+  onNavigate?: () => void
+}
+
+function SidebarGroup({
+  label,
+  icon: GroupIcon,
+  items,
+  menuId,
+  isActive,
+  isExpanded,
+  onToggle,
+  onNavigate,
+}: SidebarGroupProps) {
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={isExpanded}
+        aria-controls={menuId}
+        className={`flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-2.5 text-left text-sm font-medium transition-colors ${
+          isActive
+            ? 'bg-[#f7f3e9] font-semibold text-[#174f43] shadow-sm'
+            : 'text-[#d5e4dd] hover:bg-white/5 hover:text-white'
+        }`}
+      >
+        <GroupIcon
+          size={18}
+          className="shrink-0"
+          aria-hidden
+        />
+
+        <span className="min-w-0 flex-1 truncate">
+          {label}
+        </span>
+
+        <ChevronDown
+          size={16}
+          className={`shrink-0 transition-transform duration-200 motion-reduce:transition-none ${
+            isExpanded
+              ? 'rotate-180'
+              : ''
+          }`}
+          aria-hidden
+        />
+      </button>
+
+      <div
+        id={menuId}
+        className={`grid transition-[grid-template-rows,opacity] duration-200 motion-reduce:transition-none ${
+          isExpanded
+            ? 'grid-rows-[1fr] opacity-100'
+            : 'grid-rows-[0fr] opacity-0'
+        }`}
+      >
+        <div className="overflow-hidden">
+          <div className="ml-6 mt-2 border-l border-white/15 pl-3">
+            <div className="space-y-1">
+              {items.map((item) => {
+                const ItemIcon = item.icon
+
+                return (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    onClick={onNavigate}
+                    className={({
+                      isActive: itemIsActive,
+                    }) =>
+                      [
+                        'flex cursor-pointer items-center gap-3 rounded-lg',
+                        'px-3 py-2 text-sm transition-colors',
+                        itemIsActive
+                          ? 'bg-white/10 font-semibold text-white'
+                          : 'text-[#bed2c9] hover:bg-white/5 hover:text-white',
+                      ].join(' ')
+                    }
+                  >
+                    <ItemIcon
+                      size={15}
+                      aria-hidden
+                    />
+
+                    {item.label}
+                  </NavLink>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 interface SidebarContentProps {
   onNavigate?: () => void
 }
@@ -100,74 +227,100 @@ function SidebarContent({
 }: SidebarContentProps) {
   const location = useLocation()
   const navigate = useNavigate()
-  const {data: profile} = useProfile()
-  const {logout} = useAuth()
-
-  const [isLoggingOut, setIsLoggingOut] =
-    useState(false)
-
-  const [isMoneyMenuOpen, setIsMoneyMenuOpen] =
-    useState(false)
+  const moneyMenuId = useId()
+  const planningMenuId = useId()
 
   const [
-    collapsedActiveMovementPath,
-    setCollapsedActiveMovementPath,
+    isLoggingOut,
+    setIsLoggingOut,
+  ] = useState(false)
+
+  const [
+    openSection,
+    setOpenSection,
+  ] = useState<SidebarSection | null>(
+    null,
+  )
+
+  const [
+    collapsedPath,
+    setCollapsedPath,
   ] = useState<string | null>(null)
 
-  const isMoneyMovementActive =
-    moneyMovementPaths.includes(location.pathname)
+  const { data: profile } = useProfile()
+  const { logout } = useAuth()
 
-  const isMoneyMovementExpanded =
-    isMoneyMenuOpen ||
-    (isMoneyMovementActive &&
-      collapsedActiveMovementPath !==
-        location.pathname)
+  const activeSection =
+    activeSectionForPath(
+      location.pathname,
+    )
+
+  const expandedSection =
+    openSection ??
+    (
+      collapsedPath !== location.pathname
+        ? activeSection
+        : null
+    )
 
   const displayName = profile
     ? `${profile.firstName} ${profile.lastName}`
     : 'Your account'
 
   const initials = profile
-    ? `${profile.firstName.charAt(0)}${profile.lastName.charAt(0)}`.toUpperCase()
+    ? `${profile.firstName.charAt(0)}${profile.lastName.charAt(0)}`
+      .toUpperCase()
     : 'S'
 
   const profileIsActive =
     location.pathname === '/profile'
 
-  const navigationClassName =
-    'flex cursor-pointer items-center gap-3 rounded-xl ' +
-    'px-4 py-2.5 text-sm font-medium transition-colors'
-
-  function toggleMoneyMovement() {
-    if (isMoneyMovementExpanded) {
-      setIsMoneyMenuOpen(false)
-      setCollapsedActiveMovementPath(
+  function toggleSection(
+    section: SidebarSection,
+  ) {
+    if (expandedSection === section) {
+      setOpenSection(null)
+      setCollapsedPath(
         location.pathname,
       )
+
       return
     }
 
-    setIsMoneyMenuOpen(true)
-    setCollapsedActiveMovementPath(null)
+    setOpenSection(section)
+    setCollapsedPath(null)
+  }
+
+  function handleOverviewNavigation() {
+    setOpenSection(null)
+    setCollapsedPath(null)
+    onNavigate?.()
   }
 
   async function handleLogout() {
     setIsLoggingOut(true)
+
     await logout()
+
     onNavigate?.()
-    navigate('/login', {replace: true})
+
+    navigate('/login', {
+      replace: true,
+    })
   }
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto bg-[#174f43] px-5 py-6 text-[#f7f3e9]">
-      <div className="border-b border-white/10 px-2 pb-6">
+    <div className="salif-sidebar grid h-full grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden bg-[#174f43] px-5 py-6 text-[#f7f3e9]">
+      <div className="salif-sidebar-brand border-b border-white/10 px-2 pb-6">
         <NavLink
           to="/dashboard"
-          onClick={onNavigate}
+          onClick={
+            handleOverviewNavigation
+          }
           aria-label="Go to dashboard"
           className="inline-flex cursor-pointer"
         >
-          <SalifLogo/>
+          <SalifLogo />
         </NavLink>
 
         <p className="mt-1 text-[10px] font-semibold tracking-[0.16em] text-[#a9c9bc]">
@@ -176,7 +329,7 @@ function SidebarContent({
       </div>
 
       <nav
-        className="mt-7"
+        className="salif-sidebar-nav salif-sidebar-scrollbar mt-6 min-h-0 overflow-y-auto overscroll-contain pr-1"
         aria-label="Main navigation"
       >
         <p className="mb-2 px-4 text-[10px] font-semibold tracking-[0.16em] text-[#91b5a7]">
@@ -187,10 +340,13 @@ function SidebarContent({
           <NavLink
             to="/dashboard"
             end
-            onClick={onNavigate}
-            className={({isActive}) =>
+            onClick={
+              handleOverviewNavigation
+            }
+            className={({ isActive }) =>
               [
-                navigationClassName,
+                'flex cursor-pointer items-center gap-3 rounded-xl',
+                'px-4 py-2.5 text-sm font-medium transition-colors',
                 isActive
                   ? 'bg-[#f7f3e9] font-semibold text-[#174f43] shadow-sm'
                   : 'text-[#d5e4dd] hover:bg-white/5 hover:text-white',
@@ -201,134 +357,49 @@ function SidebarContent({
               size={18}
               aria-hidden
             />
+
             Overview
           </NavLink>
 
-          <div>
-            <div
-              className={`flex items-center rounded-xl transition-colors ${
-                isMoneyMovementActive
-                  ? 'bg-[#f7f3e9] font-semibold text-[#174f43] shadow-sm'
-                  : 'text-[#d5e4dd] hover:bg-white/5 hover:text-white'
-              }`}
-            >
-              <NavLink
-                to="/money-in-motion"
-                onClick={onNavigate}
-                className="flex min-w-0 flex-1 cursor-pointer items-center gap-3 px-4 py-2.5 text-sm font-medium"
-              >
-                <ArrowLeftRight
-                  size={18}
-                  className="shrink-0"
-                  aria-hidden
-                />
+          <SidebarGroup
+            label="Money in motion"
+            icon={ArrowLeftRight}
+            items={moneyMovementItems}
+            menuId={moneyMenuId}
+            isActive={
+              activeSection === 'money'
+            }
+            isExpanded={
+              expandedSection === 'money'
+            }
+            onToggle={() =>
+              toggleSection('money')
+            }
+            onNavigate={onNavigate}
+          />
 
-                <span className="truncate">
-                  Money in motion
-                </span>
-              </NavLink>
-
-              <button
-                type="button"
-                onClick={toggleMoneyMovement}
-                aria-expanded={
-                  isMoneyMovementExpanded
-                }
-                aria-label={
-                  isMoneyMovementExpanded
-                    ? 'Collapse money in motion menu'
-                    : 'Expand money in motion menu'
-                }
-                className="mr-2 grid size-8 shrink-0 cursor-pointer place-items-center rounded-lg transition hover:bg-black/5"
-              >
-                <ChevronDown
-                  size={16}
-                  className={`transition-transform duration-200 ${
-                    isMoneyMovementExpanded
-                      ? 'rotate-180'
-                      : ''
-                  }`}
-                  aria-hidden
-                />
-              </button>
-            </div>
-
-            {isMoneyMovementExpanded && (
-              <div className="ml-6 mt-2 border-l border-white/15 pl-3">
-                <div className="space-y-1">
-                  {moneyMovementItems.map(
-                    (item) => {
-                      const Icon = item.icon
-
-                      return (
-                        <NavLink
-                          key={item.to}
-                          to={item.to}
-                          end
-                          onClick={onNavigate}
-                          className={({
-                            isActive,
-                          }) =>
-                            [
-                              'flex cursor-pointer items-center gap-3',
-                              'rounded-lg px-3 py-2 text-sm transition-colors',
-                              isActive
-                                ? 'bg-white/10 font-semibold text-white'
-                                : 'text-[#bed2c9] hover:bg-white/5 hover:text-white',
-                            ].join(' ')
-                          }
-                        >
-                          <Icon
-                            size={15}
-                            aria-hidden
-                          />
-                          {item.label}
-                        </NavLink>
-                      )
-                    },
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <p className="mb-2 mt-7 px-4 text-[10px] font-semibold tracking-[0.16em] text-[#91b5a7]">
-          PLAN &amp; ORGANISE
-        </p>
-
-        <div className="space-y-1.5">
-          {primaryNavigationItems.map(
-            (item) => {
-              const Icon = item.icon
-
-              return (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  onClick={onNavigate}
-                  className={({isActive}) =>
-                    [
-                      navigationClassName,
-                      isActive
-                        ? 'bg-[#f7f3e9] font-semibold text-[#174f43] shadow-sm'
-                        : 'text-[#d5e4dd] hover:bg-white/5 hover:text-white',
-                    ].join(' ')
-                  }
-                >
-                  <Icon
-                    size={18}
-                    aria-hidden
-                  />
-                  {item.label}
-                </NavLink>
-              )
-            },
-          )}
+          <SidebarGroup
+            label="Plan & organise"
+            icon={ListTree}
+            items={planningItems}
+            menuId={planningMenuId}
+            isActive={
+              activeSection ===
+              'planning'
+            }
+            isExpanded={
+              expandedSection ===
+              'planning'
+            }
+            onToggle={() =>
+              toggleSection('planning')
+            }
+            onNavigate={onNavigate}
+          />
         </div>
       </nav>
 
-      <div className="mt-auto border-t border-white/10 pt-4">
+      <div className="border-t border-white/10 pt-4">
         <div
           className={`rounded-2xl border p-2 transition-colors ${
             profileIsActive
@@ -389,11 +460,12 @@ function SidebarContent({
           </div>
         </div>
 
-        <p className="mt-3 flex items-center gap-2 px-2 text-[11px] text-[#a9c9bc]">
+        <p className="salif-sidebar-status mt-3 flex items-center gap-2 px-2 text-[11px] text-[#a9c9bc]">
           <span
             className="size-1.5 rounded-full bg-[#9bc7a8]"
             aria-hidden
           />
+
           Everything looks steady
         </p>
       </div>
@@ -402,37 +474,44 @@ function SidebarContent({
 }
 
 export default function DashboardLayout() {
-  const [isMenuOpen, setIsMenuOpen] =
-    useState(false)
+  const [
+    isMenuOpen,
+    setIsMenuOpen,
+  ] = useState(false)
 
   return (
     <div className="min-h-screen bg-[#f7f5ef] text-[#173c32]">
       <aside className="fixed inset-y-0 left-0 hidden w-[18.5rem] lg:block">
-        <SidebarContent/>
+        <SidebarContent />
       </aside>
 
       <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-[#dedbd2] bg-[#f7f5ef]/95 px-5 backdrop-blur lg:hidden">
         <div className="rounded-lg bg-[#174f43] px-2">
-          <SalifLogo/>
+          <SalifLogo />
         </div>
 
         <button
           type="button"
-          onClick={() => setIsMenuOpen(true)}
+          onClick={() =>
+            setIsMenuOpen(true)
+          }
           className="cursor-pointer rounded-lg p-2 text-[#173c32] transition hover:bg-[#e7ece7]"
           aria-label="Open navigation"
           aria-expanded={isMenuOpen}
         >
-          <Menu size={23} aria-hidden/>
+          <Menu
+            size={23}
+            aria-hidden
+          />
         </button>
       </header>
 
       <div className="lg:pl-[18.5rem]">
-        <Outlet/>
+        <Outlet />
       </div>
 
       {isMenuOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
+        <div className="fixed inset-0 z-50 overflow-hidden lg:hidden">
           <button
             type="button"
             className="absolute inset-0 cursor-pointer bg-black/35"
@@ -451,7 +530,10 @@ export default function DashboardLayout() {
               className="absolute right-4 top-5 z-10 cursor-pointer rounded-lg p-2 text-white transition hover:bg-white/10"
               aria-label="Close navigation"
             >
-              <X size={21} aria-hidden/>
+              <X
+                size={21}
+                aria-hidden
+              />
             </button>
 
             <SidebarContent

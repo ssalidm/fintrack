@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router'
+import { createBrowserRouter, Navigate } from 'react-router'
 import ProtectedRoute from '../features/auth/components/ProtectedRoute.tsx'
 import AuthLayout from '../features/auth/layouts/AuthLayout.tsx'
 import DashboardLayout from '../features/dashboard/layouts/DashboardLayout.tsx'
@@ -16,7 +16,6 @@ import {
   ProfilePage,
   AccountsPage,
   CategoriesPage,
-  MoneyInMotionPage,
   TransactionsPage,
   RecurringTransactionsPage,
   TransfersPage,
@@ -88,7 +87,12 @@ export const router = createBrowserRouter([
           },
           {
             path: '/money-in-motion',
-            element: <MoneyInMotionPage />,
+            element: (
+              <Navigate
+                to="/transactions"
+                replace
+              />
+            ),
           },
           {
             path: '/transactions',
