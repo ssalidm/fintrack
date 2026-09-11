@@ -1,6 +1,6 @@
 import {Link, Outlet} from 'react-router'
-import salifLogoDark from '../../../assets/brand/salif-logo-dark.png'
-import salifLogoGreen from '../../../assets/brand/salif-logo-green.png'
+import salifLogoDark from '../../../assets/brand/salif-logo-dark.svg'
+import salifLogoGreen from '../../../assets/brand/salif-logo-green.svg'
 
 interface BrandLinkProps {
   readonly variant: 'dark' | 'green'

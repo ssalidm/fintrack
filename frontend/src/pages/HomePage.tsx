@@ -11,7 +11,7 @@ import {
 } from 'lucide-react'
 import { Link } from 'react-router'
 
-import salifLogoDark from '../assets/brand/salif-logo-green.png'
+import salifLogoDark from '../assets/brand/salif-logo-green.svg'
 import { useAuth } from '../features/auth/context/useAuth'
 
 const features = [
