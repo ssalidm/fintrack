@@ -1,9 +1,12 @@
 import { createBrowserRouter, Navigate } from 'react-router'
+import AdminRoute from '../features/admin/components/AdminRoute.tsx'
 import ProtectedRoute from '../features/auth/components/ProtectedRoute.tsx'
 import AuthLayout from '../features/auth/layouts/AuthLayout.tsx'
 import DashboardLayout from '../features/dashboard/layouts/DashboardLayout.tsx'
 import {
   HomePage,
+  PrivacyPage,
+  TermsPage,
   LoginPage,
   MfaChallengePage,
   RegisterPage,
@@ -21,8 +24,9 @@ import {
   TransfersPage,
   GoalsPage,
   BudgetsPage,
-  VerifyEmailChangePage
-
+  VerifyEmailChangePage,
+  AdminUsersPage,
+  AdminUserDetailsPage,
 } from './lazyPages'
 
 
@@ -30,6 +34,14 @@ export const router = createBrowserRouter([
   {
     path: '/',
     element: <HomePage />,
+  },
+  {
+    path: '/privacy',
+    element: <PrivacyPage />,
+  },
+  {
+    path: '/terms',
+    element: <TermsPage />,
   },
   {
     element: <AuthLayout />,
@@ -121,6 +133,19 @@ export const router = createBrowserRouter([
           {
             path: '/budgets',
             element: <BudgetsPage />,
+          },
+          {
+            element: <AdminRoute />,
+            children: [
+              {
+                path: '/admin/users',
+                element: <AdminUsersPage />,
+              },
+              {
+                path: '/admin/users/:userId',
+                element: <AdminUserDetailsPage />,
+              },
+            ],
           },
         ],
       },

@@ -97,3 +97,37 @@ export const VerifyEmailChangePage = lazy(
       '../features/auth/pages/VerifyEmailChangePage'
     ),
 )
+
+export const AdminUsersPage = lazy(
+  () =>
+    import(
+      '../features/admin/pages/AdminUsersPage'
+    ),
+)
+
+export const AdminUserDetailsPage = lazy(
+  () =>
+    import(
+      '../features/admin/pages/AdminUserDetailsPage'
+    ),
+)
+
+export const PrivacyPage = lazy(
+  () =>
+    import('../pages/LegalPages').then(
+      (module) => ({
+        default:
+          module.PrivacyPage,
+      }),
+    ),
+)
+
+export const TermsPage = lazy(
+  () =>
+    import('../pages/LegalPages').then(
+      (module) => ({
+        default:
+          module.TermsPage,
+      }),
+    ),
+)

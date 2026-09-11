@@ -32,6 +32,7 @@ import {
   useDeleteBudgetLimit,
 } from '../hooks/useBudgets'
 import RefreshButton from '../../../components/actions/RefreshButton'
+import StatusTabs from '../../../components/navigation/StatusTabs'
 
 interface LimitModalTarget {
   limit?: BudgetCategoryLimit
@@ -364,32 +365,16 @@ export default function BudgetsPage() {
 
       <section className="feature-reveal feature-reveal-delay-1 mt-8 rounded-[1.5rem] border border-[#dedbd2] bg-[#fffdf8] p-4 sm:p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="inline-flex w-fit rounded-full bg-[#eceae3] p-1">
-            {statusOptions.map(
-              (option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => {
-                    setStatus(
-                      option.value,
-                    )
-
-                    setSelectedBudgetId(
-                      '',
-                    )
-                  }}
-                  className={`cursor-pointer rounded-full px-4 py-2 text-sm font-semibold transition ${status ===
-                      option.value
-                      ? 'bg-[#fffdf8] text-[#173c32] shadow-sm'
-                      : 'text-[#657972] hover:text-[#173c32]'
-                    }`}
-                >
-                  {option.label}
-                </button>
-              ),
-            )}
-          </div>
+          <StatusTabs
+            value={status}
+            options={statusOptions}
+            onChange={(nextStatus) => {
+              setStatus(nextStatus)
+              setSelectedBudgetId('')
+            }}
+            ariaLabel="Budget status"
+            variant="pill"
+          />
 
           {budgets.length > 0 && (
             <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">

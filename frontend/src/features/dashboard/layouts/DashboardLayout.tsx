@@ -12,6 +12,7 @@ import {
   Repeat2,
   Shapes,
   Target,
+  UsersRound,
   X,
   type LucideIcon,
 } from 'lucide-react'
@@ -396,6 +397,31 @@ function SidebarContent({
             }
             onNavigate={onNavigate}
           />
+
+          {profile?.roles.includes('ROLE_ADMIN') && (
+            <div className="pt-4">
+              <p className="mb-2 px-4 text-[10px] font-semibold tracking-[0.16em] text-[#91b5a7]">
+                ADMIN
+              </p>
+
+              <NavLink
+                to="/admin/users"
+                onClick={onNavigate}
+                className={({ isActive }) =>
+                  [
+                    'flex cursor-pointer items-center gap-3 rounded-xl',
+                    'px-4 py-2.5 text-sm font-medium transition-colors',
+                    isActive
+                      ? 'bg-[#f7f3e9] font-semibold text-[#174f43] shadow-sm'
+                      : 'text-[#d5e4dd] hover:bg-white/5 hover:text-white',
+                  ].join(' ')
+                }
+              >
+                <UsersRound size={18} aria-hidden />
+                User management
+              </NavLink>
+            </div>
+          )}
         </div>
       </nav>
 

@@ -72,6 +72,116 @@ select {
   background: rgba(213, 228, 221, 0.38);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+.home-anchor {
+  scroll-margin-top: 5rem;
+}
+
+@keyframes home-hero-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.home-hero-enter {
+  animation:
+    home-hero-enter 650ms
+    cubic-bezier(0.22, 1, 0.36, 1)
+    backwards;
+}
+
+.home-hero-enter-delay-1 {
+  animation-delay: 100ms;
+}
+
+.home-hero-enter-delay-2 {
+  animation-delay: 190ms;
+}
+
+.home-scroll-reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 620ms
+      cubic-bezier(0.22, 1, 0.36, 1),
+    transform 620ms
+      cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay:
+    var(--home-reveal-delay, 0ms);
+  will-change:
+    opacity,
+    transform;
+}
+
+.home-scroll-reveal[data-visible='true'] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes home-chart-grow {
+  from {
+    transform: scaleY(0);
+  }
+
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.home-chart-bar {
+  transform-origin: bottom;
+  animation:
+    home-chart-grow 720ms
+    cubic-bezier(0.22, 1, 0.36, 1)
+    backwards;
+}
+
+@keyframes home-progress-grow {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.home-progress-bar {
+  transform-origin: left;
+  animation:
+    home-progress-grow 800ms
+    500ms
+    cubic-bezier(0.22, 1, 0.36, 1)
+    backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .home-hero-enter,
+  .home-chart-bar,
+  .home-progress-bar {
+    animation: none;
+  }
+
+  .home-scroll-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
 @media (max-height: 760px) {
   .salif-sidebar {
     padding-block: 1rem;
