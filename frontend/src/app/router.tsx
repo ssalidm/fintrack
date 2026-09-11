@@ -1,61 +1,133 @@
-import {createBrowserRouter} from "react-router";
-import HomePage from "../pages/HomePage.tsx";
-import NotFoundPage from "../pages/NotFoundPage.tsx";
-import AuthLayout from "../features/auth/layouts/AuthLayout.tsx";
-import RegisterPage from "../features/auth/pages/RegisterPage.tsx";
-import LoginPage from "../features/auth/pages/LoginPage.tsx";
-import ProtectedRoute from "../features/auth/components/ProtectedRoute.tsx";
-import DashboardPage from "../pages/DashboardPage.tsx";
-import VerifyEmailPage from "../features/auth/pages/VerifyEmailPage.tsx";
-import ResendVerificationPage from "../features/auth/pages/ResendVerificationPage.tsx";
-import ForgotPasswordPage from "../features/auth/pages/ForgotPasswordPage.tsx";
-import ResetPasswordPage from "../features/auth/pages/ResetPasswordPage.tsx";
+import { createBrowserRouter, Navigate } from 'react-router'
+import ProtectedRoute from '../features/auth/components/ProtectedRoute.tsx'
+import AuthLayout from '../features/auth/layouts/AuthLayout.tsx'
+import DashboardLayout from '../features/dashboard/layouts/DashboardLayout.tsx'
+import {
+  HomePage,
+  LoginPage,
+  MfaChallengePage,
+  RegisterPage,
+  VerifyEmailPage,
+  ResendVerificationPage,
+  ForgotPasswordPage,
+  ResetPasswordPage,
+  NotFoundPage,
+  DashboardPage,
+  ProfilePage,
+  AccountsPage,
+  CategoriesPage,
+  TransactionsPage,
+  RecurringTransactionsPage,
+  TransfersPage,
+  GoalsPage,
+  BudgetsPage,
+  VerifyEmailChangePage
+
+} from './lazyPages'
+
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <HomePage/>,
+    element: <HomePage />,
   },
   {
-    element: <AuthLayout/>,
+    element: <AuthLayout />,
     children: [
       {
         path: '/login',
-        element: <LoginPage/>,
+        element: <LoginPage />,
+      },
+      {
+        path: '/login/mfa',
+        element: <MfaChallengePage />,
       },
       {
         path: '/register',
-        element: <RegisterPage/>,
+        element: <RegisterPage />,
       },
       {
         path: '/verify-email',
-        element: <VerifyEmailPage/>,
+        element: <VerifyEmailPage />,
       },
       {
         path: '/resend-verification',
-        element: <ResendVerificationPage/>
+        element: <ResendVerificationPage />,
       },
       {
         path: '/forgot-password',
-        element: <ForgotPasswordPage/>,
+        element: <ForgotPasswordPage />,
       },
       {
         path: '/reset-password',
-        element: <ResetPasswordPage/>,
+        element: <ResetPasswordPage />,
+      },
+      {
+        path: '/verify-email-change',
+        element: <VerifyEmailChangePage />,
       },
     ],
   },
+  // **********************************
+  // Protected routes
+  // **********************************
   {
-    element: <ProtectedRoute/>,
+    element: <ProtectedRoute />,
     children: [
       {
-        path: 'dashboard',
-        element: <DashboardPage/>,
+        element: <DashboardLayout />,
+        children: [
+          {
+            path: '/dashboard',
+            element: <DashboardPage />,
+          },
+          {
+            path: '/profile',
+            element: <ProfilePage />,
+          },
+          {
+            path: '/money-in-motion',
+            element: (
+              <Navigate
+                to="/transactions"
+                replace
+              />
+            ),
+          },
+          {
+            path: '/transactions',
+            element: <TransactionsPage />,
+          },
+          {
+            path: '/transfers',
+            element: <TransfersPage />,
+          },
+          {
+            path: '/recurring',
+            element: <RecurringTransactionsPage />,
+          },
+          {
+            path: '/categories',
+            element: <CategoriesPage />,
+          },
+          {
+            path: '/accounts',
+            element: <AccountsPage />,
+          },
+          {
+            path: '/goals',
+            element: <GoalsPage />,
+          },
+          {
+            path: '/budgets',
+            element: <BudgetsPage />,
+          },
+        ],
       },
     ],
   },
   {
     path: '*',
-    element: <NotFoundPage/>
+    element: <NotFoundPage />,
   },
 ])

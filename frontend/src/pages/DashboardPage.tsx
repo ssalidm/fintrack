@@ -1,163 +1,306 @@
 import {
-  useEffect,
-  useState,
-} from 'react'
-import { useNavigate } from 'react-router'
-import salifLogo from '../assets/brand/salif-logo-dark.png'
+  ArrowRight,
+  RefreshCw,
+  Sparkles,
+} from 'lucide-react'
+
 import { ApiClientError } from '../api/ApiClientError'
-import { useAuth } from '../features/auth/context/useAuth'
-import { useAuthenticatedRequest } from '../features/auth/hooks/useAuthenticatedRequest'
-import type { UserProfile } from '../features/profile/api/types'
+import BudgetPulseCard from '../features/dashboard/components/BudgetPulseCard'
+import CashFlowChart from '../features/dashboard/components/CashFlowChart'
+import MonthlyCashFlowCard from '../features/dashboard/components/MonthlyCashFlowCard'
+import NetWorthCard from '../features/dashboard/components/NetWorthCard'
+import PaymentsToWatch from '../features/dashboard/components/PaymentToWatch'
+import RecentTransactionsCard from '../features/dashboard/components/RecentTransactionsCard'
+import TopSpendingCard from '../features/dashboard/components/TopSpendingCard'
+import type { DashboardSummary } from '../features/dashboard/api/types'
+import { useDashboardSummary } from '../features/dashboard/hooks/useDashboardSummary'
+import { useProfile } from '../features/profile/hooks/useProfile'
 
-export default function DashboardPage() {
-  const [profile, setProfile] = useState<UserProfile | null>(null)
-  const [loadError, setLoadError] = useState<string | null>(null)
-  const [reloadKey, setReloadKey] = useState(0)
-  const [isLoggingOut, setIsLoggingOut] = useState(false)
+function parseLocalDate(value: string) {
+  const [year, month, day] = value
+    .split('-')
+    .map(Number)
 
-  const request = useAuthenticatedRequest()
-  const { logout } = useAuth()
-  const navigate = useNavigate()
+  return new Date(year, month - 1, day)
+}
 
-  useEffect(() => {
-    const controller = new AbortController()
+function formatHeaderDate(value: string) {
+  return new Intl.DateTimeFormat('en-ZA', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
+    .format(parseLocalDate(value))
+    .toUpperCase()
+}
 
-    async function loadProfile() {
-      setLoadError(null)
-      setProfile(null)
+function getGreeting() {
+  const hour = new Date().getHours()
 
-      try {
-        const response = await request<UserProfile>('/profile', {
-          signal: controller.signal,
-        })
-
-        setProfile(response.data)
-      } catch (error) {
-        if (
-          error instanceof Error &&
-          error.name === 'AbortError'
-        ) {
-          return
-        }
-
-        setLoadError(
-          error instanceof ApiClientError
-            ? error.message
-            : 'Unable to load your profile.',
-        )
-      }
-    }
-
-    void loadProfile()
-
-    return () => {
-      controller.abort()
-    }
-  }, [request, reloadKey])
-
-  async function handleLogout() {
-    setIsLoggingOut(true)
-    await logout()
-    navigate('/login', { replace: true })
+  if (hour < 12) {
+    return 'Good morning'
   }
 
+  if (hour < 18) {
+    return 'Good afternoon'
+  }
+
+  return 'Good evening'
+}
+
+function getDashboardInsight(
+  summary: DashboardSummary,
+) {
+  if (summary.totalAccountCount === 0) {
+    return {
+      title: 'Your financial space is ready.',
+      description:
+        'Add your first account to start building your complete financial picture.',
+    }
+  }
+
+  if (
+    summary.dueRecurringTransactionCount > 0
+  ) {
+    const count =
+      summary.dueRecurringTransactionCount
+
+    return {
+      title: `${count} recurring ${
+        count === 1
+          ? 'payment needs'
+          : 'payments need'
+      } your attention.`,
+      description:
+        'Take a look below so that nothing important catches you by surprise.',
+    }
+  }
+
+  const cashFlowIsPositive =
+    summary.currentMonthCashFlow.length > 0 &&
+    summary.currentMonthCashFlow.every(
+      (cashFlow) =>
+        cashFlow.netCashFlow >= 0,
+    )
+
+  if (cashFlowIsPositive) {
+    return {
+      title: 'Your money is in a good place.',
+      description:
+        'Your monthly cash flow is positive across your tracked currencies.',
+    }
+  }
+
+  return {
+    title:
+      'Your financial picture is up to date.',
+    description:
+      'Everything has been checked and your latest figures are ready below.',
+  }
+}
+
+function DashboardSkeleton() {
   return (
-    <main className="min-h-screen bg-slate-50 px-6 py-8">
-      <div className="mx-auto max-w-6xl">
-        <header className="flex items-center justify-between gap-6">
-          <img
-            src={salifLogo}
-            className="h-10 w-auto"
-            alt="Salif"
-          />
+    <div className="mt-8 animate-pulse">
+      <div className="h-20 rounded-2xl bg-[#e5e8e1]" />
+
+      <div className="mt-6 grid gap-5 xl:grid-cols-12">
+        <div className="h-64 rounded-3xl bg-[#e5e8e1] xl:col-span-5" />
+        <div className="h-64 rounded-3xl bg-[#e5e8e1] xl:col-span-4" />
+        <div className="h-64 rounded-3xl bg-[#e5e8e1] xl:col-span-3" />
+      </div>
+
+      <div className="mt-6 grid gap-5 xl:grid-cols-[2fr_0.9fr]">
+        <div className="h-[330px] rounded-3xl bg-[#e5e8e1]" />
+        <div className="h-[330px] rounded-3xl bg-[#e5e8e1]" />
+      </div>
+    </div>
+  )
+}
+
+export default function DashboardPage() {
+  const {
+    data: summary,
+    error,
+    isPending,
+    isFetching,
+    refetch,
+  } = useDashboardSummary()
+
+  const { data: profile } = useProfile()
+
+  const firstName =
+    profile?.firstName ?? 'there'
+
+  const errorMessage =
+    error instanceof ApiClientError
+      ? error.message
+      : 'Unable to load your dashboard.'
+
+  return (
+    <main className="min-h-screen px-5 py-8 sm:px-8 lg:px-12 lg:py-12 xl:px-16">
+      <div className="mx-auto max-w-[1280px]">
+        <header className="flex flex-wrap items-end justify-between gap-6">
+          <div>
+            <p className="text-xs font-semibold tracking-[0.16em] text-[#657972]">
+              {summary
+                ? formatHeaderDate(
+                    summary.asOfDate,
+                  )
+                : 'YOUR FINANCIAL OVERVIEW'}
+            </p>
+
+            <h1 className="mt-5 font-serif text-4xl leading-none tracking-[-0.03em] text-[#173c32] sm:text-5xl lg:text-6xl">
+              {getGreeting()}, {firstName}.
+            </h1>
+          </div>
 
           <button
             type="button"
-            disabled={isLoggingOut}
-            onClick={() => void handleLogout()}
-            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+            disabled={isFetching}
+            onClick={() => void refetch()}
+            className="flex cursor-pointer items-center gap-3 rounded-full border border-[#dedbd2] bg-[#fffdf8] px-5 py-3 text-sm font-medium text-[#173c32] transition hover:border-[#bd9460] hover:text-[#9a6828] disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {isLoggingOut ? 'Signing out…' : 'Sign out'}
+            <span>
+              {isFetching
+                ? 'Refreshing…'
+                : 'Refresh'}
+            </span>
+
+            <RefreshCw
+              size={15}
+              className={
+                isFetching
+                  ? 'animate-spin'
+                  : ''
+              }
+              aria-hidden
+            />
           </button>
         </header>
 
-        {loadError && (
+        {isPending && (
+          <DashboardSkeleton />
+        )}
+
+        {error && (
           <section
-            className="mt-16 rounded-2xl border border-red-200 bg-red-50 p-8"
+            className="mt-8 rounded-2xl border border-red-200 bg-red-50 p-7"
             role="alert"
           >
-            <h1 className="text-2xl font-semibold text-red-900">
-              We couldn’t load your profile
-            </h1>
+            <h2 className="font-serif text-2xl text-red-950">
+              We couldn’t load your dashboard
+            </h2>
 
-            <p className="mt-2 text-red-700">{loadError}</p>
+            <p className="mt-2 text-sm leading-6 text-red-700">
+              {errorMessage}
+            </p>
 
             <button
               type="button"
-              onClick={() => setReloadKey((value) => value + 1)}
-              className="mt-5 rounded-lg bg-red-700 px-4 py-2 font-semibold text-white hover:bg-red-800"
+              onClick={() => void refetch()}
+              className="mt-5 inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-red-800 underline underline-offset-4"
             >
               Try again
+
+              <ArrowRight
+                size={15}
+                aria-hidden
+              />
             </button>
           </section>
         )}
 
-        {!profile && !loadError && (
-          <section
-            className="mt-16 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm"
-            aria-busy="true"
-          >
-            <div
-              className="size-8 animate-spin rounded-full border-4 border-slate-200 border-t-[#1F7A5C]"
-              aria-hidden="true"
+        {summary && (
+          <>
+            <DashboardContent
+              summary={summary}
             />
 
-            <p className="mt-4 text-slate-600">
-              Loading your profile…
-            </p>
-          </section>
-        )}
+            <footer className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-[#dedbd2] py-6 text-xs text-[#657972]">
+              <p>
+                Salif keeps your financial
+                information private and secure.
+              </p>
 
-        {profile && (
-          <section className="mt-16 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-            <p className="text-sm font-semibold text-[#1F7A5C]">
-              Authentication successful
-            </p>
-
-            <h1 className="mt-2 text-3xl font-semibold text-slate-950">
-              Welcome, {profile.firstName}
-            </h1>
-
-            <p className="mt-3 leading-7 text-slate-600">
-              Your Salif session is active and your profile was loaded
-              securely from the backend.
-            </p>
-
-            <dl className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              <div>
-                <dt className="text-sm text-slate-500">Email</dt>
-                <dd className="mt-1 font-medium text-slate-900">
-                  {profile.email}
-                </dd>
-              </div>
-
-              <div>
-                <dt className="text-sm text-slate-500">Time zone</dt>
-                <dd className="mt-1 font-medium text-slate-900">
-                  {profile.timeZone}
-                </dd>
-              </div>
-
-              <div>
-                <dt className="text-sm text-slate-500">Status</dt>
-                <dd className="mt-1 font-medium text-slate-900">
-                  {profile.status}
-                </dd>
-              </div>
-            </dl>
-          </section>
+              <p>
+                Last synced just now
+                {isFetching &&
+                  ' · refreshing'}
+              </p>
+            </footer>
+          </>
         )}
       </div>
     </main>
+  )
+}
+
+interface DashboardContentProps {
+  summary: DashboardSummary
+}
+
+function DashboardContent({
+  summary,
+}: DashboardContentProps) {
+  const insight =
+    getDashboardInsight(summary)
+
+  return (
+    <>
+      <section className="dashboard-reveal dashboard-reveal-delay-1 mt-8 flex items-start gap-4 rounded-2xl bg-[#dfece3] px-6 py-4 text-[#173c32]">
+        <Sparkles
+          size={18}
+          className="mt-0.5 shrink-0 text-[#bd8539]"
+          aria-hidden
+        />
+
+        <div>
+          <h2 className="text-sm font-bold">
+            {insight.title}
+          </h2>
+
+          <p className="mt-1 text-sm leading-6 text-[#4f6d63]">
+            {insight.description}
+          </p>
+        </div>
+      </section>
+
+      <section className="dashboard-reveal dashboard-reveal-delay-2 mt-6 grid gap-5 lg:grid-cols-2 xl:grid-cols-12">
+        <div className="xl:col-span-5">
+          <NetWorthCard
+            items={
+              summary.netWorthByCurrency
+            }
+          />
+        </div>
+
+        <div className="xl:col-span-4">
+          <MonthlyCashFlowCard
+            items={
+              summary.currentMonthCashFlow
+            }
+          />
+        </div>
+
+        <div className="lg:col-span-2 xl:col-span-3">
+          <BudgetPulseCard />
+        </div>
+      </section>
+
+      <section className="dashboard-reveal dashboard-reveal-delay-3 mt-6 grid gap-5 xl:grid-cols-[minmax(0,2fr)_minmax(290px,0.9fr)]">
+        <CashFlowChart />
+        <TopSpendingCard />
+      </section>
+
+      <RecentTransactionsCard />
+
+      <PaymentsToWatch
+        dueTransactions={
+          summary.dueRecurringTransactions
+        }
+      />
+    </>
   )
 }

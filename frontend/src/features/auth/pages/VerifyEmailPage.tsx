@@ -52,7 +52,7 @@ export default function VerifyEmailPage() {
         if (error instanceof ApiClientError) {
           setMessage(
             error.isNetworkError
-              ? 'Unable to reach Salif. Check that the backend is running.'
+              ? 'We couldn’t connect to Salif right now. Please try again in a moment.'
               : error.message,
           )
         } else {

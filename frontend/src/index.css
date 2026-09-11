@@ -14,6 +14,8 @@
 }
 
 :root {
+  scrollbar-gutter: stable;
+
   font-family:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
@@ -36,4 +38,164 @@ input,
 select,
 textarea {
   font: inherit;
+}
+
+select {
+  appearance: none;
+  padding-right: 1rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='m6 8 4 4 4-4' stroke='%23657972' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1.1rem;
+}
+
+.salif-sidebar-scrollbar {
+  scrollbar-color: rgba(213, 228, 221, 0.28) transparent;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
+
+.salif-sidebar-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.salif-sidebar-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.salif-sidebar-scrollbar::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(213, 228, 221, 0.22);
+}
+
+.salif-sidebar-scrollbar:hover::-webkit-scrollbar-thumb {
+  background: rgba(213, 228, 221, 0.38);
+}
+
+@media (max-height: 760px) {
+  .salif-sidebar {
+    padding-block: 1rem;
+  }
+
+  .salif-sidebar-brand {
+    padding-bottom: 1rem;
+  }
+
+  .salif-sidebar-nav {
+    margin-top: 1rem;
+  }
+
+  .salif-sidebar-status {
+    display: none;
+  }
+}
+
+@keyframes dashboard-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dashboard-reveal {
+  animation: dashboard-reveal 420ms
+    cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.dashboard-reveal-delay-1 {
+  animation-delay: 60ms;
+}
+
+.dashboard-reveal-delay-2 {
+  animation-delay: 120ms;
+}
+
+.dashboard-reveal-delay-3 {
+  animation-delay: 180ms;
+}
+
+.dashboard-reveal-delay-4 {
+  animation-delay: 240ms;
+}
+
+.dashboard-reveal-delay-5 {
+  animation-delay: 300ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-reveal {
+    animation: none;
+  }
+}
+
+@keyframes feature-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.feature-fade-in {
+  animation: feature-fade-in 320ms ease-out backwards;
+}
+
+.feature-fade-in-delay-1 {
+  animation-delay: 70ms;
+}
+
+.feature-fade-in-delay-2 {
+  animation-delay: 140ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feature-fade-in {
+    animation: none;
+  }
+}
+
+.feature-fade-in-delay-3 {
+  animation-delay: 210ms;
+}
+
+@keyframes feature-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.feature-reveal {
+  animation: feature-reveal 420ms
+    cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.feature-reveal-delay-1 {
+  animation-delay: 80ms;
+}
+
+.feature-reveal-delay-2 {
+  animation-delay: 160ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feature-reveal {
+    animation: none;
+  }
+}
+
+.feature-reveal-delay-3 {
+  animation-delay: 240ms;
 }

@@ -25,6 +25,21 @@ export interface LoginRequest {
   readonly password: string
 }
 
+export type LoginStatus =
+  | 'AUTHENTICATED'
+  | 'MFA_REQUIRED'
+
+export interface MfaChallengeResponse {
+  readonly challengeToken: string
+  readonly expiresAt: string
+}
+
+export interface LoginResponse {
+  readonly status: LoginStatus
+  readonly tokens?: TokenResponse
+  readonly mfaChallenge?: MfaChallengeResponse
+}
+
 export interface TokenResponse {
   readonly accessToken: string
   readonly refreshToken: string
@@ -34,6 +49,16 @@ export interface TokenResponse {
 
 export interface RefreshRequest {
   readonly refreshToken: string
+}
+
+export interface MfaVerifyRequest {
+  readonly challengeToken: string
+  readonly code: string
+}
+
+export interface MfaRecoverRequest {
+  readonly challengeToken: string
+  readonly recoveryCode: string
 }
 
 export interface VerifyEmailRequest {
@@ -51,4 +76,8 @@ export interface ForgotPasswordRequest {
 export interface ResetPasswordRequest {
   readonly token: string
   readonly newPassword: string
+}
+
+export interface ConfirmEmailChangeRequest {
+  readonly token: string
 }

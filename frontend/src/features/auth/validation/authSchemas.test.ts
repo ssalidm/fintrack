@@ -1,4 +1,9 @@
-import {describe, expect, it} from 'vitest'
+import {
+  describe,
+  expect,
+  it,
+} from 'vitest'
+
 import {forgotPasswordSchema} from './forgotPasswordSchema'
 import {loginSchema} from './loginSchema'
 import {registrationSchema} from './registrationSchema'
@@ -9,49 +14,72 @@ const validPassword = 'SalifSecure1!'
 
 describe('registrationSchema', () => {
   it('accepts a valid registration', () => {
-    const result = registrationSchema.safeParse({
-      firstName: 'David',
-      lastName: 'Ssali',
-      email: 'david@example.com',
-      password: validPassword,
-      confirmPassword: validPassword,
-    })
+    const result =
+      registrationSchema.safeParse({
+        firstName: 'David',
+        lastName: 'Ssali',
+        email: 'david@example.com',
+        password: validPassword,
+        confirmPassword: validPassword,
+        acceptTerms: true,
+      })
 
     expect(result.success).toBe(true)
   })
 
   it('rejects names containing unsupported characters', () => {
-    const result = registrationSchema.safeParse({
-      firstName: 'David3',
-      lastName: 'Ssali',
-      email: 'david@example.com',
-      password: validPassword,
-      confirmPassword: validPassword,
-    })
+    const result =
+      registrationSchema.safeParse({
+        firstName: 'David3',
+        lastName: 'Ssali',
+        email: 'david@example.com',
+        password: validPassword,
+        confirmPassword: validPassword,
+        acceptTerms: true,
+      })
 
     expect(result.success).toBe(false)
   })
 
   it('rejects a weak password', () => {
-    const result = registrationSchema.safeParse({
-      firstName: 'David',
-      lastName: 'Ssali',
-      email: 'david@example.com',
-      password: 'password',
-      confirmPassword: 'password',
-    })
+    const result =
+      registrationSchema.safeParse({
+        firstName: 'David',
+        lastName: 'Ssali',
+        email: 'david@example.com',
+        password: 'password',
+        confirmPassword: 'password',
+        acceptTerms: true,
+      })
 
     expect(result.success).toBe(false)
   })
 
   it('rejects passwords that do not match', () => {
-    const result = registrationSchema.safeParse({
-      firstName: 'David',
-      lastName: 'Ssali',
-      email: 'david@example.com',
-      password: validPassword,
-      confirmPassword: 'Different1!',
-    })
+    const result =
+      registrationSchema.safeParse({
+        firstName: 'David',
+        lastName: 'Ssali',
+        email: 'david@example.com',
+        password: validPassword,
+        confirmPassword:
+          'DifferentSecure1!',
+        acceptTerms: true,
+      })
+
+    expect(result.success).toBe(false)
+  })
+
+  it('requires terms acceptance', () => {
+    const result =
+      registrationSchema.safeParse({
+        firstName: 'David',
+        lastName: 'Ssali',
+        email: 'david@example.com',
+        password: validPassword,
+        confirmPassword: validPassword,
+        acceptTerms: false,
+      })
 
     expect(result.success).toBe(false)
   })
@@ -79,19 +107,22 @@ describe('loginSchema', () => {
 
 describe('resetPasswordSchema', () => {
   it('accepts matching strong passwords', () => {
-    const result = resetPasswordSchema.safeParse({
-      newPassword: validPassword,
-      confirmPassword: validPassword,
-    })
+    const result =
+      resetPasswordSchema.safeParse({
+        newPassword: validPassword,
+        confirmPassword: validPassword,
+      })
 
     expect(result.success).toBe(true)
   })
 
   it('rejects mismatched passwords', () => {
-    const result = resetPasswordSchema.safeParse({
-      newPassword: validPassword,
-      confirmPassword: 'DifferentSecure1!',
-    })
+    const result =
+      resetPasswordSchema.safeParse({
+        newPassword: validPassword,
+        confirmPassword:
+          'DifferentSecure1!',
+      })
 
     expect(result.success).toBe(false)
   })
