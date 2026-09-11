@@ -18,6 +18,7 @@ import CategoryModal from '../components/CategoryModal'
 import { useArchiveCategory } from '../hooks/useCategoryMutations'
 import { useCategories } from '../hooks/useCategories'
 import CategorySpendingChart from '../components/CategorySpendingChart'
+import PageShell from '../../../components/layout/PageShell'
 
 interface CategoryRowProps {
   category: Category
@@ -160,8 +161,7 @@ export default function CategoriesPage() {
         : null
 
   return (
-    <main className="min-h-screen px-5 py-8 sm:px-8 lg:px-12 lg:py-12">
-      <div className="mx-auto max-w-6xl">
+    <PageShell>        
         <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6c7973]">
@@ -194,64 +194,64 @@ export default function CategoriesPage() {
           </div>
         )}
 
-        <section className="mt-10 rounded-[1.75rem] border border-[#dedbd2] bg-[#fbfaf6] shadow-[0_14px_40px_rgba(36,64,54,0.04)]">
-          <div className="flex flex-wrap items-center justify-between gap-3 pb-4">
-  <div className="max-w-full overflow-x-auto">
-    <div
-      className="inline-flex w-max rounded-full bg-[#eceae2] p-1"
-      role="tablist"
-      aria-label="Category type"
-    >
-      {(['EXPENSE', 'INCOME'] as CategoryType[]).map(
-        (type) => (
-          <button
-            key={type}
-            type="button"
-            role="tab"
-            aria-selected={categoryType === type}
-            onClick={() => setCategoryType(type)}
-            className={[
-              'cursor-pointer whitespace-nowrap rounded-full px-4 py-2',
-              'text-xs font-semibold transition',
-              categoryType === type
-                ? 'bg-[#174f43] text-white shadow-sm'
-                : 'text-[#69756f] hover:text-[#173c32]',
-            ].join(' ')}
-          >
-            {type === 'EXPENSE' ? 'Expenses' : 'Income'}
-          </button>
-        ),
-      )}
-    </div>
-  </div>
+        <section className="mt-10 overflow-hidden rounded-[1.75rem] border border-[#dedbd2] bg-[#fbfaf6] shadow-[0_14px_40px_rgba(36,64,54,0.04)]">
+  <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e5e1d7] px-5 py-5 sm:px-6">
+            <div className="max-w-full overflow-x-auto">
+              <div
+                className="inline-flex w-max rounded-full bg-[#eceae2] p-1"
+                role="tablist"
+                aria-label="Category type"
+              >
+                {(['EXPENSE', 'INCOME'] as CategoryType[]).map(
+                  (type) => (
+                    <button
+                      key={type}
+                      type="button"
+                      role="tab"
+                      aria-selected={categoryType === type}
+                      onClick={() => setCategoryType(type)}
+                      className={[
+                        'cursor-pointer whitespace-nowrap rounded-full px-4 py-2',
+                        'text-xs font-semibold transition',
+                        categoryType === type
+                          ? 'bg-[#174f43] text-white shadow-sm'
+                          : 'text-[#69756f] hover:text-[#173c32]',
+                      ].join(' ')}
+                    >
+                      {type === 'EXPENSE' ? 'Expenses' : 'Income'}
+                    </button>
+                  ),
+                )}
+              </div>
+            </div>
 
-  <div
-    className="inline-flex rounded-full border border-[#dedbd2] bg-white p-1"
-    aria-label="Category status"
-  >
-    {(['ACTIVE', 'ARCHIVED'] as CategoryStatus[]).map(
-      (categoryStatus) => (
-        <button
-          key={categoryStatus}
-          type="button"
-          aria-pressed={status === categoryStatus}
-          onClick={() => setStatus(categoryStatus)}
-          className={[
-            'cursor-pointer rounded-full px-3.5 py-2',
-            'text-xs font-semibold transition',
-            status === categoryStatus
-              ? 'bg-[#deebe1] text-[#174f43]'
-              : 'text-[#748079] hover:text-[#173c32]',
-          ].join(' ')}
-        >
-          {categoryStatus === 'ACTIVE'
-            ? 'Active'
-            : 'Archived'}
-        </button>
-      ),
-    )}
-  </div>
-</div>
+            <div
+              className="inline-flex rounded-full border border-[#dedbd2] bg-white p-1"
+              aria-label="Category status"
+            >
+              {(['ACTIVE', 'ARCHIVED'] as CategoryStatus[]).map(
+                (categoryStatus) => (
+                  <button
+                    key={categoryStatus}
+                    type="button"
+                    aria-pressed={status === categoryStatus}
+                    onClick={() => setStatus(categoryStatus)}
+                    className={[
+                      'cursor-pointer rounded-full px-3.5 py-2',
+                      'text-xs font-semibold transition',
+                      status === categoryStatus
+                        ? 'bg-[#deebe1] text-[#174f43]'
+                        : 'text-[#748079] hover:text-[#173c32]',
+                    ].join(' ')}
+                  >
+                    {categoryStatus === 'ACTIVE'
+                      ? 'Active'
+                      : 'Archived'}
+                  </button>
+                ),
+              )}
+            </div>
+          </div>
 
           {categoriesQuery.isPending && (
             <div className="grid min-h-72 place-items-center">
@@ -343,7 +343,6 @@ export default function CategoriesPage() {
             their income or expense type cannot be changed.
           </p>
         </aside>
-      </div>
 
       <CategoryModal
         category={selectedCategory}
@@ -410,6 +409,6 @@ export default function CategoriesPage() {
           </section>
         </div>
       )}
-    </main>
+    </PageShell>
   )
 }

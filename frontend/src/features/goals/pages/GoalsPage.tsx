@@ -33,6 +33,7 @@ import {
   useGoals,
 } from '../hooks/useGoals'
 import ContributionHistoryDrawer from '../components/ContributionHistoryDrawer'
+import PageShell from '../../../components/layout/PageShell'
 
 const statusOptions = [
   {
@@ -336,440 +337,439 @@ export default function GoalsPage() {
     archiveGoal.isPending
 
   return (
-    <main className="min-h-screen px-5 py-8 sm:px-8 lg:px-12 lg:py-12 xl:px-16">
-      <div className="mx-auto max-w-[1280px]">
-        <header className="flex flex-wrap items-end justify-between gap-6">
-          <div>
-            <p className="text-xs font-semibold tracking-[0.16em] text-[#657972]">
-              ROOM FOR WHAT MATTERS
-            </p>
+    <PageShell>
+      <header className="flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <p className="text-xs font-semibold tracking-[0.16em] text-[#657972]">
+            ROOM FOR WHAT MATTERS
+          </p>
 
-            <h1 className="mt-4 font-serif text-5xl tracking-[-0.03em] text-[#173c32]">
-              Your goals
-            </h1>
+          <h1 className="mt-4 font-serif text-5xl tracking-[-0.03em] text-[#173c32]">
+            Your goals
+          </h1>
 
-            <p className="mt-3 max-w-xl text-sm leading-6 text-[#657972]">
-              Turn the things you care about
-              into steady, visible progress.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() =>
-                void goalsQuery.refetch()
-              }
-              disabled={
-                goalsQuery.isFetching
-              }
-              className="cursor-pointer rounded-full border border-[#d8d6ce] bg-[#fffdf8] p-3 text-[#657972] transition hover:border-[#bd9460] hover:text-[#9a6828] disabled:cursor-not-allowed disabled:opacity-60"
-              aria-label="Refresh goals"
-              title="Refresh goals"
-            >
-              <RefreshCw
-                size={18}
-                aria-hidden
-                className={
-                  goalsQuery.isFetching
-                    ? 'animate-spin'
-                    : ''
-                }
-              />
-            </button>
-
-            <button
-              type="button"
-              onClick={openCreateGoal}
-              className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#236a58]"
-            >
-              <Plus
-                size={18}
-                aria-hidden
-              />
-
-              New goal
-            </button>
-          </div>
-        </header>
-
-        <section className="mt-9 grid overflow-hidden rounded-3xl border border-[#d8ded8] bg-[#eaf0e9] md:grid-cols-[1.35fr_0.8fr_0.9fr]">
-          <div className="p-6 sm:p-7">
-            <div className="flex items-start gap-4">
-              <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#cfe1d5] text-[#39725d]">
-                <Sparkles
-                  size={20}
-                  aria-hidden
-                />
-              </span>
-
-              <div>
-                <p className="text-xs font-semibold tracking-[0.14em] text-[#657972]">
-                  YOUR MOMENTUM
-                </p>
-
-                <p className="mt-2 font-serif text-2xl text-[#173c32]">
-                  {momentumMessage}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-[#d4ddd5] p-6 sm:p-7 md:border-l md:border-t-0">
-            <p className="text-xs font-semibold tracking-[0.13em] text-[#657972]">
-              AVERAGE PROGRESS
-            </p>
-
-            <div className="mt-3 flex items-end gap-3">
-              <p className="font-serif text-4xl text-[#173c32]">
-                {averageProgress}%
-              </p>
-
-              <TrendingUp
-                size={19}
-                aria-hidden
-                className="mb-1.5 text-[#56836f]"
-              />
-            </div>
-          </div>
-
-          <div className="border-t border-[#d4ddd5] p-6 sm:p-7 md:border-l md:border-t-0">
-            <p className="text-xs font-semibold tracking-[0.13em] text-[#657972]">
-              NEAREST TARGET
-            </p>
-
-            <p className="mt-3 truncate font-semibold text-[#173c32]">
-              {nearestGoal?.name ??
-                'No date set'}
-            </p>
-
-            <p className="mt-1 text-xs text-[#657972]">
-              {nearestGoal
-                ? deadlineCopy(
-                  nearestGoal.targetDate,
-                )
-                : 'Choose dates only when they help.'}
-            </p>
-          </div>
-        </section>
-
-        <div className="mt-9 flex gap-7 border-b border-[#dedbd2]">
-          {statusOptions.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() =>
-                setStatus(option.value)
-              }
-              className={`cursor-pointer border-b-2 px-1 pb-4 text-sm font-semibold transition ${status === option.value
-                ? 'border-[#39725d] text-[#173c32]'
-                : 'border-transparent text-[#7a8984] hover:text-[#173c32]'
-                }`}
-            >
-              {option.label}
-            </button>
-          ))}
+          <p className="mt-3 max-w-xl text-sm leading-6 text-[#657972]">
+            Turn the things you care about
+            into steady, visible progress.
+          </p>
         </div>
 
-        {goalsQuery.isPending && (
-          <div className="mt-8 grid animate-pulse gap-5 md:grid-cols-2">
-            {[1, 2, 3, 4].map(
-              (item) => (
-                <div
-                  key={item}
-                  className="h-72 rounded-3xl bg-[#e5e8e1]"
-                />
-              ),
-            )}
-          </div>
-        )}
-
-        {goalsQuery.error && (
-          <section
-            role="alert"
-            className="mt-8 rounded-2xl border border-red-200 bg-red-50 p-6"
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() =>
+              void goalsQuery.refetch()
+            }
+            disabled={
+              goalsQuery.isFetching
+            }
+            className="cursor-pointer rounded-full border border-[#d8d6ce] bg-[#fffdf8] p-3 text-[#657972] transition hover:border-[#bd9460] hover:text-[#9a6828] disabled:cursor-not-allowed disabled:opacity-60"
+            aria-label="Refresh goals"
+            title="Refresh goals"
           >
-            <h2 className="font-serif text-2xl text-red-950">
-              We couldn’t load your goals
-            </h2>
+            <RefreshCw
+              size={18}
+              aria-hidden
+              className={
+                goalsQuery.isFetching
+                  ? 'animate-spin'
+                  : ''
+              }
+            />
+          </button>
 
-            <p className="mt-2 text-sm text-red-700">
-              {goalsQuery.error instanceof
-                ApiClientError
-                ? goalsQuery.error.message
-                : 'Please try again.'}
+          <button
+            type="button"
+            onClick={openCreateGoal}
+            className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#236a58]"
+          >
+            <Plus
+              size={18}
+              aria-hidden
+            />
+
+            New goal
+          </button>
+        </div>
+      </header>
+
+      <section className="mt-9 grid overflow-hidden rounded-3xl border border-[#d8ded8] bg-[#eaf0e9] md:grid-cols-[1.35fr_0.8fr_0.9fr]">
+        <div className="p-6 sm:p-7">
+          <div className="flex items-start gap-4">
+            <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#cfe1d5] text-[#39725d]">
+              <Sparkles
+                size={20}
+                aria-hidden
+              />
+            </span>
+
+            <div>
+              <p className="text-xs font-semibold tracking-[0.14em] text-[#657972]">
+                YOUR MOMENTUM
+              </p>
+
+              <p className="mt-2 font-serif text-2xl text-[#173c32]">
+                {momentumMessage}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t border-[#d4ddd5] p-6 sm:p-7 md:border-l md:border-t-0">
+          <p className="text-xs font-semibold tracking-[0.13em] text-[#657972]">
+            AVERAGE PROGRESS
+          </p>
+
+          <div className="mt-3 flex items-end gap-3">
+            <p className="font-serif text-4xl text-[#173c32]">
+              {averageProgress}%
             </p>
 
-            <button
-              type="button"
-              onClick={() =>
-                void goalsQuery.refetch()
-              }
-              className="mt-4 cursor-pointer text-sm font-semibold text-red-800 underline underline-offset-4"
-            >
-              Try again
-            </button>
+            <TrendingUp
+              size={19}
+              aria-hidden
+              className="mb-1.5 text-[#56836f]"
+            />
+          </div>
+        </div>
+
+        <div className="border-t border-[#d4ddd5] p-6 sm:p-7 md:border-l md:border-t-0">
+          <p className="text-xs font-semibold tracking-[0.13em] text-[#657972]">
+            NEAREST TARGET
+          </p>
+
+          <p className="mt-3 truncate font-semibold text-[#173c32]">
+            {nearestGoal?.name ??
+              'No date set'}
+          </p>
+
+          <p className="mt-1 text-xs text-[#657972]">
+            {nearestGoal
+              ? deadlineCopy(
+                nearestGoal.targetDate,
+              )
+              : 'Choose dates only when they help.'}
+          </p>
+        </div>
+      </section>
+
+      <div className="mt-9 flex gap-7 border-b border-[#dedbd2]">
+        {statusOptions.map((option) => (
+          <button
+            key={option.value}
+            type="button"
+            onClick={() =>
+              setStatus(option.value)
+            }
+            className={`cursor-pointer border-b-2 px-1 pb-4 text-sm font-semibold transition ${status === option.value
+              ? 'border-[#39725d] text-[#173c32]'
+              : 'border-transparent text-[#7a8984] hover:text-[#173c32]'
+              }`}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+
+      {goalsQuery.isPending && (
+        <div className="mt-8 grid animate-pulse gap-5 md:grid-cols-2">
+          {[1, 2, 3, 4].map(
+            (item) => (
+              <div
+                key={item}
+                className="h-72 rounded-3xl bg-[#e5e8e1]"
+              />
+            ),
+          )}
+        </div>
+      )}
+
+      {goalsQuery.error && (
+        <section
+          role="alert"
+          className="mt-8 rounded-2xl border border-red-200 bg-red-50 p-6"
+        >
+          <h2 className="font-serif text-2xl text-red-950">
+            We couldn’t load your goals
+          </h2>
+
+          <p className="mt-2 text-sm text-red-700">
+            {goalsQuery.error instanceof
+              ApiClientError
+              ? goalsQuery.error.message
+              : 'Please try again.'}
+          </p>
+
+          <button
+            type="button"
+            onClick={() =>
+              void goalsQuery.refetch()
+            }
+            className="mt-4 cursor-pointer text-sm font-semibold text-red-800 underline underline-offset-4"
+          >
+            Try again
+          </button>
+        </section>
+      )}
+
+      {!goalsQuery.isPending &&
+        !goalsQuery.error &&
+        goals.length === 0 && (
+          <section className="mt-8 rounded-3xl border border-[#dedbd2] bg-[#fffdf8] px-6 py-16 text-center">
+            <span className="mx-auto grid size-14 place-items-center rounded-full bg-[#f2e7ca] text-[#9a6828]">
+              <Target
+                size={25}
+                aria-hidden
+              />
+            </span>
+
+            <h2 className="mt-5 font-serif text-3xl text-[#173c32]">
+              {status === 'ACTIVE'
+                ? 'What are you making room for?'
+                : status ===
+                  'COMPLETED'
+                  ? 'No completed goals yet'
+                  : 'No archived goals'}
+            </h2>
+
+            <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-[#657972]">
+              {status === 'ACTIVE'
+                ? 'Start with something meaningful. The amount can be practical; the reason should feel personal.'
+                : 'Goals in this stage will stay here with their history intact.'}
+            </p>
+
+            {status === 'ACTIVE' && (
+              <button
+                type="button"
+                onClick={
+                  openCreateGoal
+                }
+                className="mt-7 inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#236a58]"
+              >
+                <Plus
+                  size={18}
+                  aria-hidden
+                />
+
+                Create your first goal
+              </button>
+            )}
           </section>
         )}
 
-        {!goalsQuery.isPending &&
-          !goalsQuery.error &&
-          goals.length === 0 && (
-            <section className="mt-8 rounded-3xl border border-[#dedbd2] bg-[#fffdf8] px-6 py-16 text-center">
-              <span className="mx-auto grid size-14 place-items-center rounded-full bg-[#f2e7ca] text-[#9a6828]">
-                <Target
-                  size={25}
-                  aria-hidden
-                />
-              </span>
+      {!goalsQuery.isPending &&
+        !goalsQuery.error &&
+        goals.length > 0 && (
+          <section className="mt-8 grid gap-5 md:grid-cols-2">
+            {goals.map((goal) => {
+              const displayedProgress =
+                Math.min(
+                  goal.progressPercentage,
+                  100,
+                )
 
-              <h2 className="mt-5 font-serif text-3xl text-[#173c32]">
-                {status === 'ACTIVE'
-                  ? 'What are you making room for?'
-                  : status ===
-                    'COMPLETED'
-                    ? 'No completed goals yet'
-                    : 'No archived goals'}
-              </h2>
+              const targetReached =
+                goal.currentAmount >=
+                goal.targetAmount
 
-              <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-[#657972]">
-                {status === 'ACTIVE'
-                  ? 'Start with something meaningful. The amount can be practical; the reason should feel personal.'
-                  : 'Goals in this stage will stay here with their history intact.'}
-              </p>
-
-              {status === 'ACTIVE' && (
-                <button
-                  type="button"
-                  onClick={
-                    openCreateGoal
-                  }
-                  className="mt-7 inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#236a58]"
+              return (
+                <article
+                  key={goal.id}
+                  className="flex min-h-72 flex-col rounded-3xl border border-[#dedbd2] bg-[#fffdf8] p-6 sm:p-7"
                 >
-                  <Plus
-                    size={18}
-                    aria-hidden
-                  />
+                  <div className="flex items-start justify-between gap-5">
+                    <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[#e3eee7] text-[#39725d]">
+                      {goal.status ===
+                        'COMPLETED' ? (
+                        <CheckCircle2
+                          size={21}
+                          aria-hidden
+                        />
+                      ) : (
+                        <Target
+                          size={21}
+                          aria-hidden
+                        />
+                      )}
+                    </span>
 
-                  Create your first goal
-                </button>
-              )}
-            </section>
-          )}
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setHistoryGoalId(goal.id)
+                        }
+                        className="cursor-pointer rounded-full p-2 text-[#657972] transition hover:bg-[#edf2ee] hover:text-[#39725d]"
+                        aria-label={`View contribution history for ${goal.name}`}
+                        title="Contribution history"
+                      >
+                        <History
+                          size={17}
+                          aria-hidden
+                        />
+                      </button>
 
-        {!goalsQuery.isPending &&
-          !goalsQuery.error &&
-          goals.length > 0 && (
-            <section className="mt-8 grid gap-5 md:grid-cols-2">
-              {goals.map((goal) => {
-                const displayedProgress =
-                  Math.min(
-                    goal.progressPercentage,
-                    100,
-                  )
-
-                const targetReached =
-                  goal.currentAmount >=
-                  goal.targetAmount
-
-                return (
-                  <article
-                    key={goal.id}
-                    className="flex min-h-72 flex-col rounded-3xl border border-[#dedbd2] bg-[#fffdf8] p-6 sm:p-7"
-                  >
-                    <div className="flex items-start justify-between gap-5">
-                      <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[#e3eee7] text-[#39725d]">
-                        {goal.status ===
-                          'COMPLETED' ? (
-                          <CheckCircle2
-                            size={21}
-                            aria-hidden
-                          />
-                        ) : (
-                          <Target
-                            size={21}
-                            aria-hidden
-                          />
-                        )}
-                      </span>
-
-                      <div className="flex items-center gap-1">
+                      {goal.status === 'ACTIVE' && (
                         <button
                           type="button"
                           onClick={() =>
-                            setHistoryGoalId(goal.id)
+                            openEditGoal(goal)
                           }
                           className="cursor-pointer rounded-full p-2 text-[#657972] transition hover:bg-[#edf2ee] hover:text-[#39725d]"
-                          aria-label={`View contribution history for ${goal.name}`}
-                          title="Contribution history"
+                          aria-label={`Edit ${goal.name}`}
+                          title="Edit goal"
                         >
-                          <History
+                          <Pencil
                             size={17}
                             aria-hidden
                           />
                         </button>
+                      )}
 
-                        {goal.status === 'ACTIVE' && (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              openEditGoal(goal)
-                            }
-                            className="cursor-pointer rounded-full p-2 text-[#657972] transition hover:bg-[#edf2ee] hover:text-[#39725d]"
-                            aria-label={`Edit ${goal.name}`}
-                            title="Edit goal"
-                          >
-                            <Pencil
-                              size={17}
-                              aria-hidden
-                            />
-                          </button>
+                      {goal.status !== 'ARCHIVED' && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            requestAction(
+                              goal,
+                              'archive',
+                            )
+                          }
+                          className="cursor-pointer rounded-full p-2 text-[#657972] transition hover:bg-[#f2e7df] hover:text-[#9b5845]"
+                          aria-label={`Archive ${goal.name}`}
+                          title="Archive goal"
+                        >
+                          <Archive
+                            size={17}
+                            aria-hidden
+                          />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <h2 className="mt-5 font-serif text-3xl tracking-[-0.02em] text-[#173c32]">
+                    {goal.name}
+                  </h2>
+
+                  <p className="mt-2 line-clamp-2 min-h-10 text-sm leading-5 text-[#657972]">
+                    {goal.description ??
+                      'A clear destination for steady progress.'}
+                  </p>
+
+                  <div className="mt-6">
+                    <div className="flex items-end justify-between gap-4">
+                      <div>
+                        <p className="text-xs text-[#657972]">
+                          Saved so far
+                        </p>
+
+                        <p className="mt-1 font-serif text-2xl text-[#173c32]">
+                          {formatMoney(
+                            goal.currentAmount,
+                            goal.currencyCode,
+                          )}
+                        </p>
+                      </div>
+
+                      <p className="font-serif text-2xl text-[#39725d]">
+                        {Math.round(
+                          goal.progressPercentage,
                         )}
+                        %
+                      </p>
+                    </div>
 
-                        {goal.status !== 'ARCHIVED' && (
+                    <div className="mt-4 h-2 overflow-hidden rounded-full bg-[#e2e4dc]">
+                      <div
+                        className="h-full rounded-full bg-[#6f9b82] transition-[width] duration-500"
+                        style={{
+                          width: `${displayedProgress}%`,
+                        }}
+                      />
+                    </div>
+
+                    <div className="mt-3 flex flex-wrap justify-between gap-2 text-xs text-[#657972]">
+                      <span>
+                        {formatMoney(
+                          goal.remainingAmount,
+                          goal.currencyCode,
+                        )}{' '}
+                        to go
+                      </span>
+
+                      <span>
+                        Target{' '}
+                        {formatMoney(
+                          goal.targetAmount,
+                          goal.currencyCode,
+                        )}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-5 flex items-center gap-2 text-xs text-[#657972]">
+                    <CalendarDays
+                      size={15}
+                      aria-hidden
+                    />
+
+                    {goal.targetDate
+                      ? `${formatTargetDate(
+                        goal.targetDate,
+                      )} · ${deadlineCopy(
+                        goal.targetDate,
+                      )}`
+                      : 'No fixed deadline'}
+                  </div>
+
+                  {goal.status ===
+                    'ACTIVE' && (
+                      <div className="mt-auto flex flex-wrap items-center gap-3 border-t border-[#e5e1d8] pt-5">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setContributionGoal(
+                              goal,
+                            )
+                          }
+                          className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#236a58]"
+                        >
+                          <CircleDollarSign
+                            size={17}
+                            aria-hidden
+                          />
+
+                          Add contribution
+                        </button>
+
+                        {targetReached && (
                           <button
                             type="button"
                             onClick={() =>
                               requestAction(
                                 goal,
-                                'archive',
+                                'complete',
                               )
                             }
-                            className="cursor-pointer rounded-full p-2 text-[#657972] transition hover:bg-[#f2e7df] hover:text-[#9b5845]"
-                            aria-label={`Archive ${goal.name}`}
-                            title="Archive goal"
+                            className="inline-flex cursor-pointer items-center gap-2 rounded-full px-3 py-2.5 text-sm font-semibold text-[#39725d] transition hover:bg-[#edf2ee]"
                           >
-                            <Archive
+                            <CheckCircle2
                               size={17}
                               aria-hidden
                             />
+
+                            Mark complete
                           </button>
                         )}
                       </div>
-                    </div>
+                    )}
+                </article>
+              )
+            })}
+          </section>
+        )}
 
-                    <h2 className="mt-5 font-serif text-3xl tracking-[-0.02em] text-[#173c32]">
-                      {goal.name}
-                    </h2>
-
-                    <p className="mt-2 line-clamp-2 min-h-10 text-sm leading-5 text-[#657972]">
-                      {goal.description ??
-                        'A clear destination for steady progress.'}
-                    </p>
-
-                    <div className="mt-6">
-                      <div className="flex items-end justify-between gap-4">
-                        <div>
-                          <p className="text-xs text-[#657972]">
-                            Saved so far
-                          </p>
-
-                          <p className="mt-1 font-serif text-2xl text-[#173c32]">
-                            {formatMoney(
-                              goal.currentAmount,
-                              goal.currencyCode,
-                            )}
-                          </p>
-                        </div>
-
-                        <p className="font-serif text-2xl text-[#39725d]">
-                          {Math.round(
-                            goal.progressPercentage,
-                          )}
-                          %
-                        </p>
-                      </div>
-
-                      <div className="mt-4 h-2 overflow-hidden rounded-full bg-[#e2e4dc]">
-                        <div
-                          className="h-full rounded-full bg-[#6f9b82] transition-[width] duration-500"
-                          style={{
-                            width: `${displayedProgress}%`,
-                          }}
-                        />
-                      </div>
-
-                      <div className="mt-3 flex flex-wrap justify-between gap-2 text-xs text-[#657972]">
-                        <span>
-                          {formatMoney(
-                            goal.remainingAmount,
-                            goal.currencyCode,
-                          )}{' '}
-                          to go
-                        </span>
-
-                        <span>
-                          Target{' '}
-                          {formatMoney(
-                            goal.targetAmount,
-                            goal.currencyCode,
-                          )}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="mt-5 flex items-center gap-2 text-xs text-[#657972]">
-                      <CalendarDays
-                        size={15}
-                        aria-hidden
-                      />
-
-                      {goal.targetDate
-                        ? `${formatTargetDate(
-                          goal.targetDate,
-                        )} · ${deadlineCopy(
-                          goal.targetDate,
-                        )}`
-                        : 'No fixed deadline'}
-                    </div>
-
-                    {goal.status ===
-                      'ACTIVE' && (
-                        <div className="mt-auto flex flex-wrap items-center gap-3 border-t border-[#e5e1d8] pt-5">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setContributionGoal(
-                                goal,
-                              )
-                            }
-                            className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#236a58]"
-                          >
-                            <CircleDollarSign
-                              size={17}
-                              aria-hidden
-                            />
-
-                            Add contribution
-                          </button>
-
-                          {targetReached && (
-                            <button
-                              type="button"
-                              onClick={() =>
-                                requestAction(
-                                  goal,
-                                  'complete',
-                                )
-                              }
-                              className="inline-flex cursor-pointer items-center gap-2 rounded-full px-3 py-2.5 text-sm font-semibold text-[#39725d] transition hover:bg-[#edf2ee]"
-                            >
-                              <CheckCircle2
-                                size={17}
-                                aria-hidden
-                              />
-
-                              Mark complete
-                            </button>
-                          )}
-                        </div>
-                      )}
-                  </article>
-                )
-              })}
-            </section>
-          )}
-      </div>
 
       {historyGoal && (
         <ContributionHistoryDrawer
@@ -810,6 +810,6 @@ export default function GoalsPage() {
           }
         />
       )}
-    </main>
+    </PageShell>
   )
 }

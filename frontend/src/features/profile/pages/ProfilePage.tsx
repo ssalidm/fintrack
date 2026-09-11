@@ -21,6 +21,7 @@ import ProfileDetailsForm from '../components/ProfileDetailsForm'
 import TwoFactorAuthenticationCard from '../components/TwoFactorAuthenticationCard'
 import { useProfile } from '../hooks/useProfile'
 import ChangeEmailForm from '../components/ChangeEmailForm'
+import PageShell from '../../../components/layout/PageShell'
 
 function formatDate(value: string | null) {
   if (!value) {
@@ -84,8 +85,8 @@ export default function ProfilePage() {
 
   if (isPending) {
     return (
-      <main className="min-h-screen px-5 py-8 sm:px-8 lg:px-12 lg:py-12 xl:px-16">
-        <div className="mx-auto max-w-[1180px] animate-pulse">
+      <PageShell>
+        <div className="animate-pulse">
           <div className="h-3 w-32 rounded bg-[#dfe5df]" />
 
           <div className="mt-5 h-14 w-72 rounded bg-[#dfe5df]" />
@@ -98,7 +99,7 @@ export default function ProfilePage() {
             <div className="h-[330px] rounded-3xl bg-[#e7ebe6]" />
           </div>
         </div>
-      </main>
+      </PageShell>
     )
   }
 
@@ -131,164 +132,162 @@ export default function ProfilePage() {
       .toUpperCase()
 
   return (
-    <main className="min-h-screen px-5 py-8 sm:px-8 lg:px-12 lg:py-12 xl:px-16">
-      <div className="mx-auto max-w-[1180px]">
-        <header>
-          <p className="text-xs font-semibold tracking-[0.16em] text-[#657972]">
-            YOUR ACCOUNT
-          </p>
+    <PageShell>
+      <header>
+        <p className="text-xs font-semibold tracking-[0.16em] text-[#657972]">
+          YOUR ACCOUNT
+        </p>
 
-          <h1 className="mt-5 font-serif text-4xl leading-none tracking-[-0.03em] text-[#173c32] sm:text-5xl lg:text-6xl">
-            Profile &amp; Security
-          </h1>
+        <h1 className="mt-5 font-serif text-4xl leading-none tracking-[-0.03em] text-[#173c32] sm:text-5xl lg:text-6xl">
+          Profile &amp; Security
+        </h1>
 
-          <p className="mt-4 max-w-2xl text-sm leading-6 text-[#657972]">
-            Manage the personal details and
-            security protecting your Salif
-            account.
-          </p>
-        </header>
+        <p className="mt-4 max-w-2xl text-sm leading-6 text-[#657972]">
+          Manage the personal details and
+          security protecting your Salif
+          account.
+        </p>
+      </header>
 
-        <section className="mt-10 overflow-hidden rounded-3xl bg-[#174f43] text-white">
-          <div className="grid gap-7 p-7 sm:p-9 lg:grid-cols-[auto_1fr_auto] lg:items-center">
-            <span className="grid size-20 place-items-center rounded-full bg-[#bcd9c5] font-serif text-3xl text-[#174f43]">
-              {initials}
-            </span>
+      <section className="mt-10 overflow-hidden rounded-3xl bg-[#174f43] text-white">
+        <div className="grid gap-7 p-7 sm:p-9 lg:grid-cols-[auto_1fr_auto] lg:items-center">
+          <span className="grid size-20 place-items-center rounded-full bg-[#bcd9c5] font-serif text-3xl text-[#174f43]">
+            {initials}
+          </span>
 
-            <div>
-              <p className="font-serif text-3xl">
-                {displayName}
-              </p>
-
-              <p className="mt-2 flex items-center gap-2 text-sm text-[#cfe0d8]">
-                <Mail size={15} aria-hidden />
-                {profile.email}
-              </p>
-            </div>
-
-            <div className="flex flex-wrap gap-2 lg:justify-end">
-              <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs font-semibold">
-                <ShieldCheck
-                  size={15}
-                  aria-hidden
-                />
-
-                {formatStatus(profile.status)}
-              </span>
-
-              <span className="inline-flex items-center gap-2 rounded-full bg-[#d8b56d]/20 px-4 py-2 text-xs font-semibold text-[#f1d79d]">
-                <BadgeCheck
-                  size={15}
-                  aria-hidden
-                />
-
-                {profile.emailVerified
-                  ? 'Email verified'
-                  : 'Email unverified'}
-              </span>
-            </div>
-          </div>
-        </section>
-
-        <div className="mt-6 grid items-start gap-6 lg:grid-cols-[1.5fr_0.8fr]">
-          <ProfileDetailsForm
-            key={profile.version}
-            profile={profile}
-          />
-
-          <aside className="rounded-3xl border border-[#dedbd2] bg-[#f0f3ec] p-6 sm:p-7">
-            <p className="text-xs font-semibold tracking-[0.15em] text-[#657972]">
-              ACCOUNT NOTES
+          <div>
+            <p className="font-serif text-3xl">
+              {displayName}
             </p>
 
-            <h2 className="mt-3 font-serif text-2xl text-[#173c32]">
-              A little context
-            </h2>
+            <p className="mt-2 flex items-center gap-2 text-sm text-[#cfe0d8]">
+              <Mail size={15} aria-hidden />
+              {profile.email}
+            </p>
+          </div>
 
-            <div className="mt-7 space-y-6">
-              <div className="flex gap-3">
-                <CalendarDays
-                  size={19}
-                  className="mt-0.5 shrink-0 text-[#4f806f]"
-                  aria-hidden
-                />
+          <div className="flex flex-wrap gap-2 lg:justify-end">
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs font-semibold">
+              <ShieldCheck
+                size={15}
+                aria-hidden
+              />
 
-                <div>
-                  <p className="text-sm font-semibold text-[#294e43]">
-                    Salif member since
-                  </p>
+              {formatStatus(profile.status)}
+            </span>
 
-                  <p className="mt-1 text-sm text-[#657972]">
-                    {formatDate(
-                      profile.createdAt,
-                    )}
-                  </p>
-                </div>
-              </div>
+            <span className="inline-flex items-center gap-2 rounded-full bg-[#d8b56d]/20 px-4 py-2 text-xs font-semibold text-[#f1d79d]">
+              <BadgeCheck
+                size={15}
+                aria-hidden
+              />
 
-              <div className="border-t border-[#d8ddd6]" />
+              {profile.emailVerified
+                ? 'Email verified'
+                : 'Email unverified'}
+            </span>
+          </div>
+        </div>
+      </section>
 
-              <div className="flex gap-3">
-                <Clock3
-                  size={19}
-                  className="mt-0.5 shrink-0 text-[#4f806f]"
-                  aria-hidden
-                />
+      <div className="mt-6 grid items-start gap-6 lg:grid-cols-[1.5fr_0.8fr]">
+        <ProfileDetailsForm
+          key={profile.version}
+          profile={profile}
+        />
 
-                <div>
-                  <p className="text-sm font-semibold text-[#294e43]">
-                    Last signed in
-                  </p>
+        <aside className="rounded-3xl border border-[#dedbd2] bg-[#f0f3ec] p-6 sm:p-7">
+          <p className="text-xs font-semibold tracking-[0.15em] text-[#657972]">
+            ACCOUNT NOTES
+          </p>
 
-                  <p className="mt-1 text-sm text-[#657972]">
-                    {formatDate(
-                      profile.lastLoginAt,
-                    )}
-                  </p>
-                </div>
-              </div>
+          <h2 className="mt-3 font-serif text-2xl text-[#173c32]">
+            A little context
+          </h2>
 
-              <div className="border-t border-[#d8ddd6]" />
+          <div className="mt-7 space-y-6">
+            <div className="flex gap-3">
+              <CalendarDays
+                size={19}
+                className="mt-0.5 shrink-0 text-[#4f806f]"
+                aria-hidden
+              />
 
-              <div className="flex gap-3">
-                <BadgeCheck
-                  size={19}
-                  className="mt-0.5 shrink-0 text-[#4f806f]"
-                  aria-hidden
-                />
+              <div>
+                <p className="text-sm font-semibold text-[#294e43]">
+                  Salif member since
+                </p>
 
-                <div>
-                  <p className="text-sm font-semibold text-[#294e43]">
-                    Account access
-                  </p>
-
-                  <p className="mt-1 text-sm text-[#657972]">
-                    {profile.roles
-                      .map((role) =>
-                        role.replace(
-                          'ROLE_',
-                          '',
-                        ),
-                      )
-                      .join(', ')}
-                  </p>
-                </div>
+                <p className="mt-1 text-sm text-[#657972]">
+                  {formatDate(
+                    profile.createdAt,
+                  )}
+                </p>
               </div>
             </div>
-          </aside>
-        </div>
 
-        <div className="mt-6">
-          <TwoFactorAuthenticationCard />
-        </div>
+            <div className="border-t border-[#d8ddd6]" />
 
-        <div className="mt-6 grid items-stretch gap-6 lg:grid-cols-2">
-          <ChangeEmailForm currentEmail={profile.email} />
+            <div className="flex gap-3">
+              <Clock3
+                size={19}
+                className="mt-0.5 shrink-0 text-[#4f806f]"
+                aria-hidden
+              />
 
-          <ChangePasswordForm
-            onPasswordChanged={handlePasswordChanged}
-          />
-        </div>
+              <div>
+                <p className="text-sm font-semibold text-[#294e43]">
+                  Last signed in
+                </p>
+
+                <p className="mt-1 text-sm text-[#657972]">
+                  {formatDate(
+                    profile.lastLoginAt,
+                  )}
+                </p>
+              </div>
+            </div>
+
+            <div className="border-t border-[#d8ddd6]" />
+
+            <div className="flex gap-3">
+              <BadgeCheck
+                size={19}
+                className="mt-0.5 shrink-0 text-[#4f806f]"
+                aria-hidden
+              />
+
+              <div>
+                <p className="text-sm font-semibold text-[#294e43]">
+                  Account access
+                </p>
+
+                <p className="mt-1 text-sm text-[#657972]">
+                  {profile.roles
+                    .map((role) =>
+                      role.replace(
+                        'ROLE_',
+                        '',
+                      ),
+                    )
+                    .join(', ')}
+                </p>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <div className="mt-6">
+        <TwoFactorAuthenticationCard />
+      </div>
+
+      <div className="mt-6 grid items-stretch gap-6 lg:grid-cols-2">
+        <ChangeEmailForm currentEmail={profile.email} />
+
+        <ChangePasswordForm
+          onPasswordChanged={handlePasswordChanged}
+        />
       </div>
 
       {passwordChanged && (
@@ -296,6 +295,6 @@ export default function ProfilePage() {
           onContinue={finishPasswordChange}
         />
       )}
-    </main>
+    </PageShell>
   )
 }

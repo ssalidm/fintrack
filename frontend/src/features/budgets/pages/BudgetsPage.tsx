@@ -31,6 +31,7 @@ import {
   useBudgets,
   useDeleteBudgetLimit,
 } from '../hooks/useBudgets'
+import PageShell from '../../../components/layout/PageShell'
 
 interface LimitModalTarget {
   limit?: BudgetCategoryLimit
@@ -328,7 +329,7 @@ export default function BudgetsPage() {
         : ''
 
   return (
-    <div className="mx-auto w-full max-w-[1320px] px-4 py-6 sm:px-6 sm:py-8 xl:px-10">
+    <PageShell>
       <header className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="text-xs font-semibold tracking-[0.16em] text-[#657972]">
@@ -397,8 +398,8 @@ export default function BudgetsPage() {
                     )
                   }}
                   className={`cursor-pointer rounded-full px-4 py-2 text-sm font-semibold transition ${status === option.value
-                      ? 'bg-[#fffdf8] text-[#173c32] shadow-sm'
-                      : 'text-[#657972] hover:text-[#173c32]'
+                    ? 'bg-[#fffdf8] text-[#173c32] shadow-sm'
+                    : 'text-[#657972] hover:text-[#173c32]'
                     }`}
                 >
                   {option.label}
@@ -717,6 +718,6 @@ export default function BudgetsPage() {
           }}
         />
       )}
-    </div>
+    </PageShell>
   )
 }
