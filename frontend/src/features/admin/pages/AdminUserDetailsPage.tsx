@@ -3,8 +3,6 @@ import {
   Ban,
   CalendarDays,
   CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
   CircleUserRound,
   Clock3,
   KeyRound,
@@ -16,19 +14,14 @@ import {
   ShieldOff,
 } from 'lucide-react'
 import { useState } from 'react'
-import {
-  Link,
-  useParams,
-} from 'react-router'
+import { Link, useParams } from 'react-router'
 
 import { ApiClientError } from '../../../api/ApiClientError'
 import PageShell from '../../../components/layout/PageShell'
+import Pagination from '../../../components/ui/Pagination'
 import { useProfile } from '../../profile/hooks/useProfile'
 import type { UserStatus } from '../../profile/api/types'
-import type {
-  AdminUser,
-  AdminUserSession,
-} from '../api/types'
+import type { AdminUser, AdminUserSession } from '../api/types'
 import {
   useActivateAdminUser,
   useDeactivateAdminUser,
@@ -61,9 +54,7 @@ type ConfirmationAction =
   | 'revoke-sessions'
 
 function formatDateTime(value: string | null) {
-  if (!value) {
-    return 'Never'
-  }
+  if (!value) return 'Never'
 
   return new Intl.DateTimeFormat('en-ZA', {
     day: '2-digit',
@@ -80,9 +71,7 @@ function userInitials(user: AdminUser) {
 }
 
 function describeUserAgent(userAgent: string | null) {
-  if (!userAgent) {
-    return 'Unknown device'
-  }
+  if (!userAgent) return 'Unknown device'
 
   const browser = userAgent.includes('Edg/')
     ? 'Microsoft Edge'
@@ -98,8 +87,7 @@ function describeUserAgent(userAgent: string | null) {
     ? 'Windows'
     : userAgent.includes('Android')
       ? 'Android'
-      : userAgent.includes('iPhone') ||
-          userAgent.includes('iPad')
+      : userAgent.includes('iPhone') || userAgent.includes('iPad')
         ? 'iOS'
         : userAgent.includes('Mac OS')
           ? 'macOS'
@@ -136,11 +124,13 @@ function SessionRow({ session }: SessionRowProps) {
   return (
     <article className="grid gap-4 border-t border-[#ebe8e0] px-5 py-5 first:border-t-0 sm:grid-cols-[minmax(0,1.5fr)_1fr_auto] sm:items-center sm:px-7">
       <div className="flex min-w-0 items-start gap-3">
-        <span className={`mt-0.5 grid size-10 shrink-0 place-items-center rounded-xl ${
-          session.active
-            ? 'bg-[#e1eee6] text-[#39725d]'
-            : 'bg-[#eceae5] text-[#71807b]'
-        }`}>
+        <span
+          className={`mt-0.5 grid size-10 shrink-0 place-items-center rounded-xl ${
+            session.active
+              ? 'bg-[#e1eee6] text-[#39725d]'
+              : 'bg-[#eceae5] text-[#71807b]'
+          }`}
+        >
           <Laptop2 size={18} aria-hidden />
         </span>
 
@@ -148,6 +138,7 @@ function SessionRow({ session }: SessionRowProps) {
           <p className="truncate text-sm font-semibold text-[#173c32]">
             {describeUserAgent(session.userAgent)}
           </p>
+
           <p
             className="mt-1 truncate text-xs text-[#71807b]"
             title={session.userAgent ?? undefined}
@@ -163,11 +154,13 @@ function SessionRow({ session }: SessionRowProps) {
       </div>
 
       <div className="sm:text-right">
-        <span className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-          session.active
-            ? 'bg-[#e1eee6] text-[#39725d]'
-            : 'bg-[#eceae5] text-[#68736f]'
-        }`}>
+        <span
+          className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+            session.active
+              ? 'bg-[#e1eee6] text-[#39725d]'
+              : 'bg-[#eceae5] text-[#68736f]'
+          }`}
+        >
           {session.active ? 'Active' : 'Ended'}
         </span>
 
@@ -183,15 +176,18 @@ function SessionRow({ session }: SessionRowProps) {
 
 export default function AdminUserDetailsPage() {
   const { userId = '' } = useParams()
+
   const [sessionPage, setSessionPage] = useState(0)
   const [confirmation, setConfirmation] =
     useState<ConfirmationAction | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
-  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] =
+    useState<string | null>(null)
 
   const profileQuery = useProfile()
   const userQuery = useAdminUser(userId)
   const user = userQuery.data
+
   const targetIsAdmin = user?.roles.includes('ROLE_ADMIN') ?? false
   const targetIsSelf = profileQuery.data?.id === user?.id
   const canManageUser = Boolean(user && !targetIsAdmin && !targetIsSelf)
@@ -219,9 +215,7 @@ export default function AdminUserDetailsPage() {
   }
 
   async function confirmAction() {
-    if (!user || !confirmation) {
-      return
-    }
+    if (!user || !confirmation) return
 
     setActionError(null)
     setSuccessMessage(null)
@@ -232,18 +226,23 @@ export default function AdminUserDetailsPage() {
           userId: user.id,
           version: user.version,
         })
+
         setSuccessMessage(`${user.firstName}'s account is active again.`)
       } else if (confirmation === 'deactivate') {
         await deactivateUser.mutateAsync({
           userId: user.id,
           version: user.version,
         })
+
         setSuccessMessage(
           `${user.firstName}'s account was deactivated and all sessions were ended.`,
         )
       } else {
         await revokeSessions.mutateAsync({ userId: user.id })
-        setSuccessMessage(`All of ${user.firstName}'s active sessions were ended.`)
+
+        setSuccessMessage(
+          `All of ${user.firstName}'s active sessions were ended.`,
+        )
       }
 
       setConfirmation(null)
@@ -280,15 +279,20 @@ export default function AdminUserDetailsPage() {
           Back to users
         </Link>
 
-        <section className="mt-8 rounded-3xl border border-red-200 bg-red-50 p-8" role="alert">
+        <section
+          className="mt-8 rounded-3xl border border-red-200 bg-red-50 p-8"
+          role="alert"
+        >
           <h1 className="font-serif text-3xl text-red-950">
             We couldn’t load this user
           </h1>
+
           <p className="mt-3 text-sm text-red-700">
             {userQuery.error instanceof ApiClientError
               ? userQuery.error.message
               : 'The user may no longer exist or the request could not be completed.'}
           </p>
+
           <button
             type="button"
             onClick={() => void userQuery.refetch()}
@@ -355,7 +359,11 @@ export default function AdminUserDetailsPage() {
         >
           <RefreshCw
             size={17}
-            className={userQuery.isFetching || sessionsQuery.isFetching ? 'animate-spin' : ''}
+            className={
+              userQuery.isFetching || sessionsQuery.isFetching
+                ? 'animate-spin'
+                : ''
+            }
             aria-hidden
           />
         </button>
@@ -370,7 +378,9 @@ export default function AdminUserDetailsPage() {
 
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${statusClasses[user.status]}`}>
+                <span
+                  className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${statusClasses[user.status]}`}
+                >
                   {statusLabels[user.status]}
                 </span>
 
@@ -431,7 +441,10 @@ export default function AdminUserDetailsPage() {
       </header>
 
       {successMessage && (
-        <div className="feature-reveal mt-5 flex items-start gap-3 rounded-2xl border border-[#bad5c3] bg-[#edf6ef] p-4 text-sm text-[#2f684f]" role="status">
+        <div
+          className="feature-reveal mt-5 flex items-start gap-3 rounded-2xl border border-[#bad5c3] bg-[#edf6ef] p-4 text-sm text-[#2f684f]"
+          role="status"
+        >
           <CheckCircle2 size={18} className="mt-0.5 shrink-0" aria-hidden />
           <p>{successMessage}</p>
         </div>
@@ -454,6 +467,7 @@ export default function AdminUserDetailsPage() {
             <span className="grid size-10 place-items-center rounded-xl bg-[#dfece3] text-[#39725d]">
               <CircleUserRound size={19} aria-hidden />
             </span>
+
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#87938e]">
                 Account record
@@ -470,10 +484,22 @@ export default function AdminUserDetailsPage() {
               label="Email verification"
               value={user.emailVerified ? 'Verified' : 'Not verified'}
             />
-            <DetailItem label="Created" value={formatDateTime(user.createdAt)} />
-            <DetailItem label="Last login" value={formatDateTime(user.lastLoginAt)} />
-            <DetailItem label="Last updated" value={formatDateTime(user.updatedAt)} />
-            <DetailItem label="Record version" value={String(user.version)} />
+            <DetailItem
+              label="Created"
+              value={formatDateTime(user.createdAt)}
+            />
+            <DetailItem
+              label="Last login"
+              value={formatDateTime(user.lastLoginAt)}
+            />
+            <DetailItem
+              label="Last updated"
+              value={formatDateTime(user.updatedAt)}
+            />
+            <DetailItem
+              label="Record version"
+              value={String(user.version)}
+            />
           </dl>
         </article>
 
@@ -481,12 +507,15 @@ export default function AdminUserDetailsPage() {
           <span className="grid size-10 place-items-center rounded-xl bg-[#f3ead8] text-[#8b6c3d]">
             <MailCheck size={19} aria-hidden />
           </span>
+
           <p className="mt-5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#87938e]">
             Access snapshot
           </p>
+
           <p className="mt-2 font-serif text-3xl text-[#173c32]">
             {user.emailVerified ? 'Verified' : 'Unverified'}
           </p>
+
           <p className="mt-2 text-sm leading-6 text-[#657972]">
             {user.emailVerified
               ? 'This user has completed email verification.'
@@ -509,6 +538,7 @@ export default function AdminUserDetailsPage() {
               <span className="grid size-10 place-items-center rounded-xl bg-[#e3ece8] text-[#39725d]">
                 <KeyRound size={18} aria-hidden />
               </span>
+
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#87938e]">
                   Security
@@ -553,11 +583,13 @@ export default function AdminUserDetailsPage() {
               <p className="font-semibold text-[#9b5845]">
                 We couldn’t load this user’s sessions.
               </p>
+
               <p className="mt-2 text-sm text-[#657972]">
                 {sessionsQuery.error instanceof ApiClientError
                   ? sessionsQuery.error.message
                   : 'Please try again.'}
               </p>
+
               <button
                 type="button"
                 onClick={() => void sessionsQuery.refetch()}
@@ -572,8 +604,16 @@ export default function AdminUserDetailsPage() {
             !sessionsQuery.isError &&
             sessionsQuery.data.items.length === 0 && (
               <div className="px-6 py-12 text-center">
-                <Clock3 size={24} className="mx-auto text-[#87938e]" aria-hidden />
-                <p className="mt-3 font-semibold text-[#173c32]">No sessions recorded</p>
+                <Clock3
+                  size={24}
+                  className="mx-auto text-[#87938e]"
+                  aria-hidden
+                />
+
+                <p className="mt-3 font-semibold text-[#173c32]">
+                  No sessions recorded
+                </p>
+
                 <p className="mt-1 text-sm text-[#71807b]">
                   This user has no authentication session history yet.
                 </p>
@@ -589,103 +629,94 @@ export default function AdminUserDetailsPage() {
           {!sessionsQuery.isPending &&
             !sessionsQuery.isError &&
             sessionsQuery.data.totalPages > 1 && (
-              <footer className="flex flex-wrap items-center justify-between gap-4 border-t border-[#dedbd2] bg-[#f9f7f1] px-5 py-4 sm:px-7">
-                <p className="text-xs text-[#71807b]">
-                  Page {sessionsQuery.data.page + 1} of {sessionsQuery.data.totalPages}
-                </p>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    disabled={!sessionsQuery.data.hasPrevious || sessionsQuery.isFetching}
-                    onClick={() => setSessionPage((current) => Math.max(0, current - 1))}
-                    className="grid size-9 cursor-pointer place-items-center rounded-full border border-[#d8d6ce] text-[#173c32] transition hover:bg-[#efede7] disabled:cursor-not-allowed disabled:opacity-40"
-                    aria-label="Previous session page"
-                  >
-                    <ChevronLeft size={16} aria-hidden />
-                  </button>
-                  <button
-                    type="button"
-                    disabled={!sessionsQuery.data.hasNext || sessionsQuery.isFetching}
-                    onClick={() => setSessionPage((current) => current + 1)}
-                    className="grid size-9 cursor-pointer place-items-center rounded-full bg-[#174f43] text-white transition hover:bg-[#236a58] disabled:cursor-not-allowed disabled:opacity-40"
-                    aria-label="Next session page"
-                  >
-                    <ChevronRight size={16} aria-hidden />
-                  </button>
-                </div>
+              <footer className="border-t border-[#dedbd2] bg-[#f9f7f1] px-5 py-4 sm:px-7">
+                <Pagination
+                  label="User session pages"
+                  page={sessionsQuery.data.page}
+                  totalPages={sessionsQuery.data.totalPages}
+                  onPageChange={setSessionPage}
+                  isFetching={sessionsQuery.isFetching}
+                />
               </footer>
             )}
         </section>
       )}
 
-      {confirmation && (() => {
-        const copy = confirmationCopy[confirmation]
-        const ConfirmationIcon = copy.icon
+      {confirmation &&
+        (() => {
+          const copy = confirmationCopy[confirmation]
+          const ConfirmationIcon = copy.icon
 
-        return (
-          <div className="fixed inset-0 z-[80] grid place-items-center p-5">
-            <button
-              type="button"
-              className="absolute inset-0 cursor-pointer bg-[#102e27]/45 backdrop-blur-[2px]"
-              onClick={() => {
-                if (!actionIsPending) {
-                  setConfirmation(null)
-                  setActionError(null)
-                }
-              }}
-              aria-label="Cancel admin action"
-            />
-
-            <section
-              role="alertdialog"
-              aria-modal="true"
-              aria-labelledby="admin-action-title"
-              className="relative w-full max-w-md rounded-3xl bg-[#fffdf8] p-7 shadow-2xl"
-            >
-              <span className="grid size-11 place-items-center rounded-full bg-[#f2e7df] text-[#9b5845]">
-                <ConfirmationIcon size={20} aria-hidden />
-              </span>
-
-              <h2 id="admin-action-title" className="mt-5 font-serif text-3xl text-[#173c32]">
-                {copy.title}
-              </h2>
-
-              <p className="mt-3 text-sm leading-6 text-[#657972]">
-                {copy.description}
-              </p>
-
-              {actionError && (
-                <p className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700" role="alert">
-                  {actionError}
-                </p>
-              )}
-
-              <div className="mt-7 flex justify-end gap-3">
-                <button
-                  type="button"
-                  disabled={actionIsPending}
-                  onClick={() => {
+          return (
+            <div className="fixed inset-0 z-[80] grid place-items-center p-5">
+              <button
+                type="button"
+                className="absolute inset-0 cursor-pointer bg-[#102e27]/45 backdrop-blur-[2px]"
+                onClick={() => {
+                  if (!actionIsPending) {
                     setConfirmation(null)
                     setActionError(null)
-                  }}
-                  className="cursor-pointer rounded-full border border-[#d8d6ce] px-5 py-2.5 text-sm font-semibold text-[#173c32] hover:bg-[#efede7] disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  Cancel
-                </button>
+                  }
+                }}
+                aria-label="Cancel admin action"
+              />
 
-                <button
-                  type="button"
-                  disabled={actionIsPending}
-                  onClick={() => void confirmAction()}
-                  className={`cursor-pointer rounded-full px-5 py-2.5 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60 ${copy.buttonClass}`}
+              <section
+                role="alertdialog"
+                aria-modal="true"
+                aria-labelledby="admin-action-title"
+                className="relative w-full max-w-md rounded-3xl bg-[#fffdf8] p-7 shadow-2xl"
+              >
+                <span className="grid size-11 place-items-center rounded-full bg-[#f2e7df] text-[#9b5845]">
+                  <ConfirmationIcon size={20} aria-hidden />
+                </span>
+
+                <h2
+                  id="admin-action-title"
+                  className="mt-5 font-serif text-3xl text-[#173c32]"
                 >
-                  {actionIsPending ? 'Working…' : copy.confirmLabel}
-                </button>
-              </div>
-            </section>
-          </div>
-        )
-      })()}
+                  {copy.title}
+                </h2>
+
+                <p className="mt-3 text-sm leading-6 text-[#657972]">
+                  {copy.description}
+                </p>
+
+                {actionError && (
+                  <p
+                    className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700"
+                    role="alert"
+                  >
+                    {actionError}
+                  </p>
+                )}
+
+                <div className="mt-7 flex justify-end gap-3">
+                  <button
+                    type="button"
+                    disabled={actionIsPending}
+                    onClick={() => {
+                      setConfirmation(null)
+                      setActionError(null)
+                    }}
+                    className="cursor-pointer rounded-full border border-[#d8d6ce] px-5 py-2.5 text-sm font-semibold text-[#173c32] hover:bg-[#efede7] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={actionIsPending}
+                    onClick={() => void confirmAction()}
+                    className={`cursor-pointer rounded-full px-5 py-2.5 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60 ${copy.buttonClass}`}
+                  >
+                    {actionIsPending ? 'Working…' : copy.confirmLabel}
+                  </button>
+                </div>
+              </section>
+            </div>
+          )
+        })()}
     </PageShell>
   )
 }

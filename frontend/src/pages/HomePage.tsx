@@ -300,10 +300,6 @@ export default function HomePage() {
                 'Security',
                 '#security',
               ],
-              [
-                'Pricing',
-                '#security',
-              ],
             ].map(
               ([label, href]) => (
                 <a
