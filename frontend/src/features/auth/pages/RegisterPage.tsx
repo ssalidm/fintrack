@@ -1,17 +1,16 @@
-import {zodResolver} from '@hookform/resolvers/zod'
+import { zodResolver } from '@hookform/resolvers/zod'
 import {
+  Check,
   CheckCircle2,
   LoaderCircle,
+  ShieldCheck,
 } from 'lucide-react'
-import {useState} from 'react'
-import {useForm} from 'react-hook-form'
-import {Link} from 'react-router'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { Link } from 'react-router'
 
-import {ApiClientError} from '../../../api/ApiClientError'
-import {authApi} from '../api/authApi'
-import LegalNoticeDialog, {
-  type LegalDocument,
-} from '../components/LegalNoticeDialog'
+import { ApiClientError } from '../../../api/ApiClientError'
+import { authApi } from '../api/authApi'
 import PasswordVisibilityButton from '../components/PasswordVisibilityButton'
 import {
   formatCooldown,
@@ -26,10 +25,10 @@ const VERIFICATION_COOLDOWN_KEY =
   'salif:cooldown:email-verification'
 
 const inputClasses =
-  'block w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 ' +
-  'text-sm text-slate-950 outline-none transition placeholder:text-slate-400 ' +
-  'focus:border-[#1F7A5C] focus:ring-2 focus:ring-[#1F7A5C]/20 ' +
-  'disabled:cursor-not-allowed disabled:bg-slate-100'
+  'block w-full rounded-xl border border-[#d6d2c8] bg-[#fffdf8] px-3.5 py-2.5 ' +
+  'text-sm text-[#092f28] outline-none transition placeholder:text-slate-400 ' +
+  'focus:border-[#16805f] focus:ring-2 focus:ring-[#16805f]/20 ' +
+  'disabled:cursor-not-allowed disabled:bg-[#efede6]'
 
 const registrationFields = new Set<
   keyof RegistrationFormValues
@@ -49,6 +48,68 @@ function isRegistrationField(
   )
 }
 
+function RegistrationSteps({
+  complete = false,
+}: {
+  readonly complete?: boolean
+}) {
+  return (
+    <div
+      className="mb-6 flex items-center gap-3"
+      aria-label={
+        complete
+          ? 'Step 2 of 2: verify your email'
+          : 'Step 1 of 2: create your account'
+      }
+    >
+      <span
+        className={`grid size-8 shrink-0 place-items-center rounded-full text-xs font-bold ${complete
+          ? 'bg-[#e0eee8] text-[#16805f]'
+          : 'bg-[#0d4f3f] text-white'
+          }`}
+      >
+        {complete ? (
+          <Check
+            size={15}
+            aria-hidden
+          />
+        ) : (
+          '1'
+        )}
+      </span>
+
+      <span
+        className={`text-xs font-semibold ${complete
+          ? 'text-[#657972]'
+          : 'text-[#173c32]'
+          }`}
+      >
+        Create account
+      </span>
+
+      <span className="h-px flex-1 bg-[#d6d2c8]" />
+
+      <span
+        className={`grid size-8 shrink-0 place-items-center rounded-full text-xs font-bold ${complete
+          ? 'bg-[#0d4f3f] text-white'
+          : 'border border-[#d6d2c8] bg-[#f4f1e8] text-[#657972]'
+          }`}
+      >
+        2
+      </span>
+
+      <span
+        className={`text-xs font-semibold ${complete
+          ? 'text-[#173c32]'
+          : 'text-[#657972]'
+          }`}
+      >
+        Verify email
+      </span>
+    </div>
+  )
+}
+
 export default function RegisterPage() {
   const [submitError, setSubmitError] =
     useState<string | null>(null)
@@ -63,9 +124,6 @@ export default function RegisterPage() {
     showConfirmPassword,
     setShowConfirmPassword,
   ] = useState(false)
-
-  const [legalDocument, setLegalDocument] =
-    useState<LegalDocument | null>(null)
 
   const verificationCooldown = useRequestCooldown(
     VERIFICATION_COOLDOWN_KEY,
@@ -125,6 +183,7 @@ export default function RegisterPage() {
               type: 'server',
               message,
             })
+
             hasFieldError = true
           }
         })
@@ -145,61 +204,78 @@ export default function RegisterPage() {
   if (registeredEmail) {
     return (
       <section
-        className="w-full max-w-md text-center"
+        className="auth-panel-enter rounded-[2rem] border border-white/80 bg-white/66 p-6 shadow-[0_26px_80px_rgba(9,47,40,0.14)] ring-1 ring-[#0d4f3f]/5 backdrop-blur-2xl sm:p-8"
         aria-labelledby="registration-title"
       >
-        <span className="mx-auto grid size-14 place-items-center rounded-full bg-emerald-100 text-[#1F7A5C]">
-          <CheckCircle2
-            size={28}
+        <RegistrationSteps complete />
+
+        <div className="text-center">
+          <span className="auth-success-pop mx-auto grid size-16 place-items-center rounded-full bg-[#e0eee8] text-[#16805f] ring-8 ring-[#f2f6f3]">
+            <CheckCircle2
+              size={31}
+              aria-hidden
+            />
+          </span>
+
+          <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-[#16805f]">
+            Account created
+          </p>
+
+          <h1
+            id="registration-title"
+            className="mt-2 font-serif text-4xl tracking-[-0.025em] text-[#092f28]"
+          >
+            Check your email
+          </h1>
+
+          <p className="mt-3 text-sm leading-6 text-[#657972]">
+            We sent a verification link to{' '}
+
+            <strong className="font-semibold text-[#173c32]">
+              {registeredEmail}
+            </strong>
+            .
+          </p>
+        </div>
+
+        <div className="mt-6 flex items-start gap-3 rounded-2xl border border-[#d7e5de] bg-[#edf3ef] px-4 py-3 text-sm leading-6 text-[#526b63]">
+          <ShieldCheck
+            size={18}
+            className="mt-0.5 shrink-0 text-[#16805f]"
             aria-hidden
           />
-        </span>
 
-        <p className="mt-5 text-sm font-semibold text-[#1F7A5C]">
-          Account created
-        </p>
-
-        <h1
-          id="registration-title"
-          className="mt-2 font-serif text-4xl text-[#173c32]"
-        >
-          Check your email
-        </h1>
-
-        <p className="mt-3 text-sm leading-6 text-slate-600">
-          We sent a verification link to{' '}
-          <strong className="font-semibold text-slate-900">
-            {registeredEmail}
-          </strong>
-          .
-        </p>
-
-        <div className="mt-6 rounded-2xl border border-[#dfe7e1] bg-[#eef5f1] px-4 py-3 text-left text-sm leading-6 text-[#526b63]">
-          Check your spam folder if it does not arrive.
-          To protect your inbox, another link can only
-          be requested after the timer finishes.
+          <span>
+            Check your spam folder if it does not arrive.
+            Another link becomes available when the timer
+            finishes.
+          </span>
         </div>
 
         {verificationCooldown.isCoolingDown ? (
           <button
             type="button"
             disabled
-            className="mt-6 inline-flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-full bg-[#dce8e1] px-4 py-3 font-semibold text-[#527064]"
+            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#dce8e1] px-4 py-3 font-semibold text-[#527064]"
           >
             <LoaderCircle
               size={17}
               className="animate-spin"
               aria-hidden
             />
+
             Resend available in{' '}
+
             {formatCooldown(
               verificationCooldown.remainingSeconds,
             )}
           </button>
         ) : (
           <Link
-            to={`/resend-verification?email=${encodeURIComponent(registeredEmail)}`}
-            className="mt-6 inline-flex w-full cursor-pointer justify-center rounded-full bg-[#1F7A5C] px-4 py-3 font-semibold text-white transition hover:bg-[#19664D] focus:outline-none focus:ring-2 focus:ring-[#1F7A5C] focus:ring-offset-2"
+            to={`/resend-verification?email=${encodeURIComponent(
+              registeredEmail,
+            )}`}
+            className="mt-6 inline-flex w-full justify-center rounded-full bg-[#0d4f3f] px-4 py-3 font-semibold text-white transition hover:bg-[#092f28] focus:outline-none focus:ring-2 focus:ring-[#16805f] focus:ring-offset-2"
           >
             Resend verification email
           </Link>
@@ -207,7 +283,7 @@ export default function RegisterPage() {
 
         <Link
           to="/login"
-          className="mt-4 block cursor-pointer text-sm font-semibold text-slate-700 hover:text-slate-950 hover:underline"
+          className="mt-4 block text-center text-sm font-semibold text-[#526b63] transition hover:text-[#092f28] hover:underline"
         >
           Return to sign in
         </Link>
@@ -216,369 +292,361 @@ export default function RegisterPage() {
   }
 
   return (
-    <>
-      <section
-        className="w-full max-w-md"
-        aria-labelledby="registration-title"
-      >
-        <header>
-          <p className="text-xs font-semibold tracking-[0.14em] text-[#1F7A5C]">
-            GET STARTED
-          </p>
+    <section
+      className="auth-panel-enter rounded-[2rem] border border-white/80 bg-white/66 p-5 shadow-[0_26px_80px_rgba(9,47,40,0.14)] ring-1 ring-[#0d4f3f]/5 backdrop-blur-2xl sm:p-7"
+      aria-labelledby="registration-title"
+    >
+      <RegistrationSteps />
 
-          <h1
-            id="registration-title"
-            className="mt-2 font-serif text-4xl leading-tight text-[#173c32]"
-          >
-            Create your account
-          </h1>
+      <header>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#16805f]">
+          Get started
+        </p>
 
-          <p className="mt-2 text-sm leading-6 text-slate-600">
-            A clearer picture of your money starts here.
-          </p>
-        </header>
-
-        <form
-          className="mt-6 space-y-4"
-          onSubmit={handleSubmit(onSubmit)}
-          noValidate
+        <h1
+          id="registration-title"
+          className="mt-2 font-serif text-4xl leading-tight tracking-[-0.025em] text-[#092f28]"
         >
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label
-                htmlFor="firstName"
-                className="text-sm font-medium text-slate-800"
+          Create your account
+        </h1>
+
+        <p className="mt-2 text-sm leading-6 text-[#657972]">
+          A clearer picture of your money starts here.
+        </p>
+      </header>
+
+      <form
+        className="mt-5 space-y-3.5"
+        onSubmit={handleSubmit(onSubmit)}
+        noValidate
+      >
+        <div className="grid gap-3.5 sm:grid-cols-2">
+          <div>
+            <label
+              htmlFor="firstName"
+              className="text-sm font-semibold text-[#173c32]"
+            >
+              First name
+            </label>
+
+            <input
+              id="firstName"
+              type="text"
+              autoComplete="given-name"
+              disabled={isSubmitting}
+              aria-invalid={
+                errors.firstName
+                  ? 'true'
+                  : 'false'
+              }
+              aria-describedby={
+                errors.firstName
+                  ? 'firstName-error'
+                  : undefined
+              }
+              className={`mt-1.5 ${inputClasses}`}
+              {...register('firstName')}
+            />
+
+            {errors.firstName && (
+              <p
+                id="firstName-error"
+                className="mt-1.5 text-xs text-red-600"
+                role="alert"
               >
-                First name
-              </label>
-
-              <input
-                id="firstName"
-                type="text"
-                autoComplete="given-name"
-                disabled={isSubmitting}
-                aria-invalid={
-                  errors.firstName
-                    ? 'true'
-                    : 'false'
-                }
-                aria-describedby={
-                  errors.firstName
-                    ? 'firstName-error'
-                    : undefined
-                }
-                className={`mt-1.5 ${inputClasses}`}
-                {...register('firstName')}
-              />
-
-              {errors.firstName && (
-                <p
-                  id="firstName-error"
-                  className="mt-1.5 text-xs text-red-600"
-                  role="alert"
-                >
-                  {errors.firstName.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label
-                htmlFor="lastName"
-                className="text-sm font-medium text-slate-800"
-              >
-                Last name
-              </label>
-
-              <input
-                id="lastName"
-                type="text"
-                autoComplete="family-name"
-                disabled={isSubmitting}
-                aria-invalid={
-                  errors.lastName
-                    ? 'true'
-                    : 'false'
-                }
-                aria-describedby={
-                  errors.lastName
-                    ? 'lastName-error'
-                    : undefined
-                }
-                className={`mt-1.5 ${inputClasses}`}
-                {...register('lastName')}
-              />
-
-              {errors.lastName && (
-                <p
-                  id="lastName-error"
-                  className="mt-1.5 text-xs text-red-600"
-                  role="alert"
-                >
-                  {errors.lastName.message}
-                </p>
-              )}
-            </div>
+                {errors.firstName.message}
+              </p>
+            )}
           </div>
 
           <div>
             <label
-              htmlFor="email"
-              className="text-sm font-medium text-slate-800"
+              htmlFor="lastName"
+              className="text-sm font-semibold text-[#173c32]"
             >
-              Email
+              Last name
             </label>
 
             <input
-              id="email"
-              type="email"
-              autoComplete="email"
-              inputMode="email"
+              id="lastName"
+              type="text"
+              autoComplete="family-name"
               disabled={isSubmitting}
               aria-invalid={
-                errors.email ? 'true' : 'false'
+                errors.lastName
+                  ? 'true'
+                  : 'false'
               }
               aria-describedby={
-                errors.email
-                  ? 'email-error'
+                errors.lastName
+                  ? 'lastName-error'
                   : undefined
               }
               className={`mt-1.5 ${inputClasses}`}
-              {...register('email')}
+              {...register('lastName')}
             />
 
-            {errors.email && (
+            {errors.lastName && (
               <p
-                id="email-error"
+                id="lastName-error"
                 className="mt-1.5 text-xs text-red-600"
                 role="alert"
               >
-                {errors.email.message}
+                {errors.lastName.message}
               </p>
             )}
           </div>
+        </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label
-                htmlFor="password"
-                className="text-sm font-medium text-slate-800"
-              >
-                Password
-              </label>
+        <div>
+          <label
+            htmlFor="email"
+            className="text-sm font-semibold text-[#173c32]"
+          >
+            Email
+          </label>
 
-              <div className="relative mt-1.5">
-                <input
-                  id="password"
-                  type={
-                    showPassword
-                      ? 'text'
-                      : 'password'
-                  }
-                  autoComplete="new-password"
-                  disabled={isSubmitting}
-                  aria-invalid={
-                    errors.password
-                      ? 'true'
-                      : 'false'
-                  }
-                  aria-describedby={
-                    errors.password
-                      ? 'password-error'
-                      : 'password-help'
-                  }
-                  className={`${inputClasses} pr-12`}
-                  {...register('password')}
-                />
+          <input
+            id="email"
+            type="email"
+            autoComplete="email"
+            inputMode="email"
+            disabled={isSubmitting}
+            aria-invalid={
+              errors.email ? 'true' : 'false'
+            }
+            aria-describedby={
+              errors.email
+                ? 'email-error'
+                : undefined
+            }
+            className={`mt-1.5 ${inputClasses}`}
+            {...register('email')}
+          />
 
-                <PasswordVisibilityButton
-                  visible={showPassword}
-                  fieldLabel="password"
-                  onToggle={() =>
-                    setShowPassword(
-                      (visible) => !visible,
-                    )
-                  }
-                />
-              </div>
-
-              {errors.password && (
-                <p
-                  id="password-error"
-                  className="mt-1.5 text-xs text-red-600"
-                  role="alert"
-                >
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label
-                htmlFor="confirmPassword"
-                className="text-sm font-medium text-slate-800"
-              >
-                Confirm password
-              </label>
-
-              <div className="relative mt-1.5">
-                <input
-                  id="confirmPassword"
-                  type={
-                    showConfirmPassword
-                      ? 'text'
-                      : 'password'
-                  }
-                  autoComplete="new-password"
-                  disabled={isSubmitting}
-                  aria-invalid={
-                    errors.confirmPassword
-                      ? 'true'
-                      : 'false'
-                  }
-                  aria-describedby={
-                    errors.confirmPassword
-                      ? 'confirmPassword-error'
-                      : undefined
-                  }
-                  className={`${inputClasses} pr-12`}
-                  {...register('confirmPassword')}
-                />
-
-                <PasswordVisibilityButton
-                  visible={showConfirmPassword}
-                  fieldLabel="confirmed password"
-                  onToggle={() =>
-                    setShowConfirmPassword(
-                      (visible) => !visible,
-                    )
-                  }
-                />
-              </div>
-
-              {errors.confirmPassword && (
-                <p
-                  id="confirmPassword-error"
-                  className="mt-1.5 text-xs text-red-600"
-                  role="alert"
-                >
-                  {errors.confirmPassword.message}
-                </p>
-              )}
-            </div>
-          </div>
-
-          {!errors.password && (
+          {errors.email && (
             <p
-              id="password-help"
-              className="text-xs leading-5 text-slate-500"
+              id="email-error"
+              className="mt-1.5 text-xs text-red-600"
+              role="alert"
             >
-              Use 12–72 characters with uppercase,
-              lowercase, a number and a symbol.
+              {errors.email.message}
             </p>
           )}
+        </div>
 
-          <div className="rounded-xl border border-[#dfe7e1] bg-[#f2f6f3] p-3">
-            <div className="flex items-start gap-2.5">
+        <div className="grid gap-3.5 sm:grid-cols-2">
+          <div>
+            <label
+              htmlFor="password"
+              className="text-sm font-semibold text-[#173c32]"
+            >
+              Password
+            </label>
+
+            <div className="relative mt-1.5">
               <input
-                id="acceptTerms"
-                type="checkbox"
+                id="password"
+                type={
+                  showPassword
+                    ? 'text'
+                    : 'password'
+                }
+                autoComplete="new-password"
                 disabled={isSubmitting}
                 aria-invalid={
-                  errors.acceptTerms
+                  errors.password
                     ? 'true'
                     : 'false'
                 }
                 aria-describedby={
-                  errors.acceptTerms
-                    ? 'acceptTerms-error'
-                    : undefined
+                  errors.password
+                    ? 'password-error'
+                    : 'password-help'
                 }
-                className="mt-0.5 size-4 shrink-0 cursor-pointer rounded border-slate-300 accent-[#1F7A5C]"
-                {...register('acceptTerms')}
+                className={`${inputClasses} pr-12`}
+                {...register('password')}
               />
 
-              <p className="text-xs leading-5 text-slate-600">
-                <label
-                  htmlFor="acceptTerms"
-                  className="cursor-pointer"
-                >
-                  I agree to Salif’s{' '}
-                </label>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    setLegalDocument('terms')
-                  }
-                  className="cursor-pointer font-semibold text-[#1F7A5C] hover:underline"
-                >
-                  Terms of Service
-                </button>{' '}
-                and{' '}
-                <button
-                  type="button"
-                  onClick={() =>
-                    setLegalDocument('privacy')
-                  }
-                  className="cursor-pointer font-semibold text-[#1F7A5C] hover:underline"
-                >
-                  Privacy Policy
-                </button>
-                .
-              </p>
+              <PasswordVisibilityButton
+                visible={showPassword}
+                fieldLabel="password"
+                onToggle={() =>
+                  setShowPassword(
+                    (visible) => !visible,
+                  )
+                }
+              />
             </div>
 
-            {errors.acceptTerms && (
+            {errors.password && (
               <p
-                id="acceptTerms-error"
-                className="mt-2 text-xs font-medium text-red-600"
+                id="password-error"
+                className="mt-1.5 text-xs text-red-600"
                 role="alert"
               >
-                {errors.acceptTerms.message}
+                {errors.password.message}
               </p>
             )}
           </div>
 
-          {submitError && (
-            <div
-              className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          <div>
+            <label
+              htmlFor="confirmPassword"
+              className="text-sm font-semibold text-[#173c32]"
+            >
+              Confirm password
+            </label>
+
+            <div className="relative mt-1.5">
+              <input
+                id="confirmPassword"
+                type={
+                  showConfirmPassword
+                    ? 'text'
+                    : 'password'
+                }
+                autoComplete="new-password"
+                disabled={isSubmitting}
+                aria-invalid={
+                  errors.confirmPassword
+                    ? 'true'
+                    : 'false'
+                }
+                aria-describedby={
+                  errors.confirmPassword
+                    ? 'confirmPassword-error'
+                    : undefined
+                }
+                className={`${inputClasses} pr-12`}
+                {...register('confirmPassword')}
+              />
+
+              <PasswordVisibilityButton
+                visible={showConfirmPassword}
+                fieldLabel="confirmed password"
+                onToggle={() =>
+                  setShowConfirmPassword(
+                    (visible) => !visible,
+                  )
+                }
+              />
+            </div>
+
+            {errors.confirmPassword && (
+              <p
+                id="confirmPassword-error"
+                className="mt-1.5 text-xs text-red-600"
+                role="alert"
+              >
+                {errors.confirmPassword.message}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {!errors.password && (
+          <p
+            id="password-help"
+            className="text-xs leading-5 text-[#657972]"
+          >
+            Use 12–72 characters with uppercase,
+            lowercase, a number and a symbol.
+          </p>
+        )}
+
+        <div className="rounded-xl border border-[#d7e5de] bg-[#f2f6f3] p-3">
+          <div className="flex items-start gap-2.5">
+            <input
+              id="acceptTerms"
+              type="checkbox"
+              disabled={isSubmitting}
+              aria-label="I agree to Salif’s Terms of Service and Privacy Policy"
+              aria-invalid={
+                errors.acceptTerms
+                  ? 'true'
+                  : 'false'
+              }
+              aria-describedby={
+                errors.acceptTerms
+                  ? 'acceptTerms-error'
+                  : undefined
+              }
+              className="mt-0.5 size-4 shrink-0 rounded border-[#aebdb6] accent-[#16805f]"
+              {...register('acceptTerms')}
+            />
+
+            <p className="text-xs leading-5 text-[#526b63]">
+              <label
+                htmlFor="acceptTerms"
+                className="cursor-pointer"
+              >
+                I agree to Salif’s{' '}
+              </label>
+
+              <Link
+                to="/terms"
+                target="_blank"
+                rel="noreferrer"
+                className="font-semibold text-[#16805f] hover:text-[#0d4f3f] hover:underline"
+              >
+                Terms of Service
+              </Link>{' '}
+              and{' '}
+
+              <Link
+                to="/privacy"
+                target="_blank"
+                rel="noreferrer"
+                className="font-semibold text-[#16805f] hover:text-[#0d4f3f] hover:underline"
+              >
+                Privacy Policy
+              </Link>
+              .
+            </p>
+          </div>
+
+          {errors.acceptTerms && (
+            <p
+              id="acceptTerms-error"
+              className="mt-2 text-xs font-medium text-red-600"
               role="alert"
             >
-              {submitError}
-            </div>
+              {errors.acceptTerms.message}
+            </p>
           )}
+        </div>
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="flex w-full cursor-pointer justify-center rounded-full bg-[#1F7A5C] px-4 py-3 font-semibold text-white transition hover:bg-[#19664D] focus:outline-none focus:ring-2 focus:ring-[#1F7A5C] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+        {submitError && (
+          <div
+            className="auth-message-in rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700"
+            role="alert"
           >
-            {isSubmitting
-              ? 'Creating account…'
-              : 'Create account'}
-          </button>
-        </form>
+            {submitError}
+          </div>
+        )}
 
-        <p className="mt-4 text-center text-sm text-slate-600">
-          Already have an account?{' '}
-          <Link
-            to="/login"
-            className="cursor-pointer font-semibold text-[#1F7A5C] hover:underline"
-          >
-            Sign in
-          </Link>
-        </p>
-      </section>
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="flex w-full justify-center rounded-full bg-[#0d4f3f] px-4 py-3 font-semibold text-white shadow-[0_10px_25px_rgba(13,79,63,0.18)] transition hover:-translate-y-0.5 hover:bg-[#092f28] focus:outline-none focus:ring-2 focus:ring-[#16805f] focus:ring-offset-2 disabled:translate-y-0 disabled:opacity-60"
+        >
+          {isSubmitting
+            ? 'Creating account…'
+            : 'Create account'}
+        </button>
+      </form>
 
-      {legalDocument && (
-        <LegalNoticeDialog
-          document={legalDocument}
-          onClose={() =>
-            setLegalDocument(null)
-          }
-        />
-      )}
-    </>
+      <p className="mt-4 text-center text-sm text-[#657972]">
+        Already have an account?{' '}
+
+        <Link
+          to="/login"
+          className="font-semibold text-[#16805f] transition hover:text-[#0d4f3f] hover:underline"
+        >
+          Sign in
+        </Link>
+      </p>
+    </section>
   )
 }
