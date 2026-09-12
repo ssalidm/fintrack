@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { hasAtMostFourDecimalPlaces } from '../../../utils/numberValidation'
 
 export const manualTransactionTypes = [
   'INCOME',
@@ -21,7 +22,7 @@ export const transactionFormSchema = z.object({
       'Amount is too large',
     )
     .refine(
-      (value) => Number.isInteger(value * 10_000),
+      hasAtMostFourDecimalPlaces,
       'Use no more than four decimal places',
     ),
 
