@@ -1,12 +1,17 @@
-import { createBrowserRouter, Navigate } from 'react-router'
+import {
+  createBrowserRouter,
+  Navigate,
+} from 'react-router'
+
 import AdminRoute from '../features/admin/components/AdminRoute.tsx'
 import ProtectedRoute from '../features/auth/components/ProtectedRoute.tsx'
 import AuthLayout from '../features/auth/layouts/AuthLayout.tsx'
 import DashboardLayout from '../features/dashboard/layouts/DashboardLayout.tsx'
+import RouteErrorPage from '../pages/RouteErrorPage.tsx'
+
 import {
   HomePage,
-  PrivacyPage,
-  TermsPage,
+  NotFoundPage,
   LoginPage,
   MfaChallengePage,
   RegisterPage,
@@ -14,7 +19,9 @@ import {
   ResendVerificationPage,
   ForgotPasswordPage,
   ResetPasswordPage,
-  NotFoundPage,
+  VerifyEmailChangePage,
+  PrivacyPage,
+  TermsPage,
   DashboardPage,
   ProfilePage,
   AccountsPage,
@@ -24,135 +31,135 @@ import {
   TransfersPage,
   GoalsPage,
   BudgetsPage,
-  VerifyEmailChangePage,
   AdminUsersPage,
   AdminUserDetailsPage,
 } from './lazyPages'
 
-
 export const router = createBrowserRouter([
   {
-    path: '/',
-    element: <HomePage />,
-  },
-  {
-    path: '/privacy',
-    element: <PrivacyPage />,
-  },
-  {
-    path: '/terms',
-    element: <TermsPage />,
-  },
-  {
-    element: <AuthLayout />,
+    errorElement: <RouteErrorPage />,
     children: [
       {
-        path: '/login',
-        element: <LoginPage />,
+        path: '/',
+        element: <HomePage />,
       },
       {
-        path: '/login/mfa',
-        element: <MfaChallengePage />,
+        path: '/privacy',
+        element: <PrivacyPage />,
       },
       {
-        path: '/register',
-        element: <RegisterPage />,
+        path: '/terms',
+        element: <TermsPage />,
       },
       {
-        path: '/verify-email',
-        element: <VerifyEmailPage />,
-      },
-      {
-        path: '/resend-verification',
-        element: <ResendVerificationPage />,
-      },
-      {
-        path: '/forgot-password',
-        element: <ForgotPasswordPage />,
-      },
-      {
-        path: '/reset-password',
-        element: <ResetPasswordPage />,
-      },
-      {
-        path: '/verify-email-change',
-        element: <VerifyEmailChangePage />,
-      },
-    ],
-  },
-  // **********************************
-  // Protected routes
-  // **********************************
-  {
-    element: <ProtectedRoute />,
-    children: [
-      {
-        element: <DashboardLayout />,
+        element: <AuthLayout />,
         children: [
           {
-            path: '/dashboard',
-            element: <DashboardPage />,
+            path: '/login',
+            element: <LoginPage />,
           },
           {
-            path: '/profile',
-            element: <ProfilePage />,
+            path: '/login/mfa',
+            element: <MfaChallengePage />,
           },
           {
-            path: '/money-in-motion',
-            element: (
-              <Navigate
-                to="/transactions"
-                replace
-              />
-            ),
+            path: '/register',
+            element: <RegisterPage />,
           },
           {
-            path: '/transactions',
-            element: <TransactionsPage />,
+            path: '/verify-email',
+            element: <VerifyEmailPage />,
           },
           {
-            path: '/transfers',
-            element: <TransfersPage />,
+            path: '/resend-verification',
+            element: <ResendVerificationPage />,
           },
           {
-            path: '/recurring',
-            element: <RecurringTransactionsPage />,
+            path: '/forgot-password',
+            element: <ForgotPasswordPage />,
           },
           {
-            path: '/categories',
-            element: <CategoriesPage />,
+            path: '/reset-password',
+            element: <ResetPasswordPage />,
           },
           {
-            path: '/accounts',
-            element: <AccountsPage />,
+            path: '/verify-email-change',
+            element: <VerifyEmailChangePage />,
           },
+        ],
+      },
+      {
+        element: <ProtectedRoute />,
+        children: [
           {
-            path: '/goals',
-            element: <GoalsPage />,
-          },
-          {
-            path: '/budgets',
-            element: <BudgetsPage />,
-          },
-          {
-            element: <AdminRoute />,
+            element: <DashboardLayout />,
             children: [
               {
-                path: '/admin/users',
-                element: <AdminUsersPage />,
+                path: '/dashboard',
+                element: <DashboardPage />,
               },
               {
-                path: '/admin/users/:userId',
-                element: <AdminUserDetailsPage />,
+                path: '/profile',
+                element: <ProfilePage />,
+              },
+              {
+                path: '/money-in-motion',
+                element: (
+                  <Navigate
+                    to="/transactions"
+                    replace
+                  />
+                ),
+              },
+              {
+                path: '/transactions',
+                element: <TransactionsPage />,
+              },
+              {
+                path: '/transfers',
+                element: <TransfersPage />,
+              },
+              {
+                path: '/recurring',
+                element: <RecurringTransactionsPage />,
+              },
+              {
+                path: '/categories',
+                element: <CategoriesPage />,
+              },
+              {
+                path: '/accounts',
+                element: <AccountsPage />,
+              },
+              {
+                path: '/goals',
+                element: <GoalsPage />,
+              },
+              {
+                path: '/budgets',
+                element: <BudgetsPage />,
+              },
+              {
+                element: <AdminRoute />,
+                children: [
+                  {
+                    path: '/admin/users',
+                    element: <AdminUsersPage />,
+                  },
+                  {
+                    path: '/admin/users/:userId',
+                    element: <AdminUserDetailsPage />,
+                  },
+                ],
               },
             ],
           },
         ],
       },
+      {
+        path: '*',
+        element: <NotFoundPage />,
+      },
     ],
-  },
-  {
-    path: '*',
-    element: <NotFoundPage />,
   },
 ])
