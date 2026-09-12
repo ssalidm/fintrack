@@ -1,21 +1,9 @@
 import { useState } from 'react'
-import {
-  ArrowRight,
-  LoaderCircle,
-} from 'lucide-react'
+import { ArrowRight, LoaderCircle } from 'lucide-react'
 import { Link } from 'react-router'
-import { useCategorySpending } from '../../categories/hooks/useCategorySpending'
 
-function formatMoney(
-  amount: number,
-  currencyCode: string,
-) {
-  return new Intl.NumberFormat('en-ZA', {
-    style: 'currency',
-    currency: currencyCode,
-    maximumFractionDigits: 0,
-  }).format(amount)
-}
+import { formatMoney } from '../../../utils/formatters'
+import { useCategorySpending } from '../../categories/hooks/useCategorySpending'
 
 export default function TopSpendingCard() {
   const [selectedCurrency, setSelectedCurrency] =
@@ -25,31 +13,22 @@ export default function TopSpendingCard() {
 
   const currencyCodes = Array.from(
     new Set(
-      (spendingQuery.data ?? []).map(
-        (item) => item.currencyCode,
-      ),
+      (spendingQuery.data ?? []).map((item) => item.currencyCode),
     ),
   ).sort()
 
   const activeCurrency =
-    selectedCurrency &&
-    currencyCodes.includes(selectedCurrency)
+    selectedCurrency && currencyCodes.includes(selectedCurrency)
       ? selectedCurrency
       : currencyCodes[0]
 
   const items = (spendingQuery.data ?? [])
-    .filter(
-      (item) =>
-        item.currencyCode === activeCurrency,
-    )
+    .filter((item) => item.currencyCode === activeCurrency)
     .map((item) => ({
       ...item,
       amount: Number(item.spentAmount),
     }))
-    .sort(
-      (first, second) =>
-        second.amount - first.amount,
-    )
+    .sort((first, second) => second.amount - first.amount)
     .slice(0, 5)
 
   const maximumAmount = Math.max(
@@ -73,17 +52,12 @@ export default function TopSpendingCard() {
         {currencyCodes.length > 1 && (
           <select
             value={activeCurrency}
-            onChange={(event) =>
-              setSelectedCurrency(event.target.value)
-            }
+            onChange={(event) => setSelectedCurrency(event.target.value)}
             aria-label="Spending currency"
             className="cursor-pointer rounded-full border border-[#d7d3c9] bg-white py-2 pr-9 pl-3 text-xs font-semibold text-[#173c32]"
           >
             {currencyCodes.map((currencyCode) => (
-              <option
-                key={currencyCode}
-                value={currencyCode}
-              >
+              <option key={currencyCode} value={currencyCode}>
                 {currencyCode}
               </option>
             ))}
@@ -110,9 +84,7 @@ export default function TopSpendingCard() {
 
             <button
               type="button"
-              onClick={() => {
-                void spendingQuery.refetch()
-              }}
+              onClick={() => void spendingQuery.refetch()}
               className="mt-3 cursor-pointer text-sm font-semibold text-[#174f43] underline"
             >
               Try again
@@ -121,15 +93,13 @@ export default function TopSpendingCard() {
         </div>
       )}
 
-      {spendingQuery.isSuccess &&
-        items.length === 0 && (
-          <div className="grid flex-1 place-items-center text-center">
-            <p className="max-w-xs text-sm leading-6 text-[#657972]">
-              Add expense transactions to see your
-              leading categories.
-            </p>
-          </div>
-        )}
+      {spendingQuery.isSuccess && items.length === 0 && (
+        <div className="grid flex-1 place-items-center text-center">
+          <p className="max-w-xs text-sm leading-6 text-[#657972]">
+            Add expense transactions to see your leading categories.
+          </p>
+        </div>
+      )}
 
       {spendingQuery.isSuccess && items.length > 0 && (
         <div className="mt-6 flex-1 space-y-4">
@@ -147,19 +117,14 @@ export default function TopSpendingCard() {
                   </p>
 
                   <p className="shrink-0 text-xs font-semibold text-[#173c32]">
-                    {formatMoney(
-                      item.amount,
-                      item.currencyCode,
-                    )}
+                    {formatMoney(item.amount, item.currencyCode, 0)}
                   </p>
                 </div>
 
                 <div className="h-2 overflow-hidden rounded-full bg-[#e8e7df]">
                   <div
                     className="h-full rounded-full bg-[#6f9d7d]"
-                    style={{
-                      width: `${width}%`,
-                    }}
+                    style={{ width: `${width}%` }}
                   />
                 </div>
               </div>

@@ -4,12 +4,10 @@ import {
   LoaderCircle,
   WalletCards,
 } from 'lucide-react'
-import {
-  useMemo,
-  useState,
-} from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router'
 
+import { formatMoney, formatMonth } from '../../../utils/formatters'
 import {
   useBudgetPerformance,
   useBudgets,
@@ -17,86 +15,53 @@ import {
 
 function currentMonthKey() {
   const today = new Date()
-  const month = String(
-    today.getMonth() + 1,
-  ).padStart(2, '0')
+  const month = String(today.getMonth() + 1).padStart(2, '0')
 
   return `${today.getFullYear()}-${month}`
 }
 
-function formatMonth(value: string) {
-  const [year, month] = value
-    .slice(0, 7)
-    .split('-')
-    .map(Number)
-
-  return new Intl.DateTimeFormat('en-ZA', {
-    month: 'short',
-    year: 'numeric',
-  }).format(new Date(year, month - 1, 1))
-}
-
-function formatMoney(
-  amount: number,
-  currencyCode: string,
-) {
-  return new Intl.NumberFormat('en-ZA', {
-    style: 'currency',
-    currency: currencyCode,
-    maximumFractionDigits: 0,
-  }).format(amount)
-}
-
 export default function BudgetPulseCard() {
-  const [selectedBudgetId, setSelectedBudgetId] =
-    useState('')
-
+  const [selectedBudgetId, setSelectedBudgetId] = useState('')
   const budgetsQuery = useBudgets('ACTIVE')
 
   const currentBudgets = useMemo(() => {
     const month = currentMonthKey()
 
     return (budgetsQuery.data ?? []).filter(
-      (budget) =>
-        budget.budgetMonth.slice(0, 7) === month,
+      (budget) => budget.budgetMonth.slice(0, 7) === month,
     )
   }, [budgetsQuery.data])
 
   const activeBudget =
-    currentBudgets.find(
-      (budget) => budget.id === selectedBudgetId,
-    ) ?? currentBudgets[0]
+    currentBudgets.find((budget) => budget.id === selectedBudgetId) ??
+    currentBudgets[0]
 
-  const performanceQuery = useBudgetPerformance(
-    activeBudget?.id ?? '',
-  )
+  const performanceQuery = useBudgetPerformance(activeBudget?.id ?? '')
 
   const categoryToWatch = useMemo(() => {
-    const categories =
-      performanceQuery.data?.categories
+    const categories = performanceQuery.data?.categories
 
-    if (!categories?.length) {
-      return null
-    }
+    if (!categories?.length) return null
 
     return categories.toSorted(
       (left, right) =>
-        Number(right.exceeded) -
-          Number(left.exceeded) ||
-        right.utilizationPercentage -
-          left.utilizationPercentage,
+        Number(right.exceeded) - Number(left.exceeded) ||
+        right.utilizationPercentage - left.utilizationPercentage,
     )[0]
   }, [performanceQuery.data?.categories])
 
   const performance = performanceQuery.data
+
   const currencyCode =
     performance?.currencyCode ??
     activeBudget?.currencyCode ??
     'ZAR'
+
   const utilization = Math.max(
     0,
     Number(performance?.utilizationPercentage ?? 0),
   )
+
   const progressWidth = Math.min(utilization, 100)
   const isOverBudget =
     performance?.anyCategoryExceeded || utilization > 100
@@ -119,9 +84,7 @@ export default function BudgetPulseCard() {
         {currentBudgets.length > 1 ? (
           <select
             value={activeBudget?.id ?? ''}
-            onChange={(event) =>
-              setSelectedBudgetId(event.target.value)
-            }
+            onChange={(event) => setSelectedBudgetId(event.target.value)}
             aria-label="Budget currency"
             className="cursor-pointer rounded-full border border-[#d7d3c9] bg-white py-1.5 pr-8 pl-3 text-xs font-semibold text-[#173c32]"
           >
@@ -225,9 +188,7 @@ export default function BudgetPulseCard() {
               <p
                 className={[
                   'font-serif text-3xl tracking-[-0.03em]',
-                  isOverBudget
-                    ? 'text-[#a85e49]'
-                    : 'text-[#173c32]',
+                  isOverBudget ? 'text-[#a85e49]' : 'text-[#173c32]',
                 ].join(' ')}
               >
                 {Math.round(utilization)}%
@@ -237,11 +198,13 @@ export default function BudgetPulseCard() {
                 {formatMoney(
                   Number(performance.totalSpentAmount),
                   currencyCode,
+                  0,
                 )}{' '}
                 of{' '}
                 {formatMoney(
                   Number(performance.totalLimitAmount),
                   currencyCode,
+                  0,
                 )}
               </p>
             </div>
@@ -249,9 +212,7 @@ export default function BudgetPulseCard() {
             <p
               className={[
                 'text-right text-xs font-semibold',
-                isOverBudget
-                  ? 'text-[#a85e49]'
-                  : 'text-[#36775d]',
+                isOverBudget ? 'text-[#a85e49]' : 'text-[#36775d]',
               ].join(' ')}
             >
               {isOverBudget ? 'Needs attention' : 'On track'}
@@ -262,9 +223,7 @@ export default function BudgetPulseCard() {
             <div
               className={[
                 'h-full rounded-full',
-                isOverBudget
-                  ? 'bg-[#c4775f]'
-                  : 'bg-[#79a486]',
+                isOverBudget ? 'bg-[#c4775f]' : 'bg-[#79a486]',
               ].join(' ')}
               style={{ width: `${progressWidth}%` }}
             />
@@ -273,18 +232,17 @@ export default function BudgetPulseCard() {
           <div className="mt-4 flex items-center justify-between gap-3 border-t border-[#ebe7de] pt-3">
             <div className="min-w-0">
               <p className="text-[11px] font-semibold tracking-[0.08em] text-[#7a847e]">
-                {categoryToWatch
-                  ? 'CATEGORY TO WATCH'
-                  : 'REMAINING'}
+                {categoryToWatch ? 'CATEGORY TO WATCH' : 'REMAINING'}
               </p>
 
               <p className="mt-0.5 truncate text-sm font-semibold text-[#173c32]">
                 {categoryToWatch
                   ? categoryToWatch.categoryName
                   : formatMoney(
-                    Number(performance.totalRemainingAmount),
-                    currencyCode,
-                  )}
+                      Number(performance.totalRemainingAmount),
+                      currencyCode,
+                      0,
+                    )}
               </p>
             </div>
 
