@@ -1,8 +1,6 @@
 import {
   ArrowRight,
   CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
   Clock3,
   RefreshCw,
   ShieldCheck,
@@ -14,6 +12,7 @@ import { Link } from 'react-router'
 
 import { ApiClientError } from '../../../api/ApiClientError'
 import PageShell from '../../../components/layout/PageShell'
+import Pagination from '../../../components/ui/Pagination'
 import type { UserStatus } from '../../profile/api/types'
 import type { AdminUser } from '../api/types'
 import { useAdminUsers } from '../hooks/useAdminUsers'
@@ -35,9 +34,7 @@ const statusClasses = {
 } satisfies Record<UserStatus, string>
 
 function formatDate(value: string | null) {
-  if (!value) {
-    return 'Never'
-  }
+  if (!value) return 'Never'
 
   return new Intl.DateTimeFormat('en-ZA', {
     day: '2-digit',
@@ -107,7 +104,8 @@ export default function AdminUsersPage() {
           </h1>
 
           <p className="mt-3 max-w-2xl text-sm leading-6 text-[#657972]">
-            Review account access, user status, and active sessions from one secure workspace.
+            Review account access, user status, and active sessions from one
+            secure workspace.
           </p>
         </div>
 
@@ -213,7 +211,8 @@ export default function AdminUsersPage() {
             </h2>
 
             <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-[#657972]">
-              Registered users will appear here as soon as their accounts are created.
+              Registered users will appear here as soon as their accounts are
+              created.
             </p>
           </section>
         )}
@@ -248,7 +247,9 @@ export default function AdminUsersPage() {
                       Status
                     </span>
 
-                    <span className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${statusClasses[user.status]}`}>
+                    <span
+                      className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${statusClasses[user.status]}`}
+                    >
                       {statusLabels[user.status]}
                     </span>
                   </div>
@@ -280,35 +281,22 @@ export default function AdminUsersPage() {
               )
             })}
 
-            <footer className="flex flex-wrap items-center justify-between gap-4 border-t border-[#dedbd2] bg-[#f9f7f1] px-5 py-4 sm:px-7">
-              <p className="text-xs text-[#71807b]">
-                Page {usersQuery.data.page + 1} of{' '}
-                {Math.max(usersQuery.data.totalPages, 1)}
-                <span className="mx-2 text-[#c2beb5]">·</span>
-                {usersQuery.data.totalElements} users
-              </p>
-
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  disabled={!usersQuery.data.hasPrevious || usersQuery.isFetching}
-                  onClick={() => setPage((current) => Math.max(0, current - 1))}
-                  className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-[#d8d6ce] bg-[#fffdf8] px-3.5 py-2 text-xs font-semibold text-[#173c32] transition hover:bg-[#efede7] disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  <ChevronLeft size={15} aria-hidden />
-                  Previous
-                </button>
-
-                <button
-                  type="button"
-                  disabled={!usersQuery.data.hasNext || usersQuery.isFetching}
-                  onClick={() => setPage((current) => current + 1)}
-                  className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-[#174f43] px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-[#236a58] disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  Next
-                  <ChevronRight size={15} aria-hidden />
-                </button>
-              </div>
+            <footer className="border-t border-[#dedbd2] bg-[#f9f7f1] px-5 py-4 sm:px-7">
+              <Pagination
+                label="User pages"
+                page={usersQuery.data.page}
+                totalPages={usersQuery.data.totalPages}
+                onPageChange={setPage}
+                isFetching={usersQuery.isFetching}
+                summary={
+                  <>
+                    Page {usersQuery.data.page + 1} of{' '}
+                    {usersQuery.data.totalPages}
+                    <span className="mx-2 text-[#c2beb5]">·</span>
+                    {usersQuery.data.totalElements} users
+                  </>
+                }
+              />
             </footer>
           </section>
         )}
