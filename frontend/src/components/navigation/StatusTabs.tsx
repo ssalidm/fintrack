@@ -18,12 +18,11 @@ export default function StatusTabs<T extends string>({
   ariaLabel,
   variant = 'underline',
 }: StatusTabsProps<T>) {
-  const isUnderline =
-    variant === 'underline'
+  const isUnderline = variant === 'underline'
 
   return (
     <div
-      role="tablist"
+      role="group"
       aria-label={ariaLabel}
       className={
         isUnderline
@@ -32,18 +31,14 @@ export default function StatusTabs<T extends string>({
       }
     >
       {options.map((option) => {
-        const isSelected =
-          value === option.value
+        const isSelected = value === option.value
 
         return (
           <button
             key={option.value}
             type="button"
-            role="tab"
-            aria-selected={isSelected}
-            onClick={() =>
-              onChange(option.value)
-            }
+            aria-pressed={isSelected}
+            onClick={() => onChange(option.value)}
             className={
               isUnderline
                 ? `cursor-pointer border-b-2 px-1 pb-4 text-sm font-semibold transition ${

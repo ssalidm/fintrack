@@ -16,6 +16,9 @@ import {
 import { ApiClientError } from '../../../api/ApiClientError'
 import RefreshButton from '../../../components/actions/RefreshButton'
 import PageHeader from '../../../components/layout/PageHeader'
+import ConfirmationDialog from '../../../components/ui/ConfirmationDialog'
+import EmptyState from '../../../components/ui/EmptyState'
+import ErrorPanel from '../../../components/ui/ErrorPanel'
 import { formatDateOnly, formatMoney } from '../../../utils/formatters'
 import { useAccounts } from '../../accounts/hooks/useAccounts'
 import { useCategories } from '../../categories/hooks/useCategories'
@@ -65,11 +68,9 @@ function formatFrequency(
 ) {
   const units = frequencyUnits[frequency]
 
-  if (intervalCount === 1) {
-    return `Every ${units.singular}`
-  }
-
-  return `Every ${intervalCount} ${units.plural}`
+  return intervalCount === 1
+    ? `Every ${units.singular}`
+    : `Every ${intervalCount} ${units.plural}`
 }
 
 function statusLabel(status: RecurringTransactionStatus) {
@@ -91,103 +92,15 @@ function RecurringPageSkeleton() {
   )
 }
 
-interface ArchiveConfirmationProps {
-  schedule: RecurringTransaction
-  isPending: boolean
-  onCancel: () => void
-  onConfirm: () => void
-}
-
-function ArchiveConfirmation({
-  schedule,
-  isPending,
-  onCancel,
-  onConfirm,
-}: ArchiveConfirmationProps) {
-  return (
-    <div
-      role="presentation"
-      onMouseDown={() => {
-        if (!isPending) onCancel()
-      }}
-      className="fixed inset-0 z-[60] grid place-items-center bg-[#102f28]/55 px-4 backdrop-blur-sm"
-    >
-      <section
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="archive-schedule-title"
-        onMouseDown={(event) => event.stopPropagation()}
-        className="w-full max-w-md rounded-3xl border border-[#dedbd2] bg-[#fffdf8] p-6 shadow-2xl sm:p-8"
-      >
-        <div className="flex items-start justify-between gap-4">
-          <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#f4e7df] text-[#a85e49]">
-            <Archive size={19} aria-hidden />
-          </span>
-
-          <button
-            type="button"
-            disabled={isPending}
-            onClick={onCancel}
-            aria-label="Close archive confirmation"
-            className="cursor-pointer rounded-full p-2 text-[#657972] transition hover:bg-[#eef1eb] disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <X size={19} aria-hidden />
-          </button>
-        </div>
-
-        <h2
-          id="archive-schedule-title"
-          className="mt-5 font-serif text-3xl tracking-[-0.02em] text-[#173c32]"
-        >
-          Archive this schedule?
-        </h2>
-
-        <p className="mt-3 text-sm leading-6 text-[#657972]">
-          <strong className="font-semibold text-[#173c32]">
-            {schedule.name}
-          </strong>{' '}
-          will stop generating transactions and move to your archived schedules.
-        </p>
-
-        <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-          <button
-            type="button"
-            disabled={isPending}
-            onClick={onCancel}
-            className="cursor-pointer rounded-full border border-[#d8d5cc] px-5 py-2.5 text-sm font-semibold text-[#173c32] transition hover:bg-[#f5f5ef] disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            Keep schedule
-          </button>
-
-          <button
-            type="button"
-            disabled={isPending}
-            onClick={onConfirm}
-            className="cursor-pointer rounded-full bg-[#a85e49] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#914d3c] disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {isPending ? 'Archiving…' : 'Archive'}
-          </button>
-        </div>
-      </section>
-    </div>
-  )
-}
-
 export default function RecurringTransactionsPage() {
   const [status, setStatus] =
     useState<RecurringTransactionStatus>('ACTIVE')
-
   const [isCreateOpen, setIsCreateOpen] = useState(false)
-
   const [scheduleToArchive, setScheduleToArchive] =
     useState<RecurringTransaction | null>(null)
-
   const [scheduleToEdit, setScheduleToEdit] =
     useState<RecurringTransaction | null>(null)
-
-  const [busyScheduleId, setBusyScheduleId] =
-    useState<string | null>(null)
-
+  const [busyScheduleId, setBusyScheduleId] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
 
   const schedulesQuery = useRecurringTransactions(status)
@@ -203,10 +116,7 @@ export default function RecurringTransactionsPage() {
   const accountById = useMemo(
     () =>
       new Map(
-        (accountsQuery.data ?? []).map((account) => [
-          account.id,
-          account,
-        ]),
+        (accountsQuery.data ?? []).map((account) => [account.id, account]),
       ),
     [accountsQuery.data],
   )
@@ -297,7 +207,12 @@ export default function RecurringTransactionsPage() {
   }
 
   async function handleArchive() {
-    if (!scheduleToArchive) return
+    if (
+      !scheduleToArchive ||
+      busyScheduleId === scheduleToArchive.id
+    ) {
+      return
+    }
 
     const wasSuccessful = await runAction(
       scheduleToArchive.id,
@@ -338,9 +253,11 @@ export default function RecurringTransactionsPage() {
             <p className="text-xs font-semibold tracking-[0.12em] text-[#657972]">
               {status}
             </p>
+
             <p className="mt-2 font-serif text-3xl text-[#173c32]">
               {schedules.length}
             </p>
+
             <p className="mt-1 text-xs text-[#657972]">
               {schedules.length === 1 ? 'schedule' : 'schedules'}
             </p>
@@ -350,20 +267,28 @@ export default function RecurringTransactionsPage() {
             <p className="text-xs font-semibold tracking-[0.12em] text-[#657972]">
               DUE NOW
             </p>
+
             <p className="mt-2 font-serif text-3xl text-[#a85e49]">
               {dueScheduleCount}
             </p>
-            <p className="mt-1 text-xs text-[#657972]">need attention</p>
+
+            <p className="mt-1 text-xs text-[#657972]">
+              need attention
+            </p>
           </article>
 
           <article className="rounded-2xl border border-[#dedbd2] bg-[#fffdf8] px-5 py-4">
             <p className="text-xs font-semibold tracking-[0.12em] text-[#657972]">
               AUTOMATIC
             </p>
+
             <p className="mt-2 font-serif text-3xl text-[#2d684f]">
               {automaticScheduleCount}
             </p>
-            <p className="mt-1 text-xs text-[#657972]">posted by Salif</p>
+
+            <p className="mt-1 text-xs text-[#657972]">
+              posted by Salif
+            </p>
           </article>
         </section>
 
@@ -394,12 +319,13 @@ export default function RecurringTransactionsPage() {
           />
         </section>
 
-        {actionError && (
+        {actionError && !scheduleToArchive && (
           <div
             role="alert"
             className="mt-5 flex items-start justify-between gap-4 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700"
           >
             <p>{actionError}</p>
+
             <button
               type="button"
               onClick={() => setActionError(null)}
@@ -414,55 +340,38 @@ export default function RecurringTransactionsPage() {
         {schedulesQuery.isPending && <RecurringPageSkeleton />}
 
         {schedulesQuery.error && (
-          <section
-            role="alert"
-            className="feature-reveal feature-reveal-delay-3 mt-6 rounded-2xl border border-red-200 bg-red-50 p-6"
-          >
-            <h2 className="font-serif text-2xl text-red-950">
-              We couldn’t load your schedules
-            </h2>
-
-            <p className="mt-2 text-sm text-red-700">
-              {queryErrorMessage}
-            </p>
-
-            <button
-              type="button"
-              onClick={() => void schedulesQuery.refetch()}
-              className="mt-4 cursor-pointer text-sm font-semibold text-red-800 underline underline-offset-4"
-            >
-              Try again
-            </button>
-          </section>
+          <ErrorPanel
+            title="We couldn’t load your schedules"
+            message={queryErrorMessage}
+            onRetry={() => void schedulesQuery.refetch()}
+            className="feature-reveal feature-reveal-delay-3 mt-6"
+          />
         )}
 
-        {schedulesQuery.data && schedules.length === 0 && (
-          <section className="feature-reveal feature-reveal-delay-3 mt-6 rounded-3xl border border-dashed border-[#cfcac0] bg-[#fffdf8] px-6 py-14 text-center">
-            <span className="mx-auto grid size-14 place-items-center rounded-full bg-[#e3e9ed] text-[#557587]">
-              <CalendarClock size={24} aria-hidden />
-            </span>
-
-            <h2 className="mt-5 font-serif text-3xl text-[#173c32]">
-              No {statusLabel(status).toLowerCase()} schedules
-            </h2>
-
-            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#657972]">
-              {status === 'ACTIVE'
+        {schedulesQuery.isSuccess && schedules.length === 0 && (
+          <EmptyState
+            icon={<CalendarClock size={24} aria-hidden />}
+            title={`No ${statusLabel(status).toLowerCase()} schedules`}
+            description={
+              status === 'ACTIVE'
                 ? 'Create a schedule for income or expenses that repeat over time.'
-                : `You do not have any ${statusLabel(status).toLowerCase()} recurring transactions.`}
-            </p>
-
-            {status === 'ACTIVE' && (
-              <button
-                type="button"
-                onClick={() => setIsCreateOpen(true)}
-                className="mt-6 inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#216353]"
-              >
-                <Plus size={17} aria-hidden />
-                Create your first schedule
-              </button>
-            )}
-          </section>
+                : `You do not have any ${statusLabel(status).toLowerCase()} recurring transactions.`
+            }
+            iconClassName="bg-[#e3e9ed] text-[#557587]"
+            className="feature-reveal feature-reveal-delay-3 mt-6"
+            action={
+              status === 'ACTIVE' && (
+                <button
+                  type="button"
+                  onClick={() => setIsCreateOpen(true)}
+                  className="mt-6 inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#216353]"
+                >
+                  <Plus size={17} aria-hidden />
+                  Create your first schedule
+                </button>
+              )
+            }
+          />
         )}
 
         {schedules.length > 0 && (
@@ -652,7 +561,10 @@ export default function RecurringTransactionsPage() {
                         <button
                           type="button"
                           disabled={isBusy}
-                          onClick={() => setScheduleToArchive(schedule)}
+                          onClick={() => {
+                            setActionError(null)
+                            setScheduleToArchive(schedule)
+                          }}
                           className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#e0c9bf] px-4 py-2 text-xs font-semibold text-[#a85e49] transition hover:bg-[#f8ebe6] disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           <Archive size={14} aria-hidden />
@@ -678,12 +590,36 @@ export default function RecurringTransactionsPage() {
       />
 
       {scheduleToArchive && (
-        <ArchiveConfirmation
-          schedule={scheduleToArchive}
+        <ConfirmationDialog
+          title="Archive this schedule?"
+          description={
+            <>
+              <strong className="font-semibold text-[#173c32]">
+                {scheduleToArchive.name}
+              </strong>{' '}
+              will stop generating transactions and move to your archived
+              schedules.
+            </>
+          }
+          icon={<Archive size={19} aria-hidden />}
+          confirmLabel="Archive"
+          pendingLabel="Archiving…"
+          cancelLabel="Keep schedule"
           isPending={busyScheduleId === scheduleToArchive.id}
-          onCancel={() => setScheduleToArchive(null)}
           onConfirm={() => void handleArchive()}
-        />
+          onClose={() => setScheduleToArchive(null)}
+          role="dialog"
+          closeLabel="Close archive confirmation"
+        >
+          {actionError && (
+            <p
+              role="alert"
+              className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+            >
+              {actionError}
+            </p>
+          )}
+        </ConfirmationDialog>
       )}
     </main>
   )
