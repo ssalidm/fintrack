@@ -14,6 +14,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+import static za.co.pixelly.fintrack.common.concurrency.VersionGuard.requireCurrent;
+
 @Service
 @RequiredArgsConstructor
 public class DefaultCategoryService implements CategoryService {
@@ -127,9 +129,10 @@ public class DefaultCategoryService implements CategoryService {
             throw new ArchivedCategoryModificationException();
         }
 
-        validateVersion(
-            category,
-            request.version()
+        requireCurrent(
+            category.getVersion(),
+            request.version(),
+            StaleCategoryVersionException::new
         );
 
         String targetName =
@@ -189,9 +192,10 @@ public class DefaultCategoryService implements CategoryService {
             throw new CategoryAlreadyArchivedException();
         }
 
-        validateVersion(
-            category,
-            request.version()
+        requireCurrent(
+            category.getVersion(),
+            request.version(),
+            StaleCategoryVersionException::new
         );
 
         category.archive(
@@ -219,16 +223,5 @@ public class DefaultCategoryService implements CategoryService {
             .orElseThrow(
                 CategoryNotFoundException::new
             );
-    }
-
-
-    private void validateVersion(
-        Category category,
-        Long requestedVersion
-    ) {
-        if (category.getVersion()
-            != requestedVersion) {
-            throw new StaleCategoryVersionException();
-        }
     }
 }

@@ -29,6 +29,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 import static za.co.pixelly.fintrack.common.Util.normalizeNullable;
+import static za.co.pixelly.fintrack.common.concurrency.VersionGuard.requireCurrent;
 
 @Service
 @RequiredArgsConstructor
@@ -123,7 +124,12 @@ public class DefaultTransactionService implements TransactionService {
 
         ensureManualTransaction(transaction);
         ensurePosted(transaction);
-        validateVersion(transaction, request.version());
+
+        requireCurrent(
+            transaction.getVersion(),
+            request.version(),
+            StaleTransactionVersionException::new
+        );
 
         UUID targetAccountId = request.accountId() == null
             ? transaction.getAccountId()
@@ -199,7 +205,11 @@ public class DefaultTransactionService implements TransactionService {
             throw new TransactionAlreadyVoidedException();
         }
 
-        validateVersion(transaction, request.version());
+        requireCurrent(
+            transaction.getVersion(),
+            request.version(),
+            StaleTransactionVersionException::new
+        );
 
         transaction.voidTransaction(
             request.reason(),
@@ -272,15 +282,6 @@ public class DefaultTransactionService implements TransactionService {
         return transactionRepository
             .findByIdAndUserId(transactionId, userId)
             .orElseThrow(TransactionNotFoundException::new);
-    }
-
-    private void validateVersion(
-        Transaction transaction,
-        Long requestedVersion
-    ) {
-        if (transaction.getVersion() != requestedVersion) {
-            throw new StaleTransactionVersionException();
-        }
     }
 
     private void ensurePosted(
