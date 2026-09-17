@@ -54,7 +54,7 @@ class EmailChangeIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/profile/change-email"
+                    api("/profile/change-email")
                 )
                     .header(
                         "Authorization",
@@ -176,7 +176,7 @@ class EmailChangeIntegrationTest
          */
         mockMvc.perform(
                 post(
-                    "/api/v1/auth/change-email/confirm"
+                    api("/auth/change-email/confirm")
                 )
                     .contentType(
                         MediaType.APPLICATION_JSON
@@ -268,7 +268,7 @@ class EmailChangeIntegrationTest
          */
         mockMvc.perform(
                 get(
-                    "/api/v1/profile"
+                    api("/profile")
                 )
                     .header(
                         "Authorization",
@@ -311,7 +311,7 @@ class EmailChangeIntegrationTest
          */
         mockMvc.perform(
                 post(
-                    "/api/v1/auth/change-email/confirm"
+                    api("/auth/change-email/confirm")
                 )
                     .contentType(
                         MediaType.APPLICATION_JSON
@@ -347,7 +347,7 @@ class EmailChangeIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/profile/change-email"
+                    api("/profile/change-email")
                 )
                     .header(
                         "Authorization",
@@ -444,7 +444,7 @@ class EmailChangeIntegrationTest
          */
         mockMvc.perform(
                 post(
-                    "/api/v1/auth/change-email/confirm"
+                    api("/auth/change-email/confirm")
                 )
                     .contentType(
                         MediaType.APPLICATION_JSON
@@ -559,7 +559,7 @@ class EmailChangeIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/auth/change-email/confirm"
+                    api("/auth/change-email/confirm")
                 )
                     .contentType(
                         MediaType.APPLICATION_JSON
@@ -657,7 +657,7 @@ class EmailChangeIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/profile/change-email"
+                    api("/profile/change-email")
                 )
                     .header(
                         "Authorization",
@@ -758,7 +758,7 @@ class EmailChangeIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/profile/change-email"
+                    api("/profile/change-email")
                 )
                     .header(
                         "Authorization",
@@ -870,7 +870,7 @@ class EmailChangeIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/auth/change-email/confirm"
+                    api("/auth/change-email/confirm")
                 )
                     .contentType(
                         MediaType.APPLICATION_JSON
@@ -986,7 +986,7 @@ class EmailChangeIntegrationTest
 
         return mockMvc.perform(
             post(
-                "/api/v1/profile/change-email"
+                api("/profile/change-email")
             )
                 .header(
                     "Authorization",

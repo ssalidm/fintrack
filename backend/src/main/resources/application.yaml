@@ -60,6 +60,9 @@ fintrack:
     cors:
       allowed-origins: []
 
+  api:
+    base-path: ${FINTRACK_API_BASE_PATH:/api/v1}
+
   recurring:
     processing-cron: "0 0 * * * *"
     schedule-batch-size: 100

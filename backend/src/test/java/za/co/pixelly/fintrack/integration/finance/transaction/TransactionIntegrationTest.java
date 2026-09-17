@@ -46,7 +46,7 @@ class TransactionIntegrationTest
             );
 
         mockMvc.perform(
-                post("/api/v1/transactions")
+                post(api("/transactions"))
                     .header(
                         "Authorization",
                         bearer(user)
@@ -115,7 +115,7 @@ class TransactionIntegrationTest
             );
 
         mockMvc.perform(
-                post("/api/v1/transactions")
+                post(api("/transactions"))
                     .header(
                         "Authorization",
                         bearer(user)
@@ -169,7 +169,7 @@ class TransactionIntegrationTest
             );
 
         mockMvc.perform(
-                post("/api/v1/transactions")
+                post(api("/transactions"))
                     .header(
                         "Authorization",
                         bearer(attacker)
@@ -237,7 +237,7 @@ class TransactionIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/transactions"
+                    api("/transactions")
                         + "?page=0&size=3"
                 )
                     .header(
@@ -298,7 +298,7 @@ class TransactionIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/transactions"
+                    api("/transactions")
                         + "?size=101"
                 )
                     .header(
@@ -368,7 +368,7 @@ class TransactionIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/transactions"
+                    api("/transactions")
                         + "?type=EXPENSE"
                         + "&fromDate=2026-08-01"
                         + "&toDate=2026-08-31"
@@ -467,7 +467,7 @@ class TransactionIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/transactions/{transactionId}",
+                    api("/transactions/{transactionId}"),
                     transactionId
                 )
                     .header(
@@ -486,7 +486,7 @@ class TransactionIntegrationTest
         throws Exception {
 
         mockMvc.perform(
-                get("/api/v1/transactions")
+                get(api("/transactions"))
             )
             .andExpect(
                 status().isUnauthorized()
@@ -545,7 +545,7 @@ class TransactionIntegrationTest
 
         mockMvc.perform(
                 patch(
-                    "/api/v1/transactions/{transactionId}",
+                    api("/transactions/{transactionId}"),
                     transactionId
                 )
                     .header(
@@ -650,7 +650,7 @@ class TransactionIntegrationTest
 
         mockMvc.perform(
                 patch(
-                    "/api/v1/transactions/{transactionId}",
+                    api("/transactions/{transactionId}"),
                     transactionId
                 )
                     .header(
@@ -735,7 +735,7 @@ class TransactionIntegrationTest
 
         mockMvc.perform(
                 patch(
-                    "/api/v1/transactions/{transactionId}",
+                    api("/transactions/{transactionId}"),
                     transactionId
                 )
                     .header(
@@ -757,7 +757,7 @@ class TransactionIntegrationTest
 
         mockMvc.perform(
                 patch(
-                    "/api/v1/transactions/{transactionId}",
+                    api("/transactions/{transactionId}"),
                     transactionId
                 )
                     .header(
@@ -830,7 +830,7 @@ class TransactionIntegrationTest
 
         mockMvc.perform(
                 patch(
-                    "/api/v1/transactions/{transactionId}",
+                    api("/transactions/{transactionId}"),
                     transactionId
                 )
                     .header(
@@ -898,7 +898,7 @@ class TransactionIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/transactions/{transactionId}/void",
+                    api("/transactions/{transactionId}/void"),
                     transactionId
                 )
                     .header(
@@ -982,7 +982,7 @@ class TransactionIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/transactions/{transactionId}/void",
+                    api("/transactions/{transactionId}/void"),
                     transactionId
                 )
                     .header(
@@ -1003,7 +1003,7 @@ class TransactionIntegrationTest
 
 
         mockMvc.perform(
-                get("/api/v1/transactions")
+                get(api("/transactions"))
                     .header(
                         "Authorization",
                         bearer(user)
@@ -1020,7 +1020,7 @@ class TransactionIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/transactions"
+                    api("/transactions")
                         + "?status=VOIDED"
                 )
                     .header(
@@ -1085,7 +1085,7 @@ class TransactionIntegrationTest
         MvcResult voided =
             mockMvc.perform(
                     post(
-                        "/api/v1/transactions/{transactionId}/void",
+                        api("/transactions/{transactionId}/void"),
                         transactionId
                     )
                         .header(
@@ -1115,7 +1115,7 @@ class TransactionIntegrationTest
 
         mockMvc.perform(
                 patch(
-                    "/api/v1/transactions/{transactionId}",
+                    api("/transactions/{transactionId}"),
                     transactionId
                 )
                     .header(
@@ -1153,7 +1153,7 @@ class TransactionIntegrationTest
 
         MvcResult result =
             mockMvc.perform(
-                    post("/api/v1/accounts")
+                    post(api("/accounts"))
                         .header(
                             "Authorization",
                             bearer(user)
@@ -1230,7 +1230,7 @@ class TransactionIntegrationTest
     ) throws Exception {
 
         return mockMvc.perform(
-            post("/api/v1/transactions")
+            post(api("/transactions"))
                 .header(
                     "Authorization",
                     bearer(user)

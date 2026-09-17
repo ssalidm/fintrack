@@ -27,7 +27,7 @@ public class RegistrationIntegrationTest extends AbstractIntegrationTest {
 
         String password = "SecurePassword123!";
 
-        mockMvc.perform(post("/api/v1/auth/register")
+        mockMvc.perform(post(api("/auth/register"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {
@@ -90,12 +90,12 @@ public class RegistrationIntegrationTest extends AbstractIntegrationTest {
             }
             """.formatted(email);
 
-        mockMvc.perform(post("/api/v1/auth/register")
+        mockMvc.perform(post(api("/auth/register"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(payload))
             .andExpect(status().isCreated());
 
-        mockMvc.perform(post("/api/v1/auth/register")
+        mockMvc.perform(post(api("/auth/register"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(payload))
             .andExpect(status().isConflict())
@@ -106,7 +106,7 @@ public class RegistrationIntegrationTest extends AbstractIntegrationTest {
     @Test
     void rejectsInvalidRegistrationRequest() throws Exception {
 
-        mockMvc.perform(post("/api/v1/auth/register")
+        mockMvc.perform(post(api("/auth/register"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {

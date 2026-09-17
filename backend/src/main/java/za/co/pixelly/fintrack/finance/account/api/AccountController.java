@@ -27,7 +27,7 @@ import java.util.UUID;
 )
 @SecurityRequirement(name = BEARER_AUTH)
 @RestController
-@RequestMapping("/api/v1/accounts")
+@RequestMapping("/accounts")
 @RequiredArgsConstructor
 public class AccountController {
 

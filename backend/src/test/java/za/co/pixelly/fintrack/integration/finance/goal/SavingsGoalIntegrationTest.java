@@ -309,7 +309,7 @@ class SavingsGoalIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/goals/{goalId}/contributions",
+                    api("/goals/{goalId}/contributions"),
                     goalId
                 )
                     .queryParam("page", "0")
@@ -366,7 +366,7 @@ class SavingsGoalIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/goals/{goalId}/contributions",
+                    api("/goals/{goalId}/contributions"),
                     goalId
                 )
                     .queryParam(
@@ -436,7 +436,7 @@ class SavingsGoalIntegrationTest
 
         mockMvc.perform(
                 patch(
-                    "/api/v1/goals/{goalId}/contributions/{contributionId}",
+                    api("/goals/{goalId}/contributions/{contributionId}"),
                     goalId,
                     contributionId
                 )
@@ -512,7 +512,7 @@ class SavingsGoalIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/goals/{goalId}/contributions/{contributionId}/void",
+                    api("/goals/{goalId}/contributions/{contributionId}/void"),
                     goalId,
                     contributionId
                 )
@@ -616,7 +616,7 @@ class SavingsGoalIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/goals/{goalId}",
+                    api("/goals/{goalId}"),
                     goalId
                 )
                     .header(
@@ -633,7 +633,7 @@ class SavingsGoalIntegrationTest
         throws Exception {
 
         mockMvc.perform(
-                get("/api/v1/goals")
+                get(api("/goals"))
             )
             .andExpect(
                 status().isUnauthorized()
@@ -652,7 +652,7 @@ class SavingsGoalIntegrationTest
     ) throws Exception {
 
         return mockMvc.perform(
-            post("/api/v1/goals")
+            post(api("/goals"))
                 .header(
                     "Authorization",
                     bearer(user)
@@ -685,7 +685,7 @@ class SavingsGoalIntegrationTest
 
         return mockMvc.perform(
             post(
-                "/api/v1/goals/{goalId}/contributions",
+                api("/goals/{goalId}/contributions"),
                 goalId
             )
                 .header(
@@ -717,7 +717,7 @@ class SavingsGoalIntegrationTest
 
         return mockMvc.perform(
             post(
-                "/api/v1/goals/{goalId}/complete",
+                api("/goals/{goalId}/complete"),
                 goalId
             )
                 .header(
@@ -747,7 +747,7 @@ class SavingsGoalIntegrationTest
 
         return mockMvc.perform(
             patch(
-                "/api/v1/goals/{goalId}",
+                api("/goals/{goalId}"),
                 goalId
             )
                 .header(

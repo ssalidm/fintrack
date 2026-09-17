@@ -30,7 +30,7 @@ import java.util.UUID;
     description = "Registration, authentication and account security"
 )
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
 

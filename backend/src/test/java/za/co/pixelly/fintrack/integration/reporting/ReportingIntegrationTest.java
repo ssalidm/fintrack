@@ -47,7 +47,7 @@ class ReportingIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/reports/account-balances"
+                    api("/reports/account-balances")
                 )
                     .header(
                         "Authorization",
@@ -106,7 +106,7 @@ class ReportingIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/reports/account-balances"
+                    api("/reports/account-balances")
                 )
                     .header(
                         "Authorization",
@@ -150,7 +150,7 @@ class ReportingIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/reports/net-worth"
+                    api("/reports/net-worth")
                 )
                     .header(
                         "Authorization",
@@ -214,7 +214,7 @@ class ReportingIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/reports/cash-flow"
+                    api("/reports/cash-flow")
                 )
                     .param(
                         "fromMonth",
@@ -304,7 +304,7 @@ class ReportingIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/reports/cash-flow"
+                    api("/reports/cash-flow")
                 )
                     .param(
                         "fromMonth",
@@ -392,7 +392,7 @@ class ReportingIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/reports/category-spending"
+                    api("/reports/category-spending")
                 )
                     .param(
                         "fromMonth",
@@ -455,7 +455,7 @@ class ReportingIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/reports/cash-flow"
+                    api("/reports/cash-flow")
                 )
                     .param(
                         "fromMonth",
@@ -488,7 +488,7 @@ class ReportingIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/reports/cash-flow"
+                    api("/reports/cash-flow")
                 )
                     .param(
                         "fromMonth",
@@ -521,7 +521,7 @@ class ReportingIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/reports/recurring-due"
+                    api("/reports/recurring-due")
                 )
                     .header(
                         "Authorization",
@@ -548,7 +548,7 @@ class ReportingIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/dashboard/summary"
+                    api("/dashboard/summary")
                 )
                     .header(
                         "Authorization",
@@ -613,7 +613,7 @@ class ReportingIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/reports/recurring-due"
+                    api("/reports/recurring-due")
                 )
             )
             .andExpect(
@@ -623,7 +623,7 @@ class ReportingIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/dashboard/summary"
+                    api("/dashboard/summary")
                 )
             )
             .andExpect(

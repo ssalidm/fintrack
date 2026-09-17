@@ -25,7 +25,7 @@ class AdminUserIntegrationTest
         );
 
         mockMvc.perform(
-                get("/api/v1/admin/users")
+                get(api("/admin/users"))
                     .header(
                         "Authorization",
                         bearer(user)
@@ -55,7 +55,7 @@ class AdminUserIntegrationTest
 
 
         mockMvc.perform(
-                get("/api/v1/admin/users")
+                get(api("/admin/users"))
                     .header(
                         "Authorization",
                         bearer(admin)
@@ -105,7 +105,7 @@ class AdminUserIntegrationTest
 
 
         mockMvc.perform(
-                get("/api/v1/admin/users")
+                get(api("/admin/users"))
                     .header(
                         "Authorization",
                         bearer(admin)
@@ -137,7 +137,7 @@ class AdminUserIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/admin/users/{userId}",
+                    api("/admin/users/{userId}"),
                     target.userId()
                 )
                     .header(
@@ -189,7 +189,7 @@ class AdminUserIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/admin/users/{userId}",
+                    api("/admin/users/{userId}"),
                     target.userId()
                 )
                     .header(
@@ -214,7 +214,7 @@ class AdminUserIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/admin/users/{userId}",
+                    api("/admin/users/{userId}"),
                     UUID.randomUUID()
                 )
                     .header(
@@ -247,7 +247,7 @@ class AdminUserIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/admin/users/{userId}/deactivate",
+                    api("/admin/users/{userId}/deactivate"),
                     target.userId()
                 )
                     .header(
@@ -275,7 +275,7 @@ class AdminUserIntegrationTest
          * become invalid because its session is revoked.
          */
         mockMvc.perform(
-                get("/api/v1/profile")
+                get(api("/profile"))
                     .header(
                         "Authorization",
                         bearer(target)
@@ -309,7 +309,7 @@ class AdminUserIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/admin/users/{userId}/deactivate",
+                    api("/admin/users/{userId}/deactivate"),
                     otherAdmin.userId()
                 )
                     .header(
@@ -335,7 +335,7 @@ class AdminUserIntegrationTest
          * other administrator's session.
          */
         mockMvc.perform(
-                get("/api/v1/profile")
+                get(api("/profile"))
                     .header(
                         "Authorization",
                         bearer(otherAdmin)
@@ -362,7 +362,7 @@ class AdminUserIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/admin/users/{userId}/deactivate",
+                    api("/admin/users/{userId}/deactivate"),
                     admin.userId()
                 )
                     .header(
@@ -410,7 +410,7 @@ class AdminUserIntegrationTest
          */
         mockMvc.perform(
                 post(
-                    "/api/v1/admin/users/{userId}/deactivate",
+                    api("/admin/users/{userId}/deactivate"),
                     target.userId()
                 )
                     .header(
@@ -446,7 +446,7 @@ class AdminUserIntegrationTest
          */
         mockMvc.perform(
                 post(
-                    "/api/v1/admin/users/{userId}/activate",
+                    api("/admin/users/{userId}/activate"),
                     target.userId()
                 )
                     .header(
@@ -471,7 +471,7 @@ class AdminUserIntegrationTest
             );
 
         mockMvc.perform(
-                get("/api/v1/profile")
+                get(api("/profile"))
                     .header(
                         "Authorization",
                         bearer(target)
@@ -502,7 +502,7 @@ class AdminUserIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/admin/users/{userId}/activate",
+                    api("/admin/users/{userId}/activate"),
                     target.userId()
                 )
                     .header(
@@ -548,7 +548,7 @@ class AdminUserIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/admin/users/{userId}/activate",
+                    api("/admin/users/{userId}/activate"),
                     otherAdmin.userId()
                 )
                     .header(
@@ -589,7 +589,7 @@ class AdminUserIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/admin/users/{userId}/sessions",
+                    api("/admin/users/{userId}/sessions"),
                     target.userId()
                 )
                     .header(
@@ -652,7 +652,7 @@ class AdminUserIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/admin/users/{userId}/sessions",
+                    api("/admin/users/{userId}/sessions"),
                     otherAdmin.userId()
                 )
                     .header(
@@ -678,7 +678,7 @@ class AdminUserIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/admin/users/{userId}/sessions",
+                    api("/admin/users/{userId}/sessions"),
                     admin.userId()
                 )
                     .header(
@@ -704,7 +704,7 @@ class AdminUserIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/admin/users/{userId}/sessions",
+                    api("/admin/users/{userId}/sessions"),
                     UUID.randomUUID()
                 )
                     .header(
@@ -735,7 +735,7 @@ class AdminUserIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/admin/users/{userId}/revoke-sessions",
+                    api("/admin/users/{userId}/revoke-sessions"),
                     target.userId()
                 )
                     .header(
@@ -751,7 +751,7 @@ class AdminUserIntegrationTest
          * because its sid now points to a revoked session.
          */
         mockMvc.perform(
-                get("/api/v1/profile")
+                get(api("/profile"))
                     .header(
                         "Authorization",
                         bearer(target)
@@ -821,7 +821,7 @@ class AdminUserIntegrationTest
             );
 
         mockMvc.perform(
-                get("/api/v1/profile")
+                get(api("/profile"))
                     .header(
                         "Authorization",
                         bearer(freshLogin)
@@ -850,7 +850,7 @@ class AdminUserIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/admin/users/{userId}/revoke-sessions",
+                    api("/admin/users/{userId}/revoke-sessions"),
                     otherAdmin.userId()
                 )
                     .header(
@@ -868,7 +868,7 @@ class AdminUserIntegrationTest
          * administrator's session.
          */
         mockMvc.perform(
-                get("/api/v1/profile")
+                get(api("/profile"))
                     .header(
                         "Authorization",
                         bearer(otherAdmin)
@@ -890,7 +890,7 @@ class AdminUserIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/admin/users/{userId}/revoke-sessions",
+                    api("/admin/users/{userId}/revoke-sessions"),
                     admin.userId()
                 )
                     .header(
@@ -904,7 +904,7 @@ class AdminUserIntegrationTest
 
 
         mockMvc.perform(
-                get("/api/v1/profile")
+                get(api("/profile"))
                     .header(
                         "Authorization",
                         bearer(admin)
@@ -926,7 +926,7 @@ class AdminUserIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/admin/users/{userId}/revoke-sessions",
+                    api("/admin/users/{userId}/revoke-sessions"),
                     UUID.randomUUID()
                 )
                     .header(
@@ -945,7 +945,7 @@ class AdminUserIntegrationTest
         throws Exception {
 
         mockMvc.perform(
-                get("/api/v1/admin/users")
+                get(api("/admin/users"))
             )
             .andExpect(
                 status().isUnauthorized()

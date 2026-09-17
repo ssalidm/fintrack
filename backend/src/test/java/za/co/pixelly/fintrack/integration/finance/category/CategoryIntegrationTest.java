@@ -39,7 +39,7 @@ class CategoryIntegrationTest
             );
 
         mockMvc.perform(
-                get("/api/v1/categories")
+                get(api("/categories"))
                     .header(
                         "Authorization",
                         bearer(user)
@@ -84,7 +84,7 @@ class CategoryIntegrationTest
             );
 
         mockMvc.perform(
-                post("/api/v1/categories")
+                post(api("/categories"))
                     .header(
                         "Authorization",
                         bearer(user)
@@ -167,7 +167,7 @@ class CategoryIntegrationTest
             .andExpect(status().isCreated());
 
         mockMvc.perform(
-                post("/api/v1/categories")
+                post(api("/categories"))
                     .header(
                         "Authorization",
                         bearer(user)
@@ -244,7 +244,7 @@ class CategoryIntegrationTest
         );
 
         mockMvc.perform(
-                get("/api/v1/categories")
+                get(api("/categories"))
                     .header(
                         "Authorization",
                         bearer(alice)
@@ -306,7 +306,7 @@ class CategoryIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/categories"
+                    api("/categories")
                         + "?type=EXPENSE"
                 )
                     .header(
@@ -372,7 +372,7 @@ class CategoryIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/categories/{categoryId}",
+                    api("/categories/{categoryId}"),
                     categoryId
                 )
                     .header(
@@ -412,7 +412,7 @@ class CategoryIntegrationTest
 
         mockMvc.perform(
                 patch(
-                    "/api/v1/categories/{categoryId}",
+                    api("/categories/{categoryId}"),
                     categoryId
                 )
                     .header(
@@ -466,7 +466,7 @@ class CategoryIntegrationTest
 
         mockMvc.perform(
                 patch(
-                    "/api/v1/categories/{categoryId}",
+                    api("/categories/{categoryId}"),
                     categoryId
                 )
                     .header(
@@ -515,7 +515,7 @@ class CategoryIntegrationTest
 
         mockMvc.perform(
                 patch(
-                    "/api/v1/categories/{categoryId}",
+                    api("/categories/{categoryId}"),
                     categoryId
                 )
                     .header(
@@ -537,7 +537,7 @@ class CategoryIntegrationTest
 
         mockMvc.perform(
                 patch(
-                    "/api/v1/categories/{categoryId}",
+                    api("/categories/{categoryId}"),
                     categoryId
                 )
                     .header(
@@ -586,7 +586,7 @@ class CategoryIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/categories/{categoryId}/archive",
+                    api("/categories/{categoryId}/archive"),
                     categoryId
                 )
                     .header(
@@ -614,7 +614,7 @@ class CategoryIntegrationTest
 
 
         mockMvc.perform(
-                get("/api/v1/categories")
+                get(api("/categories"))
                     .header(
                         "Authorization",
                         bearer(user)
@@ -629,7 +629,7 @@ class CategoryIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/categories"
+                    api("/categories")
                         + "?status=ARCHIVED"
                 )
                     .header(
@@ -683,7 +683,7 @@ class CategoryIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/categories/{categoryId}/archive",
+                    api("/categories/{categoryId}/archive"),
                     categoryId
                 )
                     .header(
@@ -708,7 +708,7 @@ class CategoryIntegrationTest
         throws Exception {
 
         mockMvc.perform(
-                get("/api/v1/categories")
+                get(api("/categories"))
             )
             .andExpect(status().isUnauthorized());
     }
@@ -725,7 +725,7 @@ class CategoryIntegrationTest
     ) throws Exception {
 
         return mockMvc.perform(
-            post("/api/v1/categories")
+            post(api("/categories"))
                 .header(
                     "Authorization",
                     "Bearer " + accessToken

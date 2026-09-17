@@ -11,6 +11,8 @@ import {
 import { ApiClientError } from '../../../api/ApiClientError'
 import RefreshButton from '../../../components/actions/RefreshButton'
 import PageHeader from '../../../components/layout/PageHeader'
+import EmptyState from '../../../components/ui/EmptyState'
+import ErrorPanel from '../../../components/ui/ErrorPanel'
 import Pagination from '../../../components/ui/Pagination'
 import { formatDateOnly, formatMoney } from '../../../utils/formatters'
 import { useAccounts } from '../../accounts/hooks/useAccounts'
@@ -21,10 +23,10 @@ import type {
   TransactionType,
 } from '../api/types'
 import TransactionModal from '../components/TransactionModal'
+import VoidTransactionModal from '../components/VoidTransactionModal'
 import {
   defaultTransactionFilters,
   useTransactions,
-  useVoidTransaction,
 } from '../hooks/useTransactions'
 
 const transactionTypeLabels = {
@@ -46,8 +48,14 @@ function TransactionIcon({ type }: { type: TransactionType }) {
     <span
       className={`grid size-11 shrink-0 place-items-center rounded-xl ${classes}`}
     >
-      {type === 'INCOME' && <ArrowDownLeft size={19} aria-hidden />}
-      {type === 'EXPENSE' && <ArrowUpRight size={19} aria-hidden />}
+      {type === 'INCOME' && (
+        <ArrowDownLeft size={19} aria-hidden />
+      )}
+
+      {type === 'EXPENSE' && (
+        <ArrowUpRight size={19} aria-hidden />
+      )}
+
       {(type === 'TRANSFER_IN' || type === 'TRANSFER_OUT') && (
         <ArrowLeftRight size={19} aria-hidden />
       )}
@@ -59,21 +67,16 @@ export default function TransactionsPage() {
   const [filters, setFilters] = useState<TransactionFilters>({
     ...defaultTransactionFilters,
   })
-
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingTransaction, setEditingTransaction] =
     useState<Transaction | null>(null)
-
   const [voidTarget, setVoidTarget] = useState<Transaction | null>(null)
-  const [voidReason, setVoidReason] = useState('')
-  const [voidError, setVoidError] = useState<string | null>(null)
 
   const transactionsQuery = useTransactions(filters)
   const activeAccountsQuery = useAccounts('ACTIVE')
   const archivedAccountsQuery = useAccounts('ARCHIVED')
   const activeCategoriesQuery = useCategories()
   const archivedCategoriesQuery = useCategories(undefined, 'ARCHIVED')
-  const voidTransaction = useVoidTransaction()
 
   const transactions = transactionsQuery.data?.items ?? []
 
@@ -120,54 +123,6 @@ export default function TransactionsPage() {
   function closeForm() {
     setIsFormOpen(false)
     setEditingTransaction(null)
-  }
-
-  function openVoidDialog(transaction: Transaction) {
-    setVoidTarget(transaction)
-    setVoidReason('')
-    setVoidError(null)
-  }
-
-  function closeVoidDialog() {
-    setVoidTarget(null)
-    setVoidReason('')
-    setVoidError(null)
-  }
-
-  async function confirmVoid() {
-    if (!voidTarget) return
-
-    const reason = voidReason.trim()
-
-    if (!reason) {
-      setVoidError('A reason is required.')
-      return
-    }
-
-    if (reason.length > 255) {
-      setVoidError('Reason must not exceed 255 characters.')
-      return
-    }
-
-    setVoidError(null)
-
-    try {
-      await voidTransaction.mutateAsync({
-        transactionId: voidTarget.id,
-        payload: {
-          version: voidTarget.version,
-          reason,
-        },
-      })
-
-      closeVoidDialog()
-    } catch (error) {
-      setVoidError(
-        error instanceof ApiClientError
-          ? error.message
-          : 'Unable to void this transaction.',
-      )
-    }
   }
 
   const hasFilters =
@@ -241,6 +196,7 @@ export default function TransactionsPage() {
                 className="mt-2 block w-full cursor-pointer rounded-xl border border-[#d8d6ce] bg-white px-3 py-2.5 pr-10 text-sm text-[#173c32]"
               >
                 <option value="">All accounts</option>
+
                 {accounts.map((account) => (
                   <option key={account.id} value={account.id}>
                     {account.name}
@@ -317,41 +273,31 @@ export default function TransactionsPage() {
         )}
 
         {transactionsQuery.error && (
-          <section
-            className="feature-reveal feature-reveal-delay-2 mt-8 rounded-2xl border border-red-200 bg-red-50 p-6"
-            role="alert"
-          >
-            <h2 className="font-serif text-2xl text-red-950">
-              We couldn’t load your transactions
-            </h2>
-
-            <p className="mt-2 text-sm text-red-700">
-              {transactionsQuery.error instanceof ApiClientError
+          <ErrorPanel
+            title="We couldn’t load your transactions"
+            message={
+              transactionsQuery.error instanceof ApiClientError
                 ? transactionsQuery.error.message
-                : 'Please try again.'}
-            </p>
-          </section>
+                : 'Please try again.'
+            }
+            className="feature-reveal feature-reveal-delay-2 mt-8"
+          />
         )}
 
-        {!transactionsQuery.isPending &&
-          !transactionsQuery.error &&
-          transactions.length === 0 && (
-            <section className="feature-reveal feature-reveal-delay-2 mt-8 rounded-3xl border border-[#dedbd2] bg-[#fffdf8] px-6 py-16 text-center">
-              <span className="mx-auto grid size-14 place-items-center rounded-full bg-[#dfece3] text-[#39725d]">
-                <ArrowLeftRight size={25} aria-hidden />
-              </span>
-
-              <h2 className="mt-5 font-serif text-3xl text-[#173c32]">
-                No transactions found
-              </h2>
-
-              <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-[#657972]">
-                {hasFilters
-                  ? 'Try adjusting your filters.'
-                  : 'Record your first income or expense to begin tracking your activity.'}
-              </p>
-            </section>
-          )}
+        {transactionsQuery.isSuccess && transactions.length === 0 && (
+          <EmptyState
+            icon={<ArrowLeftRight size={25} aria-hidden />}
+            title="No transactions found"
+            description={
+              hasFilters
+                ? 'Try adjusting your filters.'
+                : 'Record your first income or expense to begin tracking your activity.'
+            }
+            variant="solid"
+            iconClassName="bg-[#dfece3] text-[#39725d]"
+            className="feature-reveal feature-reveal-delay-2 mt-8"
+          />
+        )}
 
         {!transactionsQuery.isPending &&
           !transactionsQuery.error &&
@@ -359,7 +305,6 @@ export default function TransactionsPage() {
             <section className="feature-reveal feature-reveal-delay-2 mt-8 overflow-hidden rounded-3xl border border-[#dedbd2] bg-[#fffdf8]">
               {transactions.map((transaction, index) => {
                 const account = accountsById.get(transaction.accountId)
-
                 const category = transaction.categoryId
                   ? categoriesById.get(transaction.categoryId)
                   : undefined
@@ -436,7 +381,7 @@ export default function TransactionsPage() {
 
                           <button
                             type="button"
-                            onClick={() => openVoidDialog(transaction)}
+                            onClick={() => setVoidTarget(transaction)}
                             className="cursor-pointer rounded-full p-2 text-[#657972] transition hover:bg-[#f2e3de] hover:text-[#9b5845]"
                             aria-label="Void transaction"
                             title="Void transaction"
@@ -476,75 +421,11 @@ export default function TransactionsPage() {
       )}
 
       {voidTarget && (
-        <div className="fixed inset-0 z-[80] grid place-items-center p-5">
-          <button
-            type="button"
-            className="absolute inset-0 cursor-pointer bg-[#102e27]/45 backdrop-blur-[2px]"
-            onClick={closeVoidDialog}
-            aria-label="Cancel voiding"
-          />
-
-          <section
-            role="alertdialog"
-            aria-modal="true"
-            aria-labelledby="void-title"
-            className="relative w-full max-w-md rounded-3xl bg-[#fffdf8] p-7 shadow-2xl"
-          >
-            <span className="grid size-11 place-items-center rounded-full bg-[#f2e3de] text-[#9b5845]">
-              <CircleSlash2 size={20} aria-hidden />
-            </span>
-
-            <h2
-              id="void-title"
-              className="mt-5 font-serif text-3xl text-[#173c32]"
-            >
-              Void this transaction?
-            </h2>
-
-            <p className="mt-3 text-sm leading-6 text-[#657972]">
-              The transaction will remain in your history but will no longer
-              affect the account balance.
-            </p>
-
-            <label className="mt-5 block text-sm font-semibold text-[#173c32]">
-              Reason
-              <textarea
-                rows={3}
-                maxLength={255}
-                value={voidReason}
-                onChange={(event) => setVoidReason(event.target.value)}
-                className="mt-2 block w-full resize-none rounded-xl border border-[#d8d6ce] bg-white px-4 py-3 font-normal outline-none focus:border-[#9b5845] focus:ring-2 focus:ring-[#9b5845]/15"
-                placeholder="Why is this transaction being voided?"
-              />
-            </label>
-
-            {voidError && (
-              <p className="mt-3 text-sm text-red-700" role="alert">
-                {voidError}
-              </p>
-            )}
-
-            <div className="mt-7 flex justify-end gap-3">
-              <button
-                type="button"
-                disabled={voidTransaction.isPending}
-                onClick={closeVoidDialog}
-                className="cursor-pointer rounded-full border border-[#d8d6ce] px-5 py-2.5 text-sm font-semibold text-[#173c32] hover:bg-[#efede7] disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                Cancel
-              </button>
-
-              <button
-                type="button"
-                disabled={voidTransaction.isPending}
-                onClick={() => void confirmVoid()}
-                className="cursor-pointer rounded-full bg-[#9b5845] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#834937] disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {voidTransaction.isPending ? 'Voiding…' : 'Void transaction'}
-              </button>
-            </div>
-          </section>
-        </div>
+        <VoidTransactionModal
+          key={voidTarget.id}
+          transaction={voidTarget}
+          onClose={() => setVoidTarget(null)}
+        />
       )}
     </main>
   )

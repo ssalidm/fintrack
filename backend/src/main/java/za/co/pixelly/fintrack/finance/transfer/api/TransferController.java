@@ -27,7 +27,7 @@ import static za.co.pixelly.fintrack.config.OpenApiConfig.BEARER_AUTH;
 )
 @SecurityRequirement(name = BEARER_AUTH)
 @RestController
-@RequestMapping("/api/v1/transfers")
+@RequestMapping("/transfers")
 @RequiredArgsConstructor
 public class TransferController {
 

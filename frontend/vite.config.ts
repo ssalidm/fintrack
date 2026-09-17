@@ -10,6 +10,6 @@ export default defineConfig({
     setupFiles: './src/test/setup.ts',
   },
   server: {
-    allowedHosts: ['salif.local'],
+    allowedHosts: ['salif.test', 'salif.dev'],
   }
 })

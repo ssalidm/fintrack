@@ -1,9 +1,16 @@
 import { useMemo, useState } from 'react'
-import { ArrowRight, ArrowRightLeft, Ban, Plus } from 'lucide-react'
+import {
+  ArrowRight,
+  ArrowRightLeft,
+  Ban,
+  Plus,
+} from 'lucide-react'
 
 import { ApiClientError } from '../../../api/ApiClientError'
 import RefreshButton from '../../../components/actions/RefreshButton'
 import PageHeader from '../../../components/layout/PageHeader'
+import EmptyState from '../../../components/ui/EmptyState'
+import ErrorPanel from '../../../components/ui/ErrorPanel'
 import Pagination from '../../../components/ui/Pagination'
 import { formatDateOnly, formatMoney } from '../../../utils/formatters'
 import { useAccounts } from '../../accounts/hooks/useAccounts'
@@ -33,8 +40,7 @@ function TransfersSkeleton() {
 export default function TransfersPage() {
   const [filters, setFilters] = useState(defaultTransferFilters)
   const [isCreateOpen, setIsCreateOpen] = useState(false)
-  const [transferToVoid, setTransferToVoid] =
-    useState<Transfer | null>(null)
+  const [transferToVoid, setTransferToVoid] = useState<Transfer | null>(null)
 
   const transfersQuery = useTransfers(filters)
   const activeAccountsQuery = useAccounts('ACTIVE')
@@ -138,6 +144,7 @@ export default function TransfersPage() {
                 className="w-full cursor-pointer rounded-xl border border-[#d8d5cc] bg-white px-4 py-2.5 pr-10 text-sm text-[#173c32] outline-none transition focus:border-[#4e806d] focus:ring-4 focus:ring-[#dce9e0]"
               >
                 <option value="">All source accounts</option>
+
                 {accounts.map((account) => (
                   <option key={account.id} value={account.id}>
                     {account.name}
@@ -163,6 +170,7 @@ export default function TransfersPage() {
                 className="w-full cursor-pointer rounded-xl border border-[#d8d5cc] bg-white px-4 py-2.5 pr-10 text-sm text-[#173c32] outline-none transition focus:border-[#4e806d] focus:ring-4 focus:ring-[#dce9e0]"
               >
                 <option value="">All destination accounts</option>
+
                 {accounts.map((account) => (
                   <option key={account.id} value={account.id}>
                     {account.name}
@@ -218,6 +226,7 @@ export default function TransfersPage() {
             <p className="text-xs font-semibold tracking-[0.15em] text-[#657972]">
               TRANSFER HISTORY
             </p>
+
             <h2 className="mt-2 font-serif text-3xl tracking-[-0.02em] text-[#173c32]">
               Recent movement
             </h2>
@@ -232,53 +241,37 @@ export default function TransfersPage() {
         {transfersQuery.isPending && <TransfersSkeleton />}
 
         {transfersQuery.error && (
-          <section
-            role="alert"
-            className="feature-reveal feature-reveal-delay-3 mt-6 rounded-2xl border border-red-200 bg-red-50 p-6"
-          >
-            <h2 className="font-serif text-2xl text-red-950">
-              We couldn’t load your transfers
-            </h2>
-
-            <p className="mt-2 text-sm text-red-700">{errorMessage}</p>
-
-            <button
-              type="button"
-              onClick={() => void transfersQuery.refetch()}
-              className="mt-4 cursor-pointer text-sm font-semibold text-red-800 underline underline-offset-4"
-            >
-              Try again
-            </button>
-          </section>
+          <ErrorPanel
+            title="We couldn’t load your transfers"
+            message={errorMessage}
+            onRetry={() => void transfersQuery.refetch()}
+            className="feature-reveal feature-reveal-delay-3 mt-6"
+          />
         )}
 
-        {page && transfers.length === 0 && (
-          <section className="feature-reveal feature-reveal-delay-3 mt-6 rounded-3xl border border-dashed border-[#cfcac0] bg-[#fffdf8] px-6 py-14 text-center">
-            <span className="mx-auto grid size-14 place-items-center rounded-full bg-[#e0ece4] text-[#2d684f]">
-              <ArrowRightLeft size={23} aria-hidden />
-            </span>
-
-            <h2 className="mt-5 font-serif text-3xl text-[#173c32]">
-              No transfers found
-            </h2>
-
-            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#657972]">
-              {filters.status === 'POSTED'
+        {transfersQuery.isSuccess && transfers.length === 0 && (
+          <EmptyState
+            icon={<ArrowRightLeft size={23} aria-hidden />}
+            title="No transfers found"
+            description={
+              filters.status === 'POSTED'
                 ? 'Move money between two accounts and your transfer history will appear here.'
-                : 'There are no voided transfers matching these filters.'}
-            </p>
-
-            {filters.status === 'POSTED' && (
-              <button
-                type="button"
-                onClick={() => setIsCreateOpen(true)}
-                className="mt-6 inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#216353]"
-              >
-                <Plus size={17} aria-hidden />
-                Make a transfer
-              </button>
-            )}
-          </section>
+                : 'There are no voided transfers matching these filters.'
+            }
+            className="feature-reveal feature-reveal-delay-3 mt-6"
+            action={
+              filters.status === 'POSTED' && (
+                <button
+                  type="button"
+                  onClick={() => setIsCreateOpen(true)}
+                  className="mt-6 inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#216353]"
+                >
+                  <Plus size={17} aria-hidden />
+                  Make a transfer
+                </button>
+              )
+            }
+          />
         )}
 
         {transfers.length > 0 && (
@@ -337,21 +330,17 @@ export default function TransfersPage() {
                         {transfer.description && ` · ${transfer.description}`}
                       </p>
 
-                      {transfer.status === 'VOIDED' &&
-                        transfer.voidReason && (
-                          <p className="mt-2 text-xs text-[#9b705f]">
-                            Voided: {transfer.voidReason}
-                          </p>
-                        )}
+                      {transfer.status === 'VOIDED' && transfer.voidReason && (
+                        <p className="mt-2 text-xs text-[#9b705f]">
+                          Voided: {transfer.voidReason}
+                        </p>
+                      )}
                     </div>
                   </div>
 
                   <div className="lg:text-right">
                     <p className="font-serif text-2xl text-[#173c32]">
-                      {formatMoney(
-                        transfer.amount,
-                        sourceAccount?.currencyCode,
-                      )}
+                      {formatMoney(transfer.amount, sourceAccount?.currencyCode)}
                     </p>
 
                     <span

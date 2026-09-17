@@ -25,7 +25,7 @@ import static za.co.pixelly.fintrack.config.OpenApiConfig.BEARER_AUTH;
 )
 @SecurityRequirement(name = BEARER_AUTH)
 @RestController
-@RequestMapping("/api/v1/profile")
+@RequestMapping("/profile")
 @RequiredArgsConstructor
 public class ProfileController {
 

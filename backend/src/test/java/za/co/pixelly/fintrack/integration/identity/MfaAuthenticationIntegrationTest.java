@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.boot.json.JsonParser;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import za.co.pixelly.fintrack.identity.application.OpaqueTokenCodec;
@@ -25,8 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -73,24 +70,11 @@ class MfaAuthenticationIntegrationTest
             sessionCount(user);
 
         MvcResult loginResult =
-            mockMvc.perform(
-                    post("/api/v1/auth/login")
-                        .header(
-                            "User-Agent",
-                            "reko MFA integration test"
-                        )
-                        .contentType(
-                            MediaType.APPLICATION_JSON
-                        )
-                        .content("""
-                            {
-                              "email": "%s",
-                              "password": "%s"
-                            }
-                            """.formatted(
-                            user.email(),
-                            IdentityTestClient.DEFAULT_PASSWORD
-                        ))
+            identityTestClient
+                .loginRequest(
+                    user.email(),
+                    IdentityTestClient.DEFAULT_PASSWORD,
+                    "reko MFA integration test"
                 )
                 .andExpect(status().isOk())
                 .andExpect(
@@ -124,20 +108,10 @@ class MfaAuthenticationIntegrationTest
             currentTotp(rawSecret);
 
         MvcResult verifyResult =
-            mockMvc.perform(
-                    post("/api/v1/auth/mfa/verify")
-                        .contentType(
-                            MediaType.APPLICATION_JSON
-                        )
-                        .content("""
-                            {
-                              "challengeToken": "%s",
-                              "code": "%s"
-                            }
-                            """.formatted(
-                            challengeToken,
-                            code
-                        ))
+            identityTestClient
+                .verifyMfa(
+                    challengeToken,
+                    code
                 )
                 .andExpect(status().isOk())
                 .andExpect(
@@ -205,13 +179,8 @@ class MfaAuthenticationIntegrationTest
          * The token issued after MFA must behave like
          * any other authenticated access token.
          */
-        mockMvc.perform(
-                get("/api/v1/auth/me")
-                    .header(
-                        "Authorization",
-                        "Bearer " + accessToken
-                    )
-            )
+        identityTestClient
+            .currentUser(accessToken)
             .andExpect(status().isOk());
     }
 
@@ -235,18 +204,10 @@ class MfaAuthenticationIntegrationTest
         String invalidCode =
             invalidTotp(rawSecret);
 
-        mockMvc.perform(
-                post("/api/v1/auth/mfa/verify")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("""
-                        {
-                          "challengeToken": "%s",
-                          "code": "%s"
-                        }
-                        """.formatted(
-                        challengeToken,
-                        invalidCode
-                    ))
+        identityTestClient
+            .verifyMfa(
+                challengeToken,
+                invalidCode
             )
             .andExpect(status().isUnauthorized());
 
@@ -289,18 +250,10 @@ class MfaAuthenticationIntegrationTest
             invalidTotp(rawSecret);
 
         for (int attempt = 0; attempt < 5; attempt++) {
-            mockMvc.perform(
-                    post("/api/v1/auth/mfa/verify")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                            {
-                              "challengeToken": "%s",
-                              "code": "%s"
-                            }
-                            """.formatted(
-                            challengeToken,
-                            invalidCode
-                        ))
+            identityTestClient
+                .verifyMfa(
+                    challengeToken,
+                    invalidCode
                 )
                 .andExpect(status().isUnauthorized());
         }
@@ -339,18 +292,10 @@ class MfaAuthenticationIntegrationTest
         String validCode =
             currentTotp(rawSecret);
 
-        mockMvc.perform(
-                post("/api/v1/auth/mfa/verify")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("""
-                        {
-                          "challengeToken": "%s",
-                          "code": "%s"
-                        }
-                        """.formatted(
-                        challengeToken,
-                        validCode
-                    ))
+        identityTestClient
+            .verifyMfa(
+                challengeToken,
+                validCode
             )
             .andExpect(status().isUnauthorized());
     }
@@ -494,20 +439,10 @@ class MfaAuthenticationIntegrationTest
             );
 
         MvcResult result =
-            mockMvc.perform(
-                    post("/api/v1/auth/mfa/recover")
-                        .contentType(
-                            MediaType.APPLICATION_JSON
-                        )
-                        .content("""
-                            {
-                              "challengeToken": "%s",
-                              "recoveryCode": "%s"
-                            }
-                            """.formatted(
-                            challengeToken,
-                            recoveryCode
-                        ))
+            identityTestClient
+                .recoverMfa(
+                    challengeToken,
+                    recoveryCode
                 )
                 .andExpect(status().isOk())
                 .andExpect(
@@ -834,13 +769,8 @@ class MfaAuthenticationIntegrationTest
         AuthenticatedUser user =
             createAuthenticatedUser("mfa-status-disabled");
 
-        mockMvc.perform(
-                get("/api/v1/auth/mfa/status")
-                    .header(
-                        "Authorization",
-                        "Bearer " + user.accessToken()
-                    )
-            )
+        identityTestClient
+            .mfaStatus(user.accessToken())
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$.result.enabled")
@@ -872,13 +802,8 @@ class MfaAuthenticationIntegrationTest
         issueRecoveryCode(user);
         issueRecoveryCode(user);
 
-        mockMvc.perform(
-                get("/api/v1/auth/mfa/status")
-                    .header(
-                        "Authorization",
-                        "Bearer " + user.accessToken()
-                    )
-            )
+        identityTestClient
+            .mfaStatus(user.accessToken())
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$.result.enabled")
@@ -1156,24 +1081,11 @@ class MfaAuthenticationIntegrationTest
          * not be able to obtain a fresh MFA challenge
          * while the account-level MFA lock is active.
          */
-        mockMvc.perform(
-                post("/api/v1/auth/login")
-                    .header(
-                        "User-Agent",
-                        "reko MFA lockout test"
-                    )
-                    .contentType(
-                        MediaType.APPLICATION_JSON
-                    )
-                    .content("""
-                        {
-                          "email": "%s",
-                          "password": "%s"
-                        }
-                        """.formatted(
-                        user.email(),
-                        IdentityTestClient.DEFAULT_PASSWORD
-                    ))
+        identityTestClient
+            .loginRequest(
+                user.email(),
+                IdentityTestClient.DEFAULT_PASSWORD,
+                "reko MFA lockout test"
             )
             .andExpect(
                 status().isTooManyRequests()
@@ -1201,24 +1113,11 @@ class MfaAuthenticationIntegrationTest
         AuthenticatedUser user
     ) throws Exception {
 
-        return mockMvc.perform(
-                post("/api/v1/auth/login")
-                    .header(
-                        "User-Agent",
-                        "reko MFA integration test"
-                    )
-                    .contentType(
-                        MediaType.APPLICATION_JSON
-                    )
-                    .content("""
-                        {
-                          "email": "%s",
-                          "password": "%s"
-                        }
-                        """.formatted(
-                        user.email(),
-                        IdentityTestClient.DEFAULT_PASSWORD
-                    ))
+        return identityTestClient
+            .loginRequest(
+                user.email(),
+                IdentityTestClient.DEFAULT_PASSWORD,
+                "reko MFA integration test"
             )
             .andExpect(status().isOk())
             .andExpect(
@@ -1234,20 +1133,9 @@ class MfaAuthenticationIntegrationTest
         String code
     ) throws Exception {
 
-        return mockMvc.perform(
-            post("/api/v1/auth/mfa/verify")
-                .contentType(
-                    MediaType.APPLICATION_JSON
-                )
-                .content("""
-                    {
-                      "challengeToken": "%s",
-                      "code": "%s"
-                    }
-                    """.formatted(
-                    challengeToken,
-                    code
-                ))
+        return identityTestClient.verifyMfa(
+            challengeToken,
+            code
         );
     }
 
@@ -1387,20 +1275,9 @@ class MfaAuthenticationIntegrationTest
         String recoveryCode
     ) throws Exception {
 
-        return mockMvc.perform(
-            post("/api/v1/auth/mfa/recover")
-                .contentType(
-                    MediaType.APPLICATION_JSON
-                )
-                .content("""
-                    {
-                      "challengeToken": "%s",
-                      "recoveryCode": "%s"
-                    }
-                    """.formatted(
-                    challengeToken,
-                    recoveryCode
-                ))
+        return identityTestClient.recoverMfa(
+            challengeToken,
+            recoveryCode
         );
     }
 
@@ -1446,24 +1323,10 @@ class MfaAuthenticationIntegrationTest
         String mfaCode
     ) throws Exception {
 
-        return mockMvc.perform(
-            post("/api/v1/auth/mfa/disable")
-                .header(
-                    "Authorization",
-                    "Bearer " + user.accessToken()
-                )
-                .contentType(
-                    MediaType.APPLICATION_JSON
-                )
-                .content("""
-                    {
-                      "currentPassword": "%s",
-                      "mfaCode": "%s"
-                    }
-                    """.formatted(
-                    password,
-                    mfaCode
-                ))
+        return identityTestClient.disableMfa(
+            user.accessToken(),
+            password,
+            mfaCode
         );
     }
 
@@ -1531,24 +1394,10 @@ class MfaAuthenticationIntegrationTest
         String code
     ) throws Exception {
 
-        return mockMvc.perform(
-            post("/api/v1/auth/mfa/recovery-codes/regenerate")
-                .header(
-                    "Authorization",
-                    "Bearer " + user.accessToken()
-                )
-                .contentType(
-                    MediaType.APPLICATION_JSON
-                )
-                .content("""
-                    {
-                      "currentPassword": "%s",
-                      "code": "%s"
-                    }
-                    """.formatted(
-                    password,
-                    code
-                ))
+        return identityTestClient.regenerateRecoveryCodes(
+            user.accessToken(),
+            password,
+            code
         );
     }
 
