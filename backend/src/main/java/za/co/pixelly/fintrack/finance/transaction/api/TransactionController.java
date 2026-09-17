@@ -7,15 +7,13 @@ import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import za.co.pixelly.fintrack.common.api.ApiMessage;
 import za.co.pixelly.fintrack.common.api.ApiResponse;
 import za.co.pixelly.fintrack.common.api.PageResponse;
+import za.co.pixelly.fintrack.common.security.CurrentUserId;
 import za.co.pixelly.fintrack.finance.transaction.application.TransactionService;
 
-import java.util.Objects;
 import java.util.UUID;
 
 import static za.co.pixelly.fintrack.config.OpenApiConfig.BEARER_AUTH;
@@ -36,7 +34,7 @@ public class TransactionController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<TransactionResponse>> createTransaction(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @Valid
         @RequestBody
         CreateTransactionRequest request
@@ -46,14 +44,14 @@ public class TransactionController {
             .body(ApiResponse.success(
                 HttpStatus.CREATED,
                 ApiMessage.Transaction.CREATED,
-                transactionService.create(userId(jwt), request)
+                transactionService.create(userId, request)
             ));
     }
 
 
     @GetMapping
     public ResponseEntity<ApiResponse<PageResponse<TransactionResponse>>> getTransactions(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @Valid
         @ParameterObject
         @ModelAttribute
@@ -63,7 +61,7 @@ public class TransactionController {
             ApiResponse.success(
                 HttpStatus.OK,
                 ApiMessage.Transaction.FETCHED_ALL,
-                transactionService.findTransactions(userId(jwt), query)
+                transactionService.findTransactions(userId, query)
             )
         );
     }
@@ -71,21 +69,22 @@ public class TransactionController {
 
     @GetMapping("/{transactionId}")
     public ResponseEntity<ApiResponse<TransactionResponse>> getTransaction(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID transactionId
     ) {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
                 ApiMessage.Transaction.FETCHED,
-                transactionService.findById(userId(jwt), transactionId)
+                transactionService.findById(userId, transactionId)
             )
         );
     }
 
+
     @PatchMapping("/{transactionId}")
     public ResponseEntity<ApiResponse<TransactionResponse>> updateTransaction(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID transactionId,
         @Valid
         @RequestBody
@@ -96,7 +95,7 @@ public class TransactionController {
                 HttpStatus.OK,
                 ApiMessage.Transaction.UPDATED,
                 transactionService.update(
-                    userId(jwt),
+                    userId,
                     transactionId,
                     request
                 )
@@ -104,9 +103,10 @@ public class TransactionController {
         );
     }
 
+
     @PostMapping("/{transactionId}/void")
     public ResponseEntity<ApiResponse<TransactionResponse>> voidTransaction(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID transactionId,
         @Valid
         @RequestBody
@@ -117,15 +117,11 @@ public class TransactionController {
                 HttpStatus.OK,
                 ApiMessage.Transaction.VOIDED,
                 transactionService.voidTransaction(
-                    userId(jwt),
+                    userId,
                     transactionId,
                     request
                 )
             )
         );
-    }
-
-    private UUID userId(Jwt jwt) {
-        return UUID.fromString(Objects.requireNonNull(jwt.getSubject()));
     }
 }

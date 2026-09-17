@@ -8,15 +8,13 @@ import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import za.co.pixelly.fintrack.common.api.ApiMessage;
 import za.co.pixelly.fintrack.common.api.ApiResponse;
 import za.co.pixelly.fintrack.common.api.PageResponse;
+import za.co.pixelly.fintrack.common.security.CurrentUserId;
 import za.co.pixelly.fintrack.identity.application.admin.AdminUserService;
 
-import java.util.Objects;
 import java.util.UUID;
 
 import static za.co.pixelly.fintrack.config.OpenApiConfig.BEARER_AUTH;
@@ -70,10 +68,10 @@ public class AdminUserController {
     }
 
 
-    @PostMapping("/{userId}/deactivate")
+    @PostMapping("/{targetUserId}/deactivate")
     public ResponseEntity<ApiResponse<AdminUserResponse>> deactivateUser(
-        @AuthenticationPrincipal Jwt jwt,
-        @PathVariable UUID userId,
+        @CurrentUserId UUID adminUserId,
+        @PathVariable UUID targetUserId,
         @Valid
         @RequestBody
         AdminUserVersionRequest request
@@ -83,8 +81,8 @@ public class AdminUserController {
                 HttpStatus.OK,
                 ApiMessage.Admin.DEACTIVATED,
                 adminUserService.deactivateUser(
-                    userId(jwt),
-                    userId,
+                    adminUserId,
+                    targetUserId,
                     request.version()
                 )
             )
@@ -92,10 +90,10 @@ public class AdminUserController {
     }
 
 
-    @PostMapping("/{userId}/activate")
+    @PostMapping("/{targetUserId}/activate")
     public ResponseEntity<ApiResponse<AdminUserResponse>> activateUser(
-        @AuthenticationPrincipal Jwt jwt,
-        @PathVariable UUID userId,
+        @CurrentUserId UUID adminUserId,
+        @PathVariable UUID targetUserId,
         @Valid
         @RequestBody
         AdminUserVersionRequest request
@@ -105,8 +103,8 @@ public class AdminUserController {
                 HttpStatus.OK,
                 ApiMessage.Admin.ACTIVATED,
                 adminUserService.activateUser(
-                    userId(jwt),
-                    userId,
+                    adminUserId,
+                    targetUserId,
                     request.version()
                 )
             )
@@ -114,10 +112,10 @@ public class AdminUserController {
     }
 
 
-    @GetMapping("/{userId}/sessions")
+    @GetMapping("/{targetUserId}/sessions")
     public ResponseEntity<ApiResponse<PageResponse<AdminUserSessionResponse>>> findUserSessions(
-        @AuthenticationPrincipal Jwt jwt,
-        @PathVariable UUID userId,
+        @CurrentUserId UUID adminUserId,
+        @PathVariable UUID targetUserId,
 
         @RequestParam(defaultValue = "0")
         @Min(value = 0, message = "page must be 0 or greater")
@@ -133,8 +131,8 @@ public class AdminUserController {
                 HttpStatus.OK,
                 ApiMessage.Admin.SESSIONS_FETCHED,
                 adminUserService.findUserSessions(
-                    userId(jwt),
-                    userId,
+                    adminUserId,
+                    targetUserId,
                     page,
                     size
                 )
@@ -143,12 +141,12 @@ public class AdminUserController {
     }
 
 
-    @PostMapping("/{userId}/revoke-sessions")
+    @PostMapping("/{targetUserId}/revoke-sessions")
     public ResponseEntity<ApiResponse<Void>> revokeUserSessions(
-        @AuthenticationPrincipal Jwt jwt,
-        @PathVariable UUID userId
+        @CurrentUserId UUID adminUserId,
+        @PathVariable UUID targetUserId
     ) {
-        adminUserService.revokeUserSessions(userId(jwt), userId);
+        adminUserService.revokeUserSessions(adminUserId, targetUserId);
 
         return ResponseEntity.ok(
             ApiResponse.success(
@@ -157,10 +155,5 @@ public class AdminUserController {
                 null
             )
         );
-    }
-
-
-    private UUID userId(Jwt jwt) {
-        return UUID.fromString(Objects.requireNonNull(jwt.getSubject()));
     }
 }

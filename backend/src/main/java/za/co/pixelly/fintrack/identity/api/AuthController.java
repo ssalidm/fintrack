@@ -6,11 +6,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import za.co.pixelly.fintrack.common.api.ApiMessage;
 import za.co.pixelly.fintrack.common.api.ApiResponse;
+import za.co.pixelly.fintrack.common.security.CurrentSessionId;
+import za.co.pixelly.fintrack.common.security.CurrentUserId;
+import za.co.pixelly.fintrack.common.security.CurrentUserRoles;
 import za.co.pixelly.fintrack.identity.application.AuthenticationService;
 import za.co.pixelly.fintrack.identity.application.EmailVerificationService;
 import za.co.pixelly.fintrack.identity.application.PasswordResetService;
@@ -20,8 +21,8 @@ import za.co.pixelly.fintrack.identity.application.mfa.MfaLoginService;
 import za.co.pixelly.fintrack.identity.application.mfa.MfaManagementService;
 import za.co.pixelly.fintrack.identity.application.mfa.MfaSetupService;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
 
@@ -103,11 +104,12 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(
-        @AuthenticationPrincipal Jwt jwt
+        @CurrentUserId UUID userId,
+        @CurrentSessionId UUID sessionId
     ) {
         authenticationService.logout(
-            UUID.fromString(Objects.requireNonNull(jwt.getSubject())),
-            UUID.fromString(Objects.requireNonNull(jwt.getClaimAsString("sid")))
+            userId,
+            sessionId
         );
 
         return ResponseEntity.ok(
@@ -226,26 +228,27 @@ public class AuthController {
 
     @GetMapping("/me")
     public Map<String, Object> me(
-        @AuthenticationPrincipal Jwt jwt
+        @CurrentUserId UUID userId,
+        @CurrentSessionId UUID sessionId,
+        @CurrentUserRoles List<String> roles
     ) {
         return Map.of(
-            "userId", Objects.requireNonNull(jwt.getSubject()),
-            "sessionId", Objects.requireNonNull(jwt.getClaimAsString("sid")),
-            "roles", Objects.requireNonNull(jwt.getClaimAsStringList("roles"))
+            "userId", userId,
+            "sessionId", sessionId,
+            "roles", roles
         );
     }
 
 
     @PostMapping("/mfa/setup")
     public ResponseEntity<ApiResponse<MfaSetupResponse>>
-    startMfaSetup(
-        @AuthenticationPrincipal Jwt jwt
-    ) {
+    startMfaSetup(@CurrentUserId UUID userId) {
+
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
                 ApiMessage.Auth.TFA_SETUP,
-                mfaSetupService.startSetup(userId(jwt))
+                mfaSetupService.startSetup(userId)
             )
         );
     }
@@ -254,14 +257,14 @@ public class AuthController {
     @PostMapping("/mfa/setup/confirm")
     public ResponseEntity<ApiResponse<MfaSetupConfirmResponse>>
     confirmMfaSetup(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @Valid @RequestBody MfaSetupConfirmRequest request
     ) {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
                 "Two-factor authentication enabled",
-                mfaSetupService.confirmSetup(userId(jwt), request.code())
+                mfaSetupService.confirmSetup(userId, request.code())
             )
         );
     }
@@ -303,15 +306,7 @@ public class AuthController {
 
     @GetMapping("/mfa/status")
     public ResponseEntity<ApiResponse<MfaStatusResponse>>
-    getMfaStatus(
-        @AuthenticationPrincipal Jwt jwt
-    ) {
-        UUID userId =
-            UUID.fromString(
-                Objects.requireNonNull(
-                    jwt.getSubject()
-                )
-            );
+    getMfaStatus(@CurrentUserId UUID userId) {
 
         MfaStatusResponse response =
             mfaManagementService.status(
@@ -331,13 +326,13 @@ public class AuthController {
     @PostMapping("/mfa/disable")
     public ResponseEntity<ApiResponse<Void>>
     disableMfa(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @Valid
         @RequestBody
         MfaDisableRequest request
     ) {
         mfaManagementService.disable(
-            userId(jwt),
+            userId,
             request.currentPassword(),
             request.mfaCode()
         );
@@ -355,7 +350,7 @@ public class AuthController {
     @PostMapping("/mfa/recovery-codes/regenerate")
     public ResponseEntity<ApiResponse<MfaRecoveryCodesResponse>>
     regenerateMfaRecoveryCodes(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @Valid
         @RequestBody
         MfaRecoveryCodesRegenerateRequest request
@@ -366,16 +361,11 @@ public class AuthController {
                 ApiMessage.Auth.TFA_CODES_GENERATED,
                 mfaManagementService
                     .regenerateRecoveryCodes(
-                        userId(jwt),
+                        userId,
                         request.currentPassword(),
                         request.code()
                     )
             )
         );
-    }
-
-
-    private UUID userId(Jwt jwt) {
-        return UUID.fromString(Objects.requireNonNull(jwt.getSubject()));
     }
 }

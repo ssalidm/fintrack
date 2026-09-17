@@ -6,17 +6,15 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import za.co.pixelly.fintrack.common.api.ApiMessage;
 import za.co.pixelly.fintrack.common.api.ApiResponse;
+import za.co.pixelly.fintrack.common.security.CurrentUserId;
 import za.co.pixelly.fintrack.finance.category.application.CategoryService;
 import za.co.pixelly.fintrack.finance.category.domain.CategoryStatus;
 import za.co.pixelly.fintrack.finance.category.domain.CategoryType;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 import static za.co.pixelly.fintrack.config.OpenApiConfig.BEARER_AUTH;
@@ -38,33 +36,28 @@ public class CategoryController {
     @PostMapping
     public ResponseEntity<ApiResponse<CategoryResponse>>
     createCategory(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @Valid @RequestBody CreateCategoryRequest request
     ) {
-        CategoryResponse result =
-            categoryService.create(
-                userId(jwt),
-                request
-            );
-
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(
                 ApiResponse.success(
                     HttpStatus.CREATED,
                     ApiMessage.Category.CREATED,
-                    result
+                    categoryService.create(
+                        userId,
+                        request
+                    )
                 )
             );
     }
 
 
     @GetMapping
-    public ResponseEntity<
-        ApiResponse<List<CategoryResponse>>
-        >
+    public ResponseEntity<ApiResponse<List<CategoryResponse>>>
     getCategories(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
 
         @RequestParam(required = false)
         CategoryType type,
@@ -74,18 +67,15 @@ public class CategoryController {
         )
         CategoryStatus status
     ) {
-        List<CategoryResponse> result =
-            categoryService.findCategories(
-                userId(jwt),
-                type,
-                status
-            );
-
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
                 ApiMessage.Category.FETCHED_ALL,
-                result
+                categoryService.findCategories(
+                    userId,
+                    type,
+                    status
+                )
             )
         );
     }
@@ -94,20 +84,17 @@ public class CategoryController {
     @GetMapping("/{categoryId}")
     public ResponseEntity<ApiResponse<CategoryResponse>>
     getCategory(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID categoryId
     ) {
-        CategoryResponse result =
-            categoryService.findById(
-                userId(jwt),
-                categoryId
-            );
-
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
                 ApiMessage.Category.FETCHED,
-                result
+                categoryService.findById(
+                    userId,
+                    categoryId
+                )
             )
         );
     }
@@ -116,24 +103,21 @@ public class CategoryController {
     @PatchMapping("/{categoryId}")
     public ResponseEntity<ApiResponse<CategoryResponse>>
     updateCategory(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID categoryId,
         @Valid
         @RequestBody
         UpdateCategoryRequest request
     ) {
-        CategoryResponse result =
-            categoryService.update(
-                userId(jwt),
-                categoryId,
-                request
-            );
-
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
                 ApiMessage.Category.UPDATED,
-                result
+                categoryService.update(
+                    userId,
+                    categoryId,
+                    request
+                )
             )
         );
     }
@@ -142,32 +126,22 @@ public class CategoryController {
     @PostMapping("/{categoryId}/archive")
     public ResponseEntity<ApiResponse<CategoryResponse>>
     archiveCategory(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID categoryId,
         @Valid
         @RequestBody
         ArchiveCategoryRequest request
     ) {
-        CategoryResponse result =
-            categoryService.archive(
-                userId(jwt),
-                categoryId,
-                request
-            );
-
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
                 ApiMessage.Category.ARCHIVED,
-                result
+                categoryService.archive(
+                    userId,
+                    categoryId,
+                    request
+                )
             )
-        );
-    }
-
-
-    private UUID userId(Jwt jwt) {
-        return UUID.fromString(
-            Objects.requireNonNull(jwt.getSubject())
         );
     }
 }

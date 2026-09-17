@@ -7,15 +7,13 @@ import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import za.co.pixelly.fintrack.common.api.ApiMessage;
 import za.co.pixelly.fintrack.common.api.ApiResponse;
 import za.co.pixelly.fintrack.common.api.PageResponse;
+import za.co.pixelly.fintrack.common.security.CurrentUserId;
 import za.co.pixelly.fintrack.finance.transfer.application.TransferService;
 
-import java.util.Objects;
 import java.util.UUID;
 
 import static za.co.pixelly.fintrack.config.OpenApiConfig.BEARER_AUTH;
@@ -35,7 +33,7 @@ public class TransferController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<TransferResponse>> createTransfer(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @Valid
         @RequestBody
         CreateTransferRequest request
@@ -45,7 +43,7 @@ public class TransferController {
                     HttpStatus.CREATED,
                     ApiMessage.Transfer.CREATED,
                     transferService.create(
-                        userId(jwt),
+                        userId,
                         request
                     )
                 )
@@ -55,7 +53,7 @@ public class TransferController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<PageResponse<TransferResponse>>> getTransfers(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @Valid
         @ParameterObject
         @ModelAttribute
@@ -66,7 +64,7 @@ public class TransferController {
                 HttpStatus.OK,
                 ApiMessage.Transfer.FETCHED_ALL,
                 transferService.findTransfers(
-                    userId(jwt),
+                    userId,
                     query
                 )
             )
@@ -76,7 +74,7 @@ public class TransferController {
 
     @GetMapping("/{transferId}")
     public ResponseEntity<ApiResponse<TransferResponse>> getTransfer(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID transferId
     ) {
         return ResponseEntity.ok(
@@ -84,7 +82,7 @@ public class TransferController {
                 HttpStatus.OK,
                 ApiMessage.Transfer.FETCHED,
                 transferService.findById(
-                    userId(jwt),
+                    userId,
                     transferId
                 )
             )
@@ -94,7 +92,7 @@ public class TransferController {
 
     @PostMapping("{transferId}/void")
     public ResponseEntity<ApiResponse<TransferResponse>> voidTransfer(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID transferId,
         @Valid
         @RequestBody
@@ -105,16 +103,11 @@ public class TransferController {
                 HttpStatus.OK,
                 ApiMessage.Transfer.VOIDED,
                 transferService.voidTransfer(
-                    userId(jwt),
+                    userId,
                     transferId,
                     request
                 )
             )
         );
-    }
-
-
-    private UUID userId(Jwt jwt) {
-        return UUID.fromString(Objects.requireNonNull(jwt.getSubject()));
     }
 }

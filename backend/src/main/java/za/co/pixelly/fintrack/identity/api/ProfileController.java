@@ -6,15 +6,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import za.co.pixelly.fintrack.common.api.ApiMessage;
 import za.co.pixelly.fintrack.common.api.ApiResponse;
+import za.co.pixelly.fintrack.common.security.CurrentUserId;
 import za.co.pixelly.fintrack.identity.application.UserProfileService;
 import za.co.pixelly.fintrack.identity.application.emailchange.EmailChangeService;
 
-import java.util.Objects;
 import java.util.UUID;
 
 import static za.co.pixelly.fintrack.config.OpenApiConfig.BEARER_AUTH;
@@ -35,13 +33,13 @@ public class ProfileController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<UserProfileResponse>> getProfile(
-        @AuthenticationPrincipal Jwt jwt
+        @CurrentUserId UUID userId
     ) {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
                 ApiMessage.Profile.FETCHED,
-                userProfileService.getProfile(userId(jwt))
+                userProfileService.getProfile(userId)
             )
         );
     }
@@ -49,7 +47,7 @@ public class ProfileController {
 
     @PatchMapping
     public ResponseEntity<ApiResponse<UserProfileResponse>> updateProfile(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @Valid
         @RequestBody
         UpdateUserProfileRequest request
@@ -58,19 +56,20 @@ public class ProfileController {
             ApiResponse.success(
                 HttpStatus.OK,
                 ApiMessage.Profile.UPDATED,
-                userProfileService.updateProfile(userId(jwt), request)
+                userProfileService.updateProfile(userId, request)
             )
         );
     }
 
+
     @PostMapping("/change-password")
     public ResponseEntity<ApiResponse<Void>> changePassword(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @Valid
         @RequestBody
         ChangePasswordRequest request
     ) {
-        userProfileService.changePassword(userId(jwt), request);
+        userProfileService.changePassword(userId, request);
 
         return ResponseEntity.ok(
             ApiResponse.success(
@@ -84,13 +83,13 @@ public class ProfileController {
 
     @PostMapping("/change-email")
     public ResponseEntity<ApiResponse<Void>> changeEmail(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @Valid
         @RequestBody
         EmailChangeRequestDto request
     ) {
         emailChangeService.initiate(
-            userId(jwt),
+            userId,
             request.newEmail(),
             request.currentPassword(),
             request.mfaCode()
@@ -104,10 +103,4 @@ public class ProfileController {
             )
         );
     }
-
-
-    private UUID userId(Jwt jwt) {
-        return UUID.fromString(Objects.requireNonNull(jwt.getSubject()));
-    }
-
 }
