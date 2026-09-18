@@ -61,6 +61,10 @@ public class DefaultAuthenticationService implements AuthenticationService {
             throw new InvalidCredentialsException();
         }
 
+        if (!user.hasPassword()) {
+            throw new InvalidCredentialsException();
+        }
+
         if (!passwordEncoder.matches(
             request.password(),
             user.getPasswordHash()
