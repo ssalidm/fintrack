@@ -948,7 +948,7 @@ export default function HomePage() {
               </p>
 
               <p className="mt-5 text-xs text-[#789f91]">
-                See it. Save it.
+                Personal finance, in order.
               </p>
             </div>
 

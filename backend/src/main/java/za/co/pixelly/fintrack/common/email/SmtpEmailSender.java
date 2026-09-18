@@ -25,25 +25,14 @@ public class SmtpEmailSender implements EmailSender {
     private final JavaMailSender mailSender;
     private final EmailProperties emailProperties;
 
+
     @Override
-    public void send(
-        EmailMessage email
-    ) {
+    public void send(EmailMessage email) {
+
         MimeMessage message = mailSender.createMimeMessage();
 
         try {
-            MimeMessageHelper helper = new MimeMessageHelper(
-                message,
-                true,
-                StandardCharsets.UTF_8.name()
-            );
-
-            helper.setFrom(emailProperties.from(), emailProperties.fromName());
-            helper.setTo(email.recipient());
-            helper.setSubject(email.subject());
-
-            // HTML first
-            helper.setText(email.htmlBody(), true);
+            MimeMessageHelper helper = createHelper(email, message);
 
             // Inline logo second
             ClassPathResource logo = new ClassPathResource("email/salif-logo-green.png");
@@ -62,5 +51,30 @@ public class SmtpEmailSender implements EmailSender {
                 exception
             );
         }
+    }
+
+
+    private MimeMessageHelper createHelper(
+        EmailMessage email,
+        MimeMessage message
+    ) throws MessagingException, UnsupportedEncodingException {
+        MimeMessageHelper helper = new MimeMessageHelper(
+            message,
+            true,
+            StandardCharsets.UTF_8.name()
+        );
+
+        helper.setFrom(emailProperties.from(), emailProperties.fromName());
+        helper.setTo(email.recipient());
+        helper.setSubject(email.subject());
+
+        if (email.replyTo() != null
+            && !email.replyTo().isBlank()) {
+            helper.setReplyTo(email.replyTo());
+        }
+
+        // HTML first
+        helper.setText(email.htmlBody(), true);
+        return helper;
     }
 }

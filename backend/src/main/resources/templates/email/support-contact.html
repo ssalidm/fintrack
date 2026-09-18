@@ -40,7 +40,9 @@
       >
 
         <tr>
-          <td style="
+          <td
+            align="center"
+            style="
                         padding: 28px 32px;
                         background: #101828;
                     ">
@@ -51,7 +53,10 @@
               style="
                                 display: block;
                                 width: 140px;
+                                max-width: 100%;
                                 height: auto;
+                                margin: 0 auto;
+                                border: 0;
                             "
             >
           </td>
@@ -98,7 +103,7 @@
                                         width: 110px;
                                     "
                 >
-                  Name
+                  Name:
                 </td>
 
                 <td
@@ -119,7 +124,7 @@
                                         color: #657972;
                                     "
                 >
-                  Email
+                  Email:
                 </td>
 
                 <td
@@ -137,7 +142,7 @@
                                         color: #657972;
                                     "
                 >
-                  Submitted
+                  Submitted:
                 </td>
 
                 <td
@@ -156,10 +161,12 @@
               <p style="
                                 margin: 0 0 10px;
                                 font-size: 12px;
-                                font-weight: 700;
-                                color: #657972;
+                                font-weight: 800;
+                                letter-spacing: 1px;
+                                /*color: #657972;*/
+                                color: #50605b;
                             ">
-                MESSAGE
+                MESSAGE:
               </p>
 
               <p
@@ -179,10 +186,14 @@
           </td>
         </tr>
 
+
       </table>
 
     </td>
   </tr>
+
+  <tr th:replace="~{email/fragments/footer :: footer}"></tr>
+
 </table>
 
 </body>

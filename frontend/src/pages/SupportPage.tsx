@@ -1,61 +1,50 @@
-import { useState } from 'react'
-import type { FormEvent } from 'react'
+import { useRef, useState } from 'react'
+import type { SubmitEvent } from 'react'
 import { Link } from 'react-router'
 import {
   ArrowRight,
+  CheckCircle2,
   ChevronDown,
-  Copy,
   KeyRound,
   LifeBuoy,
+  LoaderCircle,
   Mail,
   MailCheck,
   ShieldCheck,
 } from 'lucide-react'
 
+import { ApiClientError } from '../api/ApiClientError'
 import PublicPageLayout from '../components/layout/PublicPageLayout'
+import {
+  supportApi,
+  supportTopics,
+} from '../features/support/api/supportApi'
+import type { SupportTopic } from '../features/support/api/supportApi'
+import SupportVerification from '../features/support/components/SupportVerification'
 
-const configuredEmail: unknown = import.meta.env.VITE_SUPPORT_EMAIL
+const siteKey =
+  import.meta.env.VITE_TURNSTILE_SITE_KEY?.trim() ?? ''
 
-const supportEmail =
-  typeof configuredEmail === 'string'
-    ? configuredEmail.trim()
-    : ''
-
-const hasSupportEmail =
-  /^[a-zA-Z0-9.!#$%&'*+/=_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9.-]*[a-zA-Z0-9])?\.[a-zA-Z]{2,}$/.test(
-    supportEmail,
-  )
-
-const topics = [
-  {
-    value: 'account-security',
-    label: 'Account security or an unexpected email',
-    subject: 'Salif support: account security',
-  },
-  {
-    value: 'sign-in',
-    label: 'Signing in or resetting my password',
-    subject: 'Salif support: account access',
-  },
-  {
-    value: 'verification',
-    label: 'Verifying my email address',
-    subject: 'Salif support: email verification',
-  },
-  {
-    value: 'general',
-    label: 'Something else',
-    subject: 'Salif support: general enquiry',
-  },
-] as const
-
-type SupportTopic = (typeof topics)[number]['value']
+const MAX_MESSAGE_LENGTH = 2000
 
 interface SupportFormValues {
   name: string
   email: string
   topic: SupportTopic
   message: string
+  website: string
+}
+
+type FieldErrors = Partial<
+  Record<keyof SupportFormValues, string>
+>
+
+const initialValues: SupportFormValues = {
+  name: '',
+  email: '',
+  topic: 'SECURITY',
+  message: '',
+  website: '',
 }
 
 const helpLinks = [
@@ -112,24 +101,36 @@ const fieldClasses =
   'mt-2 block w-full rounded-xl border border-[#bfd2c8] ' +
   'bg-[#fffdf8] px-4 py-3 text-sm text-[#123e33] outline-none ' +
   'transition placeholder:text-[#819188] focus:border-[#e0ad51] ' +
-  'focus:ring-2 focus:ring-[#e0ad51]'
+  'focus:ring-2 focus:ring-[#e0ad51] ' +
+  'disabled:cursor-not-allowed disabled:opacity-70'
 
-const MAX_MESSAGE_LENGTH = 1500
+function FieldError({
+  id,
+  message,
+}: {
+  id: string
+  message?: string
+}) {
+  if (!message) return null
+
+  return (
+    <p id={id} role="alert" className="mt-2 text-xs text-[#ffd8bd]">
+      {message}
+    </p>
+  )
+}
 
 export default function SupportPage() {
-  const [values, setValues] = useState<SupportFormValues>({
-    name: '',
-    email: '',
-    topic: 'account-security',
-    message: '',
-  })
+  const [values, setValues] =
+    useState<SupportFormValues>({ ...initialValues })
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState('')
+  const [verificationKey, setVerificationKey] = useState(0)
 
-  const [feedback, setFeedback] = useState<string | null>(null)
-  const [feedbackIsError, setFeedbackIsError] = useState(false)
-  const [isCopying, setIsCopying] = useState(false)
-
-  const selectedTopic =
-    topics.find((item) => item.value === values.topic) ?? topics[0]
+  const submittingRef = useRef(false)
 
   function updateField<K extends keyof SupportFormValues>(
     field: K,
@@ -139,84 +140,114 @@ export default function SupportPage() {
       ...current,
       [field]: value,
     }))
-    setFeedback(null)
-    setFeedbackIsError(false)
+
+    setFieldErrors((current) => ({
+      ...current,
+      [field]: undefined,
+    }))
+
+    setSubmitError(null)
   }
 
-  function prepareDraft() {
-    return [
-      'Hello Salif support,',
-      '',
-      `Name: ${values.name.trim()}`,
-      `Contact email: ${values.email.trim()}`,
-      `Topic: ${selectedTopic.label}`,
-      '',
-      values.message.trim(),
-    ].join('\r\n')
-  }
-
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
 
-    if (!hasSupportEmail || isCopying) {
+    if (submittingRef.current || isSubmitted) return
+
+    const payload = {
+      name: values.name.trim(),
+      email: values.email.trim(),
+      topic: values.topic,
+      message: values.message.trim(),
+      website: values.website,
+      turnstileToken,
+    }
+
+    const errors: FieldErrors = {}
+
+    if (payload.name.length < 2 || payload.name.length > 100) {
+      errors.name = 'Enter a name between 2 and 100 characters.'
+    }
+
+    if (
+      !payload.email ||
+      payload.email.length > 254 ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)
+    ) {
+      errors.email = 'Enter a valid email address.'
+    }
+
+    if (
+      payload.message.length < 10 ||
+      payload.message.length > MAX_MESSAGE_LENGTH
+    ) {
+      errors.message = 'Enter a message between 10 and 4,000 characters.'
+    }
+
+    setFieldErrors(errors)
+    setSubmitError(null)
+
+    if (Object.keys(errors).length > 0) return
+
+    if (!siteKey || !turnstileToken) {
+      setSubmitError('Please complete the security check before sending.')
       return
     }
 
-    setFeedback(null)
-    setFeedbackIsError(false)
-
-    if (!values.name.trim() || !values.message.trim()) {
-      setFeedback('Please enter your name and describe what you need help with.')
-      setFeedbackIsError(true)
-      return
-    }
-
-    const submitter = (event.nativeEvent as SubmitEvent).submitter
-    const shouldCopy =
-      submitter instanceof HTMLButtonElement &&
-      submitter.value === 'copy'
-
-    const draft = prepareDraft()
-
-    if (shouldCopy) {
-      setIsCopying(true)
-
-      try {
-        await navigator.clipboard.writeText(
-          `To: ${supportEmail}\r\nSubject: ${selectedTopic.subject}\r\n\r\n${draft}`,
-        )
-
-        setFeedback(
-          'Draft copied. Paste it into your email app, review it and send it to the support address below.',
-        )
-      } catch {
-        setFeedback(
-          'Your browser could not copy the draft. You can select and copy your message manually, or use “Open email draft”.',
-        )
-        setFeedbackIsError(true)
-      } finally {
-        setIsCopying(false)
-      }
-
-      return
-    }
-
-    const emailHref =
-      `mailto:${encodeURIComponent(supportEmail)}` +
-      `?subject=${encodeURIComponent(selectedTopic.subject)}` +
-      `&body=${encodeURIComponent(draft)}`
+    submittingRef.current = true
+    setIsSubmitting(true)
 
     try {
-      window.location.assign(emailHref)
+      await supportApi.contact(payload)
 
-      setFeedback(
-        'Your draft is ready. Finish sending it in your email app. If nothing opened, use “Copy draft” and send it through webmail.',
-      )
-    } catch {
-      setFeedback(
-        'We could not open your email app. Use “Copy draft” and send it through webmail instead.',
-      )
-      setFeedbackIsError(true)
+      setValues({ ...initialValues })
+      setFieldErrors({})
+      setIsSubmitted(true)
+    } catch (error) {
+      if (error instanceof ApiClientError) {
+        const validation = error.validationErrors
+
+        if (validation) {
+          setFieldErrors({
+            name: validation.name,
+            email: validation.email,
+            topic: validation.topic,
+            message: validation.message,
+          })
+
+          setSubmitError(
+            validation.turnstileToken
+              ? 'Please complete the security check again.'
+              : 'Please review the form and try again.',
+          )
+        } else if (error.status === 429) {
+          setSubmitError(
+            'Too many support requests. Please wait before trying again. Your message is still here.',
+          )
+        } else if (error.isNetworkError) {
+          setSubmitError(
+            'We could not confirm your submission. Check your connection before trying again. Your message is still here.',
+          )
+        } else if (error.status >= 500) {
+          setSubmitError(
+            'Support is temporarily unavailable. Please try again shortly. Your message is still here.',
+          )
+        } else {
+          setSubmitError(
+            error.message || 'Your request could not be completed.',
+          )
+        }
+      } else {
+        setSubmitError(
+          'Your request could not be completed. Please try again.',
+        )
+      }
+    } finally {
+      // Verification tokens must not be reused for another attempt.
+      setTurnstileToken('')
+      setVerificationKey((current) => current + 1)
+      setIsSubmitting(false)
+      submittingRef.current = false
     }
   }
 
@@ -312,213 +343,291 @@ export default function SupportPage() {
               How can we help?
             </h2>
 
-            <p className="mt-3 text-sm leading-7 text-[#c5ddd4]">
-              Tell us what happened. We’ll prepare an email draft for you
-              to review and send from your email app.
-            </p>
-
-            {hasSupportEmail ? (
-              <form
-                onSubmit={(event) => void handleSubmit(event)}
-                className="mt-6 space-y-5"
-              >
-                <div className="grid gap-5 sm:grid-cols-2">
-                  <div>
-                    <label
-                      htmlFor="support-name"
-                      className="text-sm font-semibold text-[#edf5f0]"
-                    >
-                      Your name
-                    </label>
-
-                    <input
-                      id="support-name"
-                      name="name"
-                      type="text"
-                      autoComplete="name"
-                      required
-                      maxLength={100}
-                      value={values.name}
-                      onChange={(event) =>
-                        updateField('name', event.target.value)
-                      }
-                      placeholder="Your name"
-                      className={fieldClasses}
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="support-email"
-                      className="text-sm font-semibold text-[#edf5f0]"
-                    >
-                      Email address
-                    </label>
-
-                    <input
-                      id="support-email"
-                      name="email"
-                      type="email"
-                      autoComplete="email"
-                      required
-                      maxLength={254}
-                      value={values.email}
-                      onChange={(event) =>
-                        updateField('email', event.target.value)
-                      }
-                      placeholder="you@example.com"
-                      className={fieldClasses}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="support-topic"
-                    className="text-sm font-semibold text-[#edf5f0]"
-                  >
-                    What is this about?
-                  </label>
-
-                  <select
-                    id="support-topic"
-                    name="topic"
-                    value={values.topic}
-                    onChange={(event) =>
-                      updateField(
-                        'topic',
-                        event.target.value as SupportTopic,
-                      )
-                    }
-                    className={`${fieldClasses} cursor-pointer pr-10`}
-                  >
-                    {topics.map((item) => (
-                      <option key={item.value} value={item.value}>
-                        {item.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="support-message"
-                    className="text-sm font-semibold text-[#edf5f0]"
-                  >
-                    Your message
-                  </label>
-
-                  <textarea
-                    id="support-message"
-                    name="message"
-                    required
-                    rows={6}
-                    maxLength={MAX_MESSAGE_LENGTH}
-                    value={values.message}
-                    onChange={(event) =>
-                      updateField('message', event.target.value)
-                    }
-                    aria-describedby="support-message-help support-message-count"
-                    placeholder="What were you trying to do, and what happened instead?"
-                    className={`${fieldClasses} resize-y`}
-                  />
-
-                  <div className="mt-2 flex items-start justify-between gap-4 text-xs leading-5 text-[#c5ddd4]">
-                    <p id="support-message-help">
-                      Include the approximate time and any error message.
-                    </p>
-
-                    <span
-                      id="support-message-count"
-                      className="shrink-0 tabular-nums"
-                    >
-                      {values.message.length}/{MAX_MESSAGE_LENGTH}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-2.5 border-t border-white/15 pt-4">
-                  <ShieldCheck
-                    size={16}
-                    className="mt-1 shrink-0 text-[#e4bd70]"
+            {isSubmitted ? (
+              <div className="mt-7">
+                <div role="status">
+                  <CheckCircle2
+                    size={34}
+                    className="text-[#e4bd70]"
                     aria-hidden
                   />
 
-                  <p className="text-xs leading-6 text-[#c5ddd4]">
-                    Do not include passwords, reset links, verification
-                    codes, recovery codes or bank details.
+                  <h3 className="mt-4 font-serif text-2xl">
+                    Your request has been submitted.
+                  </h3>
+
+                  <p className="mt-3 text-sm leading-7 text-[#c5ddd4]">
+                    Thank you for getting in touch. Any reply will go to
+                    the email address you provided.
                   </p>
                 </div>
 
-                {feedback && (
-                  <p
-                    role={feedbackIsError ? 'alert' : 'status'}
-                    className={`rounded-xl px-4 py-3 text-sm leading-6 ${
-                      feedbackIsError
-                        ? 'bg-[#fff0e7] text-[#873d28]'
-                        : 'bg-[#e4efe6] text-[#24533c]'
-                    }`}
-                  >
-                    {feedback}
-                  </p>
-                )}
-
-                <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
-                  <button
-                    type="submit"
-                    name="action"
-                    value="email"
-                    disabled={isCopying}
-                    className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-full bg-[#e0ad51] px-5 py-3.5 text-sm font-bold text-[#143d30] transition hover:bg-[#edbf69] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    Open email draft
-                    <ArrowRight size={17} aria-hidden />
-                  </button>
-
-                  <button
-                    type="submit"
-                    name="action"
-                    value="copy"
-                    disabled={isCopying}
-                    className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-full border border-white/30 px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    <Copy size={15} aria-hidden />
-                    {isCopying ? 'Copying…' : 'Copy draft'}
-                  </button>
-                </div>
-
-                <p className="text-xs leading-6 text-[#c5ddd4]">
-                  This form does not send a message directly. Finish
-                  sending your draft in your email app, or copy it into
-                  webmail.
-                </p>
-              </form>
-            ) : (
-              <div className="mt-6 border-t border-white/20 pt-5">
-                <p className="text-sm font-semibold text-[#f0cf8d]">
-                  Email support is currently unavailable.
-                </p>
-
-                <p className="mt-2 text-sm leading-6 text-[#c5ddd4]">
-                  You can still use the account recovery and security
-                  options above.
-                </p>
-              </div>
-            )}
-
-            {hasSupportEmail && (
-              <div className="mt-6 border-t border-white/15 pt-5">
-                <p className="text-xs text-[#c5ddd4]">
-                  You can also email us directly:
-                </p>
-
-                <a
-                  href={`mailto:${encodeURIComponent(supportEmail)}`}
-                  className="mt-2 inline-block break-all rounded-sm text-sm font-semibold text-white underline decoration-[#e0ad51] underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSubmitError(null)
+                    setIsSubmitted(false)
+                  }}
+                  className="mt-6 cursor-pointer rounded-full border border-white/30 px-5 py-3 text-sm font-semibold transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
                 >
-                  {supportEmail}
-                </a>
+                  Send another message
+                </button>
               </div>
+            ) : (
+              <>
+                <p className="mt-3 text-sm leading-7 text-[#c5ddd4]">
+                  Tell us what happened and send your message directly
+                  to the Salif support team.
+                </p>
+
+                <form
+                  onSubmit={(event) => void handleSubmit(event)}
+                  className="mt-6"
+                  aria-busy={isSubmitting}
+                >
+                  <fieldset
+                    disabled={isSubmitting}
+                    className="min-w-0 space-y-5"
+                  >
+                    <legend className="sr-only">
+                      Contact support
+                    </legend>
+
+                    <div className="grid gap-5 sm:grid-cols-2">
+                      <div>
+                        <label
+                          htmlFor="support-name"
+                          className="text-sm font-semibold text-[#edf5f0]"
+                        >
+                          Your name
+                        </label>
+
+                        <input
+                          id="support-name"
+                          name="name"
+                          type="text"
+                          autoComplete="name"
+                          required
+                          minLength={2}
+                          maxLength={100}
+                          value={values.name}
+                          onChange={(event) =>
+                            updateField('name', event.target.value)
+                          }
+                          aria-invalid={Boolean(fieldErrors.name)}
+                          aria-describedby={
+                            fieldErrors.name ? 'support-name-error' : undefined
+                          }
+                          placeholder="Your name"
+                          className={fieldClasses}
+                        />
+
+                        <FieldError
+                          id="support-name-error"
+                          message={fieldErrors.name}
+                        />
+                      </div>
+
+                      <div>
+                        <label
+                          htmlFor="support-email"
+                          className="text-sm font-semibold text-[#edf5f0]"
+                        >
+                          Email address
+                        </label>
+
+                        <input
+                          id="support-email"
+                          name="email"
+                          type="email"
+                          autoComplete="email"
+                          required
+                          maxLength={254}
+                          value={values.email}
+                          onChange={(event) =>
+                            updateField('email', event.target.value)
+                          }
+                          aria-invalid={Boolean(fieldErrors.email)}
+                          aria-describedby={
+                            fieldErrors.email ? 'support-email-error' : undefined
+                          }
+                          placeholder="you@example.com"
+                          className={fieldClasses}
+                        />
+
+                        <FieldError
+                          id="support-email-error"
+                          message={fieldErrors.email}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="support-topic"
+                        className="text-sm font-semibold text-[#edf5f0]"
+                      >
+                        What is this about?
+                      </label>
+
+                      <select
+                        id="support-topic"
+                        name="topic"
+                        value={values.topic}
+                        onChange={(event) =>
+                          updateField(
+                            'topic',
+                            event.target.value as SupportTopic,
+                          )
+                        }
+                        aria-invalid={Boolean(fieldErrors.topic)}
+                        aria-describedby={
+                          fieldErrors.topic ? 'support-topic-error' : undefined
+                        }
+                        className={`${fieldClasses} cursor-pointer pr-10`}
+                      >
+                        {supportTopics.map((item) => (
+                          <option key={item.value} value={item.value}>
+                            {item.label}
+                          </option>
+                        ))}
+                      </select>
+
+                      <FieldError
+                        id="support-topic-error"
+                        message={fieldErrors.topic}
+                      />
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="support-message"
+                        className="text-sm font-semibold text-[#edf5f0]"
+                      >
+                        Your message
+                      </label>
+
+                      <textarea
+                        id="support-message"
+                        name="message"
+                        required
+                        rows={6}
+                        minLength={10}
+                        maxLength={MAX_MESSAGE_LENGTH}
+                        value={values.message}
+                        onChange={(event) =>
+                          updateField('message', event.target.value)
+                        }
+                        aria-invalid={Boolean(fieldErrors.message)}
+                        aria-describedby={`support-message-help support-message-count${
+                          fieldErrors.message ? ' support-message-error' : ''
+                        }`}
+                        placeholder="What were you trying to do, and what happened instead?"
+                        className={`${fieldClasses} resize-y`}
+                      />
+
+                      <div className="mt-2 flex items-start justify-between gap-4 text-xs leading-5 text-[#c5ddd4]">
+                        <p id="support-message-help">
+                          Include the approximate time and any error message.
+                        </p>
+
+                        <span
+                          id="support-message-count"
+                          className="shrink-0 tabular-nums"
+                        >
+                          {values.message.length}/{MAX_MESSAGE_LENGTH}
+                        </span>
+                      </div>
+
+                      <FieldError
+                        id="support-message-error"
+                        message={fieldErrors.message}
+                      />
+                    </div>
+
+                    <div
+                      aria-hidden="true"
+                      className="absolute -left-[10000px] top-0 h-px w-px overflow-hidden"
+                    >
+                      <label htmlFor="support-website">
+                        Leave this field empty
+                      </label>
+                      <input
+                        id="support-website"
+                        name="website"
+                        type="text"
+                        autoComplete="off"
+                        tabIndex={-1}
+                        maxLength={200}
+                        value={values.website}
+                        onChange={(event) =>
+                          updateField('website', event.target.value)
+                        }
+                      />
+                    </div>
+
+                    <div className="flex items-start gap-2.5 border-t border-white/15 pt-4">
+                      <ShieldCheck
+                        size={16}
+                        className="mt-1 shrink-0 text-[#e4bd70]"
+                        aria-hidden
+                      />
+
+                      <p className="text-xs leading-6 text-[#c5ddd4]">
+                        Do not include passwords, reset links, verification
+                        codes, recovery codes or bank details.
+                      </p>
+                    </div>
+
+                    {siteKey ? (
+                      <SupportVerification
+                        key={verificationKey}
+                        siteKey={siteKey}
+                        onTokenChange={setTurnstileToken}
+                      />
+                    ) : (
+                      <p
+                        role="alert"
+                        className="rounded-xl bg-[#fff0e7] px-4 py-3 text-sm leading-6 text-[#873d28]"
+                      >
+                        The contact form is temporarily unavailable.
+                        Please try again later.
+                      </p>
+                    )}
+
+                    {submitError && (
+                      <p
+                        role="alert"
+                        className="rounded-xl bg-[#fff0e7] px-4 py-3 text-sm leading-6 text-[#873d28]"
+                      >
+                        {submitError}
+                      </p>
+                    )}
+
+                    <button
+                      type="submit"
+                      disabled={isSubmitting || !siteKey || !turnstileToken}
+                      className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[#e0ad51] px-5 py-3.5 text-sm font-bold text-[#143d30] transition hover:bg-[#edbf69] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <LoaderCircle
+                            size={17}
+                            className="animate-spin"
+                            aria-hidden
+                          />
+                          Sending…
+                        </>
+                      ) : (
+                        <>
+                          Send message
+                          <ArrowRight size={17} aria-hidden />
+                        </>
+                      )}
+                    </button>
+                  </fieldset>
+                </form>
+              </>
             )}
           </div>
         </section>
