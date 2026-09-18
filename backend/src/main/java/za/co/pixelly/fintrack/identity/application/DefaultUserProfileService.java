@@ -92,7 +92,8 @@ public class DefaultUserProfileService implements UserProfileService {
          * Re-authenticate the user before allowing
          * security-sensitive credential change.
          */
-        if (!passwordEncoder.matches(
+        if (!user.hasPassword()
+            || !passwordEncoder.matches(
             request.currentPassword(),
             user.getPasswordHash()
         )) {
@@ -104,7 +105,8 @@ public class DefaultUserProfileService implements UserProfileService {
          * strings would not work. We must use matched()
          * against the existing hash.
          */
-        if (passwordEncoder.matches(
+        if (user.hasPassword()
+            && passwordEncoder.matches(
             request.newPassword(),
             user.getPasswordHash()
         )) {

@@ -84,7 +84,8 @@ public class MfaManagementService {
          * A stolen access token alone must not be enough
          * to remove the user's second factor.
          */
-        if (!passwordEncoder.matches(
+        if (!user.hasPassword()
+            || !passwordEncoder.matches(
             currentPassword,
             user.getPasswordHash()
         )) {
@@ -163,7 +164,8 @@ public class MfaManagementService {
                     UserProfileNotFoundException::new
                 );
 
-        if (!passwordEncoder.matches(
+        if (!user.hasPassword()
+            || !passwordEncoder.matches(
             currentPassword,
             user.getPasswordHash()
         )) {

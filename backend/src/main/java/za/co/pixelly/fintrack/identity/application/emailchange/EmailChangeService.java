@@ -60,7 +60,8 @@ public class EmailChangeService {
          * First reauthenticate using the user's
          * current password.
          */
-        if (!passwordEncoder.matches(
+        if (!user.hasPassword()
+            || !passwordEncoder.matches(
             currentPassword,
             user.getPasswordHash()
         )) {

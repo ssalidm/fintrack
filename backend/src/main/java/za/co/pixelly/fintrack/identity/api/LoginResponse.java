@@ -29,4 +29,20 @@ public record LoginResponse(
             challenge
         );
     }
+
+    public static LoginResponse emailVerificationRequired() {
+        return new LoginResponse(
+            LoginStatus.EMAIL_VERIFICATION_REQUIRED,
+            null,
+            null
+        );
+    }
+
+    public static LoginResponse accountLinkRequired() {
+        return new LoginResponse(
+            LoginStatus.ACCOUNT_LINK_REQUIRED,
+            null,
+            null
+        );
+    }
 }

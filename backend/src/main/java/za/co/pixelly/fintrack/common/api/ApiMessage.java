@@ -26,6 +26,9 @@ public final class ApiMessage {
         public static final String FORGOT_PASSWORD = "If an eligible account exists, password reset instructions will be sent";
         public static final String RESET_SUCCESS = "Password reset successfully. Please log in again";
         public static final String EMAIL_CHANGED = "Email address changed successfully";
+        public static final String EMAIL_VERIFICATION_REQUIRED = "Email verification required";
+        public static final String ACCOUNT_LINK_REQUIRED =
+            "An account already exists with this email. Sign in with your password to connect Google.";
     }
 
     /*
