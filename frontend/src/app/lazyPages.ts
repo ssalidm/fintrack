@@ -8,6 +8,10 @@ export const NotFoundPage = lazy(
   () => import('../pages/NotFoundPage'),
 )
 
+export const SupportPage = lazy(
+  () => import('../pages/SupportPage'),
+)
+
 export const RegisterPage = lazy(
   () => import('../features/auth/pages/RegisterPage'),
 )

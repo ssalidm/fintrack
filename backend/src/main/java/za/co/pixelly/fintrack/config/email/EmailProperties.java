@@ -8,6 +8,7 @@ public record EmailProperties(
     boolean enabled,
     String from,
     String fromName,
-    String frontendBaseUrl
+    String frontendBaseUrl,
+    String supportUrl
 ) {
 }

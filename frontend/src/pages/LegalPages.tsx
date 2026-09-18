@@ -1,7 +1,7 @@
-import { ArrowLeft } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 import { Link } from 'react-router'
 
-import salifLogoGreen from '../assets/brand/salif-logo-green.svg'
+import PublicPageLayout from '../components/layout/PublicPageLayout'
 
 interface LegalSection {
   title: string
@@ -22,156 +22,120 @@ function LegalDocument({
   sections,
 }: LegalDocumentProps) {
   return (
-    <div className="min-h-screen bg-[#f4f1e8] text-[#123e33]">
-      <header className="border-b border-[#d9d4c8] bg-[#fffdf8]">
-        <div className="mx-auto flex h-18 max-w-[1080px] items-center justify-between px-5 sm:px-8">
-          <Link
-            to="/"
-            aria-label="Salif home"
-          >
-            <img
-              src={salifLogoGreen}
-              alt="Salif"
-              className="h-auto w-27"
-            />
-          </Link>
-
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-[#0d4f3f] transition hover:text-[#16805f]"
-          >
-            <ArrowLeft
-              size={16}
-              aria-hidden
-            />
-
-            Back to home
-          </Link>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-[1080px] px-5 py-14 sm:px-8 sm:py-20">
-        <div className="grid gap-10 lg:grid-cols-[0.55fr_1.45fr] lg:gap-16">
-          <aside>
-            <p className="text-xs font-bold tracking-[0.16em] text-[#16805f]">
-              {eyebrow}
-            </p>
-
-            <h1 className="mt-4 font-serif text-5xl tracking-[-0.04em] text-[#103b30]">
-              {title}
-            </h1>
-
-            <p className="mt-4 text-sm text-[#657972]">
-              Last updated 11 September 2026
-            </p>
-          </aside>
-
-          <article className="rounded-[2rem] border border-[#d9d4c8] bg-[#fffdf8] p-6 shadow-[0_18px_50px_rgba(18,62,51,0.06)] sm:p-9">
-            <p className="text-lg leading-8 text-[#405f55]">
-              {introduction}
-            </p>
-
-            <div className="mt-9 space-y-9 border-t border-[#e3dfd5] pt-9">
-              {sections.map(
-                (section) => (
-                  <section
-                    key={
-                      section.title
-                    }
-                  >
-                    <h2 className="font-serif text-2xl text-[#103b30]">
-                      {
-                        section.title
-                      }
-                    </h2>
-
-                    <div className="mt-3 space-y-3 text-base leading-7 text-[#566f66]">
-                      {section.paragraphs.map(
-                        (
-                          paragraph,
-                        ) => (
-                          <p
-                            key={
-                              paragraph
-                            }
-                          >
-                            {
-                              paragraph
-                            }
-                          </p>
-                        ),
-                      )}
-                    </div>
-                  </section>
-                ),
-              )}
-            </div>
-          </article>
-        </div>
-      </main>
-
-      <footer className="border-t border-white/10 bg-[#092f28]">
-        <div className="mx-auto flex max-w-[1080px] flex-col gap-3 px-5 py-7 text-xs text-[#8fb3a6] sm:flex-row sm:items-center sm:justify-between sm:px-8">
-          <p>
-            © {new Date().getFullYear()}{' '}
-            Salif. All rights reserved.
+    <PublicPageLayout>
+      <div className="mx-auto max-w-[800px]">
+        <header>
+          <p className="text-xs font-bold uppercase tracking-[0.17em] text-[#16805f]">
+            {eyebrow}
           </p>
 
-          <div className="flex gap-5">
-            <Link
-              to="/privacy"
-              className="transition hover:text-white"
-            >
-              Privacy
-            </Link>
+          <h1 className="mt-4 font-serif text-5xl leading-tight tracking-[-0.04em] text-[#103b30] sm:text-6xl">
+            {title}
+          </h1>
+
+          <p className="mt-4 text-xs text-[#657972]">
+            Last updated{' '}
+            <time dateTime="2026-09-11">
+              11 September 2026
+            </time>
+          </p>
+
+          <span
+            aria-hidden
+            className="mt-6 block h-1 w-12 rounded-full bg-[#d7a84d]"
+          />
+
+          <p className="mt-6 max-w-[680px] text-base leading-8 text-[#4f6a60] sm:text-lg">
+            {introduction}
+          </p>
+        </header>
+
+        <article
+          aria-label={title}
+          className="mt-9 border-t border-[#d9d4c8] pt-8 sm:mt-10 sm:pt-10"
+        >
+          <div className="space-y-9 sm:space-y-10">
+            {sections.map((section, index) => (
+              <section
+                key={section.title}
+                aria-labelledby={`legal-heading-${index + 1}`}
+              >
+                <div className="flex items-baseline gap-3 sm:gap-4">
+                  <span
+                    aria-hidden
+                    className="shrink-0 text-xs font-semibold tabular-nums text-[#9a742e]"
+                  >
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+
+                  <h2
+                    id={`legal-heading-${index + 1}`}
+                    className="font-serif text-2xl leading-tight tracking-[-0.02em] text-[#103b30] sm:text-3xl"
+                  >
+                    {section.title}
+                  </h2>
+                </div>
+
+                <div className="mt-4 space-y-4 text-base leading-8 text-[#536d63]">
+                  {section.paragraphs.map((paragraph) => (
+                    <p key={paragraph}>
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+
+          <div className="mt-10 flex flex-col gap-3 border-t border-[#d9d4c8] pt-6 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-[#657972]">
+              Have a question about your account?
+            </p>
 
             <Link
-              to="/terms"
-              className="transition hover:text-white"
+              to="/support"
+              className="inline-flex items-center gap-2 rounded-sm text-sm font-semibold text-[#0d4f3f] transition hover:text-[#16805f] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#16805f]"
             >
-              Terms
+              Contact support
+              <ArrowUpRight size={16} aria-hidden />
             </Link>
           </div>
-        </div>
-      </footer>
-    </div>
+        </article>
+      </div>
+    </PublicPageLayout>
   )
 }
 
 export function PrivacyPage() {
   return (
     <LegalDocument
-      eyebrow="YOUR INFORMATION"
+      eyebrow="Your information"
       title="Privacy policy"
       introduction="This policy explains the information Salif uses to provide personal finance features and protect your account."
       sections={[
         {
-          title:
-            'Information you provide',
+          title: 'Information you provide',
           paragraphs: [
             'We process the account details you provide, such as your name, email address, time zone, and authentication information.',
             'We also process the financial information you choose to enter, including accounts, balances, transactions, categories, budgets, recurring payments, transfers, and savings goals.',
           ],
         },
         {
-          title:
-            'How information is used',
+          title: 'How information is used',
           paragraphs: [
             'Your information is used to operate Salif, calculate your financial summaries, maintain your account, secure your sessions, and respond to requests you make through the service.',
             'Salif does not treat the information you enter as permission to provide financial advice or make financial decisions on your behalf.',
           ],
         },
         {
-          title:
-            'Security information',
+          title: 'Security information',
           paragraphs: [
             'Salif records limited technical and session information needed to authenticate requests, detect unauthorised access, support two-factor authentication, and allow sessions to be revoked.',
             'No online service can guarantee absolute security. You should use a strong, unique password and protect your recovery codes and devices.',
           ],
         },
         {
-          title:
-            'Sharing and retention',
+          title: 'Sharing and retention',
           paragraphs: [
             'Information is shared only where needed to operate the service, meet legal obligations, or protect the rights and security of users and the service.',
             'Information is retained for as long as it is needed to provide the service, maintain accurate records, resolve disputes, and meet applicable obligations.',
@@ -191,7 +155,7 @@ export function PrivacyPage() {
 export function TermsPage() {
   return (
     <LegalDocument
-      eyebrow="USING SALIF"
+      eyebrow="Using Salif"
       title="Terms of use"
       introduction="These terms describe the basic rules for accessing and using Salif. By creating an account or using the service, you agree to follow them."
       sections={[
@@ -203,31 +167,27 @@ export function TermsPage() {
           ],
         },
         {
-          title:
-            'Acceptable use',
+          title: 'Acceptable use',
           paragraphs: [
             'You may use Salif only for lawful personal finance purposes. You may not attempt to disrupt the service, bypass its security controls, access another user’s information, or use the service to commit fraud or another unlawful act.',
           ],
         },
         {
-          title:
-            'Your financial information',
+          title: 'Your financial information',
           paragraphs: [
             'You remain responsible for the information you enter and for checking that balances, transactions, budgets, goals, and reports are accurate.',
             'Salif is an organisational tool. It does not provide financial, tax, investment, or legal advice, and it should not be your only source when making important financial decisions.',
           ],
         },
         {
-          title:
-            'Service availability',
+          title: 'Service availability',
           paragraphs: [
             'We aim to keep Salif reliable and secure, but access may occasionally be interrupted for maintenance, security work, technical problems, or circumstances outside our control.',
             'Features may change as the service develops. Material changes to these terms will be reflected by updating this page and its revision date.',
           ],
         },
         {
-          title:
-            'Suspension and termination',
+          title: 'Suspension and termination',
           paragraphs: [
             'Access may be restricted or ended when necessary to protect users or the service, respond to unlawful activity, or address a serious breach of these terms.',
           ],

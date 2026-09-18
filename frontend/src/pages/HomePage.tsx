@@ -1040,6 +1040,13 @@ export default function HomePage() {
                 >
                   Terms of use
                 </Link>
+
+                <Link
+                  to="/support"
+                  className="transition hover:text-white"
+                >
+                  Support
+                </Link>
               </nav>
             </div>
           </div>

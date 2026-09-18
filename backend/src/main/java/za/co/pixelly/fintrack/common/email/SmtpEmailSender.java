@@ -27,9 +27,7 @@ public class SmtpEmailSender implements EmailSender {
 
     @Override
     public void send(
-        String recipient,
-        String subject,
-        String body
+        EmailMessage email
     ) {
         MimeMessage message = mailSender.createMimeMessage();
 
@@ -41,11 +39,11 @@ public class SmtpEmailSender implements EmailSender {
             );
 
             helper.setFrom(emailProperties.from(), emailProperties.fromName());
-            helper.setTo(recipient);
-            helper.setSubject(subject);
+            helper.setTo(email.recipient());
+            helper.setSubject(email.subject());
 
             // HTML first
-            helper.setText(body, true);
+            helper.setText(email.htmlBody(), true);
 
             // Inline logo second
             ClassPathResource logo = new ClassPathResource("email/salif-logo-green.png");

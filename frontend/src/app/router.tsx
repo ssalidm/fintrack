@@ -12,6 +12,7 @@ import RouteErrorPage from '../pages/RouteErrorPage.tsx'
 import {
   HomePage,
   NotFoundPage,
+  SupportPage,
   LoginPage,
   MfaChallengePage,
   RegisterPage,
@@ -42,6 +43,10 @@ export const router = createBrowserRouter([
       {
         path: '/',
         element: <HomePage />,
+      },
+      {
+        path: '/support',
+        element: <SupportPage />,
       },
       {
         path: '/privacy',

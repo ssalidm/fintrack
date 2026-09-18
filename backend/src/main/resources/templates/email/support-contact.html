@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+  <meta charset="UTF-8">
+  <title>Support request</title>
+</head>
+
+<body style="
+    margin: 0;
+    padding: 32px;
+    background: #EFEDE6;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #101828;
+">
+
+<table
+  role="presentation"
+  width="100%"
+  cellspacing="0"
+  cellpadding="0"
+  border="0"
+>
+  <tr>
+    <td align="center">
+
+      <table
+        role="presentation"
+        width="100%"
+        cellspacing="0"
+        cellpadding="0"
+        border="0"
+        style="
+                    max-width: 640px;
+                    background: #FAF9F6;
+                    border-radius: 6px;
+                "
+      >
+
+        <tr>
+          <td style="
+                        padding: 28px 32px;
+                        background: #101828;
+                    ">
+            <img
+              src="cid:salif-logo"
+              alt="Salif"
+              width="140"
+              style="
+                                display: block;
+                                width: 140px;
+                                height: auto;
+                            "
+            >
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding: 32px;">
+
+            <p style="
+                            margin: 0 0 8px;
+                            font-size: 12px;
+                            font-weight: 700;
+                            color: #16805F;
+                        ">
+              SUPPORT REQUEST
+            </p>
+
+            <h1
+              th:text="${topic}"
+              style="
+                                margin: 0 0 28px;
+                                font-size: 26px;
+                            "
+            >
+              Support request
+            </h1>
+
+            <table
+              role="presentation"
+              width="100%"
+              cellspacing="0"
+              cellpadding="0"
+              border="0"
+              style="
+                                margin-bottom: 28px;
+                                font-size: 14px;
+                            "
+            >
+              <tr>
+                <td
+                  style="
+                                        padding: 8px 0;
+                                        color: #657972;
+                                        width: 110px;
+                                    "
+                >
+                  Name
+                </td>
+
+                <td
+                  th:text="${name}"
+                  style="
+                                        padding: 8px 0;
+                                        font-weight: 600;
+                                    "
+                >
+                  Name
+                </td>
+              </tr>
+
+              <tr>
+                <td
+                  style="
+                                        padding: 8px 0;
+                                        color: #657972;
+                                    "
+                >
+                  Email
+                </td>
+
+                <td
+                  th:text="${email}"
+                  style="padding: 8px 0;"
+                >
+                  Email
+                </td>
+              </tr>
+
+              <tr>
+                <td
+                  style="
+                                        padding: 8px 0;
+                                        color: #657972;
+                                    "
+                >
+                  Submitted
+                </td>
+
+                <td
+                  th:text="${submittedAt}"
+                  style="padding: 8px 0;"
+                >
+                  Date
+                </td>
+              </tr>
+            </table>
+
+            <div style="
+                            border-top: 1px solid #E4E1D8;
+                            padding-top: 24px;
+                        ">
+              <p style="
+                                margin: 0 0 10px;
+                                font-size: 12px;
+                                font-weight: 700;
+                                color: #657972;
+                            ">
+                MESSAGE
+              </p>
+
+              <p
+                th:text="${message}"
+                style="
+                                    margin: 0;
+                                    white-space: pre-wrap;
+                                    font-size: 15px;
+                                    line-height: 1.7;
+                                    color: #405F55;
+                                "
+              >
+                Message
+              </p>
+            </div>
+
+          </td>
+        </tr>
+
+      </table>
+
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>

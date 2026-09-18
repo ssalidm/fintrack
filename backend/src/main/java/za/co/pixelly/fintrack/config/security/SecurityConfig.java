@@ -66,7 +66,8 @@ public class SecurityConfig {
                     apiPrefix + "/auth/reset-password",
                     apiPrefix + "/auth/mfa/verify",
                     apiPrefix + "/auth/mfa/recover",
-                    apiPrefix + "/auth/change-email/confirm"
+                    apiPrefix + "/auth/change-email/confirm",
+                    apiPrefix + "/support/contact"
                 ).permitAll()
 
                 // OpenAPI / Swagger
