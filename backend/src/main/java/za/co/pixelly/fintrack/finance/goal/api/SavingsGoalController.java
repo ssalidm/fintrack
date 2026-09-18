@@ -6,17 +6,15 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.*;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import za.co.pixelly.fintrack.common.api.ApiMessage;
 import za.co.pixelly.fintrack.common.api.ApiResponse;
 import za.co.pixelly.fintrack.common.api.PageResponse;
+import za.co.pixelly.fintrack.common.security.CurrentUserId;
 import za.co.pixelly.fintrack.finance.goal.application.SavingsGoalService;
 import za.co.pixelly.fintrack.finance.goal.domain.SavingsGoalStatus;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 import static za.co.pixelly.fintrack.config.OpenApiConfig.BEARER_AUTH;
@@ -27,7 +25,7 @@ import static za.co.pixelly.fintrack.config.OpenApiConfig.BEARER_AUTH;
 )
 @SecurityRequirement(name = BEARER_AUTH)
 @RestController
-@RequestMapping("/api/v1/goals")
+@RequestMapping("/goals")
 @RequiredArgsConstructor
 public class SavingsGoalController {
 
@@ -36,7 +34,7 @@ public class SavingsGoalController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<SavingsGoalResponse>> createGoal(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @Valid
         @RequestBody
         CreateSavingsGoalRequest request
@@ -48,7 +46,7 @@ public class SavingsGoalController {
                     HttpStatus.CREATED,
                     ApiMessage.Goal.CREATED,
                     savingsGoalService.create(
-                        userId(jwt),
+                        userId,
                         request
                     )
                 )
@@ -58,7 +56,7 @@ public class SavingsGoalController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<SavingsGoalResponse>>> getGoals(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @RequestParam(defaultValue = "ACTIVE")
         SavingsGoalStatus status
     ) {
@@ -67,7 +65,7 @@ public class SavingsGoalController {
                 HttpStatus.OK,
                 ApiMessage.Goal.FETCHED_ALL,
                 savingsGoalService.findGoals(
-                    userId(jwt),
+                    userId,
                     status
                 )
             )
@@ -77,7 +75,7 @@ public class SavingsGoalController {
 
     @GetMapping("/{goalId}")
     public ResponseEntity<ApiResponse<SavingsGoalResponse>> getGoal(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID goalId
     ) {
         return ResponseEntity.ok(
@@ -85,7 +83,7 @@ public class SavingsGoalController {
                 HttpStatus.OK,
                 ApiMessage.Goal.FETCHED,
                 savingsGoalService.findById(
-                    userId(jwt),
+                    userId,
                     goalId
                 )
             )
@@ -95,7 +93,7 @@ public class SavingsGoalController {
 
     @PatchMapping("/{goalId}")
     public ResponseEntity<ApiResponse<SavingsGoalResponse>> updateGoal(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID goalId,
         @Valid
         @RequestBody
@@ -106,7 +104,7 @@ public class SavingsGoalController {
                 HttpStatus.OK,
                 ApiMessage.Goal.UPDATED,
                 savingsGoalService.update(
-                    userId(jwt),
+                    userId,
                     goalId,
                     request
                 )
@@ -117,7 +115,7 @@ public class SavingsGoalController {
 
     @PostMapping("/{goalId}/complete")
     public ResponseEntity<ApiResponse<SavingsGoalResponse>> completeGoal(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID goalId,
         @Valid
         @RequestBody
@@ -128,7 +126,7 @@ public class SavingsGoalController {
                 HttpStatus.OK,
                 ApiMessage.Goal.COMPLETED,
                 savingsGoalService.complete(
-                    userId(jwt),
+                    userId,
                     goalId,
                     request
                 )
@@ -139,7 +137,7 @@ public class SavingsGoalController {
 
     @PostMapping("/{goalId}/archive")
     public ResponseEntity<ApiResponse<SavingsGoalResponse>> archiveGoal(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID goalId,
         @Valid
         @RequestBody
@@ -150,7 +148,7 @@ public class SavingsGoalController {
                 HttpStatus.OK,
                 ApiMessage.Goal.ARCHIVED,
                 savingsGoalService.archive(
-                    userId(jwt),
+                    userId,
                     goalId,
                     request
                 )
@@ -161,7 +159,7 @@ public class SavingsGoalController {
 
     @PostMapping("/{goalId}/contributions")
     public ResponseEntity<ApiResponse<SavingsGoalResponse>> addContribution(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID goalId,
         @Valid
         @RequestBody
@@ -174,7 +172,7 @@ public class SavingsGoalController {
                     HttpStatus.CREATED,
                     ApiMessage.Goal.CONTRIBUTION_CREATED,
                     savingsGoalService.addContribution(
-                        userId(jwt),
+                        userId,
                         goalId,
                         request
                     )
@@ -185,7 +183,7 @@ public class SavingsGoalController {
 
     @GetMapping("/{goalId}/contributions")
     public ResponseEntity<ApiResponse<PageResponse<GoalContributionResponse>>> getContributions(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID goalId,
         @Valid
         @ParameterObject
@@ -198,7 +196,7 @@ public class SavingsGoalController {
                 ApiMessage.Goal.CONTRIBUTION_FETCHED_ALL,
                 savingsGoalService
                     .findContributions(
-                        userId(jwt),
+                        userId,
                         goalId,
                         query
                     )
@@ -209,7 +207,7 @@ public class SavingsGoalController {
 
     @PatchMapping("/{goalId}/contributions/{contributionId}")
     public ResponseEntity<ApiResponse<SavingsGoalResponse>> updateContribution(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID goalId,
         @PathVariable UUID contributionId,
         @Valid
@@ -222,7 +220,7 @@ public class SavingsGoalController {
                 ApiMessage.Goal.CONTRIBUTION_FETCHED,
                 savingsGoalService
                     .updateContribution(
-                        userId(jwt),
+                        userId,
                         goalId,
                         contributionId,
                         request
@@ -234,7 +232,7 @@ public class SavingsGoalController {
 
     @PostMapping("/{goalId}/contributions/{contributionId}/void")
     public ResponseEntity<ApiResponse<SavingsGoalResponse>> voidContribution(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID goalId,
         @PathVariable UUID contributionId,
         @Valid
@@ -247,21 +245,12 @@ public class SavingsGoalController {
                 ApiMessage.Goal.CONTRIBUTION_VOIDED,
                 savingsGoalService
                     .voidContribution(
-                        userId(jwt),
+                        userId,
                         goalId,
                         contributionId,
                         request
                     )
             )
-        );
-    }
-
-
-    private UUID userId(
-        Jwt jwt
-    ) {
-        return UUID.fromString(
-            Objects.requireNonNull(jwt.getSubject())
         );
     }
 }

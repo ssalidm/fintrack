@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { hasAtMostFourDecimalPlaces } from '../../../utils/numberValidation'
 
 export const accountTypes = [
   'CASH',
@@ -36,13 +37,11 @@ export const accountFormSchema = z.object({
       'Opening balance is too large',
     )
     .refine(
-      (value) => Number.isInteger(value * 10_000),
+      hasAtMostFourDecimalPlaces,
       'Use no more than four decimal places',
     ),
 
   includeInNetWorth: z.boolean(),
 })
 
-export type AccountFormValues = z.infer<
-  typeof accountFormSchema
->
+export type AccountFormValues = z.infer<typeof accountFormSchema>

@@ -62,7 +62,7 @@ class EmailVerificationIntegrationTest
             emailSender.tokenFor(email);
 
         mockMvc.perform(
-                post("/api/v1/auth/verify-email")
+                post(api("/auth/verify-email"))
                     .contentType("application/json")
                     .content("""
                         {
@@ -145,7 +145,7 @@ class EmailVerificationIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/auth/resend-verification"
+                    api("/auth/resend-verification")
                 )
                     .contentType("application/json")
                     .content("""
@@ -224,7 +224,7 @@ class EmailVerificationIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/auth/resend-verification"
+                    api("/auth/resend-verification")
                 )
                     .contentType("application/json")
                     .content("""
@@ -258,7 +258,7 @@ class EmailVerificationIntegrationTest
             .andExpect(status().isOk());
 
         mockMvc.perform(
-                post("/api/v1/auth/login")
+                post(api("/auth/login"))
                     .contentType(
                         "application/json"
                     )
@@ -287,7 +287,7 @@ class EmailVerificationIntegrationTest
         throws Exception {
 
         mockMvc.perform(
-                post("/api/v1/auth/register")
+                post(api("/auth/register"))
                     .contentType(
                         "application/json"
                     )
@@ -309,7 +309,7 @@ class EmailVerificationIntegrationTest
         throws Exception {
 
         return mockMvc.perform(
-            post("/api/v1/auth/verify-email")
+            post(api("/auth/verify-email"))
                 .contentType("application/json")
                 .content("""
                     {
@@ -324,7 +324,7 @@ class EmailVerificationIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/auth/resend-verification"
+                    api("/auth/resend-verification")
                 )
                     .contentType(
                         "application/json"

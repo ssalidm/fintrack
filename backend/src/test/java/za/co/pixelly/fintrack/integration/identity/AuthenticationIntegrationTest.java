@@ -34,7 +34,7 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
 
         registerUser(email, password);
 
-        mockMvc.perform(post("/api/v1/auth/login")
+        mockMvc.perform(post(api("/auth/login"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {
@@ -55,7 +55,7 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
         registerUser(email, "SecurePassword123!");
         activateUser(email);
 
-        mockMvc.perform(post("/api/v1/auth/login")
+        mockMvc.perform(post(api("/auth/login"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {
@@ -146,7 +146,7 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
         String accessToken =
             loginTokenField(loginResult, "accessToken");
 
-        mockMvc.perform(get("/api/v1/auth/me")
+        mockMvc.perform(get(api("/auth/me"))
                 .header(
                     "Authorization",
                     "Bearer " + accessToken
@@ -161,7 +161,7 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
     void protectedEndpointReturnsJson401WithoutToken() throws Exception {
 
         mockMvc.perform(
-                get("/api/v1/auth/me")
+                get(api("/auth/me"))
             )
             .andExpect(status().isUnauthorized()
             )
@@ -181,7 +181,7 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
         throws Exception {
 
         mockMvc.perform(
-                get("/api/v1/auth/me")
+                get(api("/auth/me"))
                     .header(
                         "Authorization",
                         "Bearer definitely-not-a-jwt"
@@ -227,7 +227,7 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
         String oldHash = refreshTokenCodec.hash(oldRefreshToken);
 
         MvcResult refreshResult =
-            mockMvc.perform(post("/api/v1/auth/refresh")
+            mockMvc.perform(post(api("/auth/refresh"))
                     .contentType("application/json")
                     .content("""
                         {
@@ -288,7 +288,7 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
 
 
         // Replay the old refresh token.
-        mockMvc.perform(post("/api/v1/auth/refresh")
+        mockMvc.perform(post(api("/auth/refresh"))
                 .contentType("application/json")
                 .content("""
                     {
@@ -302,7 +302,7 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
         String email,
         String password
     ) throws Exception {
-        mockMvc.perform(post("/api/v1/auth/register")
+        mockMvc.perform(post(api("/auth/register"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {
@@ -330,7 +330,7 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
         activateUser(email);
 
         mockMvc.perform(
-                post("/api/v1/auth/login")
+                post(api("/auth/login"))
                     .contentType("application/json")
                     .content("""
                         {
@@ -371,7 +371,7 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
         for (int attempt = 0; attempt < 5; attempt++) {
 
             mockMvc.perform(
-                    post("/api/v1/auth/login")
+                    post(api("/auth/login"))
                         .contentType(
                             "application/json"
                         )
@@ -418,7 +418,7 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
          * during the lock period.
          */
         mockMvc.perform(
-                post("/api/v1/auth/login")
+                post(api("/auth/login"))
                     .contentType(
                         "application/json"
                     )
@@ -452,7 +452,7 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
         for (int attempt = 0; attempt < 2; attempt++) {
 
             mockMvc.perform(
-                    post("/api/v1/auth/login")
+                    post(api("/auth/login"))
                         .contentType(
                             "application/json"
                         )
@@ -567,7 +567,7 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
                 Objects.requireNonNull(jwt.getClaimAsString("sid"))
             );
 
-        mockMvc.perform(post("/api/v1/auth/logout")
+        mockMvc.perform(post(api("/auth/logout"))
                 .header(
                     "Authorization",
                     "Bearer " + accessToken
@@ -603,7 +603,7 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
         assertNotNull(tokenRevokedAt);
 
 
-        mockMvc.perform(post("/api/v1/auth/refresh")
+        mockMvc.perform(post(api("/auth/refresh"))
                 .contentType("application/json")
                 .content("""
                     {
@@ -677,7 +677,7 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
 
         MvcResult result =
             mockMvc.perform(
-                    post("/api/v1/auth/login")
+                    post(api("/auth/login"))
                         .header(
                             "User-Agent",
                             "reko MFA integration test"
@@ -824,7 +824,7 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
         String password
     ) throws Exception {
 
-        return mockMvc.perform(post("/api/v1/auth/login")
+        return mockMvc.perform(post(api("/auth/login"))
                 .header("User-Agent", "FinTrack integration test")
                 .contentType("application/json")
                 .content("""

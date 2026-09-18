@@ -21,6 +21,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+import static za.co.pixelly.fintrack.common.concurrency.VersionGuard.requireCurrent;
+
 @Service
 @RequiredArgsConstructor
 public class DefaultUserProfileService implements UserProfileService {
@@ -53,11 +55,13 @@ public class DefaultUserProfileService implements UserProfileService {
     public UserProfileResponse updateProfile(UUID userId, UpdateUserProfileRequest request) {
         User user = getUserForUpdate(userId);
 
-        if (user.getVersion() != request.version()) {
-            throw new UserProfileConflictException(
+        requireCurrent(
+            user.getVersion(),
+            request.version(),
+            () -> new UserProfileConflictException(
                 "The profile has changed since it was last retrieved"
-            );
-        }
+            )
+        );
 
         user.updateProfile(
             request.firstName(),

@@ -7,38 +7,23 @@ import {
 import { useState } from 'react'
 import { Link } from 'react-router'
 
+import { formatMoney } from '../../../utils/formatters'
 import type { MonthlyCashFlow } from '../api/types'
 
 interface MonthlyCashFlowCardProps {
   items: MonthlyCashFlow[]
 }
 
-function formatMoney(
-  amount: number,
-  currencyCode: string,
-) {
-  return new Intl.NumberFormat('en-ZA', {
-    style: 'currency',
-    currency: currencyCode,
-    maximumFractionDigits: 2,
-  }).format(amount)
-}
-
 export default function MonthlyCashFlowCard({
   items,
 }: MonthlyCashFlowCardProps) {
-  const [selectedCurrency, setSelectedCurrency] =
-    useState('')
+  const [selectedCurrency, setSelectedCurrency] = useState('')
 
   const activeItem =
-    items.find(
-      (item) =>
-        item.currencyCode === selectedCurrency,
-    ) ?? items[0]
+    items.find((item) => item.currencyCode === selectedCurrency) ??
+    items[0]
 
-  const netCashFlow = Number(
-    activeItem?.netCashFlow ?? 0,
-  )
+  const netCashFlow = Number(activeItem?.netCashFlow ?? 0)
   const isPositive = netCashFlow >= 0
 
   return (
@@ -67,9 +52,7 @@ export default function MonthlyCashFlowCard({
         {items.length > 1 && activeItem && (
           <select
             value={activeItem.currencyCode}
-            onChange={(event) =>
-              setSelectedCurrency(event.target.value)
-            }
+            onChange={(event) => setSelectedCurrency(event.target.value)}
             aria-label="Cash flow currency"
             className="cursor-pointer rounded-full border border-[#d6c7ae] bg-[#fffaf0] py-2 pr-9 pl-3 text-xs font-semibold text-[#173c32] outline-none focus:border-[#b88949]"
           >
@@ -118,16 +101,10 @@ export default function MonthlyCashFlowCard({
                     ? 'text-[#2f6d54]'
                     : 'text-[#a85e49]',
                 ].join(' ')}
-                title={formatMoney(
-                  netCashFlow,
-                  activeItem.currencyCode,
-                )}
+                title={formatMoney(netCashFlow, activeItem.currencyCode)}
               >
                 {isPositive ? '+' : ''}
-                {formatMoney(
-                  netCashFlow,
-                  activeItem.currencyCode,
-                )}
+                {formatMoney(netCashFlow, activeItem.currencyCode)}
               </p>
             </div>
 
@@ -139,9 +116,7 @@ export default function MonthlyCashFlowCard({
                   : 'bg-[#f1ddd5] text-[#934f3e]',
               ].join(' ')}
             >
-              {isPositive
-                ? 'Keeping more'
-                : 'Spending more'}
+              {isPositive ? 'Keeping more' : 'Spending more'}
             </span>
           </div>
 
@@ -151,6 +126,7 @@ export default function MonthlyCashFlowCard({
                 <ArrowDownLeft size={13} aria-hidden />
                 INCOME
               </div>
+
               <p
                 className="mt-1 truncate text-sm font-bold text-[#2f6d54]"
                 title={formatMoney(
@@ -170,6 +146,7 @@ export default function MonthlyCashFlowCard({
                 <ArrowUpRight size={13} aria-hidden />
                 EXPENSES
               </div>
+
               <p
                 className="mt-1 truncate text-sm font-bold text-[#9b5745]"
                 title={formatMoney(

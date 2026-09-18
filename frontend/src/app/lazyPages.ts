@@ -8,6 +8,10 @@ export const NotFoundPage = lazy(
   () => import('../pages/NotFoundPage'),
 )
 
+export const SupportPage = lazy(
+  () => import('../pages/SupportPage'),
+)
+
 export const RegisterPage = lazy(
   () => import('../features/auth/pages/RegisterPage'),
 )
@@ -95,5 +99,39 @@ export const VerifyEmailChangePage = lazy(
   () =>
     import(
       '../features/auth/pages/VerifyEmailChangePage'
+    ),
+)
+
+export const AdminUsersPage = lazy(
+  () =>
+    import(
+      '../features/admin/pages/AdminUsersPage'
+    ),
+)
+
+export const AdminUserDetailsPage = lazy(
+  () =>
+    import(
+      '../features/admin/pages/AdminUserDetailsPage'
+    ),
+)
+
+export const PrivacyPage = lazy(
+  () =>
+    import('../pages/LegalPages').then(
+      (module) => ({
+        default:
+          module.PrivacyPage,
+      }),
+    ),
+)
+
+export const TermsPage = lazy(
+  () =>
+    import('../pages/LegalPages').then(
+      (module) => ({
+        default:
+          module.TermsPage,
+      }),
     ),
 )

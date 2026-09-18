@@ -15,9 +15,7 @@ public class NoOpEmailSender implements EmailSender {
 
     @Override
     public void send(
-        String recipient,
-        String subject,
-        String body
+        EmailMessage message
     ) {
         // Intentionally disabled for environments such as tests.
     }

@@ -10,13 +10,13 @@ import {
   History,
   Pencil,
   Plus,
-  RefreshCw,
   Sparkles,
   Target,
   TrendingUp,
 } from 'lucide-react'
 
 import { ApiClientError } from '../../../api/ApiClientError'
+import PageHeader from '../../../components/layout/PageHeader'
 import PageShell from '../../../components/layout/PageShell'
 import type {
   SavingsGoal,
@@ -33,6 +33,7 @@ import {
   useCompleteGoal,
   useGoals,
 } from '../hooks/useGoals'
+import RefreshButton from '../../../components/actions/RefreshButton'
 
 const statusOptions = [
   {
@@ -216,7 +217,7 @@ export default function GoalsPage() {
 
       return Math.round(
         totalProgress /
-          goals.length,
+        goals.length,
       )
     }, [goals])
 
@@ -357,61 +358,34 @@ export default function GoalsPage() {
 
   return (
     <PageShell>
-      <header className="feature-reveal flex flex-wrap items-end justify-between gap-6">
-        <div>
-          <p className="text-xs font-semibold tracking-[0.16em] text-[#657972]">
-            ROOM FOR WHAT MATTERS
-          </p>
-
-          <h1 className="mt-4 font-serif text-5xl tracking-[-0.03em] text-[#173c32]">
-            Your goals
-          </h1>
-
-          <p className="mt-3 max-w-xl text-sm leading-6 text-[#657972]">
-            Turn the things you care
-            about into steady, visible
-            progress.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() =>
-              void goalsQuery.refetch()
-            }
-            disabled={
-              goalsQuery.isFetching
-            }
-            className="cursor-pointer rounded-full border border-[#d8d6ce] bg-[#fffdf8] p-3 text-[#657972] transition hover:border-[#bd9460] hover:text-[#9a6828] disabled:cursor-not-allowed disabled:opacity-60"
-            aria-label="Refresh goals"
-            title="Refresh goals"
-          >
-            <RefreshCw
-              size={18}
-              aria-hidden
-              className={
-                goalsQuery.isFetching
-                  ? 'animate-spin'
-                  : ''
-              }
-            />
-          </button>
-
-          <button
-            type="button"
-            onClick={openCreateGoal}
-            className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#236a58]"
-          >
-            <Plus
-              size={18}
-              aria-hidden
+      <PageHeader
+        eyebrow="Room for what matters"
+        title="Your goals"
+        description="Turn the things you care about into steady, visible progress."
+        actions={
+          <>
+            <RefreshButton
+              isRefreshing={goalsQuery.isFetching}
+              onRefresh={goalsQuery.refetch}
+              label="Refresh goals"
+              iconOnly
             />
 
-            New goal
-          </button>
-        </div>
-      </header>
+            <button
+              type="button"
+              onClick={openCreateGoal}
+              className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#236a58]"
+            >
+              <Plus
+                size={18}
+                aria-hidden
+              />
+
+              New goal
+            </button>
+          </>
+        }
+      />
 
       <section className="feature-reveal feature-reveal-delay-1 mt-9 grid overflow-hidden rounded-3xl border border-[#d8ded8] bg-[#eaf0e9] md:grid-cols-[1.35fr_0.8fr_0.9fr]">
         <div className="p-6 sm:p-7">
@@ -466,8 +440,8 @@ export default function GoalsPage() {
           <p className="mt-1 text-xs text-[#657972]">
             {nearestGoal
               ? deadlineCopy(
-                  nearestGoal.targetDate,
-                )
+                nearestGoal.targetDate,
+              )
               : 'Choose dates only when they help.'}
           </p>
         </div>
@@ -482,11 +456,10 @@ export default function GoalsPage() {
               onClick={() =>
                 setStatus(option.value)
               }
-              className={`cursor-pointer border-b-2 px-1 pb-4 text-sm font-semibold transition ${
-                status === option.value
+              className={`cursor-pointer border-b-2 px-1 pb-4 text-sm font-semibold transition ${status === option.value
                   ? 'border-[#39725d] text-[#173c32]'
                   : 'border-transparent text-[#7a8984] hover:text-[#173c32]'
-              }`}
+                }`}
             >
               {option.label}
             </button>
@@ -518,7 +491,7 @@ export default function GoalsPage() {
 
           <p className="mt-2 text-sm text-red-700">
             {goalsQuery.error instanceof
-            ApiClientError
+              ApiClientError
               ? goalsQuery.error.message
               : 'Please try again.'}
           </p>
@@ -550,7 +523,7 @@ export default function GoalsPage() {
               {status === 'ACTIVE'
                 ? 'What are you making room for?'
                 : status ===
-                    'COMPLETED'
+                  'COMPLETED'
                   ? 'No completed goals yet'
                   : 'No archived goals'}
             </h2>
@@ -563,21 +536,21 @@ export default function GoalsPage() {
 
             {status ===
               'ACTIVE' && (
-              <button
-                type="button"
-                onClick={
-                  openCreateGoal
-                }
-                className="mt-7 inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#236a58]"
-              >
-                <Plus
-                  size={18}
-                  aria-hidden
-                />
+                <button
+                  type="button"
+                  onClick={
+                    openCreateGoal
+                  }
+                  className="mt-7 inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#236a58]"
+                >
+                  <Plus
+                    size={18}
+                    aria-hidden
+                  />
 
-                Create your first goal
-              </button>
-            )}
+                  Create your first goal
+                </button>
+              )}
           </section>
         )}
 
@@ -604,7 +577,7 @@ export default function GoalsPage() {
                   <div className="flex items-start justify-between gap-5">
                     <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[#e3eee7] text-[#39725d]">
                       {goal.status ===
-                      'COMPLETED' ? (
+                        'COMPLETED' ? (
                         <CheckCircle2
                           size={21}
                           aria-hidden
@@ -637,44 +610,44 @@ export default function GoalsPage() {
 
                       {goal.status ===
                         'ACTIVE' && (
-                        <button
-                          type="button"
-                          onClick={() =>
-                            openEditGoal(
-                              goal,
-                            )
-                          }
-                          className="cursor-pointer rounded-full p-2 text-[#657972] transition hover:bg-[#edf2ee] hover:text-[#39725d]"
-                          aria-label={`Edit ${goal.name}`}
-                          title="Edit goal"
-                        >
-                          <Pencil
-                            size={17}
-                            aria-hidden
-                          />
-                        </button>
-                      )}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              openEditGoal(
+                                goal,
+                              )
+                            }
+                            className="cursor-pointer rounded-full p-2 text-[#657972] transition hover:bg-[#edf2ee] hover:text-[#39725d]"
+                            aria-label={`Edit ${goal.name}`}
+                            title="Edit goal"
+                          >
+                            <Pencil
+                              size={17}
+                              aria-hidden
+                            />
+                          </button>
+                        )}
 
                       {goal.status !==
                         'ARCHIVED' && (
-                        <button
-                          type="button"
-                          onClick={() =>
-                            requestAction(
-                              goal,
-                              'archive',
-                            )
-                          }
-                          className="cursor-pointer rounded-full p-2 text-[#657972] transition hover:bg-[#f2e7df] hover:text-[#9b5845]"
-                          aria-label={`Archive ${goal.name}`}
-                          title="Archive goal"
-                        >
-                          <Archive
-                            size={17}
-                            aria-hidden
-                          />
-                        </button>
-                      )}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              requestAction(
+                                goal,
+                                'archive',
+                              )
+                            }
+                            className="cursor-pointer rounded-full p-2 text-[#657972] transition hover:bg-[#f2e7df] hover:text-[#9b5845]"
+                            aria-label={`Archive ${goal.name}`}
+                            title="Archive goal"
+                          >
+                            <Archive
+                              size={17}
+                              aria-hidden
+                            />
+                          </button>
+                        )}
                     </div>
                   </div>
 
@@ -746,54 +719,54 @@ export default function GoalsPage() {
 
                     {goal.targetDate
                       ? `${formatTargetDate(
-                          goal.targetDate,
-                        )} · ${deadlineCopy(
-                          goal.targetDate,
-                        )}`
+                        goal.targetDate,
+                      )} · ${deadlineCopy(
+                        goal.targetDate,
+                      )}`
                       : 'No fixed deadline'}
                   </div>
 
                   {goal.status ===
                     'ACTIVE' && (
-                    <div className="mt-auto flex flex-wrap items-center gap-3 border-t border-[#e5e1d8] pt-5">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setContributionGoal(
-                            goal,
-                          )
-                        }
-                        className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#236a58]"
-                      >
-                        <CircleDollarSign
-                          size={17}
-                          aria-hidden
-                        />
-
-                        Add contribution
-                      </button>
-
-                      {targetReached && (
+                      <div className="mt-auto flex flex-wrap items-center gap-3 border-t border-[#e5e1d8] pt-5">
                         <button
                           type="button"
                           onClick={() =>
-                            requestAction(
+                            setContributionGoal(
                               goal,
-                              'complete',
                             )
                           }
-                          className="inline-flex cursor-pointer items-center gap-2 rounded-full px-3 py-2.5 text-sm font-semibold text-[#39725d] transition hover:bg-[#edf2ee]"
+                          className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#236a58]"
                         >
-                          <CheckCircle2
+                          <CircleDollarSign
                             size={17}
                             aria-hidden
                           />
 
-                          Mark complete
+                          Add contribution
                         </button>
-                      )}
-                    </div>
-                  )}
+
+                        {targetReached && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              requestAction(
+                                goal,
+                                'complete',
+                              )
+                            }
+                            className="inline-flex cursor-pointer items-center gap-2 rounded-full px-3 py-2.5 text-sm font-semibold text-[#39725d] transition hover:bg-[#edf2ee]"
+                          >
+                            <CheckCircle2
+                              size={17}
+                              aria-hidden
+                            />
+
+                            Mark complete
+                          </button>
+                        )}
+                      </div>
+                    )}
                 </article>
               )
             })}

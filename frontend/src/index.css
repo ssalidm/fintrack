@@ -72,6 +72,183 @@ select {
   background: rgba(213, 228, 221, 0.38);
 }
 
+.dashboard-app-surface {
+  background:
+    radial-gradient(
+      circle at 92% 4%,
+      rgba(215, 168, 77, 0.16),
+      transparent 24rem
+    ),
+    radial-gradient(
+      circle at 8% 42%,
+      rgba(22, 128, 95, 0.12),
+      transparent 28rem
+    ),
+    linear-gradient(
+      145deg,
+      #edf2ed 0%,
+      #f7f4eb 52%,
+      #e7eee9 100%
+    );
+}
+
+.dashboard-app-surface::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: '';
+  pointer-events: none;
+  background-image:
+    linear-gradient(
+      rgba(13, 79, 63, 0.03) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(13, 79, 63, 0.03) 1px,
+      transparent 1px
+    );
+  background-size: 56px 56px;
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.5),
+    transparent 76%
+  );
+}
+
+.dashboard-app-surface .border-\[\#dedbd2\] {
+  border-color: #c4cec6;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.home-anchor {
+  scroll-margin-top: 5rem;
+}
+
+@keyframes home-hero-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.home-hero-enter {
+  animation:
+    home-hero-enter 650ms
+    cubic-bezier(0.22, 1, 0.36, 1)
+    backwards;
+}
+
+.home-hero-enter-delay-1 {
+  animation-delay: 100ms;
+}
+
+.home-hero-enter-delay-2 {
+  animation-delay: 190ms;
+}
+
+.home-scroll-reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 620ms
+      cubic-bezier(0.22, 1, 0.36, 1),
+    transform 620ms
+      cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay:
+    var(--home-reveal-delay, 0ms);
+  will-change:
+    opacity,
+    transform;
+}
+
+.auth-surface-grid {
+  background-image:
+    linear-gradient(
+      rgba(13, 79, 63, 0.055) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(13, 79, 63, 0.055) 1px,
+      transparent 1px
+    );
+  background-size: 48px 48px;
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.7),
+    transparent 82%
+  );
+}
+
+.home-scroll-reveal[data-visible='true'] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes home-chart-grow {
+  from {
+    transform: scaleY(0);
+  }
+
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.home-chart-bar {
+  transform-origin: bottom;
+  animation:
+    home-chart-grow 720ms
+    cubic-bezier(0.22, 1, 0.36, 1)
+    backwards;
+}
+
+@keyframes home-progress-grow {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.home-progress-bar {
+  transform-origin: left;
+  animation:
+    home-progress-grow 800ms
+    500ms
+    cubic-bezier(0.22, 1, 0.36, 1)
+    backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .home-hero-enter,
+  .home-chart-bar,
+  .home-progress-bar {
+    animation: none;
+  }
+
+  .home-scroll-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
 @media (max-height: 760px) {
   .salif-sidebar {
     padding-block: 1rem;
@@ -198,4 +375,60 @@ select {
 
 .feature-reveal-delay-3 {
   animation-delay: 240ms;
+}
+
+@keyframes auth-panel-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.auth-panel-enter {
+  animation: auth-panel-enter 460ms
+    cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+@keyframes auth-message-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.auth-message-in {
+  animation: auth-message-in 220ms ease-out backwards;
+}
+
+@keyframes auth-success-pop {
+  from {
+    opacity: 0.5;
+    transform: scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.auth-success-pop {
+  animation: auth-success-pop 480ms
+    cubic-bezier(0.22, 1, 0.36, 1) 100ms backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-panel-enter,
+  .auth-message-in,
+  .auth-success-pop {
+    animation: none;
+  }
 }

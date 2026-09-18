@@ -12,6 +12,7 @@ import {
   Repeat2,
   Shapes,
   Target,
+  UsersRound,
   X,
   type LucideIcon,
 } from 'lucide-react'
@@ -27,8 +28,8 @@ import {
 } from 'react-router'
 
 import salifLogoLight from '../../../assets/brand/salif-logo-light.png'
-import { useAuth } from '../../auth/context/useAuth'
-import { useProfile } from '../../profile/hooks/useProfile'
+import {useAuth} from '../../auth/context/useAuth'
+import {useProfile} from '../../profile/hooks/useProfile'
 
 type SidebarSection =
   | 'money'
@@ -247,8 +248,8 @@ function SidebarContent({
     setCollapsedPath,
   ] = useState<string | null>(null)
 
-  const { data: profile } = useProfile()
-  const { logout } = useAuth()
+  const {data: profile} = useProfile()
+  const {logout} = useAuth()
 
   const activeSection =
     activeSectionForPath(
@@ -310,7 +311,7 @@ function SidebarContent({
   }
 
   return (
-    <div className="salif-sidebar grid h-full grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden bg-[#174f43] px-5 py-6 text-[#f7f3e9]">
+    <div className="salif-sidebar grid h-full grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden bg-[#0d4f3f] px-5 py-6 text-[#f7f3e9] shadow-[12px_0_45px_rgba(9,47,40,0.12)]">
       <div className="salif-sidebar-brand border-b border-white/10 px-2 pb-6">
         <NavLink
           to="/dashboard"
@@ -343,7 +344,7 @@ function SidebarContent({
             onClick={
               handleOverviewNavigation
             }
-            className={({ isActive }) =>
+            className={({isActive}) =>
               [
                 'flex cursor-pointer items-center gap-3 rounded-xl',
                 'px-4 py-2.5 text-sm font-medium transition-colors',
@@ -396,6 +397,35 @@ function SidebarContent({
             }
             onNavigate={onNavigate}
           />
+
+          {profile?.roles.includes('ROLE_ADMIN') && (
+            <div className="pt-4">
+              <p className="mb-2 px-4 text-[10px] font-semibold tracking-[0.16em] text-[#91b5a7]">
+                ADMIN
+              </p>
+
+              <NavLink
+                to="/admin/users"
+                onClick={onNavigate}
+                className={({isActive}) =>
+                  [
+                    'flex cursor-pointer items-center gap-3 rounded-xl',
+                    'px-4 py-2.5 text-sm font-medium transition-colors',
+                    isActive
+                      ? 'bg-[#f7f3e9] font-semibold text-[#174f43] shadow-sm'
+                      : 'text-[#d5e4dd] hover:bg-white/5 hover:text-white',
+                  ].join(' ')
+                }
+              >
+                <UsersRound
+                  size={18}
+                  aria-hidden
+                />
+
+                User management
+              </NavLink>
+            </div>
+          )}
         </div>
       </nav>
 
@@ -480,12 +510,12 @@ export default function DashboardLayout() {
   ] = useState(false)
 
   return (
-    <div className="min-h-screen bg-[#f7f5ef] text-[#173c32]">
+    <div className="min-h-screen bg-[#e9efea] text-[#173c32]">
       <aside className="fixed inset-y-0 left-0 hidden w-[18.5rem] lg:block">
         <SidebarContent />
       </aside>
 
-      <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-[#dedbd2] bg-[#f7f5ef]/95 px-5 backdrop-blur lg:hidden">
+      <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-[#dedbd2] bg-[#edf2ed]/90 px-5 shadow-sm backdrop-blur-xl lg:hidden">
         <div className="rounded-lg bg-[#174f43] px-2">
           <SalifLogo />
         </div>
@@ -506,8 +536,10 @@ export default function DashboardLayout() {
         </button>
       </header>
 
-      <div className="lg:pl-[18.5rem]">
-        <Outlet />
+      <div className="dashboard-app-surface relative isolate min-h-screen lg:ml-[18.5rem]">
+        <div className="relative z-10">
+          <Outlet />
+        </div>
       </div>
 
       {isMenuOpen && (

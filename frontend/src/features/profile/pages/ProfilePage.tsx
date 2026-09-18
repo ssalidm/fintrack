@@ -3,7 +3,6 @@ import {
   useRef,
   useState,
 } from 'react'
-
 import {
   BadgeCheck,
   CalendarDays,
@@ -14,14 +13,15 @@ import {
 import { useNavigate } from 'react-router'
 
 import { ApiClientError } from '../../../api/ApiClientError'
+import PageHeader from '../../../components/layout/PageHeader'
+import PageShell from '../../../components/layout/PageShell'
 import { useAuth } from '../../auth/context/useAuth'
+import ChangeEmailForm from '../components/ChangeEmailForm'
 import ChangePasswordForm from '../components/ChangePasswordForm'
 import PasswordChangedDialog from '../components/PasswordChangedDialog'
 import ProfileDetailsForm from '../components/ProfileDetailsForm'
 import TwoFactorAuthenticationCard from '../components/TwoFactorAuthenticationCard'
 import { useProfile } from '../hooks/useProfile'
-import ChangeEmailForm from '../components/ChangeEmailForm'
-import PageShell from '../../../components/layout/PageShell'
 
 function formatDate(value: string | null) {
   if (!value) {
@@ -47,10 +47,13 @@ export default function ProfilePage() {
   const navigate = useNavigate()
   const { logout } = useAuth()
 
-  const [passwordChanged, setPasswordChanged] =
-    useState(false)
+  const [
+    passwordChanged,
+    setPasswordChanged,
+  ] = useState(false)
 
-  const signOutStarted = useRef(false)
+  const signOutStarted =
+    useRef(false)
 
   const {
     data: profile,
@@ -62,15 +65,17 @@ export default function ProfilePage() {
     setPasswordChanged(true)
   }
 
-  const finishPasswordChange = useCallback(
-    async () => {
+  const finishPasswordChange =
+    useCallback(async () => {
       if (signOutStarted.current) {
         return
       }
 
       signOutStarted.current = true
 
-      await logout().catch(() => undefined)
+      await logout().catch(
+        () => undefined,
+      )
 
       navigate('/login', {
         replace: true,
@@ -79,9 +84,7 @@ export default function ProfilePage() {
             'Password changed successfully. Sign in with your new password.',
         },
       })
-    },
-    [logout, navigate],
-  )
+    }, [logout, navigate])
 
   if (isPending) {
     return (
@@ -133,21 +136,11 @@ export default function ProfilePage() {
 
   return (
     <PageShell>
-      <header className="feature-reveal">
-        <p className="text-xs font-semibold tracking-[0.16em] text-[#657972]">
-          YOUR ACCOUNT
-        </p>
-
-        <h1 className="mt-5 font-serif text-4xl leading-none tracking-[-0.03em] text-[#173c32] sm:text-5xl lg:text-6xl">
-          Profile &amp; Security
-        </h1>
-
-        <p className="mt-4 max-w-2xl text-sm leading-6 text-[#657972]">
-          Manage the personal details and
-          security protecting your Salif
-          account.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Your account"
+        title="Profile & Security"
+        description="Manage the personal details and security protecting your Salif account."
+      />
 
       <section className="feature-reveal feature-reveal-delay-1 mt-10 overflow-hidden rounded-3xl bg-[#174f43] text-white">
         <div className="grid gap-7 p-7 sm:p-9 lg:grid-cols-[auto_1fr_auto] lg:items-center">
@@ -161,7 +154,10 @@ export default function ProfilePage() {
             </p>
 
             <p className="mt-2 flex items-center gap-2 text-sm text-[#cfe0d8]">
-              <Mail size={15} aria-hidden />
+              <Mail
+                size={15}
+                aria-hidden
+              />
               {profile.email}
             </p>
           </div>
@@ -173,7 +169,9 @@ export default function ProfilePage() {
                 aria-hidden
               />
 
-              {formatStatus(profile.status)}
+              {formatStatus(
+                profile.status,
+              )}
             </span>
 
             <span className="inline-flex items-center gap-2 rounded-full bg-[#d8b56d]/20 px-4 py-2 text-xs font-semibold text-[#f1d79d]">
@@ -283,16 +281,22 @@ export default function ProfilePage() {
       </div>
 
       <div className="feature-reveal feature-reveal-delay-3 mt-6 grid items-stretch gap-6 lg:grid-cols-2">
-        <ChangeEmailForm currentEmail={profile.email} />
+        <ChangeEmailForm
+          currentEmail={profile.email}
+        />
 
         <ChangePasswordForm
-          onPasswordChanged={handlePasswordChanged}
+          onPasswordChanged={
+            handlePasswordChanged
+          }
         />
       </div>
 
       {passwordChanged && (
         <PasswordChangedDialog
-          onContinue={finishPasswordChange}
+          onContinue={
+            finishPasswordChange
+          }
         />
       )}
     </PageShell>

@@ -14,6 +14,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.postgresql.PostgreSQLContainer;
+import za.co.pixelly.fintrack.config.security.ApiProperties;
 import za.co.pixelly.fintrack.identity.application.EmailChangeSender;
 import za.co.pixelly.fintrack.integration.support.*;
 
@@ -99,6 +100,9 @@ public abstract class AbstractIntegrationTest {
 
     protected IdentityTestClient identityTestClient;
 
+    @Autowired
+    protected ApiProperties apiProperties;
+
     @BeforeEach
     void configureIdentityTestClient() {
 
@@ -108,8 +112,21 @@ public abstract class AbstractIntegrationTest {
             new IdentityTestClient(
                 mockMvc,
                 emailSender,
-                jwtDecoder
+                jwtDecoder,
+                apiProperties
             );
+    }
+
+    protected String api(
+        String path
+    ) {
+        if (path == null || path.isBlank()) {
+            return apiProperties.basePath();
+        }
+
+        return path.startsWith("/")
+            ? apiProperties.basePath() + path
+            : apiProperties.basePath() + "/" + path;
     }
 
     protected AuthenticatedUser createAuthenticatedUser(

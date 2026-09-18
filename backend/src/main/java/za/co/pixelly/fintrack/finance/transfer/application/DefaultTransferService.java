@@ -28,6 +28,7 @@ import za.co.pixelly.fintrack.finance.transfer.persistence.TransferRepository;
 import java.util.UUID;
 
 import static za.co.pixelly.fintrack.common.Util.normalizeNullable;
+import static za.co.pixelly.fintrack.common.concurrency.VersionGuard.requireCurrent;
 
 
 @Service
@@ -114,11 +115,13 @@ public class DefaultTransferService implements TransferService {
             userId
         ).orElseThrow(TransferNotFoundException::new);
 
-        if (transfer.getVersion() != request.version()) {
-            throw new TransferConflictException(
+        requireCurrent(
+            transfer.getVersion(),
+            request.version(),
+            () -> new TransferConflictException(
                 "The transfer has changed since it was last retrieved"
-            );
-        }
+            )
+        );
 
         if (transfer.getStatus() == TransferStatus.VOIDED) {
             throw new TransferAlreadyVoidedException();

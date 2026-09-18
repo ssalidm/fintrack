@@ -51,7 +51,7 @@ fintrack:
 
     mfa:
       encryption-key: ${FINTRACK_MFA_ENCRYPTION_KEY:}
-      issuer: salif
+      issuer: fintrack
       challenge-ttl: PT5M
       challenge-retention-duration: PT24H
       max-attempts: 5
@@ -60,6 +60,9 @@ fintrack:
     cors:
       allowed-origins: []
 
+  api:
+    base-path: ${FINTRACK_API_BASE_PATH:/api/v1}
+
   recurring:
     processing-cron: "0 0 * * * *"
     schedule-batch-size: 100
@@ -67,9 +70,27 @@ fintrack:
 
   email:
     enabled: ${FINTRACK_EMAIL_ENABLED:false}
-    from: ${FINTRACK_EMAIL_FROM:no-reply@salif.local}
-    from-name: ${FINTRACK_EMAIL_FROM_NAME:Salif}
+    from: ${FINTRACK_EMAIL_FROM:no-reply@fintrack.local}
+    from-name: ${FINTRACK_EMAIL_FROM_NAME:FinTrack}
     frontend-base-url: ${FINTRACK_FRONTEND_BASE_URL:http://localhost:5173}
+    support-url: ${FINTRACK_SUPPORT_URL:http://localhost:5173/support}
+
+  support:
+    recipient: ${FINTRACK_SUPPORT_RECIPIENT:support@fintrack.local}
+    duplicate-window: PT1H
+
+    turnstile:
+      secret-key: ${FINTRACK_TURNSTILE_SECRET_KEY:}
+      expected-hostname: ${FINTRACK_TURNSTILE_EXPECTED_HOSTNAME:localhost}
+      expected-action: support_contact
+
+    rate-limit:
+      ip-burst-capacity: 3
+      ip-burst-window: PT10M
+      ip-daily-capacity: 10
+      ip-daily-window: PT24H
+      email-capacity: 3
+      email-window: PT1H
 
 springdoc:
   api-docs:

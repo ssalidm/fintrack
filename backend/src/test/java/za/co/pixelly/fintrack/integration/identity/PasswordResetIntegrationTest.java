@@ -63,7 +63,7 @@ class PasswordResetIntegrationTest
                 .formatted(UUID.randomUUID());
 
         mockMvc.perform(
-                post("/api/v1/auth/forgot-password")
+                post(api("/auth/forgot-password"))
                     .contentType("application/json")
                     .content("""
                         {
@@ -343,7 +343,7 @@ class PasswordResetIntegrationTest
 
         // Previously issued refresh token is dead.
         mockMvc.perform(
-                post("/api/v1/auth/refresh")
+                post(api("/auth/refresh"))
                     .contentType(
                         "application/json"
                     )
@@ -372,7 +372,7 @@ class PasswordResetIntegrationTest
                 );
 
         mockMvc.perform(
-                post("/api/v1/auth/register")
+                post(api("/auth/register"))
                     .contentType(
                         "application/json"
                     )
@@ -395,7 +395,7 @@ class PasswordResetIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/auth/verify-email"
+                    api("/auth/verify-email")
                 )
                     .contentType(
                         "application/json"
@@ -418,7 +418,7 @@ class PasswordResetIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/auth/forgot-password"
+                    api("/auth/forgot-password")
                 )
                     .contentType(
                         "application/json"
@@ -439,7 +439,7 @@ class PasswordResetIntegrationTest
     ) throws Exception {
 
         return mockMvc.perform(
-            post("/api/v1/auth/reset-password")
+            post(api("/auth/reset-password"))
                 .contentType("application/json")
                 .content("""
                     {
@@ -460,7 +460,7 @@ class PasswordResetIntegrationTest
     ) throws Exception {
 
         return mockMvc.perform(
-            post("/api/v1/auth/login")
+            post(api("/auth/login"))
                 .contentType("application/json")
                 .content("""
                     {

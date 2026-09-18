@@ -4,12 +4,14 @@ import {
   Landmark,
   Pencil,
   Plus,
-  RefreshCw,
   WalletCards,
 } from 'lucide-react'
 
 import { ApiClientError } from '../../../api/ApiClientError'
+import RefreshButton from '../../../components/actions/RefreshButton'
+import PageHeader from '../../../components/layout/PageHeader'
 import PageShell from '../../../components/layout/PageShell'
+import StatusTabs from '../../../components/navigation/StatusTabs'
 import type {
   Account,
   AccountStatus,
@@ -40,6 +42,20 @@ const accountTypeColours = {
   OTHER: 'bg-[#e8e7e2] text-[#657972]',
 } satisfies Record<AccountType, string>
 
+const accountStatusOptions = [
+  {
+    value: 'ACTIVE',
+    label: 'Active accounts',
+  },
+  {
+    value: 'ARCHIVED',
+    label: 'Archived',
+  },
+] satisfies Array<{
+  value: AccountStatus
+  label: string
+}>
+
 function formatMoney(
   amount: number,
   currencyCode: string,
@@ -55,34 +71,52 @@ export default function AccountsPage() {
   const [status, setStatus] =
     useState<AccountStatus>('ACTIVE')
 
-  const [isFormOpen, setIsFormOpen] =
-    useState(false)
+  const [
+    isFormOpen,
+    setIsFormOpen,
+  ] = useState(false)
 
-  const [editingAccount, setEditingAccount] =
-    useState<Account | null>(null)
+  const [
+    editingAccount,
+    setEditingAccount,
+  ] = useState<Account | null>(null)
 
-  const [archiveTarget, setArchiveTarget] =
-    useState<Account | null>(null)
+  const [
+    archiveTarget,
+    setArchiveTarget,
+  ] = useState<Account | null>(null)
 
-  const [archiveError, setArchiveError] =
-    useState<string | null>(null)
+  const [
+    archiveError,
+    setArchiveError,
+  ] = useState<string | null>(null)
 
-  const accountsQuery = useAccounts(status)
-  const balancesQuery = useAccountBalances()
-  const archiveAccount = useArchiveAccount()
+  const accountsQuery =
+    useAccounts(status)
 
-  const accounts = accountsQuery.data ?? []
-  const balances = balancesQuery.data ?? []
+  const balancesQuery =
+    useAccountBalances()
 
-  const balancesByAccountId = new Map(
-    balances.map((balance) => [
-      balance.accountId,
-      balance,
-    ]),
-  )
+  const archiveAccount =
+    useArchiveAccount()
+
+  const accounts =
+    accountsQuery.data ?? []
+
+  const balances =
+    balancesQuery.data ?? []
+
+  const balancesByAccountId =
+    new Map(
+      balances.map((balance) => [
+        balance.accountId,
+        balance,
+      ]),
+    )
 
   const loadError =
-    accountsQuery.error ?? balancesQuery.error
+    accountsQuery.error ??
+    balancesQuery.error
 
   const isPending =
     accountsQuery.isPending ||
@@ -97,7 +131,9 @@ export default function AccountsPage() {
     setIsFormOpen(true)
   }
 
-  function openEditForm(account: Account) {
+  function openEditForm(
+    account: Account,
+  ) {
     setEditingAccount(account)
     setIsFormOpen(true)
   }
@@ -125,7 +161,8 @@ export default function AccountsPage() {
       await archiveAccount.mutateAsync({
         accountId: archiveTarget.id,
         payload: {
-          version: archiveTarget.version,
+          version:
+            archiveTarget.version,
         },
       })
 
@@ -141,85 +178,59 @@ export default function AccountsPage() {
 
   return (
     <PageShell>
-      <header className="feature-reveal flex flex-wrap items-end justify-between gap-6">
-        <div>
-          <p className="text-xs font-semibold tracking-[0.16em] text-[#657972]">
-            THE FULL PICTURE
-          </p>
-
-          <h1 className="mt-4 font-serif text-5xl tracking-[-0.03em] text-[#173c32]">
-            Your accounts
-          </h1>
-
-          <p className="mt-3 max-w-xl text-sm leading-6 text-[#657972]">
-            See where your money lives and how each account
-            contributes to your overall position.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            disabled={isRefreshing}
-            onClick={() => void refreshAccounts()}
-            className="rounded-full border border-[#d8d6ce] bg-[#fffdf8] p-3 text-[#657972] transition hover:border-[#bd9460] hover:text-[#9a6828] disabled:opacity-60"
-            aria-label="Refresh accounts"
-          >
-            <RefreshCw
-              size={18}
-              className={
+      <PageHeader
+        eyebrow="The full picture"
+        title="Your accounts"
+        description="See where your money lives and how each account contributes to your overall position."
+        actions={
+          <>
+            <RefreshButton
+              isRefreshing={
                 isRefreshing
-                  ? 'animate-spin'
-                  : ''
               }
+              onRefresh={
+                refreshAccounts
+              }
+              label="Refresh accounts"
+              iconOnly
             />
-          </button>
 
-          <button
-            type="button"
-            onClick={openCreateForm}
-            className="inline-flex items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#236a58]"
-          >
-            <Plus size={18} aria-hidden />
-            Add account
-          </button>
-        </div>
-      </header>
+            <button
+              type="button"
+              onClick={openCreateForm}
+              className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#236a58]"
+            >
+              <Plus
+                size={18}
+                aria-hidden
+              />
+              Add account
+            </button>
+          </>
+        }
+      />
 
-      <div className="feature-reveal feature-reveal-delay-1 mt-10 flex gap-7 border-b border-[#dedbd2]">
-        {(
-          [
-            'ACTIVE',
-            'ARCHIVED',
-          ] as const
-        ).map((accountStatus) => (
-          <button
-            key={accountStatus}
-            type="button"
-            onClick={() =>
-              setStatus(accountStatus)
-            }
-            className={`border-b-2 px-1 pb-4 text-sm font-semibold transition ${
-              status === accountStatus
-                ? 'border-[#39725d] text-[#173c32]'
-                : 'border-transparent text-[#7a8984] hover:text-[#173c32]'
-            }`}
-          >
-            {accountStatus === 'ACTIVE'
-              ? 'Active accounts'
-              : 'Archived'}
-          </button>
-        ))}
+      <div className="feature-reveal feature-reveal-delay-1 mt-10">
+        <StatusTabs
+          value={status}
+          options={
+            accountStatusOptions
+          }
+          onChange={setStatus}
+          ariaLabel="Account status"
+        />
       </div>
 
       {isPending && (
         <div className="feature-reveal feature-reveal-delay-2 mt-8 animate-pulse overflow-hidden rounded-3xl border border-[#dedbd2]">
-          {[1, 2, 3].map((item) => (
-            <div
-              key={item}
-              className="h-28 border-b border-[#dedbd2] bg-[#e7e8e2] last:border-0"
-            />
-          ))}
+          {[1, 2, 3].map(
+            (item) => (
+              <div
+                key={item}
+                className="h-28 border-b border-[#dedbd2] bg-[#e7e8e2] last:border-0"
+              />
+            ),
+          )}
         </div>
       )}
 
@@ -229,19 +240,23 @@ export default function AccountsPage() {
           role="alert"
         >
           <h2 className="font-serif text-2xl text-red-950">
-            We couldn’t load your accounts
+            We couldn’t load your
+            accounts
           </h2>
 
           <p className="mt-2 text-sm text-red-700">
-            {loadError instanceof ApiClientError
+            {loadError instanceof
+            ApiClientError
               ? loadError.message
               : 'Please try again.'}
           </p>
 
           <button
             type="button"
-            onClick={() => void refreshAccounts()}
-            className="mt-4 text-sm font-semibold text-red-800 underline underline-offset-4"
+            onClick={() =>
+              void refreshAccounts()
+            }
+            className="mt-4 cursor-pointer text-sm font-semibold text-red-800 underline underline-offset-4"
           >
             Try again
           </button>
@@ -253,7 +268,10 @@ export default function AccountsPage() {
         accounts.length === 0 && (
           <section className="feature-reveal feature-reveal-delay-2 mt-8 rounded-3xl border border-[#dedbd2] bg-[#fffdf8] px-6 py-16 text-center">
             <span className="mx-auto grid size-14 place-items-center rounded-full bg-[#dfece3] text-[#39725d]">
-              <WalletCards size={25} />
+              <WalletCards
+                size={25}
+                aria-hidden
+              />
             </span>
 
             <h2 className="mt-5 font-serif text-3xl text-[#173c32]">
@@ -268,14 +286,21 @@ export default function AccountsPage() {
                 : 'Accounts you archive will remain available here for historical reporting.'}
             </p>
 
-            {status === 'ACTIVE' && (
+            {status ===
+              'ACTIVE' && (
               <button
                 type="button"
-                onClick={openCreateForm}
-                className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#236a58]"
+                onClick={
+                  openCreateForm
+                }
+                className="mt-7 inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#236a58]"
               >
-                <Plus size={18} aria-hidden />
-                Add your first account
+                <Plus
+                  size={18}
+                  aria-hidden
+                />
+                Add your first
+                account
               </button>
             )}
           </section>
@@ -323,7 +348,9 @@ export default function AccountsPage() {
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
                           <h2 className="truncate font-semibold text-[#173c32]">
-                            {account.name}
+                            {
+                              account.name
+                            }
                           </h2>
 
                           {!account.includeInNetWorth && (
@@ -377,11 +404,13 @@ export default function AccountsPage() {
                                 account,
                               )
                             }
-                            className="rounded-full p-2 text-[#657972] transition hover:bg-[#e5ece7] hover:text-[#39725d]"
+                            className="cursor-pointer rounded-full p-2 text-[#657972] transition hover:bg-[#e5ece7] hover:text-[#39725d]"
                             aria-label={`Edit ${account.name}`}
+                            title={`Edit ${account.name}`}
                           >
                             <Pencil
                               size={17}
+                              aria-hidden
                             />
                           </button>
 
@@ -396,11 +425,13 @@ export default function AccountsPage() {
                                 account,
                               )
                             }}
-                            className="rounded-full p-2 text-[#657972] transition hover:bg-[#f2e7df] hover:text-[#9b5845]"
+                            className="cursor-pointer rounded-full p-2 text-[#657972] transition hover:bg-[#f2e7df] hover:text-[#9b5845]"
                             aria-label={`Archive ${account.name}`}
+                            title={`Archive ${account.name}`}
                           >
                             <Archive
                               size={17}
+                              aria-hidden
                             />
                           </button>
                         </div>
@@ -420,7 +451,8 @@ export default function AccountsPage() {
             'new-account'
           }
           account={
-            editingAccount ?? undefined
+            editingAccount ??
+            undefined
           }
           onClose={closeForm}
         />
@@ -430,7 +462,7 @@ export default function AccountsPage() {
         <div className="fixed inset-0 z-[80] grid place-items-center p-5">
           <button
             type="button"
-            className="absolute inset-0 bg-[#102e27]/45 backdrop-blur-[2px]"
+            className="absolute inset-0 cursor-pointer bg-[#102e27]/45 backdrop-blur-[2px]"
             onClick={() =>
               setArchiveTarget(null)
             }
@@ -444,7 +476,10 @@ export default function AccountsPage() {
             className="relative w-full max-w-md rounded-3xl bg-[#fffdf8] p-7 shadow-2xl"
           >
             <span className="grid size-11 place-items-center rounded-full bg-[#f2e7df] text-[#9b5845]">
-              <Archive size={20} />
+              <Archive
+                size={20}
+                aria-hidden
+              />
             </span>
 
             <h2
@@ -459,8 +494,9 @@ export default function AccountsPage() {
                 {archiveTarget.name}
               </strong>{' '}
               will be removed from your
-              active accounts but retained
-              for historical reporting.
+              active accounts but
+              retained for historical
+              reporting.
             </p>
 
             {archiveError && (
@@ -481,7 +517,7 @@ export default function AccountsPage() {
                 onClick={() =>
                   setArchiveTarget(null)
                 }
-                className="rounded-full border border-[#d8d6ce] px-5 py-2.5 text-sm font-semibold text-[#173c32] hover:bg-[#efede7] disabled:opacity-60"
+                className="cursor-pointer rounded-full border border-[#d8d6ce] px-5 py-2.5 text-sm font-semibold text-[#173c32] hover:bg-[#efede7] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Cancel
               </button>
@@ -494,7 +530,7 @@ export default function AccountsPage() {
                 onClick={() =>
                   void confirmArchive()
                 }
-                className="rounded-full bg-[#9b5845] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#834937] disabled:opacity-60"
+                className="cursor-pointer rounded-full bg-[#9b5845] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#834937] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {archiveAccount.isPending
                   ? 'Archiving…'

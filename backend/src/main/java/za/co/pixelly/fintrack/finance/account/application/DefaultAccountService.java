@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
+import static za.co.pixelly.fintrack.common.concurrency.VersionGuard.requireCurrent;
+
 @Service
 @RequiredArgsConstructor
 public class DefaultAccountService implements AccountService {
@@ -142,7 +144,12 @@ public class DefaultAccountService implements AccountService {
             throw new ArchivedAccountModificationException();
         }
 
-        validateVersion(account, request.version());
+        requireCurrent(
+            account.getVersion(),
+            request.version(),
+            StaleAccountVersionException::new
+        );
+
 
         String normalizedName = null;
 
@@ -189,9 +196,10 @@ public class DefaultAccountService implements AccountService {
             throw new AccountAlreadyArchivedException();
         }
 
-        validateVersion(
-            account,
-            request.version()
+        requireCurrent(
+            account.getVersion(),
+            request.version(),
+            StaleAccountVersionException::new
         );
 
         account.archive(Instant.now());
@@ -227,14 +235,5 @@ public class DefaultAccountService implements AccountService {
                 userId
             )
             .orElseThrow(AccountNotFoundException::new);
-    }
-
-    private void validateVersion(
-        Account account,
-        Long requestedVersion
-    ) {
-        if (account.getVersion() != requestedVersion) {
-            throw new StaleAccountVersionException();
-        }
     }
 }

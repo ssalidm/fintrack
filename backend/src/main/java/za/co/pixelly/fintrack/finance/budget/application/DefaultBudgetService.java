@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
+import static za.co.pixelly.fintrack.common.concurrency.VersionGuard.requireCurrent;
+
 @Service
 @RequiredArgsConstructor
 public class DefaultBudgetService implements BudgetService {
@@ -134,7 +136,13 @@ public class DefaultBudgetService implements BudgetService {
 
         ensureActive(budget);
 
-        validateBudgetVersion(budget, request.version());
+        requireCurrent(
+            budget.getVersion(),
+            request.version(),
+            () -> new BudgetConflictException(
+                "The budget has changed since it was last retrieved"
+            )
+        );
 
         budget.rename(request.name(), Instant.now());
 
@@ -157,7 +165,13 @@ public class DefaultBudgetService implements BudgetService {
             throw new BudgetConflictException("Budget is already archived");
         }
 
-        validateBudgetVersion(budget, request.version());
+        requireCurrent(
+            budget.getVersion(),
+            request.version(),
+            () -> new BudgetConflictException(
+                "The budget has changed since it was last retrieved"
+            )
+        );
 
         budget.archive(Instant.now());
 
@@ -237,7 +251,13 @@ public class DefaultBudgetService implements BudgetService {
             )
             .orElseThrow(BudgetLimitNotFoundException::new);
 
-        validateLimitVersion(limit, request.version());
+        requireCurrent(
+            limit.getVersion(),
+            request.version(),
+            () -> new BudgetConflictException(
+                "The budget category limit has changed since it was last retrieved"
+            )
+        );
 
 
         /*
@@ -316,7 +336,13 @@ public class DefaultBudgetService implements BudgetService {
             )
             .orElseThrow(BudgetLimitNotFoundException::new);
 
-        validateLimitVersion(limit, version);
+        requireCurrent(
+            limit.getVersion(),
+            version,
+            () -> new BudgetConflictException(
+                "The budget category limit has changed since it was last retrieved"
+            )
+        );
 
         budgetCategoryLimitRepository.delete(limit);
 
@@ -368,30 +394,6 @@ public class DefaultBudgetService implements BudgetService {
         if (budget.getStatus() != BudgetStatus.ACTIVE) {
             throw new BudgetConflictException(
                 "Archived budgets cannot be modified"
-            );
-        }
-    }
-
-
-    private void validateBudgetVersion(
-        Budget budget,
-        long requestedVersion
-    ) {
-        if (budget.getVersion() != requestedVersion) {
-            throw new BudgetConflictException(
-                "The budget has changed since it was last retrieved"
-            );
-        }
-    }
-
-
-    private void validateLimitVersion(
-        BudgetCategoryLimit limit,
-        long requestedVersion
-    ) {
-        if (limit.getVersion() != requestedVersion) {
-            throw new BudgetConflictException(
-                "The budget category limit has changed since it was last retrieved"
             );
         }
     }

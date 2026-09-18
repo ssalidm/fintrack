@@ -37,7 +37,7 @@ class AccountIntegrationTest
             );
 
         mockMvc.perform(
-                post("/api/v1/accounts")
+                post(api("/accounts"))
                     .header(
                         "Authorization",
                         bearer(user)
@@ -103,7 +103,7 @@ class AccountIntegrationTest
             );
 
         mockMvc.perform(
-                post("/api/v1/accounts")
+                post(api("/accounts"))
                     .header(
                         "Authorization",
                         bearer(user)
@@ -145,7 +145,7 @@ class AccountIntegrationTest
             );
 
         mockMvc.perform(
-                post("/api/v1/accounts")
+                post(api("/accounts"))
                     .header(
                         "Authorization",
                         bearer(user)
@@ -189,7 +189,7 @@ class AccountIntegrationTest
             );
 
         mockMvc.perform(
-                post("/api/v1/accounts")
+                post(api("/accounts"))
                     .header(
                         "Authorization",
                         bearer(user)
@@ -235,7 +235,7 @@ class AccountIntegrationTest
         );
 
         mockMvc.perform(
-                get("/api/v1/accounts")
+                get(api("/accounts"))
                     .header(
                         "Authorization",
                         bearer(user)
@@ -294,7 +294,7 @@ class AccountIntegrationTest
         );
 
         mockMvc.perform(
-                get("/api/v1/accounts")
+                get(api("/accounts"))
                     .header(
                         "Authorization",
                         bearer(alice)
@@ -358,7 +358,7 @@ class AccountIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/accounts/{accountId}",
+                    api("/accounts/{accountId}"),
                     accountId
                 )
                     .header(
@@ -410,7 +410,7 @@ class AccountIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/accounts/{accountId}",
+                    api("/accounts/{accountId}"),
                     accountId
                 )
                     .header(
@@ -429,7 +429,7 @@ class AccountIntegrationTest
         throws Exception {
 
         mockMvc.perform(
-                get("/api/v1/accounts")
+                get(api("/accounts"))
             )
             .andExpect(
                 status().isUnauthorized()
@@ -463,7 +463,7 @@ class AccountIntegrationTest
 
         mockMvc.perform(
                 patch(
-                    "/api/v1/accounts/{accountId}",
+                    api("/accounts/{accountId}"),
                     accountId
                 )
                     .header(
@@ -551,7 +551,7 @@ class AccountIntegrationTest
 
         mockMvc.perform(
                 patch(
-                    "/api/v1/accounts/{accountId}",
+                    api("/accounts/{accountId}"),
                     accountId
                 )
                     .header(
@@ -607,7 +607,7 @@ class AccountIntegrationTest
 
         mockMvc.perform(
                 patch(
-                    "/api/v1/accounts/{accountId}",
+                    api("/accounts/{accountId}"),
                     accountId
                 )
                     .header(
@@ -660,7 +660,7 @@ class AccountIntegrationTest
         // First update succeeds.
         mockMvc.perform(
                 patch(
-                    "/api/v1/accounts/{accountId}",
+                    api("/accounts/{accountId}"),
                     accountId
                 )
                     .header(
@@ -685,7 +685,7 @@ class AccountIntegrationTest
         // Client still thinks version is 0.
         mockMvc.perform(
                 patch(
-                    "/api/v1/accounts/{accountId}",
+                    api("/accounts/{accountId}"),
                     accountId
                 )
                     .header(
@@ -736,7 +736,7 @@ class AccountIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/accounts/{accountId}/archive",
+                    api("/accounts/{accountId}/archive"),
                     accountId
                 )
                     .header(
@@ -771,7 +771,7 @@ class AccountIntegrationTest
 
         // Default listing only returns ACTIVE.
         mockMvc.perform(
-                get("/api/v1/accounts")
+                get(api("/accounts"))
                     .header(
                         "Authorization",
                         bearer(user)
@@ -788,7 +788,7 @@ class AccountIntegrationTest
         // Archived account is still retrievable.
         mockMvc.perform(
                 get(
-                    "/api/v1/accounts"
+                    api("/accounts")
                         + "?status=ARCHIVED"
                 )
                     .header(
@@ -841,7 +841,7 @@ class AccountIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/accounts/{accountId}/archive",
+                    api("/accounts/{accountId}/archive"),
                     accountId
                 )
                     .header(
@@ -892,7 +892,7 @@ class AccountIntegrationTest
         MvcResult archived =
             mockMvc.perform(
                     post(
-                        "/api/v1/accounts/{accountId}/archive",
+                        api("/accounts/{accountId}/archive"),
                         accountId
                     )
                         .header(
@@ -921,7 +921,7 @@ class AccountIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/accounts/{accountId}/archive",
+                    api("/accounts/{accountId}/archive"),
                     accountId
                 )
                     .header(
@@ -957,7 +957,7 @@ class AccountIntegrationTest
     ) throws Exception {
 
         return mockMvc.perform(
-            post("/api/v1/accounts")
+            post(api("/accounts"))
                 .header(
                     "Authorization",
                     "Bearer " + accessToken

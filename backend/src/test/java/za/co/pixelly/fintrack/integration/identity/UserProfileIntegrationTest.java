@@ -36,7 +36,7 @@ class UserProfileIntegrationTest extends AbstractIntegrationTest {
             );
 
         mockMvc.perform(
-                get("/api/v1/profile")
+                get(api("/profile"))
                     .header(
                         "Authorization",
                         bearer(user)
@@ -89,7 +89,7 @@ class UserProfileIntegrationTest extends AbstractIntegrationTest {
 
         MvcResult currentProfile =
             mockMvc.perform(
-                    get("/api/v1/profile")
+                    get(api("/profile"))
                         .header(
                             "Authorization",
                             bearer(user)
@@ -101,7 +101,7 @@ class UserProfileIntegrationTest extends AbstractIntegrationTest {
         long version = profileVersion(user);
 
         mockMvc.perform(
-                patch("/api/v1/profile")
+                patch(api("/profile"))
                     .header(
                         "Authorization",
                         bearer(user)
@@ -144,7 +144,7 @@ class UserProfileIntegrationTest extends AbstractIntegrationTest {
 
         MvcResult currentProfile =
             mockMvc.perform(
-                    get("/api/v1/profile")
+                    get(api("/profile"))
                         .header(
                             "Authorization",
                             bearer(user)
@@ -156,7 +156,7 @@ class UserProfileIntegrationTest extends AbstractIntegrationTest {
         long version = profileVersion(user);
 
         mockMvc.perform(
-                patch("/api/v1/profile")
+                patch(api("/profile"))
                     .header(
                         "Authorization",
                         bearer(user)
@@ -175,7 +175,7 @@ class UserProfileIntegrationTest extends AbstractIntegrationTest {
 
 
         mockMvc.perform(
-                patch("/api/v1/profile")
+                patch(api("/profile"))
                     .header(
                         "Authorization",
                         bearer(user)
@@ -206,7 +206,7 @@ class UserProfileIntegrationTest extends AbstractIntegrationTest {
             );
 
         mockMvc.perform(
-                patch("/api/v1/profile")
+                patch(api("/profile"))
                     .header(
                         "Authorization",
                         bearer(user)
@@ -251,7 +251,7 @@ class UserProfileIntegrationTest extends AbstractIntegrationTest {
          * auth session.
          */
         mockMvc.perform(
-                get("/api/v1/profile")
+                get(api("/profile"))
                     .header(
                         "Authorization",
                         bearer(user)
@@ -342,7 +342,7 @@ class UserProfileIntegrationTest extends AbstractIntegrationTest {
          * The freshly-created session and JWT must work.
          */
         mockMvc.perform(
-                get("/api/v1/profile")
+                get(api("/profile"))
                     .header(
                         "Authorization",
                         "Bearer " + newAccessToken
@@ -383,7 +383,7 @@ class UserProfileIntegrationTest extends AbstractIntegrationTest {
          * existing authenticated session.
          */
         mockMvc.perform(
-                get("/api/v1/profile")
+                get(api("/profile"))
                     .header(
                         "Authorization",
                         bearer(user)
@@ -428,7 +428,7 @@ class UserProfileIntegrationTest extends AbstractIntegrationTest {
          * no password change actually occurred.
          */
         mockMvc.perform(
-                get("/api/v1/profile")
+                get(api("/profile"))
                     .header(
                         "Authorization",
                         bearer(user)
@@ -443,7 +443,7 @@ class UserProfileIntegrationTest extends AbstractIntegrationTest {
 
         mockMvc.perform(
                 post(
-                    "/api/v1/profile/change-password"
+                    api("/profile/change-password")
                 )
                     .contentType(
                         "application/json"
@@ -469,7 +469,7 @@ class UserProfileIntegrationTest extends AbstractIntegrationTest {
         throws Exception {
 
         mockMvc.perform(
-                get("/api/v1/profile")
+                get(api("/profile"))
             )
             .andExpect(
                 status().isUnauthorized()
@@ -508,7 +508,7 @@ class UserProfileIntegrationTest extends AbstractIntegrationTest {
 
         return mockMvc.perform(
             post(
-                "/api/v1/profile/change-password"
+                api("/profile/change-password")
             )
                 .header(
                     "Authorization",
@@ -536,7 +536,7 @@ class UserProfileIntegrationTest extends AbstractIntegrationTest {
     ) throws Exception {
 
         return mockMvc.perform(
-            post("/api/v1/auth/login")
+            post(api("/auth/login"))
                 .header(
                     "User-Agent",
                     "FinTrack profile integration test"

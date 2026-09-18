@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static za.co.pixelly.fintrack.common.concurrency.VersionGuard.requireCurrent;
+
 @Service
 @RequiredArgsConstructor
 public class DefaultAdminUserService implements AdminUserService {
@@ -142,11 +144,13 @@ public class DefaultAdminUserService implements AdminUserService {
             );
         }
 
-        if (targetUser.getVersion() != requestedVersion) {
-            throw new AdminUserConflictException(
+        requireCurrent(
+            targetUser.getVersion(),
+            requestedVersion,
+            () -> new AdminUserConflictException(
                 "The user has changed since it was last retrieved"
-            );
-        }
+            )
+        );
 
         Instant now = Instant.now();
 
@@ -217,13 +221,13 @@ public class DefaultAdminUserService implements AdminUserService {
             );
         }
 
-
-        if (targetUser.getVersion() != requestedVersion) {
-            throw new AdminUserConflictException(
+        requireCurrent(
+            targetUser.getVersion(),
+            requestedVersion,
+            () -> new AdminUserConflictException(
                 "The user has changed since it was last retrieved"
-            );
-        }
-
+            )
+        );
 
         targetUser.activate(Instant.now());
 

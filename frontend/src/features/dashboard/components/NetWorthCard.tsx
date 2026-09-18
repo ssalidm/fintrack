@@ -1,51 +1,26 @@
-import {
-  ArrowRight,
-  Landmark,
-  Scale,
-} from 'lucide-react'
+import { ArrowRight, Landmark, Scale } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router'
 
+import { formatMoney } from '../../../utils/formatters'
 import type { NetWorthSummary } from '../api/types'
 
 interface NetWorthCardProps {
   items: NetWorthSummary[]
 }
 
-function formatMoney(
-  amount: number,
-  currencyCode: string,
-) {
-  return new Intl.NumberFormat('en-ZA', {
-    style: 'currency',
-    currency: currencyCode,
-    maximumFractionDigits: 2,
-  }).format(amount)
-}
-
 function positionLabel(netWorth: number) {
-  if (netWorth > 0) {
-    return 'Positive position'
-  }
-
-  if (netWorth < 0) {
-    return 'Liabilities lead'
-  }
-
+  if (netWorth > 0) return 'Positive position'
+  if (netWorth < 0) return 'Liabilities lead'
   return 'Balanced position'
 }
 
-export default function NetWorthCard({
-  items,
-}: NetWorthCardProps) {
-  const [selectedCurrency, setSelectedCurrency] =
-    useState('')
+export default function NetWorthCard({ items }: NetWorthCardProps) {
+  const [selectedCurrency, setSelectedCurrency] = useState('')
 
   const activeItem =
-    items.find(
-      (item) =>
-        item.currencyCode === selectedCurrency,
-    ) ?? items[0]
+    items.find((item) => item.currencyCode === selectedCurrency) ??
+    items[0]
 
   return (
     <article className="relative flex min-h-[250px] flex-col overflow-hidden rounded-3xl bg-[#173c32] p-6 text-[#f8f4e9] shadow-[0_18px_45px_rgba(23,60,50,0.16)]">
@@ -53,6 +28,7 @@ export default function NetWorthCard({
         className="pointer-events-none absolute -top-20 -right-16 size-48 rounded-full border border-white/10"
         aria-hidden
       />
+
       <div
         className="pointer-events-none absolute -right-5 -bottom-20 size-40 rounded-full bg-[#d6a45f]/10"
         aria-hidden
@@ -77,9 +53,7 @@ export default function NetWorthCard({
         {items.length > 1 && activeItem && (
           <select
             value={activeItem.currencyCode}
-            onChange={(event) =>
-              setSelectedCurrency(event.target.value)
-            }
+            onChange={(event) => setSelectedCurrency(event.target.value)}
             aria-label="Net worth currency"
             className="cursor-pointer rounded-full border border-white/20 bg-white/10 py-2 pr-9 pl-3 text-xs font-semibold text-[#fffdf8] outline-none focus:border-[#e7bd7e]"
           >
@@ -99,9 +73,7 @@ export default function NetWorthCard({
       {!activeItem ? (
         <div className="relative mt-8 flex flex-1 flex-col justify-between">
           <div>
-            <p className="font-serif text-2xl">
-              No accounts yet
-            </p>
+            <p className="font-serif text-2xl">No accounts yet</p>
             <p className="mt-2 max-w-sm text-sm leading-6 text-[#bed0c8]">
               Add an account to begin building your financial picture.
             </p>
@@ -159,9 +131,7 @@ export default function NetWorthCard({
                     : 'text-[#b9d7c2]',
                 ].join(' ')}
               >
-                {positionLabel(
-                  Number(activeItem.netWorth),
-                )}
+                {positionLabel(Number(activeItem.netWorth))}
               </p>
             </div>
 

@@ -1,4 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import {
+  LockKeyhole,
+  ShieldCheck,
+} from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
@@ -17,9 +21,10 @@ import {
 } from '../validation/loginSchema'
 
 const inputClasses =
-  'block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-950 ' +
-  'outline-none transition placeholder:text-slate-400 focus:border-[#1F7A5C] focus:ring-2 ' +
-  'focus:ring-[#1F7A5C]/20 disabled:cursor-not-allowed disabled:bg-slate-100'
+  'block w-full rounded-xl border border-[#d6d2c8] bg-[#fffdf8] px-3.5 py-3 ' +
+  'text-sm text-[#092f28] outline-none transition placeholder:text-slate-400 ' +
+  'focus:border-[#16805f] focus:ring-2 focus:ring-[#16805f]/20 ' +
+  'disabled:cursor-not-allowed disabled:bg-[#efede6]'
 
 function getRedirectPath(
   state: unknown,
@@ -47,15 +52,11 @@ function getRedirectPath(
 }
 
 export default function LoginPage() {
-  const [
-    showPassword,
-    setShowPassword,
-  ] = useState(false)
+  const [showPassword, setShowPassword] =
+    useState(false)
 
-  const [
-    submitError,
-    setSubmitError,
-  ] = useState<string | null>(null)
+  const [submitError, setSubmitError] =
+    useState<string | null>(null)
 
   const { login, status } = useAuth()
   const navigate = useNavigate()
@@ -75,7 +76,6 @@ export default function LoginPage() {
     },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
-
     defaultValues: {
       email: '',
       password: '',
@@ -93,25 +93,18 @@ export default function LoginPage() {
         password: values.password,
       })
 
-      if (
-        result.status ===
-        'MFA_REQUIRED'
-      ) {
+      if (result.status === 'MFA_REQUIRED') {
         if (!result.mfaChallenge) {
           setSubmitError(
             'Salif returned an invalid authentication challenge.',
           )
-
           return
         }
 
         navigate('/login/mfa', {
           replace: true,
-
           state: {
-            challenge:
-              result.mfaChallenge,
-
+            challenge: result.mfaChallenge,
             from: redirectTo,
           },
         })
@@ -123,22 +116,14 @@ export default function LoginPage() {
         replace: true,
       })
     } catch (error) {
-      if (
-        !(
-          error instanceof
-          ApiClientError
-        )
-      ) {
+      if (!(error instanceof ApiClientError)) {
         setSubmitError(
           'Something went wrong. Please try again.',
         )
-
         return
       }
 
-      if (
-        error.validationErrors?.email
-      ) {
+      if (error.validationErrors?.email) {
         setError('email', {
           type: 'server',
           message:
@@ -146,14 +131,11 @@ export default function LoginPage() {
         })
       }
 
-      if (
-        error.validationErrors?.password
-      ) {
+      if (error.validationErrors?.password) {
         setError('password', {
           type: 'server',
           message:
-            error.validationErrors
-              .password,
+            error.validationErrors.password,
         })
       }
 
@@ -183,35 +165,43 @@ export default function LoginPage() {
 
   return (
     <section
-      className="w-full max-w-md"
+      className="auth-panel-enter rounded-[2rem] border border-white/80 bg-white/64 p-6 shadow-[0_26px_80px_rgba(9,47,40,0.14)] ring-1 ring-[#0d4f3f]/5 backdrop-blur-2xl sm:p-8"
       aria-labelledby="login-title"
     >
       <header>
-        <p className="text-sm font-semibold text-[#1F7A5C]">
+        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#16805f]">
+          <span className="grid size-7 place-items-center rounded-full bg-[#e0eee8]">
+            <LockKeyhole
+              size={14}
+              aria-hidden
+            />
+          </span>
+
           Welcome back
-        </p>
+        </div>
 
         <h1
           id="login-title"
-          className="mt-2 text-3xl font-semibold tracking-tight text-slate-950"
+          className="mt-4 font-serif text-4xl leading-tight tracking-[-0.025em] text-[#092f28]"
         >
           Sign in to Salif
         </h1>
 
-        <p className="mt-2 text-sm leading-6 text-slate-600">
-          Continue managing your finances.
+        <p className="mt-2 text-sm leading-6 text-[#657972]">
+          Pick up where you left off and keep your money
+          moving with purpose.
         </p>
       </header>
 
       <form
-        className="mt-8 space-y-5"
+        className="mt-7 space-y-5"
         onSubmit={handleSubmit(onSubmit)}
         noValidate
       >
         <div>
           <label
             htmlFor="email"
-            className="text-sm font-medium text-slate-800"
+            className="text-sm font-semibold text-[#173c32]"
           >
             Email
           </label>
@@ -223,9 +213,7 @@ export default function LoginPage() {
             inputMode="email"
             disabled={isSubmitting}
             aria-invalid={
-              errors.email
-                ? 'true'
-                : 'false'
+              errors.email ? 'true' : 'false'
             }
             aria-describedby={
               errors.email
@@ -251,14 +239,14 @@ export default function LoginPage() {
           <div className="flex items-center justify-between gap-4">
             <label
               htmlFor="password"
-              className="text-sm font-medium text-slate-800"
+              className="text-sm font-semibold text-[#173c32]"
             >
               Password
             </label>
 
             <Link
               to="/forgot-password"
-              className="cursor-pointer text-sm font-semibold text-[#1F7A5C] hover:underline"
+              className="text-sm font-semibold text-[#16805f] transition hover:text-[#0d4f3f] hover:underline"
             >
               Forgot password?
             </Link>
@@ -312,7 +300,7 @@ export default function LoginPage() {
 
         {submitError && (
           <div
-            className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+            className="auth-message-in rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700"
             role="alert"
           >
             {submitError}
@@ -325,7 +313,7 @@ export default function LoginPage() {
             isSubmitting ||
             status === 'checking'
           }
-          className="flex w-full cursor-pointer justify-center rounded-lg bg-[#1F7A5C] px-4 py-2.5 font-semibold text-white transition hover:bg-[#19664D] focus:outline-none focus:ring-2 focus:ring-[#1F7A5C] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex w-full justify-center rounded-full bg-[#0d4f3f] px-4 py-3 font-semibold text-white shadow-[0_10px_25px_rgba(13,79,63,0.18)] transition hover:-translate-y-0.5 hover:bg-[#092f28] focus:outline-none focus:ring-2 focus:ring-[#16805f] focus:ring-offset-2 disabled:translate-y-0 disabled:opacity-60"
         >
           {isSubmitting
             ? 'Signing in…'
@@ -333,12 +321,25 @@ export default function LoginPage() {
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-slate-600">
+      <div className="mt-6 flex items-start gap-3 rounded-2xl bg-[#edf3ef] px-4 py-3 text-xs leading-5 text-[#526b63]">
+        <ShieldCheck
+          size={17}
+          className="mt-0.5 shrink-0 text-[#16805f]"
+          aria-hidden
+        />
+
+        <span>
+          Protected by secure sessions and optional
+          multi-factor authentication.
+        </span>
+      </div>
+
+      <p className="mt-6 text-center text-sm text-[#657972]">
         Don’t have an account?{' '}
 
         <Link
           to="/register"
-          className="cursor-pointer font-semibold text-[#1F7A5C] hover:underline"
+          className="font-semibold text-[#16805f] transition hover:text-[#0d4f3f] hover:underline"
         >
           Create an account
         </Link>

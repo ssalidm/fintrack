@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import za.co.pixelly.fintrack.common.api.ApiMessage;
 import za.co.pixelly.fintrack.common.api.ApiResponse;
+import za.co.pixelly.fintrack.common.security.CurrentUserId;
 import za.co.pixelly.fintrack.finance.account.application.AccountService;
 import za.co.pixelly.fintrack.finance.account.domain.AccountStatus;
 
@@ -27,7 +28,7 @@ import java.util.UUID;
 )
 @SecurityRequirement(name = BEARER_AUTH)
 @RestController
-@RequestMapping("/api/v1/accounts")
+@RequestMapping("/accounts")
 @RequiredArgsConstructor
 public class AccountController {
 
@@ -36,22 +37,18 @@ public class AccountController {
     @PostMapping
     public ResponseEntity<ApiResponse<AccountResponse>>
     createAccount(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @Valid
         @RequestBody
         CreateAccountRequest request
     ) {
-        UUID userId = UUID.fromString(Objects.requireNonNull(jwt.getSubject()));
-
-        AccountResponse account = accountService.create(userId, request);
-
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(
                 ApiResponse.success(
                     HttpStatus.CREATED,
                     ApiMessage.Account.CREATED,
-                    account
+                    accountService.create(userId, request)
                 )
             );
 
@@ -61,14 +58,14 @@ public class AccountController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<AccountResponse>>>
     getAccounts(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @RequestParam(defaultValue = "ACTIVE") AccountStatus status
     ) {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
                 ApiMessage.Account.FETCHED_ALL,
-                accountService.findAccounts(userId(jwt), status)
+                accountService.findAccounts(userId, status)
             )
         );
     }
@@ -77,14 +74,14 @@ public class AccountController {
     @GetMapping("/{accountId}")
     public ResponseEntity<ApiResponse<AccountResponse>>
     getAccount(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID accountId
     ) {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
                 ApiMessage.Account.FETCHED,
-                accountService.findById(userId(jwt), accountId)
+                accountService.findById(userId, accountId)
             )
         );
     }
@@ -93,24 +90,21 @@ public class AccountController {
     @PatchMapping("/{accountId}")
     public ResponseEntity<ApiResponse<AccountResponse>>
     updateAccount(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID accountId,
         @Valid
         @RequestBody
         UpdateAccountRequest request
     ) {
-        AccountResponse result =
-            accountService.update(
-                userId(jwt),
-                accountId,
-                request
-            );
-
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
                 ApiMessage.Account.UPDATED,
-                result
+                accountService.update(
+                    userId,
+                    accountId,
+                    request
+                )
             )
         );
     }
@@ -119,30 +113,22 @@ public class AccountController {
     @PostMapping("/{accountId}/archive")
     public ResponseEntity<ApiResponse<AccountResponse>>
     archiveAccount(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID accountId,
         @Valid
         @RequestBody
         ArchiveAccountRequest request
     ) {
-        AccountResponse result =
-            accountService.archive(
-                userId(jwt),
-                accountId,
-                request
-            );
-
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
                 ApiMessage.Account.ARCHIVED,
-                result
+                accountService.archive(
+                    userId,
+                    accountId,
+                    request
+                )
             )
         );
-    }
-
-
-    private UUID userId(Jwt jwt) {
-        return UUID.fromString(Objects.requireNonNull(jwt.getSubject()));
     }
 }
