@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import za.co.pixelly.fintrack.common.api.ApiResponse;
 import za.co.pixelly.fintrack.identity.application.google.GoogleAuthenticationUnavailableException;
+import za.co.pixelly.fintrack.identity.application.google.GoogleIdentityLinkConflictException;
+import za.co.pixelly.fintrack.identity.application.google.GoogleLinkReauthenticationRequiredException;
 import za.co.pixelly.fintrack.identity.application.google.InvalidGoogleCredentialException;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -45,6 +47,42 @@ public class GoogleAuthenticationExceptionHandler {
                 ApiResponse.error(
                     HttpStatus.SERVICE_UNAVAILABLE,
                     "Google authentication is temporarily unavailable"
+                )
+            );
+    }
+
+
+    @ExceptionHandler(GoogleIdentityLinkConflictException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleLinkConflict(
+        GoogleIdentityLinkConflictException exception
+    ) {
+        return ResponseEntity
+            .status(
+                HttpStatus.CONFLICT
+            )
+            .body(
+                ApiResponse.error(
+                    HttpStatus.CONFLICT,
+                    exception.getMessage()
+                )
+            );
+    }
+
+
+    @ExceptionHandler(GoogleLinkReauthenticationRequiredException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleReauthenticationRequired(
+        GoogleLinkReauthenticationRequiredException exception
+    ) {
+        return ResponseEntity
+            .status(
+                HttpStatus.UNAUTHORIZED
+            )
+            .body(
+                ApiResponse.error(
+                    HttpStatus.UNAUTHORIZED,
+                    exception.getMessage()
                 )
             );
     }

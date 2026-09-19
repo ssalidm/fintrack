@@ -115,8 +115,7 @@ public class AuthController {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
-                ApiMessage.Auth.LOGOUT_SUCCESS,
-                null
+                ApiMessage.Auth.LOGOUT_SUCCESS
             )
         );
     }
@@ -133,8 +132,7 @@ public class AuthController {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
-                ApiMessage.Auth.VERIFY_SUCCESS,
-                null
+                ApiMessage.Auth.VERIFY_SUCCESS
             )
         );
     }
@@ -156,8 +154,7 @@ public class AuthController {
             .body(
                 ApiResponse.success(
                     HttpStatus.ACCEPTED,
-                    ApiMessage.Auth.RESEND_VERIFY,
-                    null
+                    ApiMessage.Auth.RESEND_VERIFY
                 )
             );
     }
@@ -178,8 +175,7 @@ public class AuthController {
             .body(
                 ApiResponse.success(
                     HttpStatus.ACCEPTED,
-                    ApiMessage.Auth.FORGOT_PASSWORD,
-                    null
+                    ApiMessage.Auth.FORGOT_PASSWORD
                 )
             );
     }
@@ -199,8 +195,7 @@ public class AuthController {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
-                ApiMessage.Auth.RESET_SUCCESS,
-                null
+                ApiMessage.Auth.RESET_SUCCESS
             )
         );
     }
@@ -219,8 +214,7 @@ public class AuthController {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
-                ApiMessage.Auth.EMAIL_CHANGED,
-                null
+                ApiMessage.Auth.EMAIL_CHANGED
             )
         );
     }
@@ -340,8 +334,7 @@ public class AuthController {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
-                ApiMessage.Auth.TFA_DISABLED,
-                null
+                ApiMessage.Auth.TFA_DISABLED
             )
         );
     }

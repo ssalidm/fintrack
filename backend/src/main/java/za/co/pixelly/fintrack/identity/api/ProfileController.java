@@ -74,8 +74,7 @@ public class ProfileController {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
-                ApiMessage.Profile.PASSWORD_UPDATED,
-                null
+                ApiMessage.Profile.PASSWORD_UPDATED
             )
         );
     }
@@ -98,8 +97,7 @@ public class ProfileController {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
-                ApiMessage.Profile.EMAIL_CHANGE_REQUESTED,
-                null
+                ApiMessage.Profile.EMAIL_CHANGE_REQUESTED
             )
         );
     }
