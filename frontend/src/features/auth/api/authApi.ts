@@ -4,6 +4,8 @@ import type {
   ConfirmEmailChangeRequest,
   ForgotPasswordRequest,
   LoginRequest,
+  GoogleLoginRequest,
+  GoogleLinkRequest,
   LoginResponse,
   MfaRecoverRequest,
   MfaVerifyRequest,
@@ -33,6 +35,32 @@ export const authApi = {
       {
         method: 'POST',
         body: request,
+      },
+    )
+  },
+
+  googleLogin(
+    request: GoogleLoginRequest,
+  ) {
+    return apiRequest<LoginResponse>(
+      '/auth/google',
+      {
+        method: 'POST',
+        body: request,
+      },
+    )
+  },
+
+  linkGoogle(
+    request: GoogleLinkRequest,
+    accessToken: string,
+  ) {
+    return apiRequest<void>(
+      '/auth/google/link',
+      {
+        method: 'POST',
+        body: request,
+        accessToken,
       },
     )
   },
@@ -122,7 +150,7 @@ export const authApi = {
       },
     )
   },
-  
+
   confirmEmailChange(
     request: ConfirmEmailChangeRequest) {
     return apiRequest<void>(

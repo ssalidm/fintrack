@@ -28,6 +28,8 @@ export interface LoginRequest {
 export type LoginStatus =
   | 'AUTHENTICATED'
   | 'MFA_REQUIRED'
+  | 'EMAIL_VERIFICATION_REQUIRED'
+  | 'ACCOUNT_LINK_REQUIRED'
 
 export interface MfaChallengeResponse {
   readonly challengeToken: string
@@ -45,6 +47,14 @@ export interface TokenResponse {
   readonly refreshToken: string
   readonly tokenType: string
   readonly expiresIn: number
+}
+
+export interface GoogleLoginRequest {
+  readonly credential: string
+}
+
+export interface GoogleLinkRequest {
+  readonly credential: string
 }
 
 export interface RefreshRequest {
@@ -81,3 +91,4 @@ export interface ResetPasswordRequest {
 export interface ConfirmEmailChangeRequest {
   readonly token: string
 }
+

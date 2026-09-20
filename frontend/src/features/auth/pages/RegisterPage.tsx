@@ -7,7 +7,7 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 
 import { ApiClientError } from '../../../api/ApiClientError'
 import { authApi } from '../api/authApi'
@@ -20,6 +20,9 @@ import {
   registrationSchema,
   type RegistrationFormValues,
 } from '../validation/registrationSchema'
+import GoogleSignInButton from '../components/GoogleSignInButton'
+import { useAuth } from '../context/useAuth'
+
 
 const VERIFICATION_COOLDOWN_KEY =
   'salif:cooldown:email-verification'
@@ -111,6 +114,18 @@ function RegistrationSteps({
 }
 
 export default function RegisterPage() {
+  const navigate = useNavigate()
+
+  const {
+    googleLogin,
+    status,
+  } = useAuth()
+
+  const [
+    googleSubmitting,
+    setGoogleSubmitting,
+  ] = useState(false)
+
   const [submitError, setSubmitError] =
     useState<string | null>(null)
 
@@ -133,6 +148,7 @@ export default function RegisterPage() {
     register,
     handleSubmit,
     setError,
+    watch,
     formState: {
       errors,
       isSubmitting,
@@ -148,6 +164,104 @@ export default function RegisterPage() {
       acceptTerms: false,
     },
   })
+
+  const acceptTerms =
+    watch('acceptTerms')
+
+  async function handleGoogleCredential(
+    credential: string,
+  ) {
+    setSubmitError(null)
+    setGoogleSubmitting(true)
+
+    try {
+      const result =
+        await googleLogin({
+          credential,
+        })
+
+      if (
+        result.status ===
+        'AUTHENTICATED'
+      ) {
+        navigate(
+          '/dashboard',
+          {
+            replace: true,
+          },
+        )
+
+        return
+      }
+
+      if (
+        result.status ===
+        'MFA_REQUIRED'
+      ) {
+        if (!result.mfaChallenge) {
+          setSubmitError(
+            'Salif returned an invalid authentication challenge.',
+          )
+
+          return
+        }
+
+        navigate(
+          '/login/mfa',
+          {
+            replace: true,
+            state: {
+              challenge:
+                result.mfaChallenge,
+              from:
+                '/dashboard',
+            },
+          },
+        )
+
+        return
+      }
+
+      if (
+        result.status ===
+        'ACCOUNT_LINK_REQUIRED'
+      ) {
+        navigate(
+          '/login',
+          {
+            replace: true,
+            state: {
+              from:
+                '/dashboard',
+              googleLinkRequired:
+                true,
+            },
+          },
+        )
+
+        return
+      }
+
+      if (
+        result.status ===
+        'EMAIL_VERIFICATION_REQUIRED'
+      ) {
+        setSubmitError(
+          'Your account was created. Check your email and verify your address before signing in.',
+        )
+      }
+    } catch (error) {
+      setSubmitError(
+        error instanceof ApiClientError
+          ? error.isNetworkError
+            ? 'We couldn’t connect to Salif right now. Please try again in a moment.'
+            : error.message
+          : 'Google sign-up could not be completed.',
+      )
+    } finally {
+      setGoogleSubmitting(false)
+    }
+  }
 
   async function onSubmit(
     values: RegistrationFormValues,
@@ -615,6 +729,34 @@ export default function RegisterPage() {
               {errors.acceptTerms.message}
             </p>
           )}
+
+          <div className="space-y-4">
+            <GoogleSignInButton
+              text="signup_with"
+              disabled={
+                !acceptTerms ||
+                googleSubmitting ||
+                isSubmitting ||
+                status === 'checking'
+              }
+              onCredential={
+                handleGoogleCredential
+              }
+              onError={
+                setSubmitError
+              }
+            />
+
+            <div className="flex items-center gap-4">
+              <span className="h-px flex-1 bg-[#d6d2c8]" />
+
+              <span className="shrink-0 text-xs font-semibold uppercase tracking-[0.12em] text-[#8a958f]">
+                or sign up with email
+              </span>
+
+              <span className="h-px flex-1 bg-[#d6d2c8]" />
+            </div>
+          </div>
         </div>
 
         {submitError && (

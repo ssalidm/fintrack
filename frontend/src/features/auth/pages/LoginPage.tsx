@@ -14,6 +14,7 @@ import {
 
 import { ApiClientError } from '../../../api/ApiClientError'
 import PasswordVisibilityButton from '../components/PasswordVisibilityButton'
+import GoogleSignInButton from '../components/GoogleSignInButton'
 import { useAuth } from '../context/useAuth'
 import {
   loginSchema,
@@ -51,20 +52,41 @@ function getRedirectPath(
   return '/dashboard'
 }
 
+function hasGoogleLinkRequest(
+  state: unknown,
+): boolean {
+  if (
+    typeof state !== 'object' ||
+    state === null
+  ) {
+    return false
+  }
+
+  return (
+    (
+      state as {
+        googleLinkRequired?: unknown
+      }
+    ).googleLinkRequired === true
+  )
+}
+
 export default function LoginPage() {
-  const [showPassword, setShowPassword] =
-    useState(false)
+  const [googleSubmitting, setGoogleSubmitting] = useState(false)
+  
+  const [googleLinkRequired, setGoogleLinkRequired] = useState(
+    () => hasGoogleLinkRequest(location.state)
+  )
 
-  const [submitError, setSubmitError] =
-    useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
 
-  const { login, status } = useAuth()
+  const [submitError, setSubmitError] = useState<string | null>(null)
+
+  const { googleLogin, login, status } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
-  const redirectTo = getRedirectPath(
-    location.state,
-  )
+  const redirectTo = getRedirectPath(location.state,)
 
   const {
     register,
@@ -81,6 +103,72 @@ export default function LoginPage() {
       password: '',
     },
   })
+
+  async function handleGoogleCredential(
+    credential: string
+  ) {
+    setSubmitError(null)
+
+    setGoogleLinkRequired(false)
+
+    setGoogleSubmitting(true)
+
+    try {
+      const result = await googleLogin({
+        credential
+      })
+
+      if (result.status === 'AUTHENTICATED') {
+        navigate(
+          redirectTo,
+          {
+            replace: true,
+          },
+        )
+
+        return
+      }
+
+      if (result.status === 'MFA_REQUIRED') {
+        if (!result.mfaChallenge) {
+          setSubmitError('Salif returned an invalid authentication challenge.')
+
+          return
+        }
+
+        navigate(
+          '/login/mfa',
+          {
+            replace: true,
+            state: {
+              challenge: result.mfaChallenge,
+              from: redirectTo,
+            },
+          },
+        )
+
+        return
+      }
+
+      if (result.status === 'ACCOUNT_LINK_REQUIRED') {
+        setGoogleLinkRequired(true)
+
+        return
+      }
+
+      if (result.status === 'EMAIL_VERIFICATION_REQUIRED') {
+        setSubmitError('Please check your email and verify your address before continuing.')
+      }
+    } catch (error) {
+      setSubmitError(
+        error instanceof ApiClientError
+          ? error.message
+          : 'Google sign-in could not be completed.'
+      )
+    } finally {
+      setGoogleSubmitting(false)
+    }
+  }
 
   async function onSubmit(
     values: LoginFormValues,
@@ -193,133 +281,178 @@ export default function LoginPage() {
         </p>
       </header>
 
-      <form
-        className="mt-7 space-y-5"
-        onSubmit={handleSubmit(onSubmit)}
-        noValidate
-      >
-        <div>
-          <label
-            htmlFor="email"
-            className="text-sm font-semibold text-[#173c32]"
-          >
-            Email
-          </label>
-
-          <input
-            id="email"
-            type="email"
-            autoComplete="email"
-            inputMode="email"
-            disabled={isSubmitting}
-            aria-invalid={
-              errors.email ? 'true' : 'false'
-            }
-            aria-describedby={
-              errors.email
-                ? 'email-error'
-                : undefined
-            }
-            className={`mt-2 ${inputClasses}`}
-            {...register('email')}
-          />
-
-          {errors.email && (
-            <p
-              id="email-error"
-              className="mt-1.5 text-sm text-red-600"
-              role="alert"
-            >
-              {errors.email.message}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <div className="flex items-center justify-between gap-4">
-            <label
-              htmlFor="password"
-              className="text-sm font-semibold text-[#173c32]"
-            >
-              Password
-            </label>
-
-            <Link
-              to="/forgot-password"
-              className="text-sm font-semibold text-[#16805f] transition hover:text-[#0d4f3f] hover:underline"
-            >
-              Forgot password?
-            </Link>
-          </div>
-
-          <div className="relative mt-2">
-            <input
-              id="password"
-              type={
-                showPassword
-                  ? 'text'
-                  : 'password'
-              }
-              autoComplete="current-password"
-              disabled={isSubmitting}
-              aria-invalid={
-                errors.password
-                  ? 'true'
-                  : 'false'
-              }
-              aria-describedby={
-                errors.password
-                  ? 'password-error'
-                  : undefined
-              }
-              className={`${inputClasses} pr-12`}
-              {...register('password')}
-            />
-
-            <PasswordVisibilityButton
-              visible={showPassword}
-              fieldLabel="password"
-              onToggle={() =>
-                setShowPassword(
-                  (visible) => !visible,
-                )
-              }
-            />
-          </div>
-
-          {errors.password && (
-            <p
-              id="password-error"
-              className="mt-1.5 text-sm text-red-600"
-              role="alert"
-            >
-              {errors.password.message}
-            </p>
-          )}
-        </div>
-
-        {submitError && (
-          <div
-            className="auth-message-in rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700"
-            role="alert"
-          >
-            {submitError}
-          </div>
-        )}
-
-        <button
-          type="submit"
+      <div className="mx-auto mt-7 w-full max-w-[400px]">
+        <GoogleSignInButton
           disabled={
+            googleSubmitting ||
             isSubmitting ||
             status === 'checking'
           }
-          className="flex w-full justify-center rounded-full bg-[#0d4f3f] px-4 py-3 font-semibold text-white shadow-[0_10px_25px_rgba(13,79,63,0.18)] transition hover:-translate-y-0.5 hover:bg-[#092f28] focus:outline-none focus:ring-2 focus:ring-[#16805f] focus:ring-offset-2 disabled:translate-y-0 disabled:opacity-60"
+          onCredential={
+            handleGoogleCredential
+          }
+          onError={
+            setSubmitError
+          }
+        />
+
+        <div className="my-6 flex items-center gap-4">
+          <span className="h-px flex-1 bg-[#d6d2c8]" />
+
+          <span className="shrink-0 text-xs font-semibold uppercase tracking-[0.12em] text-[#8a958f]">
+            or continue with email
+          </span>
+
+          <span className="h-px flex-1 bg-[#d6d2c8]" />
+        </div>
+
+        {googleLinkRequired && (
+          <div
+            className="auth-message-in mb-5 rounded-xl border border-[#c9ddd5] bg-[#edf3ef] px-4 py-3 text-sm leading-6 text-[#315c4f]"
+            role="status"
+          >
+            This Google email already belongs to
+            an existing Salif account. Sign in
+            below with your current password to
+            confirm the account. Google will be
+            connected automatically after
+            successful authentication.
+          </div>
+        )}
+
+        <form
+          className="space-y-5"
+          onSubmit={
+            handleSubmit(
+              onSubmit,
+            )
+          }
+          noValidate
         >
-          {isSubmitting
-            ? 'Signing in…'
-            : 'Sign in'}
-        </button>
-      </form>
+          <div>
+            <label
+              htmlFor="email"
+              className="text-sm font-semibold text-[#173c32]"
+            >
+              Email
+            </label>
+
+            <input
+              id="email"
+              type="email"
+              autoComplete="email"
+              inputMode="email"
+              disabled={isSubmitting || googleSubmitting}
+              aria-invalid={
+                errors.email ? 'true' : 'false'
+              }
+              aria-describedby={
+                errors.email
+                  ? 'email-error'
+                  : undefined
+              }
+              className={`mt-2 ${inputClasses}`}
+              {...register('email')}
+            />
+
+            {errors.email && (
+              <p
+                id="email-error"
+                className="mt-1.5 text-sm text-red-600"
+                role="alert"
+              >
+                {errors.email.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between gap-4">
+              <label
+                htmlFor="password"
+                className="text-sm font-semibold text-[#173c32]"
+              >
+                Password
+              </label>
+
+              <Link
+                to="/forgot-password"
+                className="text-sm font-semibold text-[#16805f] transition hover:text-[#0d4f3f] hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </div>
+
+            <div className="relative mt-2">
+              <input
+                id="password"
+                type={
+                  showPassword
+                    ? 'text'
+                    : 'password'
+                }
+                autoComplete="current-password"
+                disabled={isSubmitting || googleSubmitting}
+                aria-invalid={
+                  errors.password
+                    ? 'true'
+                    : 'false'
+                }
+                aria-describedby={
+                  errors.password
+                    ? 'password-error'
+                    : undefined
+                }
+                className={`${inputClasses} pr-12`}
+                {...register('password')}
+              />
+
+              <PasswordVisibilityButton
+                visible={showPassword}
+                fieldLabel="password"
+                onToggle={() =>
+                  setShowPassword(
+                    (visible) => !visible,
+                  )
+                }
+              />
+            </div>
+
+            {errors.password && (
+              <p
+                id="password-error"
+                className="mt-1.5 text-sm text-red-600"
+                role="alert"
+              >
+                {errors.password.message}
+              </p>
+            )}
+          </div>
+
+          {submitError && (
+            <div
+              className="auth-message-in rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700"
+              role="alert"
+            >
+              {submitError}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={
+              isSubmitting ||
+              googleSubmitting ||
+              status === 'checking'
+            }
+            className="flex w-full justify-center rounded-full bg-[#0d4f3f] px-4 py-3 font-semibold text-white shadow-[0_10px_25px_rgba(13,79,63,0.18)] transition hover:-translate-y-0.5 hover:bg-[#092f28] focus:outline-none focus:ring-2 focus:ring-[#16805f] focus:ring-offset-2 disabled:translate-y-0 disabled:opacity-60"
+          >
+            {isSubmitting
+              ? 'Signing in…'
+              : 'Sign in'}
+          </button>
+        </form>
+      </div>
 
       <div className="mt-6 flex items-start gap-3 rounded-2xl bg-[#edf3ef] px-4 py-3 text-xs leading-5 text-[#526b63]">
         <ShieldCheck
