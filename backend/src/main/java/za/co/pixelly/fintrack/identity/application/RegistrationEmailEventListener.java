@@ -9,8 +9,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @RequiredArgsConstructor
 public class RegistrationEmailEventListener {
 
-    private final AccountEmailService
-        accountEmailService;
+    private final RegistrationEmailSender registrationEmailSender;
 
 
     @TransactionalEventListener(
@@ -19,7 +18,7 @@ public class RegistrationEmailEventListener {
     public void handle(
         RegistrationEmailRequested event
     ) {
-        accountEmailService
+        registrationEmailSender
             .sendRegistrationEmail(
                 event.email(),
                 event.rawToken()

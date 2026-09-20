@@ -119,6 +119,38 @@ public class User {
     }
 
 
+    public static User registerVerified(
+        String email,
+        String passwordHash,
+        String firstName,
+        String lastName,
+        String preferredName,
+        Instant now
+    ) {
+        User user = new User();
+
+        user.email = email;
+        user.passwordHash = passwordHash;
+        user.firstName = firstName.trim();
+        user.lastName = lastName.trim();
+
+        user.preferredName =
+            preferredName == null
+                || preferredName.isBlank()
+                ? null
+                : preferredName.trim();
+
+        user.timeZone = "UTC";
+        user.status = UserStatus.ACTIVE;
+        user.emailVerifiedAt = now;
+        user.failedLoginAttempts = 0;
+        user.createdAt = now;
+        user.updatedAt = now;
+
+        return user;
+    }
+
+
     public static User register(
         String email,
         String passwordHash,

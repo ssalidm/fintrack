@@ -33,6 +33,7 @@ import java.util.UUID;
 public class AuthController {
 
     private final RegistrationRequestService registrationRequestService;
+    private final RegistrationCompletionService registrationCompletionService;
     private final UserRegistrationService registrationService;
     private final AuthenticationService authenticationService;
     private final EmailVerificationService emailVerificationService;
@@ -62,6 +63,26 @@ public class AuthController {
                 )
             );
     }
+
+
+    @PostMapping("/registration/complete")
+    public ResponseEntity<ApiResponse<Void>>
+    completeRegistration(
+        @Valid
+        @RequestBody
+        CompleteRegistrationRequest request
+    ) {
+        registrationCompletionService.complete(request);
+
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(ApiResponse.success(
+                    HttpStatus.CREATED,
+                    ApiMessage.Auth.REGISTRATION_COMPLETED
+                )
+            );
+    }
+
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<RegisterResponse>> register(
