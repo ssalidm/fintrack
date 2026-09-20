@@ -12,6 +12,7 @@ public final class ApiMessage {
         private Auth() {
         }
 
+        public static final String REGISTRATION_STARTED = "If this email can be used to create an account, a registration link will be sent";
         public static final String REGISTER_SUCCESS = "User registered successfully";
         public static final String LOGIN_SUCCESS = "Login successful";
         public static final String LOGOUT_SUCCESS = "Logged out successfully";

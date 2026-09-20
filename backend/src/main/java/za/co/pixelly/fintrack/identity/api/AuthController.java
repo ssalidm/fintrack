@@ -12,10 +12,7 @@ import za.co.pixelly.fintrack.common.api.ApiResponse;
 import za.co.pixelly.fintrack.common.security.CurrentSessionId;
 import za.co.pixelly.fintrack.common.security.CurrentUserId;
 import za.co.pixelly.fintrack.common.security.CurrentUserRoles;
-import za.co.pixelly.fintrack.identity.application.AuthenticationService;
-import za.co.pixelly.fintrack.identity.application.EmailVerificationService;
-import za.co.pixelly.fintrack.identity.application.PasswordResetService;
-import za.co.pixelly.fintrack.identity.application.UserRegistrationService;
+import za.co.pixelly.fintrack.identity.application.*;
 import za.co.pixelly.fintrack.identity.application.emailchange.EmailChangeService;
 import za.co.pixelly.fintrack.identity.application.mfa.MfaLoginService;
 import za.co.pixelly.fintrack.identity.application.mfa.MfaManagementService;
@@ -35,6 +32,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuthController {
 
+    private final RegistrationRequestService registrationRequestService;
     private final UserRegistrationService registrationService;
     private final AuthenticationService authenticationService;
     private final EmailVerificationService emailVerificationService;
@@ -43,6 +41,27 @@ public class AuthController {
     private final MfaLoginService mfaLoginService;
     private final MfaManagementService mfaManagementService;
     private final EmailChangeService emailChangeService;
+
+
+    @PostMapping("/registration/start")
+    public ResponseEntity<ApiResponse<Void>>
+    startRegistration(
+        @Valid
+        @RequestBody
+        StartRegistrationRequest request
+    ) {
+        registrationRequestService.start(
+            request.email()
+        );
+
+        return ResponseEntity
+            .status(HttpStatus.ACCEPTED)
+            .body(ApiResponse.success(
+                    HttpStatus.ACCEPTED,
+                    ApiMessage.Auth.REGISTRATION_STARTED
+                )
+            );
+    }
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<RegisterResponse>> register(

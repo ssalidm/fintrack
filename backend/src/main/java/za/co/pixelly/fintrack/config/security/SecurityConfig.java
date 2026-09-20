@@ -57,6 +57,7 @@ public class SecurityConfig {
 
                 .requestMatchers(
                     HttpMethod.POST,
+                    apiPrefix + "/auth/registration/start",
                     apiPrefix + "/auth/register",
                     apiPrefix + "/auth/login",
                     apiPrefix + "/auth/google",
