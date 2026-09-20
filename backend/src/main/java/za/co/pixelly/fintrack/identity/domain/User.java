@@ -42,6 +42,12 @@ public class User {
     private String lastName;
 
     @Column(
+        name = "preferred_name",
+        length = 100
+    )
+    private String preferredName;
+
+    @Column(
         name = "time_zone",
         nullable = false,
         length = 64
@@ -267,22 +273,28 @@ public class User {
         String lastName,
         String timeZone
     ) {
-        if (
-            firstName != null
-        ) {
+        if (firstName != null) {
             this.firstName = firstName.trim();
         }
 
-        if (
-            lastName != null
-        ) {
+        if (lastName != null) {
             this.lastName = lastName.trim();
         }
 
-        if (
-            timeZone != null
-        ) {
+        if (timeZone != null) {
             this.timeZone = timeZone.trim();
+        }
+    }
+
+    public void updatePreferredName(
+        String preferredName,
+        Instant now
+    ) {
+        if (preferredName == null
+            || preferredName.isBlank()) {
+            this.preferredName = null;
+        } else {
+            this.preferredName = preferredName.trim();
         }
     }
 
