@@ -66,6 +66,7 @@ public class DefaultUserProfileService implements UserProfileService {
         user.updateProfile(
             request.firstName(),
             request.lastName(),
+            request.preferredName(),
             request.timeZone()
         );
 

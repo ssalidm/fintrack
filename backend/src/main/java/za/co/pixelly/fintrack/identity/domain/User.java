@@ -271,6 +271,7 @@ public class User {
     public void updateProfile(
         String firstName,
         String lastName,
+        String preferredName,
         String timeZone
     ) {
         if (firstName != null) {
@@ -281,20 +282,15 @@ public class User {
             this.lastName = lastName.trim();
         }
 
+        if (preferredName != null) {
+            this.preferredName =
+                preferredName.isBlank()
+                    ? null
+                    : preferredName.trim();
+        }
+
         if (timeZone != null) {
             this.timeZone = timeZone.trim();
-        }
-    }
-
-    public void updatePreferredName(
-        String preferredName,
-        Instant now
-    ) {
-        if (preferredName == null
-            || preferredName.isBlank()) {
-            this.preferredName = null;
-        } else {
-            this.preferredName = preferredName.trim();
         }
     }
 
