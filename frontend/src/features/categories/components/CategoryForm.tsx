@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
+
 import type { Category } from '../api/types'
 import {
   useCreateCategory,
@@ -17,13 +18,20 @@ interface CategoryFormProps {
   onSuccess: () => void
 }
 
+const fieldClasses =
+  'w-full rounded-xl border border-line bg-surface px-4 py-3 text-ink outline-none transition placeholder:text-subtle focus:border-accent focus:ring-2 focus:ring-accent/10 disabled:bg-surface-muted disabled:text-muted'
+
 function getDefaultValues(
   category?: Category | null,
 ): CategoryFormValues {
   return {
-    name: category?.name ?? '',
-    categoryType: category?.categoryType ?? 'EXPENSE',
-    displayOrder: category?.displayOrder ?? 0,
+    name:
+      category?.name ?? '',
+    categoryType:
+      category?.categoryType ??
+      'EXPENSE',
+    displayOrder:
+      category?.displayOrder ?? 0,
   }
 }
 
@@ -32,60 +40,101 @@ export default function CategoryForm({
   onCancel,
   onSuccess,
 }: CategoryFormProps) {
-  const createCategory = useCreateCategory()
-  const updateCategory = useUpdateCategory()
+  const createCategory =
+    useCreateCategory()
 
-  const isEditing = Boolean(category)
-  const isTemplateCategory = Boolean(category?.templateCode)
+  const updateCategory =
+    useUpdateCategory()
+
+  const isEditing =
+    Boolean(category)
+
+  const isTemplateCategory =
+    Boolean(
+      category?.templateCode,
+    )
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
-  } = useForm<CategoryFormValues>({
-    resolver: zodResolver(categorySchema),
-    defaultValues: getDefaultValues(category),
-  })
+    formState: {
+      errors,
+    },
+  } =
+    useForm<CategoryFormValues>(
+      {
+        resolver: zodResolver(
+          categorySchema,
+        ),
+        defaultValues:
+          getDefaultValues(
+            category,
+          ),
+      },
+    )
 
   useEffect(() => {
-    reset(getDefaultValues(category))
-  }, [category, reset])
+    reset(
+      getDefaultValues(
+        category,
+      ),
+    )
+  }, [
+    category,
+    reset,
+  ])
 
-  const mutation = isEditing
-    ? updateCategory
-    : createCategory
+  const mutation =
+    isEditing
+      ? updateCategory
+      : createCategory
 
-  async function onSubmit(values: CategoryFormValues) {
+  async function onSubmit(
+    values: CategoryFormValues,
+  ) {
     try {
       if (category) {
-        await updateCategory.mutateAsync({
-          categoryId: category.id,
-          request: {
-            version: category.version,
-            name: values.name,
-            displayOrder: values.displayOrder,
-            categoryType: isTemplateCategory
-              ? undefined
-              : values.categoryType,
+        await updateCategory.mutateAsync(
+          {
+            categoryId:
+              category.id,
+            request: {
+              version:
+                category.version,
+              name:
+                values.name,
+              displayOrder:
+                values.displayOrder,
+              categoryType:
+                isTemplateCategory
+                  ? undefined
+                  : values.categoryType,
+            },
           },
-        })
+        )
       } else {
-        await createCategory.mutateAsync({
-          name: values.name,
-          categoryType: values.categoryType,
-          displayOrder: values.displayOrder,
-        })
+        await createCategory.mutateAsync(
+          {
+            name:
+              values.name,
+            categoryType:
+              values.categoryType,
+            displayOrder:
+              values.displayOrder,
+          },
+        )
       }
 
       onSuccess()
     } catch {
-      // The mutation exposes the API error in the form.
+      // Mutation exposes the API error below.
     }
   }
 
   const errorMessage =
-    mutation.error instanceof Error
+    mutation.error instanceof
+    Error
       ? mutation.error.message
       : mutation.error
         ? 'Something went wrong. Please try again.'
@@ -94,14 +143,16 @@ export default function CategoryForm({
   return (
     <form
       onSubmit={(event) => {
-        void handleSubmit(onSubmit)(event)
+        void handleSubmit(
+          onSubmit,
+        )(event)
       }}
       className="space-y-5"
     >
       <div>
         <label
           htmlFor="category-name"
-          className="mb-2 block text-sm font-semibold text-[#173c32]"
+          className="type-label mb-2 block"
         >
           Category name
         </label>
@@ -112,12 +163,16 @@ export default function CategoryForm({
           autoComplete="off"
           placeholder="For example, Groceries"
           {...register('name')}
-          className="w-full rounded-xl border border-[#d8d4c9] bg-white px-4 py-3 text-[#173c32] outline-none transition focus:border-[#2b7d67] focus:ring-2 focus:ring-[#2b7d67]/15"
+          className={
+            fieldClasses
+          }
         />
 
         {errors.name && (
-          <p className="mt-2 text-sm text-[#a94d3c]">
-            {errors.name.message}
+          <p className="mt-2 text-sm text-danger">
+            {
+              errors.name.message
+            }
           </p>
         )}
       </div>
@@ -125,7 +180,7 @@ export default function CategoryForm({
       <div>
         <label
           htmlFor="category-type"
-          className="mb-2 block text-sm font-semibold text-[#173c32]"
+          className="type-label mb-2 block"
         >
           Category type
         </label>
@@ -134,33 +189,48 @@ export default function CategoryForm({
           <>
             <input
               type="hidden"
-              {...register('categoryType')}
+              {...register(
+                'categoryType',
+              )}
             />
 
-            <div className="rounded-xl border border-[#d8d4c9] bg-[#f1efe8] px-4 py-3 text-[#5f706a]">
-              {category?.categoryType === 'INCOME'
+            <div className={`${fieldClasses} bg-surface-muted`}>
+              {category
+                ?.categoryType ===
+              'INCOME'
                 ? 'Income'
                 : 'Expense'}
             </div>
 
-            <p className="mt-2 text-xs leading-5 text-[#6d7974]">
-              The type of a default Salif category cannot be changed.
+            <p className="type-caption mt-2">
+              The type of a default
+              Salif category cannot
+              be changed.
             </p>
           </>
         ) : (
           <select
             id="category-type"
-            {...register('categoryType')}
-            className="w-full rounded-xl border border-[#d8d4c9] bg-white px-4 py-3 text-[#173c32] outline-none transition focus:border-[#2b7d67] focus:ring-2 focus:ring-[#2b7d67]/15"
+            {...register(
+              'categoryType',
+            )}
+            className={`${fieldClasses} cursor-pointer pr-10`}
           >
-            <option value="EXPENSE">Expense</option>
-            <option value="INCOME">Income</option>
+            <option value="EXPENSE">
+              Expense
+            </option>
+            <option value="INCOME">
+              Income
+            </option>
           </select>
         )}
 
         {errors.categoryType && (
-          <p className="mt-2 text-sm text-[#a94d3c]">
-            {errors.categoryType.message}
+          <p className="mt-2 text-sm text-danger">
+            {
+              errors.categoryType
+                .message
+            }
           </p>
         )}
       </div>
@@ -168,7 +238,7 @@ export default function CategoryForm({
       <div>
         <label
           htmlFor="category-display-order"
-          className="mb-2 block text-sm font-semibold text-[#173c32]"
+          className="type-label mb-2 block"
         >
           Display order
         </label>
@@ -179,20 +249,35 @@ export default function CategoryForm({
           min={0}
           max={32767}
           step={1}
-          {...register('displayOrder', {
-            setValueAs: (value) =>
-              value === '' ? 0 : Number(value),
-          })}
-          className="w-full rounded-xl border border-[#d8d4c9] bg-white px-4 py-3 text-[#173c32] outline-none transition focus:border-[#2b7d67] focus:ring-2 focus:ring-[#2b7d67]/15"
+          {...register(
+            'displayOrder',
+            {
+              setValueAs: (
+                value,
+              ) =>
+                value === ''
+                  ? 0
+                  : Number(
+                      value,
+                    ),
+            },
+          )}
+          className={
+            fieldClasses
+          }
         />
 
-        <p className="mt-2 text-xs leading-5 text-[#6d7974]">
-          Lower numbers appear first in category lists.
+        <p className="type-caption mt-2">
+          Lower numbers appear first
+          in category lists.
         </p>
 
         {errors.displayOrder && (
-          <p className="mt-2 text-sm text-[#a94d3c]">
-            {errors.displayOrder.message}
+          <p className="mt-2 text-sm text-danger">
+            {
+              errors.displayOrder
+                .message
+            }
           </p>
         )}
       </div>
@@ -200,26 +285,30 @@ export default function CategoryForm({
       {errorMessage && (
         <div
           role="alert"
-          className="rounded-xl border border-[#e8c8bf] bg-[#fff4f1] px-4 py-3 text-sm text-[#8f3f30]"
+          className="rounded-xl border border-danger/20 bg-danger-soft px-4 py-3 text-sm text-danger"
         >
           {errorMessage}
         </div>
       )}
 
-      <div className="flex justify-end gap-3 border-t border-[#e2ded4] pt-5">
+      <div className="flex justify-end gap-3 border-t border-line pt-5">
         <button
           type="button"
           onClick={onCancel}
-          disabled={mutation.isPending}
-          className="cursor-pointer rounded-full border border-[#cbc7bc] px-5 py-2.5 text-sm font-semibold text-[#173c32] transition hover:bg-[#efede6] disabled:cursor-not-allowed disabled:opacity-60"
+          disabled={
+            mutation.isPending
+          }
+          className="cursor-pointer rounded-full border border-line bg-surface px-5 py-2.5 text-sm font-semibold text-ink transition hover:bg-surface-muted disabled:cursor-not-allowed disabled:opacity-60"
         >
           Cancel
         </button>
 
         <button
           type="submit"
-          disabled={mutation.isPending}
-          className="cursor-pointer rounded-full bg-[#174f43] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#216555] disabled:cursor-not-allowed disabled:opacity-60"
+          disabled={
+            mutation.isPending
+          }
+          className="cursor-pointer rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-inverse transition hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60"
         >
           {mutation.isPending
             ? 'Saving…'

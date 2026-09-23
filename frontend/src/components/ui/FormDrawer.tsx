@@ -10,6 +10,7 @@ interface FormDrawerProps {
   description: string
   onClose: () => void
   children: ReactNode
+  isPending?: boolean
 }
 
 export default function FormDrawer({
@@ -18,34 +19,39 @@ export default function FormDrawer({
   description,
   onClose,
   children,
+  isPending = false,
 }: FormDrawerProps) {
   const titleId = useId()
-  const descriptionId = useId()
+  const descriptionId =
+    useId()
 
   return (
     <ModalDialog
       labelledBy={titleId}
-      describedBy={descriptionId}
+      describedBy={
+        descriptionId
+      }
+      isPending={isPending}
       onClose={onClose}
       className="overflow-hidden p-0 backdrop:bg-[#102e27]/45 backdrop:backdrop-blur-[2px]"
     >
-      <section className="ml-auto h-full w-full max-w-xl overflow-y-auto overscroll-contain bg-[#f7f5ef] p-6 shadow-2xl sm:p-9">
+      <section className="ml-auto h-full w-full max-w-xl overflow-y-auto overscroll-contain bg-app p-6 shadow-2xl sm:p-9">
         <header className="flex items-start justify-between gap-6">
           <div>
-            <p className="text-xs font-semibold tracking-[0.15em] text-[#657972]">
+            <p className="type-eyebrow">
               {eyebrow}
             </p>
 
             <h2
               id={titleId}
-              className="mt-3 font-serif text-4xl tracking-[-0.03em] text-[#173c32]"
+              className="type-page-title mt-3"
             >
               {title}
             </h2>
 
             <p
               id={descriptionId}
-              className="mt-2 text-sm leading-6 text-[#657972]"
+              className="type-body mt-2"
             >
               {description}
             </p>
@@ -53,15 +59,21 @@ export default function FormDrawer({
 
           <button
             type="button"
+            disabled={isPending}
             onClick={onClose}
-            className="shrink-0 rounded-full border border-[#d8d6ce] p-2 text-[#657972] transition hover:bg-[#ebe9e3] hover:text-[#173c32] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#173c32]"
+            className="grid size-9 shrink-0 cursor-pointer place-items-center rounded-full border border-line bg-surface text-muted transition hover:bg-surface-muted hover:text-ink disabled:cursor-not-allowed disabled:opacity-60"
             aria-label="Close"
           >
-            <X size={20} aria-hidden />
+            <X
+              size={18}
+              aria-hidden
+            />
           </button>
         </header>
 
-        <div className="mt-9">{children}</div>
+        <div className="mt-9">
+          {children}
+        </div>
       </section>
     </ModalDialog>
   )

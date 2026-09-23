@@ -213,7 +213,7 @@ export default function DashboardTopBar() {
     >
       <header
         className="
-          flex h-14
+          flex h-16
           items-center
           justify-between
           rounded-bl-2xl

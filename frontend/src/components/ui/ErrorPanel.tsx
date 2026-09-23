@@ -14,13 +14,19 @@ export default function ErrorPanel({
   return (
     <section
       role="alert"
-      className={`rounded-2xl border border-red-200 bg-red-50 p-6 ${className}`}
+      className={`
+        rounded-2xl
+        border border-danger/20
+        bg-danger-soft
+        p-5
+        ${className}
+      `}
     >
-      <h2 className="font-serif text-2xl text-red-950">
+      <h2 className="text-lg font-semibold tracking-[-0.015em] text-ink">
         {title}
       </h2>
 
-      <p className="mt-2 text-sm text-red-700">
+      <p className="mt-2 text-sm leading-6 text-danger">
         {message}
       </p>
 
@@ -28,7 +34,14 @@ export default function ErrorPanel({
         <button
           type="button"
           onClick={onRetry}
-          className="mt-4 cursor-pointer text-sm font-semibold text-red-800 underline underline-offset-4"
+          className="
+            mt-4
+            cursor-pointer
+            text-sm font-semibold
+            text-danger
+            underline
+            underline-offset-4
+          "
         >
           Try again
         </button>

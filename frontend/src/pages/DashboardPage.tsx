@@ -9,22 +9,19 @@ import { ApiClientError } from '../api/ApiClientError'
 import PageShell from '../components/layout/PageShell'
 import OverviewAccountsPanel from '../features/dashboard/components/overview/OverviewAccountsPanel'
 import OverviewBalancePanel from '../features/dashboard/components/overview/OverviewBalancePanel'
+import OverviewBudgetPanel from '../features/dashboard/components/overview/OverviewBudgetPanel'
 import OverviewCashFlowPanel from '../features/dashboard/components/overview/OverviewCashFlowPanel'
+import OverviewCategorySpendingPanel from '../features/dashboard/components/overview/OverviewCategorySpendingPanel'
 import OverviewPaymentsPanel from '../features/dashboard/components/overview/OverviewPaymentsPanel'
 import OverviewRecentTransactions from '../features/dashboard/components/overview/OverviewRecentTransactions'
+import OverviewSavingsPanel from '../features/dashboard/components/overview/OverviewSavingsPanel'
 import { useDashboardSummary } from '../features/dashboard/hooks/useDashboardSummary'
 import { useProfile } from '../features/profile/hooks/useProfile'
 
 function DashboardSkeleton() {
   return (
     <div
-      className="
-        mt-6
-        grid
-        animate-pulse
-        gap-4
-        xl:grid-cols-[300px_minmax(0,1fr)]
-      "
+      className="mt-6 grid animate-pulse gap-4 xl:grid-cols-[300px_minmax(0,1fr)]"
       aria-hidden
     >
       <div className="space-y-4">
@@ -35,13 +32,21 @@ function DashboardSkeleton() {
       <div className="h-[480px] rounded-2xl bg-surface-strong" />
 
       <div className="h-[390px] rounded-2xl bg-surface-strong xl:col-span-2" />
+
+      <div className="grid gap-4 sm:grid-cols-2 xl:col-span-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="h-72 rounded-2xl bg-surface-strong" />
+          <div className="h-72 rounded-2xl bg-surface-strong" />
+        </div>
+
+        <div className="h-72 rounded-2xl bg-surface-strong" />
+      </div>
     </div>
   )
 }
 
 function greeting() {
-  const hour =
-    new Date().getHours()
+  const hour = new Date().getHours()
 
   if (hour < 12) {
     return 'Good morning'
@@ -63,13 +68,10 @@ export default function DashboardPage() {
     refetch,
   } = useDashboardSummary()
 
-  const { data: profile } =
-    useProfile()
+  const { data: profile } = useProfile()
 
   const name =
-    profile?.preferredName?.trim() ||
-    profile?.firstName ||
-    'there'
+    profile?.preferredName?.trim() || profile?.firstName || 'there'
 
   const errorMessage =
     error instanceof ApiClientError
@@ -79,125 +81,66 @@ export default function DashboardPage() {
   return (
     <PageShell>
       <div className="dashboard-reveal">
-        <h2
-          className="
-            text-2xl
-            font-semibold
-            tracking-[-0.025em]
-            text-ink
-            sm:text-3xl
-          "
-        >
+        <h2 className="text-2xl font-semibold tracking-[-0.025em] text-ink sm:text-3xl">
           {greeting()}, {name}.
         </h2>
 
         <p className="mt-2 text-sm leading-6 text-muted sm:text-base">
-          Here&apos;s where your money
-          stands today.
+          Here&apos;s where your money stands today.
         </p>
       </div>
 
-      {summary &&
-        summary.dueRecurringTransactionCount >
-          0 && (
-          <div
-            className="
-              dashboard-reveal
-              dashboard-reveal-delay-1
-              mt-5
-              flex
-              items-start
-              gap-3
-              rounded-xl
-              border border-warning/20
-              bg-warning-soft/70
-              px-4 py-3
-            "
-          >
-            <AlertTriangle
-              size={16}
-              className="mt-0.5 shrink-0 text-warning"
-              aria-hidden
-            />
+      {summary && summary.dueRecurringTransactionCount > 0 && (
+        <div className="dashboard-reveal dashboard-reveal-delay-1 mt-5 flex items-start gap-3 rounded-xl border border-warning/20 bg-warning-soft/70 px-4 py-3">
+          <AlertTriangle
+            size={16}
+            className="mt-0.5 shrink-0 text-warning"
+            aria-hidden
+          />
 
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-ink">
-                {
-                  summary.dueRecurringTransactionCount
-                }{' '}
-                recurring{' '}
-                {summary.dueRecurringTransactionCount ===
-                1
-                  ? 'payment needs'
-                  : 'payments need'}{' '}
-                your attention.
-              </p>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-ink">
+              {summary.dueRecurringTransactionCount} recurring{' '}
+              {summary.dueRecurringTransactionCount === 1
+                ? 'payment needs'
+                : 'payments need'}{' '}
+              your attention.
+            </p>
 
-              <Link
-                to="/recurring"
-                className="mt-1 inline-flex items-center gap-1.5 text-xs font-semibold text-warning"
-              >
-                Review payments
-
-                <ArrowRight
-                  size={12}
-                  aria-hidden
-                />
-              </Link>
-            </div>
+            <Link
+              to="/recurring"
+              className="mt-1 inline-flex items-center gap-1.5 text-xs font-semibold text-warning"
+            >
+              Review payments
+              <ArrowRight size={12} aria-hidden />
+            </Link>
           </div>
-        )}
-
-      {isPending && (
-        <DashboardSkeleton />
+        </div>
       )}
+
+      {isPending && <DashboardSkeleton />}
 
       {error && (
         <section
-          className="
-            mt-6
-            rounded-xl
-            border border-danger/20
-            bg-danger-soft
-            p-5
-          "
+          className="mt-6 rounded-xl border border-danger/20 bg-danger-soft p-5"
           role="alert"
         >
           <p className="text-sm font-semibold text-danger">
-            We couldn&apos;t load your
-            overview.
+            We couldn&apos;t load your overview.
           </p>
 
-          <p className="mt-1 text-sm text-danger">
-            {errorMessage}
-          </p>
+          <p className="mt-1 text-sm text-danger">{errorMessage}</p>
 
           <button
             type="button"
-            onClick={() =>
-              void refetch()
-            }
-            className="
-              mt-3
-              inline-flex
-              cursor-pointer
-              items-center
-              gap-2
-              text-xs font-semibold
-              text-danger
-              underline
-              underline-offset-4
-            "
+            onClick={() => void refetch()}
+            className="mt-3 inline-flex cursor-pointer items-center gap-2 text-xs font-semibold text-danger underline underline-offset-4"
           >
             Try again
 
             <RefreshCw
               size={13}
-              className={
-                isFetching
-                  ? 'animate-spin'
-                  : ''
-              }
+              className={isFetching ? 'animate-spin' : ''}
               aria-hidden
             />
           </button>
@@ -205,41 +148,29 @@ export default function DashboardPage() {
       )}
 
       {summary && (
-        <div
-          className="
-            dashboard-reveal
-            dashboard-reveal-delay-2
-            mt-6
-            grid
-            gap-4
-            xl:grid-cols-[300px_minmax(0,1fr)]
-          "
-        >
+        <div className="dashboard-reveal dashboard-reveal-delay-2 mt-6 grid gap-4 xl:grid-cols-[300px_minmax(0,1fr)]">
           <div className="space-y-4">
-            <OverviewBalancePanel
-              summary={summary}
-            />
-
+            <OverviewBalancePanel summary={summary} />
             <OverviewAccountsPanel />
           </div>
 
           <OverviewCashFlowPanel />
 
-          <div
-            className="
-              grid
-              gap-4
-              xl:col-span-2
-              xl:grid-cols-[minmax(0,1fr)_320px]
-            "
-          >
+          <div className="grid gap-4 xl:col-span-2 xl:grid-cols-[minmax(0,1fr)_320px]">
             <OverviewRecentTransactions />
 
             <OverviewPaymentsPanel
-              dueTransactions={
-                summary.dueRecurringTransactions
-              }
+              dueTransactions={summary.dueRecurringTransactions}
             />
+          </div>
+
+          <div className="grid gap-4 xl:col-span-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <OverviewSavingsPanel />
+              <OverviewBudgetPanel />
+            </div>
+
+            <OverviewCategorySpendingPanel />
           </div>
         </div>
       )}

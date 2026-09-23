@@ -16,8 +16,13 @@ import {
 } from 'lucide-react'
 
 import { ApiClientError } from '../../../api/ApiClientError'
+import RefreshButton from '../../../components/actions/RefreshButton'
 import PageHeader from '../../../components/layout/PageHeader'
 import PageShell from '../../../components/layout/PageShell'
+import StatusTabs from '../../../components/navigation/StatusTabs'
+import EmptyState from '../../../components/ui/EmptyState'
+import ErrorPanel from '../../../components/ui/ErrorPanel'
+import { formatMoney } from '../../../utils/formatters'
 import type {
   SavingsGoal,
   SavingsGoalStatus,
@@ -33,7 +38,6 @@ import {
   useCompleteGoal,
   useGoals,
 } from '../hooks/useGoals'
-import RefreshButton from '../../../components/actions/RefreshButton'
 
 const statusOptions = [
   {
@@ -53,19 +57,14 @@ const statusOptions = [
   label: string
 }>
 
-function formatMoney(
-  amount: number,
-  currencyCode: string,
+function parseLocalDate(
+  value: string,
 ) {
-  return new Intl.NumberFormat('en-ZA', {
-    style: 'currency',
-    currency: currencyCode,
-    maximumFractionDigits: 2,
-  }).format(amount)
-}
-
-function parseLocalDate(value: string) {
-  const [year, month, day] = value
+  const [
+    year,
+    month,
+    day,
+  ] = value
     .split('-')
     .map(Number)
 
@@ -86,11 +85,17 @@ function formatTargetDate(
       month: 'short',
       year: 'numeric',
     },
-  ).format(parseLocalDate(value))
+  ).format(
+    parseLocalDate(value),
+  )
 }
 
-function daysUntil(value: string) {
-  const target = parseLocalDate(value)
+function daysUntil(
+  value: string,
+) {
+  const target =
+    parseLocalDate(value)
+
   const now = new Date()
 
   const today = new Date(
@@ -136,7 +141,10 @@ interface ActionTarget {
 }
 
 export default function GoalsPage() {
-  const [status, setStatus] =
+  const [
+    status,
+    setStatus,
+  ] =
     useState<SavingsGoalStatus>(
       'ACTIVE',
     )
@@ -149,64 +157,84 @@ export default function GoalsPage() {
   const [
     editingGoal,
     setEditingGoal,
-  ] = useState<SavingsGoal | null>(
-    null,
-  )
+  ] =
+    useState<SavingsGoal | null>(
+      null,
+    )
 
   const [
     contributionGoal,
     setContributionGoal,
-  ] = useState<SavingsGoal | null>(
-    null,
-  )
+  ] =
+    useState<SavingsGoal | null>(
+      null,
+    )
 
   const [
     actionTarget,
     setActionTarget,
-  ] = useState<ActionTarget | null>(
-    null,
-  )
+  ] =
+    useState<ActionTarget | null>(
+      null,
+    )
 
   const [
     actionError,
     setActionError,
-  ] = useState<string | null>(null)
+  ] = useState<string | null>(
+    null,
+  )
 
   const [
     historyGoalId,
     setHistoryGoalId,
-  ] = useState<string | null>(null)
+  ] = useState<string | null>(
+    null,
+  )
 
-  const goalsQuery = useGoals(status)
+  const goalsQuery =
+    useGoals(status)
+
   const completeGoal =
     useCompleteGoal()
+
   const archiveGoal =
     useArchiveGoal()
 
   const goals = useMemo(
-    () => goalsQuery.data ?? [],
+    () =>
+      goalsQuery.data ?? [],
     [goalsQuery.data],
   )
 
-  const historyGoal = useMemo(
-    () =>
-      goals.find(
-        (goal) =>
-          goal.id ===
-          historyGoalId,
-      ) ?? null,
-    [goals, historyGoalId],
-  )
+  const historyGoal =
+    useMemo(
+      () =>
+        goals.find(
+          (goal) =>
+            goal.id ===
+            historyGoalId,
+        ) ?? null,
+      [
+        goals,
+        historyGoalId,
+      ],
+    )
 
   const averageProgress =
     useMemo(() => {
-      if (goals.length === 0) {
+      if (
+        goals.length === 0
+      ) {
         return 0
       }
 
       const totalProgress =
         goals.reduce(
-          (total, goal) =>
+          (
+            total,
+            goal,
+          ) =>
             total +
             Math.min(
               goal.progressPercentage,
@@ -217,43 +245,72 @@ export default function GoalsPage() {
 
       return Math.round(
         totalProgress /
-        goals.length,
+          goals.length,
       )
     }, [goals])
 
+  const nearestGoal =
+    useMemo(
+      () =>
+        goals
+          .filter(
+            (goal) =>
+              goal.targetDate !==
+              null,
+          )
+          .toSorted(
+            (
+              left,
+              right,
+            ) =>
+              left.targetDate!.localeCompare(
+                right.targetDate!,
+              ),
+          )[0],
+      [goals],
+    )
+
   const momentumMessage =
     useMemo(() => {
-      if (status === 'COMPLETED') {
-        if (goals.length === 0) {
-          return 'Finished goals will become milestones here.'
-        }
-
-        if (goals.length === 1) {
-          return 'One promise to yourself, kept.'
-        }
-
-        return 'A growing record of promises kept.'
+      if (
+        status === 'COMPLETED'
+      ) {
+        return goals.length === 0
+          ? 'Finished goals will become milestones here.'
+          : goals.length === 1
+            ? 'One promise to yourself, kept.'
+            : 'A growing record of promises kept.'
       }
 
-      if (status === 'ARCHIVED') {
+      if (
+        status === 'ARCHIVED'
+      ) {
         return goals.length === 0
           ? 'Nothing tucked away yet.'
           : 'Past plans, kept for perspective.'
       }
 
-      if (goals.length === 0) {
+      if (
+        goals.length === 0
+      ) {
         return 'A fresh page for your next plan.'
       }
 
-      if (averageProgress >= 100) {
+      if (
+        averageProgress >= 100
+      ) {
         return 'A target has been reached—time to celebrate it.'
       }
 
-      if (averageProgress >= 75) {
+      if (
+        averageProgress >= 75
+      ) {
         return 'The finish line is getting close.'
       }
 
-      if (averageProgress >= 35) {
+      if (
+        averageProgress >= 35
+      ) {
         return 'Small steps are building something real.'
       }
 
@@ -263,22 +320,6 @@ export default function GoalsPage() {
       goals.length,
       status,
     ])
-
-  const nearestGoal = useMemo(
-    () =>
-      goals
-        .filter(
-          (goal) =>
-            goal.targetDate !== null,
-        )
-        .toSorted(
-          (left, right) =>
-            left.targetDate!.localeCompare(
-              right.targetDate!,
-            ),
-        )[0],
-    [goals],
-  )
 
   function openCreateGoal() {
     setEditingGoal(null)
@@ -302,7 +343,6 @@ export default function GoalsPage() {
     action: GoalAction,
   ) {
     setActionError(null)
-
     setActionTarget({
       goal,
       action,
@@ -321,31 +361,36 @@ export default function GoalsPage() {
         actionTarget.action ===
         'complete'
       ) {
-        await completeGoal.mutateAsync({
-          goalId:
-            actionTarget.goal.id,
-
-          payload: {
-            version:
-              actionTarget.goal.version,
+        await completeGoal.mutateAsync(
+          {
+            goalId:
+              actionTarget.goal.id,
+            payload: {
+              version:
+                actionTarget.goal
+                  .version,
+            },
           },
-        })
+        )
       } else {
-        await archiveGoal.mutateAsync({
-          goalId:
-            actionTarget.goal.id,
-
-          payload: {
-            version:
-              actionTarget.goal.version,
+        await archiveGoal.mutateAsync(
+          {
+            goalId:
+              actionTarget.goal.id,
+            payload: {
+              version:
+                actionTarget.goal
+                  .version,
+            },
           },
-        })
+        )
       }
 
       setActionTarget(null)
     } catch (error) {
       setActionError(
-        error instanceof ApiClientError
+        error instanceof
+        ApiClientError
           ? error.message
           : 'Unable to update this goal.',
       )
@@ -365,16 +410,22 @@ export default function GoalsPage() {
         actions={
           <>
             <RefreshButton
-              isRefreshing={goalsQuery.isFetching}
-              onRefresh={goalsQuery.refetch}
+              isRefreshing={
+                goalsQuery.isFetching
+              }
+              onRefresh={
+                goalsQuery.refetch
+              }
               label="Refresh goals"
               iconOnly
             />
 
             <button
               type="button"
-              onClick={openCreateGoal}
-              className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#236a58]"
+              onClick={
+                openCreateGoal
+              }
+              className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-inverse transition hover:bg-primary-hover"
             >
               <Plus
                 size={18}
@@ -387,84 +438,80 @@ export default function GoalsPage() {
         }
       />
 
-      <section className="feature-reveal feature-reveal-delay-1 mt-9 grid overflow-hidden rounded-3xl border border-[#d8ded8] bg-[#eaf0e9] md:grid-cols-[1.35fr_0.8fr_0.9fr]">
-        <div className="p-6 sm:p-7">
-          <div className="flex items-start gap-4">
-            <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#cfe1d5] text-[#39725d]">
+      <section className="feature-reveal feature-reveal-delay-1 mt-10 grid overflow-hidden rounded-2xl border border-line/50 bg-surface sm:grid-cols-3">
+        <div className="p-5 sm:col-span-1 sm:p-6">
+          <div className="flex items-start gap-3">
+            <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent">
               <Sparkles
-                size={20}
+                size={18}
                 aria-hidden
               />
             </span>
 
             <div>
-              <p className="text-xs font-semibold tracking-[0.14em] text-[#657972]">
-                YOUR MOMENTUM
+              <p className="type-eyebrow">
+                Momentum
               </p>
 
-              <p className="mt-2 font-serif text-2xl text-[#173c32]">
-                {momentumMessage}
+              <p className="mt-2 text-base font-semibold leading-6 text-ink">
+                {
+                  momentumMessage
+                }
               </p>
             </div>
           </div>
         </div>
 
-        <div className="border-t border-[#d4ddd5] p-6 sm:p-7 md:border-l md:border-t-0">
-          <p className="text-xs font-semibold tracking-[0.13em] text-[#657972]">
-            AVERAGE PROGRESS
+        <div className="border-t border-line/50 p-5 sm:border-l sm:border-t-0 sm:p-6">
+          <p className="type-eyebrow">
+            Average progress
           </p>
 
-          <div className="mt-3 flex items-end gap-3">
-            <p className="font-serif text-4xl text-[#173c32]">
-              {averageProgress}%
+          <div className="mt-2 flex items-end gap-2">
+            <p className="text-3xl font-semibold tracking-[-0.03em] text-ink">
+              {
+                averageProgress
+              }
+              %
             </p>
 
             <TrendingUp
-              size={19}
+              size={17}
+              className="mb-1 text-success"
               aria-hidden
-              className="mb-1.5 text-[#56836f]"
             />
           </div>
         </div>
 
-        <div className="border-t border-[#d4ddd5] p-6 sm:p-7 md:border-l md:border-t-0">
-          <p className="text-xs font-semibold tracking-[0.13em] text-[#657972]">
-            NEAREST TARGET
+        <div className="border-t border-line/50 p-5 sm:border-l sm:border-t-0 sm:p-6">
+          <p className="type-eyebrow">
+            Nearest target
           </p>
 
-          <p className="mt-3 truncate font-semibold text-[#173c32]">
+          <p className="mt-2 truncate text-sm font-semibold text-ink">
             {nearestGoal?.name ??
               'No date set'}
           </p>
 
-          <p className="mt-1 text-xs text-[#657972]">
+          <p className="mt-1 text-xs text-muted">
             {nearestGoal
               ? deadlineCopy(
-                nearestGoal.targetDate,
-              )
+                  nearestGoal.targetDate,
+                )
               : 'Choose dates only when they help.'}
           </p>
         </div>
       </section>
 
-      <div className="feature-reveal feature-reveal-delay-2 mt-9 flex gap-7 border-b border-[#dedbd2]">
-        {statusOptions.map(
-          (option) => (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() =>
-                setStatus(option.value)
-              }
-              className={`cursor-pointer border-b-2 px-1 pb-4 text-sm font-semibold transition ${status === option.value
-                  ? 'border-[#39725d] text-[#173c32]'
-                  : 'border-transparent text-[#7a8984] hover:text-[#173c32]'
-                }`}
-            >
-              {option.label}
-            </button>
-          ),
-        )}
+      <div className="feature-reveal feature-reveal-delay-2 mt-8">
+        <StatusTabs
+          value={status}
+          options={
+            statusOptions
+          }
+          onChange={setStatus}
+          ariaLabel="Goal status"
+        />
       </div>
 
       {goalsQuery.isPending && (
@@ -473,7 +520,7 @@ export default function GoalsPage() {
             (item) => (
               <div
                 key={item}
-                className="h-72 rounded-3xl bg-[#e5e8e1]"
+                className="h-64 rounded-2xl border border-line/50 bg-surface-muted/50"
               />
             ),
           )}
@@ -481,135 +528,127 @@ export default function GoalsPage() {
       )}
 
       {goalsQuery.error && (
-        <section
-          role="alert"
-          className="feature-reveal feature-reveal-delay-3 mt-8 rounded-2xl border border-red-200 bg-red-50 p-6"
-        >
-          <h2 className="font-serif text-2xl text-red-950">
-            We couldn’t load your goals
-          </h2>
-
-          <p className="mt-2 text-sm text-red-700">
-            {goalsQuery.error instanceof
-              ApiClientError
-              ? goalsQuery.error.message
-              : 'Please try again.'}
-          </p>
-
-          <button
-            type="button"
-            onClick={() =>
-              void goalsQuery.refetch()
-            }
-            className="mt-4 cursor-pointer text-sm font-semibold text-red-800 underline underline-offset-4"
-          >
-            Try again
-          </button>
-        </section>
+        <ErrorPanel
+          title="We couldn’t load your goals"
+          message={
+            goalsQuery.error instanceof
+            ApiClientError
+              ? goalsQuery.error
+                  .message
+              : 'Please try again.'
+          }
+          onRetry={() =>
+            void goalsQuery.refetch()
+          }
+          className="feature-reveal feature-reveal-delay-3 mt-8"
+        />
       )}
 
       {!goalsQuery.isPending &&
         !goalsQuery.error &&
         goals.length === 0 && (
-          <section className="feature-reveal feature-reveal-delay-3 mt-8 rounded-3xl border border-[#dedbd2] bg-[#fffdf8] px-6 py-16 text-center">
-            <span className="mx-auto grid size-14 place-items-center rounded-full bg-[#f2e7ca] text-[#9a6828]">
+          <EmptyState
+            icon={
               <Target
-                size={25}
+                size={22}
                 aria-hidden
               />
-            </span>
-
-            <h2 className="mt-5 font-serif text-3xl text-[#173c32]">
-              {status === 'ACTIVE'
+            }
+            title={
+              status === 'ACTIVE'
                 ? 'What are you making room for?'
                 : status ===
-                  'COMPLETED'
+                    'COMPLETED'
                   ? 'No completed goals yet'
-                  : 'No archived goals'}
-            </h2>
-
-            <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-[#657972]">
-              {status === 'ACTIVE'
+                  : 'No archived goals'
+            }
+            description={
+              status === 'ACTIVE'
                 ? 'Start with something meaningful. The amount can be practical; the reason should feel personal.'
-                : 'Goals in this stage will stay here with their history intact.'}
-            </p>
-
-            {status ===
-              'ACTIVE' && (
+                : 'Goals in this stage will stay here with their history intact.'
+            }
+            action={
+              status ===
+              'ACTIVE' ? (
                 <button
                   type="button"
                   onClick={
                     openCreateGoal
                   }
-                  className="mt-7 inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#236a58]"
+                  className="mt-5 inline-flex cursor-pointer items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-inverse transition hover:bg-primary-hover"
                 >
                   <Plus
-                    size={18}
+                    size={16}
                     aria-hidden
                   />
 
-                  Create your first goal
+                  Create your first
+                  goal
                 </button>
-              )}
-          </section>
+              ) : undefined
+            }
+            variant="solid"
+            className="feature-reveal feature-reveal-delay-3 mt-8"
+          />
         )}
 
       {!goalsQuery.isPending &&
         !goalsQuery.error &&
         goals.length > 0 && (
           <section className="feature-reveal feature-reveal-delay-3 mt-8 grid gap-5 md:grid-cols-2">
-            {goals.map((goal) => {
-              const displayedProgress =
-                Math.min(
-                  goal.progressPercentage,
-                  100,
-                )
+            {goals.map(
+              (goal) => {
+                const displayedProgress =
+                  Math.min(
+                    goal.progressPercentage,
+                    100,
+                  )
 
-              const targetReached =
-                goal.currentAmount >=
-                goal.targetAmount
+                const targetReached =
+                  goal.currentAmount >=
+                  goal.targetAmount
 
-              return (
-                <article
-                  key={goal.id}
-                  className="flex min-h-72 flex-col rounded-3xl border border-[#dedbd2] bg-[#fffdf8] p-6 sm:p-7"
-                >
-                  <div className="flex items-start justify-between gap-5">
-                    <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[#e3eee7] text-[#39725d]">
-                      {goal.status ===
+                return (
+                  <article
+                    key={goal.id}
+                    className="flex min-h-64 flex-col rounded-2xl border border-line/50 bg-surface p-5 shadow-[0_10px_30px_rgba(23,60,50,0.03)] sm:p-6"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent">
+                        {goal.status ===
                         'COMPLETED' ? (
-                        <CheckCircle2
-                          size={21}
-                          aria-hidden
-                        />
-                      ) : (
-                        <Target
-                          size={21}
-                          aria-hidden
-                        />
-                      )}
-                    </span>
+                          <CheckCircle2
+                            size={18}
+                            aria-hidden
+                          />
+                        ) : (
+                          <Target
+                            size={18}
+                            aria-hidden
+                          />
+                        )}
+                      </span>
 
-                    <div className="flex items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setHistoryGoalId(
-                            goal.id,
-                          )
-                        }
-                        className="cursor-pointer rounded-full p-2 text-[#657972] transition hover:bg-[#edf2ee] hover:text-[#39725d]"
-                        aria-label={`View contribution history for ${goal.name}`}
-                        title="Contribution history"
-                      >
-                        <History
-                          size={17}
-                          aria-hidden
-                        />
-                      </button>
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setHistoryGoalId(
+                              goal.id,
+                            )
+                          }
+                          className="grid size-8 cursor-pointer place-items-center rounded-full text-muted transition hover:bg-surface-muted hover:text-primary"
+                          aria-label={`View contribution history for ${goal.name}`}
+                          title="Contribution history"
+                        >
+                          <History
+                            size={15}
+                            aria-hidden
+                          />
+                        </button>
 
-                      {goal.status ===
-                        'ACTIVE' && (
+                        {goal.status ===
+                          'ACTIVE' && (
                           <button
                             type="button"
                             onClick={() =>
@@ -617,19 +656,19 @@ export default function GoalsPage() {
                                 goal,
                               )
                             }
-                            className="cursor-pointer rounded-full p-2 text-[#657972] transition hover:bg-[#edf2ee] hover:text-[#39725d]"
+                            className="grid size-8 cursor-pointer place-items-center rounded-full text-muted transition hover:bg-accent-soft hover:text-accent"
                             aria-label={`Edit ${goal.name}`}
                             title="Edit goal"
                           >
                             <Pencil
-                              size={17}
+                              size={15}
                               aria-hidden
                             />
                           </button>
                         )}
 
-                      {goal.status !==
-                        'ARCHIVED' && (
+                        {goal.status !==
+                          'ARCHIVED' && (
                           <button
                             type="button"
                             onClick={() =>
@@ -638,97 +677,97 @@ export default function GoalsPage() {
                                 'archive',
                               )
                             }
-                            className="cursor-pointer rounded-full p-2 text-[#657972] transition hover:bg-[#f2e7df] hover:text-[#9b5845]"
+                            className="grid size-8 cursor-pointer place-items-center rounded-full text-muted transition hover:bg-danger-soft hover:text-danger"
                             aria-label={`Archive ${goal.name}`}
                             title="Archive goal"
                           >
                             <Archive
-                              size={17}
+                              size={15}
                               aria-hidden
                             />
                           </button>
                         )}
+                      </div>
                     </div>
-                  </div>
 
-                  <h2 className="mt-5 font-serif text-3xl tracking-[-0.02em] text-[#173c32]">
-                    {goal.name}
-                  </h2>
+                    <h2 className="mt-4 text-xl font-semibold tracking-[-0.02em] text-ink">
+                      {goal.name}
+                    </h2>
 
-                  <p className="mt-2 line-clamp-2 min-h-10 text-sm leading-5 text-[#657972]">
-                    {goal.description ??
-                      'A clear destination for steady progress.'}
-                  </p>
+                    <p className="mt-1 line-clamp-2 min-h-10 text-sm leading-5 text-muted">
+                      {goal.description ??
+                        'A clear destination for steady progress.'}
+                    </p>
 
-                  <div className="mt-6">
-                    <div className="flex items-end justify-between gap-4">
-                      <div>
-                        <p className="text-xs text-[#657972]">
-                          Saved so far
-                        </p>
+                    <div className="mt-5">
+                      <div className="flex items-end justify-between gap-4">
+                        <div>
+                          <p className="text-xs text-muted">
+                            Saved so far
+                          </p>
 
-                        <p className="mt-1 font-serif text-2xl text-[#173c32]">
-                          {formatMoney(
-                            goal.currentAmount,
-                            goal.currencyCode,
+                          <p className="mt-1 text-lg font-semibold text-ink">
+                            {formatMoney(
+                              goal.currentAmount,
+                              goal.currencyCode,
+                            )}
+                          </p>
+                        </div>
+
+                        <p className="text-lg font-semibold text-success">
+                          {Math.round(
+                            goal.progressPercentage,
                           )}
+                          %
                         </p>
                       </div>
 
-                      <p className="font-serif text-2xl text-[#39725d]">
-                        {Math.round(
-                          goal.progressPercentage,
-                        )}
-                        %
-                      </p>
+                      <div className="mt-3 h-2 overflow-hidden rounded-full bg-surface-strong">
+                        <div
+                          className="h-full rounded-full bg-accent transition-[width] duration-500"
+                          style={{
+                            width: `${displayedProgress}%`,
+                          }}
+                        />
+                      </div>
+
+                      <div className="mt-2 flex flex-wrap justify-between gap-2 text-xs text-muted">
+                        <span>
+                          {formatMoney(
+                            goal.remainingAmount,
+                            goal.currencyCode,
+                          )}{' '}
+                          to go
+                        </span>
+
+                        <span>
+                          Target{' '}
+                          {formatMoney(
+                            goal.targetAmount,
+                            goal.currencyCode,
+                          )}
+                        </span>
+                      </div>
                     </div>
 
-                    <div className="mt-4 h-2 overflow-hidden rounded-full bg-[#e2e4dc]">
-                      <div
-                        className="h-full rounded-full bg-[#6f9b82] transition-[width] duration-500"
-                        style={{
-                          width: `${displayedProgress}%`,
-                        }}
+                    <div className="mt-4 flex items-center gap-2 text-xs text-muted">
+                      <CalendarDays
+                        size={14}
+                        aria-hidden
                       />
+
+                      {goal.targetDate
+                        ? `${formatTargetDate(
+                            goal.targetDate,
+                          )} · ${deadlineCopy(
+                            goal.targetDate,
+                          )}`
+                        : 'No fixed deadline'}
                     </div>
 
-                    <div className="mt-3 flex flex-wrap justify-between gap-2 text-xs text-[#657972]">
-                      <span>
-                        {formatMoney(
-                          goal.remainingAmount,
-                          goal.currencyCode,
-                        )}{' '}
-                        to go
-                      </span>
-
-                      <span>
-                        Target{' '}
-                        {formatMoney(
-                          goal.targetAmount,
-                          goal.currencyCode,
-                        )}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="mt-5 flex items-center gap-2 text-xs text-[#657972]">
-                    <CalendarDays
-                      size={15}
-                      aria-hidden
-                    />
-
-                    {goal.targetDate
-                      ? `${formatTargetDate(
-                        goal.targetDate,
-                      )} · ${deadlineCopy(
-                        goal.targetDate,
-                      )}`
-                      : 'No fixed deadline'}
-                  </div>
-
-                  {goal.status ===
-                    'ACTIVE' && (
-                      <div className="mt-auto flex flex-wrap items-center gap-3 border-t border-[#e5e1d8] pt-5">
+                    {goal.status ===
+                      'ACTIVE' && (
+                      <div className="mt-auto flex flex-wrap items-center gap-2 border-t border-line/50 pt-4">
                         <button
                           type="button"
                           onClick={() =>
@@ -736,10 +775,10 @@ export default function GoalsPage() {
                               goal,
                             )
                           }
-                          className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#236a58]"
+                          className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-inverse transition hover:bg-primary-hover"
                         >
                           <CircleDollarSign
-                            size={17}
+                            size={16}
                             aria-hidden
                           />
 
@@ -755,10 +794,10 @@ export default function GoalsPage() {
                                 'complete',
                               )
                             }
-                            className="inline-flex cursor-pointer items-center gap-2 rounded-full px-3 py-2.5 text-sm font-semibold text-[#39725d] transition hover:bg-[#edf2ee]"
+                            className="inline-flex cursor-pointer items-center gap-2 rounded-full px-3 py-2.5 text-sm font-semibold text-success transition hover:bg-success-soft"
                           >
                             <CheckCircle2
-                              size={17}
+                              size={16}
                               aria-hidden
                             />
 
@@ -767,9 +806,10 @@ export default function GoalsPage() {
                         )}
                       </div>
                     )}
-                </article>
-              )
-            })}
+                  </article>
+                )
+              },
+            )}
           </section>
         )}
 
@@ -777,7 +817,9 @@ export default function GoalsPage() {
         <ContributionHistoryDrawer
           goal={historyGoal}
           onClose={() =>
-            setHistoryGoalId(null)
+            setHistoryGoalId(
+              null,
+            )
           }
         />
       )}
@@ -785,29 +827,42 @@ export default function GoalsPage() {
       {isGoalModalOpen && (
         <GoalModal
           goal={
-            editingGoal ?? undefined
+            editingGoal ??
+            undefined
           }
-          onClose={closeGoalModal}
+          onClose={
+            closeGoalModal
+          }
         />
       )}
 
       {contributionGoal && (
         <ContributionModal
-          goal={contributionGoal}
+          goal={
+            contributionGoal
+          }
           onClose={() =>
-            setContributionGoal(null)
+            setContributionGoal(
+              null,
+            )
           }
         />
       )}
 
       {actionTarget && (
         <GoalActionDialog
-          goal={actionTarget.goal}
+          goal={
+            actionTarget.goal
+          }
           action={
             actionTarget.action
           }
-          isPending={actionPending}
-          error={actionError}
+          isPending={
+            actionPending
+          }
+          error={
+            actionError
+          }
           onCancel={() =>
             setActionTarget(null)
           }

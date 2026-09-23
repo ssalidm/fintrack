@@ -16,6 +16,7 @@ import PasswordChangedDialog from '../features/profile/components/PasswordChange
 import ProfileAvatarEditor from '../features/profile/components/ProfileAvatarEditor'
 import ProfileDetailsForm from '../features/profile/components/ProfileDetailsForm'
 import ProfileSessions from '../features/profile/components/ProfileSessions'
+import ThemePreferenceSetting from '../features/profile/components/ThemePreferenceSetting'
 import TwoFactorAuthenticationCard from '../features/profile/components/TwoFactorAuthenticationCard'
 import { useProfile } from '../features/profile/hooks/useProfile'
 import { formatDate } from '../utils/dateFormatter'
@@ -108,7 +109,7 @@ export default function ProfilePage() {
   ) {
     const message =
       error instanceof
-      ApiClientError
+        ApiClientError
         ? error.message
         : 'Unable to load your profile.'
 
@@ -152,8 +153,9 @@ export default function ProfilePage() {
           flex-col
           gap-5
           rounded-2xl
-          border border-line/40
-          bg-[#17634898]/25
+          border border-line/50
+          bg-surface
+          shadow-[0_10px_30px_rgba(23,60,50,0.05)]
           p-6
           sm:flex-row
           sm:items-center
@@ -187,11 +189,12 @@ export default function ProfilePage() {
           feature-reveal-delay-2
           mt-10
           rounded-2xl
-          border border-line/40
-          bg-surface/25
+          border border-line/50
+          bg-surface/75
+          shadow-[0_10px_30px_rgba(23,60,50,0.05)]
           p-6
           sm:p-7
-        "
+          "
       >
         <ProfileDetailsForm
           key={profile.version}
@@ -218,6 +221,29 @@ export default function ProfilePage() {
         "
       >
         <SectionHeader
+          title="Appearance"
+          description="Choose how Salif looks on this device."
+        />
+
+        <SettingsList className="mt-5">
+          <ThemePreferenceSetting />
+        </SettingsList>
+      </section>
+
+      <section
+        className="
+        feature-reveal
+        feature-reveal-delay-2
+        mt-8
+        rounded-2xl
+        border border-line/50
+        bg-surface/75
+        shadow-[0_10px_30px_rgba(23,60,50,0.05)]
+          p-6
+          sm:p-7
+        "
+      >
+        <SectionHeader
           title="Security"
           description="Manage how you sign in and protect your Salif account."
         />
@@ -228,9 +254,7 @@ export default function ProfilePage() {
               profile.passwordChangedAt
             }
             onPasswordChanged={() =>
-              setPasswordChanged(
-                true,
-              )
+              setPasswordChanged(true,)
             }
           />
 
@@ -244,8 +268,9 @@ export default function ProfilePage() {
           feature-reveal-delay-3
           mt-8
           rounded-2xl
-          border border-line/40
-          bg-danger/4
+          border border-line/60
+          bg-surface/75
+          shadow-[0_10px_30px_rgba(23,60,50,0.05)]
           p-6
           sm:p-7
         "
@@ -265,7 +290,8 @@ export default function ProfilePage() {
           mt-8
           rounded-2xl
           border border-line/40
-          bg-surface/25
+          bg-surface/75
+          shadow-[0_10px_30px_rgba(23,60,50,0.05)]
           p-6
           sm:p-7
         "
@@ -339,7 +365,7 @@ function AccountRow({
       className="
         grid
         gap-1
-        py-5
+        py-4
         sm:grid-cols-[180px_minmax(0,1fr)]
         sm:items-center
         sm:gap-8

@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Check, LoaderCircle, X } from 'lucide-react'
+import { Check, LoaderCircle, X, Pencil } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -461,8 +461,8 @@ function SettingsRow({
     <div
       className="
         grid
-        gap-3
-        py-5
+        gap-0
+        py-4
         md:grid-cols-[180px_minmax(0,1fr)_auto]
         md:items-center
         md:gap-8
@@ -499,7 +499,7 @@ function SettingsRow({
                 inline-flex
                 items-center
                 gap-1.5
-                rounded-md
+                rounded-full
                 border border-primary
                 bg-primary
                 px-3 py-1.5
@@ -557,18 +557,22 @@ function SettingsRow({
             type="button"
             onClick={onEdit}
             className="
-              rounded-md
-              border border-line-strong
-              bg-surface
-              px-3 py-1.5
-              text-xs font-semibold
-              text-ink
+              grid size-8
+              cursor-pointer
+              place-items-center
+              rounded-full
+              text-muted
               transition
-              hover:border-accent
+              hover:bg-accent-soft
               hover:text-accent
             "
+            aria-label={`Edit ${label}`}
+            title={`Edit ${label}`}
           >
-            Edit
+            <Pencil
+              size={15}
+              aria-hidden
+            />
           </button>
         )}
       </div>

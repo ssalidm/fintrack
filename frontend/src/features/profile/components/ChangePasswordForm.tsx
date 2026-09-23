@@ -141,7 +141,7 @@ function formatPasswordChangedAt(
   return `Last changed — ${formatDate(value, true)}`
 }
 
-const passwordBtnClass = "rounded-md border border-line-strong bg-surface" +
+const passwordBtnClass = "rounded-full border border-line-strong bg-surface" +
               " px-3 py-1.5 text-xs font-semibold text-ink transition" +
               " hover:border-accent  hover:text-accent"
 
@@ -238,7 +238,7 @@ export default function ChangePasswordForm({
         className="
           grid
           gap-3
-          py-5
+          py-4
           md:grid-cols-[180px_minmax(0,1fr)_auto]
           md:items-center
           md:gap-8

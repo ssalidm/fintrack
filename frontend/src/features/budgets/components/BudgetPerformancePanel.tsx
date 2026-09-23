@@ -61,10 +61,10 @@ function categoryTone(
   if (category.exceeded) {
     return {
       label: 'Over limit',
-      text: 'text-[#a5503d]',
+      text: 'text-danger',
       pill:
-        'bg-[#f4e2dc] text-[#954936]',
-      bar: 'bg-[#b85e47]',
+        'bg-danger-soft text-danger',
+      bar: 'bg-danger',
     }
   }
 
@@ -74,19 +74,19 @@ function categoryTone(
   ) {
     return {
       label: 'Close watch',
-      text: 'text-[#8a5f20]',
+      text: 'text-warning',
       pill:
-        'bg-[#f5e8c8] text-[#7b551d]',
-      bar: 'bg-[#c39442]',
+        'bg-warning-soft text-warning',
+      bar: 'bg-warning',
     }
   }
 
   return {
     label: 'On track',
-    text: 'text-[#236a58]',
+    text: 'text-success',
     pill:
-      'bg-[#dfece4] text-[#236a58]',
-    bar: 'bg-[#5f9278]',
+      'bg-success-soft text-success',
+    bar: 'bg-success',
   }
 }
 
@@ -95,7 +95,8 @@ function performanceMessage(
 ) {
   if (
     !performance ||
-    performance.categories.length === 0
+    performance.categories.length ===
+      0
   ) {
     return {
       heading: 'A clean page',
@@ -104,7 +105,9 @@ function performanceMessage(
     }
   }
 
-  if (performance.anyCategoryExceeded) {
+  if (
+    performance.anyCategoryExceeded
+  ) {
     return {
       heading:
         'A little course correction',
@@ -146,47 +149,56 @@ export default function BudgetPerformancePanel({
     budget.status === 'ARCHIVED'
 
   const totalLimit =
-    performance?.totalLimitAmount ?? 0
+    performance?.totalLimitAmount ??
+    0
 
   const totalSpent =
-    performance?.totalSpentAmount ?? 0
+    performance?.totalSpentAmount ??
+    0
 
   const totalRemaining =
-    performance?.totalRemainingAmount ?? 0
+    performance?.totalRemainingAmount ??
+    0
 
   const utilization =
     performance?.utilizationPercentage ??
     0
 
   const message =
-    performanceMessage(performance)
+    performanceMessage(
+      performance,
+    )
 
   if (isError) {
     return (
-      <section className="rounded-[1.75rem] border border-[#e8c8bf] bg-[#fff8f4] p-6 sm:p-8">
+      <section className="rounded-2xl border border-danger/20 bg-danger-soft p-6 sm:p-7">
         <AlertTriangle
-          size={25}
-          className="text-[#a5503d]"
+          size={22}
+          className="text-danger"
           aria-hidden
         />
 
-        <h2 className="mt-5 font-serif text-2xl text-[#173c32]">
-          We could not read this budget
-          yet
+        <h2 className="mt-4 text-xl font-semibold tracking-[-0.02em] text-ink">
+          We could not read this
+          budget yet
         </h2>
 
-        <p className="mt-2 max-w-xl text-sm leading-6 text-[#657972]">
-          The budget itself is safe. Its
-          live spending report could not be
-          loaded.
+        <p className="mt-2 max-w-xl text-sm leading-6 text-muted">
+          The budget itself is safe.
+          Its live spending report
+          could not be loaded.
         </p>
 
         <button
           type="button"
           onClick={onRetry}
-          className="mt-5 inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#d8d6ce] px-5 py-2.5 text-sm font-semibold text-[#173c32] transition hover:bg-[#efede7]"
+          className="mt-5 inline-flex cursor-pointer items-center gap-2 rounded-full border border-line bg-surface px-5 py-2.5 text-sm font-semibold text-ink transition hover:bg-surface-muted"
         >
-          <RefreshCw size={16}/>
+          <RefreshCw
+            size={16}
+            aria-hidden
+          />
+
           Try again
         </button>
       </section>
@@ -195,31 +207,34 @@ export default function BudgetPerformancePanel({
 
   return (
     <div className="space-y-6">
-      <section className="overflow-hidden rounded-[1.75rem] border border-[#dedbd2] bg-[#fffdf8]">
+      <section className="overflow-hidden rounded-2xl border border-line/50 bg-surface">
         <div className="grid lg:grid-cols-[1fr_280px]">
-          <div className="p-5 sm:p-7">
+          <div className="p-5 sm:p-6">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
-                <p className="text-xs font-semibold tracking-[0.15em] text-[#657972]">
-                  MONTH AT A GLANCE
+                <p className="type-eyebrow">
+                  Month at a glance
                 </p>
 
-                <h2 className="mt-2 font-serif text-2xl text-[#173c32]">
-                  Your spending boundary
+                <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-ink">
+                  Your spending
+                  boundary
                 </h2>
               </div>
 
               {performance?.anyCategoryExceeded ? (
-                <span className="inline-flex items-center gap-2 rounded-full bg-[#f4e2dc] px-3 py-1.5 text-xs font-semibold text-[#954936]">
+                <span className="inline-flex items-center gap-2 rounded-full bg-danger-soft px-3 py-1.5 text-xs font-semibold text-danger">
                   <AlertTriangle
                     size={14}
+                    aria-hidden
                   />
                   Needs attention
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-2 rounded-full bg-[#dfece4] px-3 py-1.5 text-xs font-semibold text-[#236a58]">
+                <span className="inline-flex items-center gap-2 rounded-full bg-success-soft px-3 py-1.5 text-xs font-semibold text-success">
                   <CheckCircle2
                     size={14}
+                    aria-hidden
                   />
                   Looking steady
                 </span>
@@ -229,22 +244,22 @@ export default function BudgetPerformancePanel({
             {isLoading ? (
               <div className="mt-7 animate-pulse space-y-5">
                 <div className="grid grid-cols-3 gap-4">
-                  <div className="h-16 rounded-2xl bg-[#eceae3]"/>
-                  <div className="h-16 rounded-2xl bg-[#eceae3]"/>
-                  <div className="h-16 rounded-2xl bg-[#eceae3]"/>
+                  <div className="h-16 rounded-xl bg-surface-muted" />
+                  <div className="h-16 rounded-xl bg-surface-muted" />
+                  <div className="h-16 rounded-xl bg-surface-muted" />
                 </div>
 
-                <div className="h-2 rounded-full bg-[#eceae3]"/>
+                <div className="h-2 rounded-full bg-surface-muted" />
               </div>
             ) : (
               <>
-                <div className="mt-7 grid grid-cols-1 gap-5 sm:grid-cols-3 sm:divide-x sm:divide-[#e2ded4]">
+                <div className="mt-7 grid grid-cols-1 gap-5 sm:grid-cols-3 sm:divide-x sm:divide-line/50">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#7a8984]">
+                    <p className="type-eyebrow">
                       Planned
                     </p>
 
-                    <p className="mt-2 text-xl font-semibold text-[#173c32]">
+                    <p className="mt-2 text-lg font-semibold text-ink">
                       {formatMoney(
                         totalLimit,
                         budget.currencyCode,
@@ -253,11 +268,11 @@ export default function BudgetPerformancePanel({
                   </div>
 
                   <div className="sm:pl-5">
-                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#7a8984]">
+                    <p className="type-eyebrow">
                       Spent
                     </p>
 
-                    <p className="mt-2 text-xl font-semibold text-[#173c32]">
+                    <p className="mt-2 text-lg font-semibold text-ink">
                       {formatMoney(
                         totalSpent,
                         budget.currencyCode,
@@ -266,17 +281,19 @@ export default function BudgetPerformancePanel({
                   </div>
 
                   <div className="sm:pl-5">
-                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#7a8984]">
-                      {totalRemaining < 0
+                    <p className="type-eyebrow">
+                      {totalRemaining <
+                      0
                         ? 'Over by'
                         : 'Remaining'}
                     </p>
 
                     <p
-                      className={`mt-2 text-xl font-semibold ${
-                        totalRemaining < 0
-                          ? 'text-[#a5503d]'
-                          : 'text-[#236a58]'
+                      className={`mt-2 text-lg font-semibold ${
+                        totalRemaining <
+                        0
+                          ? 'text-danger'
+                          : 'text-success'
                       }`}
                     >
                       {formatMoney(
@@ -290,12 +307,12 @@ export default function BudgetPerformancePanel({
                 </div>
 
                 <div className="mt-7">
-                  <div className="flex items-center justify-between gap-4 text-xs text-[#657972]">
+                  <div className="flex items-center justify-between gap-4 text-xs text-muted">
                     <span>
                       Overall use
                     </span>
 
-                    <span className="font-semibold text-[#173c32]">
+                    <span className="font-semibold text-ink">
                       {Math.round(
                         utilization,
                       )}
@@ -303,15 +320,15 @@ export default function BudgetPerformancePanel({
                     </span>
                   </div>
 
-                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#e8e7df]">
+                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-surface-strong">
                     <div
                       className={`h-full rounded-full transition-all ${
                         performance?.anyCategoryExceeded
-                          ? 'bg-[#b85e47]'
+                          ? 'bg-danger'
                           : utilization >=
                               85
-                            ? 'bg-[#c39442]'
-                            : 'bg-[#5f9278]'
+                            ? 'bg-warning'
+                            : 'bg-success'
                       }`}
                       style={{
                         width: `${clampPercentage(
@@ -325,33 +342,33 @@ export default function BudgetPerformancePanel({
             )}
           </div>
 
-          <aside className="border-t border-[#dedbd2] bg-[#e7efe9] p-6 lg:border-l lg:border-t-0">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/70 text-[#236a58]">
+          <aside className="border-t border-line/50 bg-accent-soft p-6 lg:border-l lg:border-t-0">
+            <div className="grid size-10 place-items-center rounded-xl bg-surface/70 text-accent">
               <Gauge
-                size={20}
+                size={18}
                 aria-hidden
               />
             </div>
 
-            <h3 className="mt-5 font-serif text-2xl text-[#173c32]">
+            <h3 className="mt-4 text-lg font-semibold text-ink">
               {message.heading}
             </h3>
 
-            <p className="mt-2 text-sm leading-6 text-[#536b63]">
+            <p className="mt-2 text-sm leading-6 text-muted">
               {message.copy}
             </p>
           </aside>
         </div>
       </section>
 
-      <section className="rounded-[1.75rem] border border-[#dedbd2] bg-[#fffdf8]">
-        <header className="flex flex-wrap items-center justify-between gap-4 border-b border-[#e2ded4] px-5 py-5 sm:px-7">
+      <section className="rounded-2xl border border-line/50 bg-surface">
+        <header className="flex flex-wrap items-center justify-between gap-4 border-b border-line/50 px-5 py-4 sm:px-6">
           <div>
-            <p className="text-xs font-semibold tracking-[0.15em] text-[#657972]">
-              CATEGORY RHYTHM
+            <p className="type-eyebrow">
+              Category rhythm
             </p>
 
-            <h2 className="mt-2 font-serif text-2xl text-[#173c32]">
+            <h2 className="mt-1 text-lg font-semibold text-ink">
               Where the plan lives
             </h2>
           </div>
@@ -360,61 +377,77 @@ export default function BudgetPerformancePanel({
             <button
               type="button"
               onClick={onAddLimit}
-              className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#236a58]"
+              className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-inverse transition hover:bg-primary-hover"
             >
-              <Plus size={16}/>
+              <Plus
+                size={16}
+                aria-hidden
+              />
+
               Add limit
             </button>
           )}
         </header>
 
         {isLoading ? (
-          <div className="space-y-4 p-5 sm:p-7">
+          <div className="space-y-4 p-5 sm:p-6">
             {[1, 2, 3].map(
               (item) => (
                 <div
                   key={item}
-                  className="h-24 animate-pulse rounded-2xl bg-[#efede7]"
+                  className="h-20 animate-pulse rounded-xl bg-surface-muted"
                 />
               ),
             )}
           </div>
         ) : !performance ||
-          performance.categories.length ===
-            0 ? (
-          <div className="px-6 py-14 text-center">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#e7efe9] text-[#236a58]">
-              <Gauge size={22}/>
+          performance.categories
+            .length === 0 ? (
+          <div className="px-6 py-12 text-center">
+            <div className="mx-auto grid size-11 place-items-center rounded-xl bg-accent-soft text-accent">
+              <Gauge
+                size={20}
+                aria-hidden
+              />
             </div>
 
-            <h3 className="mt-5 font-serif text-2xl text-[#173c32]">
+            <h3 className="mt-4 text-xl font-semibold text-ink">
               No limits yet
             </h3>
 
-            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#657972]">
-              Start with the categories that
-              tend to drift. A budget does
-              not need to account for every
-              cent to be useful.
+            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted">
+              Start with the
+              categories that tend
+              to drift. A budget does
+              not need to account for
+              every cent to be useful.
             </p>
 
             {!isArchived && (
               <button
                 type="button"
-                onClick={onAddLimit}
-                className="mt-6 inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#bfcfc6] px-5 py-2.5 text-sm font-semibold text-[#174f43] transition hover:bg-[#e7efe9]"
+                onClick={
+                  onAddLimit
+                }
+                className="mt-5 inline-flex cursor-pointer items-center gap-2 rounded-full border border-line px-5 py-2.5 text-sm font-semibold text-primary transition hover:bg-accent-soft"
               >
-                <Plus size={16}/>
+                <Plus
+                  size={16}
+                  aria-hidden
+                />
+
                 Add the first limit
               </button>
             )}
           </div>
         ) : (
-          <div className="divide-y divide-[#e6e2d9]">
+          <div className="divide-y divide-line/50">
             {performance.categories.map(
               (category) => {
                 const tone =
-                  categoryTone(category)
+                  categoryTone(
+                    category,
+                  )
 
                 const limit =
                   budget.limits.find(
@@ -428,25 +461,25 @@ export default function BudgetPerformancePanel({
                     key={
                       category.budgetLimitId
                     }
-                    className="px-5 py-5 sm:px-7"
+                    className="px-5 py-4 sm:px-6"
                   >
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-3">
-                          <h3 className="font-semibold text-[#173c32]">
+                          <h3 className="text-sm font-semibold text-ink">
                             {
                               category.categoryName
                             }
                           </h3>
 
                           <span
-                            className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${tone.pill}`}
+                            className={`rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] ${tone.pill}`}
                           >
                             {tone.label}
                           </span>
                         </div>
 
-                        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[#e8e7df]">
+                        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-surface-strong">
                           <div
                             className={`h-full rounded-full ${tone.bar}`}
                             style={{
@@ -457,7 +490,7 @@ export default function BudgetPerformancePanel({
                           />
                         </div>
 
-                        <div className="mt-2 flex flex-wrap justify-between gap-2 text-xs text-[#657972]">
+                        <div className="mt-2 flex flex-wrap justify-between gap-2 text-xs text-muted">
                           <span>
                             {formatMoney(
                               category.spentAmount,
@@ -492,7 +525,7 @@ export default function BudgetPerformancePanel({
 
                       {!isArchived &&
                         limit && (
-                          <div className="flex shrink-0 gap-2">
+                          <div className="flex shrink-0 gap-1">
                             <button
                               type="button"
                               onClick={() =>
@@ -501,12 +534,14 @@ export default function BudgetPerformancePanel({
                                   category.categoryName,
                                 )
                               }
-                              className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#d8d6ce] px-3.5 py-2 text-xs font-semibold text-[#173c32] transition hover:bg-[#efede7]"
+                              className="grid size-8 cursor-pointer place-items-center rounded-full text-muted transition hover:bg-accent-soft hover:text-accent"
+                              aria-label={`Edit ${category.categoryName} limit`}
+                              title="Edit limit"
                             >
                               <Pencil
-                                size={14}
+                                size={15}
+                                aria-hidden
                               />
-                              Edit
                             </button>
 
                             <button
@@ -517,11 +552,13 @@ export default function BudgetPerformancePanel({
                                   category.categoryName,
                                 )
                               }
-                              className="inline-flex cursor-pointer items-center justify-center rounded-full border border-[#e3c9c2] p-2 text-[#a5503d] transition hover:bg-[#fff0eb]"
+                              className="grid size-8 cursor-pointer place-items-center rounded-full text-muted transition hover:bg-danger-soft hover:text-danger"
                               aria-label={`Remove ${category.categoryName} limit`}
+                              title="Remove limit"
                             >
                               <Trash2
                                 size={15}
+                                aria-hidden
                               />
                             </button>
                           </div>

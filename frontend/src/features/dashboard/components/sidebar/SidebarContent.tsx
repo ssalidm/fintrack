@@ -1,22 +1,17 @@
 import {
-  LogOut,
+  LifeBuoy,
   Settings,
   UsersRound,
 } from 'lucide-react'
-import { useState } from 'react'
-import {
-  NavLink,
-  useNavigate,
-} from 'react-router'
+import { NavLink } from 'react-router'
 
-import { useAuth } from '../../../auth/context/useAuth'
 import { useProfile } from '../../../profile/hooks/useProfile'
+import ThemeToggle from '../../../theme/components/ThemeToggle'
 import SalifLogo from './SalifLogo'
 import {
   sidebarNavigationItems,
 } from './sidebarConfig'
 import {
-  sidebarItemBase,
   sidebarItemClass,
 } from './sidebarStyles'
 
@@ -29,30 +24,8 @@ export default function SidebarContent({
   onNavigate,
   isCollapsed = false,
 }: SidebarContentProps) {
-  const navigate = useNavigate()
-
-  const [
-    isLoggingOut,
-    setIsLoggingOut,
-  ] = useState(false)
-
   const { data: profile } =
     useProfile()
-
-  const { logout } =
-    useAuth()
-
-  async function handleLogout() {
-    setIsLoggingOut(true)
-
-    await logout()
-
-    onNavigate?.()
-
-    navigate('/login', {
-      replace: true,
-    })
-  }
 
   return (
     <div
@@ -129,9 +102,7 @@ export default function SidebarContent({
                       ? item.label
                       : undefined
                   }
-                  className={({
-                    isActive,
-                  }) =>
+                  className={({ isActive }) =>
                     sidebarItemClass(
                       isActive,
                       isCollapsed,
@@ -173,9 +144,7 @@ export default function SidebarContent({
                     ? 'User management'
                     : undefined
                 }
-                className={({
-                  isActive,
-                }) =>
+                className={({ isActive }) =>
                   sidebarItemClass(
                     isActive,
                     isCollapsed,
@@ -214,9 +183,7 @@ export default function SidebarContent({
                 ? 'Account settings'
                 : undefined
             }
-            className={({
-              isActive,
-            }) =>
+            className={({ isActive }) =>
               sidebarItemClass(
                 isActive,
                 isCollapsed,
@@ -236,53 +203,42 @@ export default function SidebarContent({
             )}
           </NavLink>
 
-          <button
-            type="button"
-            disabled={isLoggingOut}
+          <NavLink
+            to="/support"
+            onClick={onNavigate}
             title={
               isCollapsed
-                ? 'Sign out'
+                ? 'Support'
                 : undefined
             }
             aria-label={
               isCollapsed
-                ? 'Sign out'
+                ? 'Support'
                 : undefined
             }
-            onClick={() =>
-              void handleLogout()
+            className={({ isActive }) =>
+              sidebarItemClass(
+                isActive,
+                isCollapsed,
+              )
             }
-            className={[
-              sidebarItemBase,
-              isCollapsed
-                ? 'justify-center px-0'
-                : 'gap-3',
-              'cursor-pointer',
-              'text-[#c5d8d0]',
-              'hover:bg-white/[0.07]',
-              'hover:text-white',
-              'disabled:cursor-not-allowed',
-              'disabled:opacity-50',
-            ].join(' ')}
           >
-            <LogOut
+            <LifeBuoy
               size={18}
-              className={
-                isLoggingOut
-                  ? 'shrink-0 animate-pulse'
-                  : 'shrink-0'
-              }
+              className="shrink-0"
               aria-hidden
             />
 
             {!isCollapsed && (
               <span className="truncate">
-                {isLoggingOut
-                  ? 'Signing out…'
-                  : 'Sign out'}
+                Support
               </span>
             )}
-          </button>
+          </NavLink>
+
+          <ThemeToggle
+            isCollapsed={isCollapsed}
+          />
         </div>
       </div>
     </div>

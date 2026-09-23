@@ -274,7 +274,7 @@ export default function ChangeEmailForm({
               items-center
               justify-center
               gap-1.5
-              rounded-md
+              rounded-full
               border border-line-strong
               bg-surface
               px-3 py-1.5

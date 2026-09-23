@@ -1,10 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ChevronDown } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import {
+  useEffect,
+  useState,
+} from 'react'
 import { useForm } from 'react-hook-form'
 
 import { ApiClientError } from '../../../api/ApiClientError'
-
 import type { SavingsGoal } from '../api/types'
 import {
   useCreateGoal,
@@ -33,13 +35,12 @@ const currencyLabels = {
 >
 
 const fieldClasses =
-  'mt-2 block w-full rounded-xl border border-[#d8d6ce] ' +
-  'bg-[#fffdf8] px-4 py-3 text-[#173c32] outline-none ' +
-  'transition placeholder:text-[#98a39f] focus:border-[#39725d] ' +
-  'focus:ring-2 focus:ring-[#39725d]/15 disabled:bg-[#efede7]'
+  'mt-2 block w-full rounded-xl border border-line bg-surface px-4 py-3 text-ink outline-none transition placeholder:text-subtle focus:border-accent focus:ring-2 focus:ring-accent/10 disabled:bg-surface-muted disabled:text-muted'
 
 const goalFormFields =
-  new Set<keyof GoalFormValues>([
+  new Set<
+    keyof GoalFormValues
+  >([
     'name',
     'description',
     'currencyCode',
@@ -60,13 +61,21 @@ export default function GoalForm({
   onCancel,
   onSuccess,
 }: GoalFormProps) {
-  const [submitError, setSubmitError] =
-    useState<string | null>(null)
+  const [
+    submitError,
+    setSubmitError,
+  ] = useState<string | null>(
+    null,
+  )
 
-  const createGoal = useCreateGoal()
-  const updateGoal = useUpdateGoal()
+  const createGoal =
+    useCreateGoal()
 
-  const isEditing = goal !== undefined
+  const updateGoal =
+    useUpdateGoal()
+
+  const isEditing =
+    goal !== undefined
 
   const {
     register,
@@ -78,34 +87,39 @@ export default function GoalForm({
       isSubmitting,
     },
   } = useForm<GoalFormValues>({
-    resolver: zodResolver(goalFormSchema),
-
+    resolver: zodResolver(
+      goalFormSchema,
+    ),
     defaultValues: {
       name: goal?.name ?? '',
-      description: goal?.description ?? '',
+      description:
+        goal?.description ?? '',
       currencyCode:
-        (
-          goal?.currencyCode as
+        (goal?.currencyCode as
           | GoalFormValues['currencyCode']
-          | undefined
-        ) ?? 'ZAR',
-      targetAmount: goal?.targetAmount ?? 0,
-      targetDate: goal?.targetDate ?? '',
+          | undefined) ??
+        'ZAR',
+      targetAmount:
+        goal?.targetAmount ?? 0,
+      targetDate:
+        goal?.targetDate ?? '',
     },
   })
 
   useEffect(() => {
     reset({
       name: goal?.name ?? '',
-      description: goal?.description ?? '',
+      description:
+        goal?.description ?? '',
       currencyCode:
-        (
-          goal?.currencyCode as
+        (goal?.currencyCode as
           | GoalFormValues['currencyCode']
-          | undefined
-        ) ?? 'ZAR',
-      targetAmount: goal?.targetAmount ?? 0,
-      targetDate: goal?.targetDate ?? '',
+          | undefined) ??
+        'ZAR',
+      targetAmount:
+        goal?.targetAmount ?? 0,
+      targetDate:
+        goal?.targetDate ?? '',
     })
   }, [goal, reset])
 
@@ -121,58 +135,83 @@ export default function GoalForm({
       if (goal) {
         await updateGoal.mutateAsync({
           goalId: goal.id,
-
           payload: {
-            version: goal.version,
-            name: values.name.trim(),
+            version:
+              goal.version,
+            name:
+              values.name.trim(),
             description,
             targetAmount:
               values.targetAmount,
             targetDate:
-              values.targetDate || undefined,
+              values.targetDate ||
+              undefined,
             clearTargetDate:
-              goal.targetDate !== null &&
-              values.targetDate === '',
+              goal.targetDate !==
+                null &&
+              values.targetDate ===
+                '',
           },
         })
       } else {
         await createGoal.mutateAsync({
-          name: values.name.trim(),
+          name:
+            values.name.trim(),
           description:
-            description || undefined,
+            description ||
+            undefined,
           currencyCode:
             values.currencyCode,
           targetAmount:
             values.targetAmount,
           targetDate:
-            values.targetDate || undefined,
+            values.targetDate ||
+            undefined,
         })
       }
 
       onSuccess()
     } catch (error) {
-      if (!(error instanceof ApiClientError)) {
+      if (
+        !(
+          error instanceof
+          ApiClientError
+        )
+      ) {
         setSubmitError(
           'Something went wrong. Please try again.',
         )
         return
       }
 
-      let hasFieldError = false
+      let hasFieldError =
+        false
 
-      if (error.validationErrors) {
+      if (
+        error.validationErrors
+      ) {
         Object.entries(
           error.validationErrors,
-        ).forEach(([field, message]) => {
-          if (isGoalFormField(field)) {
-            setError(field, {
-              type: 'server',
-              message,
-            })
+        ).forEach(
+          ([field, message]) => {
+            if (
+              isGoalFormField(
+                field,
+              )
+            ) {
+              setError(
+                field,
+                {
+                  type: 'server',
+                  message,
+                },
+              )
 
-            hasFieldError = true
-          }
-        })
+              hasFieldError =
+                true
+            }
+          },
+        )
       }
 
       if (!hasFieldError) {
@@ -187,14 +226,16 @@ export default function GoalForm({
 
   return (
     <form
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleSubmit(
+        onSubmit,
+      )}
       className="space-y-6"
       noValidate
     >
       <div>
         <label
           htmlFor="goal-name"
-          className="text-sm font-semibold text-[#173c32]"
+          className="type-label"
         >
           Goal name
         </label>
@@ -206,15 +247,19 @@ export default function GoalForm({
           placeholder="For example, Rainy day fund"
           disabled={isSubmitting}
           aria-invalid={
-            errors.name ? 'true' : 'false'
+            errors.name
+              ? 'true'
+              : 'false'
           }
-          className={fieldClasses}
+          className={
+            fieldClasses
+          }
           {...register('name')}
         />
 
         {errors.name && (
           <p
-            className="mt-2 text-sm text-red-700"
+            className="mt-2 text-sm text-danger"
             role="alert"
           >
             {errors.name.message}
@@ -225,7 +270,7 @@ export default function GoalForm({
       <div>
         <label
           htmlFor="goal-description"
-          className="text-sm font-semibold text-[#173c32]"
+          className="type-label"
         >
           A note to your future self
         </label>
@@ -241,15 +286,20 @@ export default function GoalForm({
               : 'false'
           }
           className={`${fieldClasses} resize-none`}
-          {...register('description')}
+          {...register(
+            'description',
+          )}
         />
 
         {errors.description && (
           <p
-            className="mt-2 text-sm text-red-700"
+            className="mt-2 text-sm text-danger"
             role="alert"
           >
-            {errors.description.message}
+            {
+              errors.description
+                .message
+            }
           </p>
         )}
       </div>
@@ -258,7 +308,7 @@ export default function GoalForm({
         <div>
           <label
             htmlFor="goal-currency"
-            className="text-sm font-semibold text-[#173c32]"
+            className="type-label"
           >
             Currency
           </label>
@@ -267,45 +317,58 @@ export default function GoalForm({
             <>
               <input
                 type="hidden"
-                {...register('currencyCode')}
+                {...register(
+                  'currencyCode',
+                )}
               />
 
               <div
-                className={`${fieldClasses} bg-[#efede7]`}
+                className={`${fieldClasses} bg-surface-muted`}
               >
-                {
-                  currencyLabels[
-                  goal.currencyCode as
-                  GoalFormValues['currencyCode']
-                  ] ?? goal.currencyCode
-                }
+                {currencyLabels[
+                  goal.currencyCode as GoalFormValues['currencyCode']
+                ] ??
+                  goal.currencyCode}
               </div>
 
-              <p className="mt-2 text-xs leading-5 text-[#657972]">
-                Currency cannot be changed after
-                creating a goal.
+              <p className="type-caption mt-2">
+                Currency cannot be
+                changed after creating
+                a goal.
               </p>
             </>
           ) : (
             <span className="relative block">
               <select
                 id="goal-currency"
-                disabled={isSubmitting}
+                disabled={
+                  isSubmitting
+                }
                 aria-invalid={
                   errors.currencyCode
                     ? 'true'
                     : 'false'
                 }
                 className={`${fieldClasses} cursor-pointer appearance-none pr-11`}
-                {...register('currencyCode')}
+                {...register(
+                  'currencyCode',
+                )}
               >
                 {goalCurrencies.map(
                   (currency) => (
                     <option
-                      key={currency}
-                      value={currency}
+                      key={
+                        currency
+                      }
+                      value={
+                        currency
+                      }
                     >
-                      {currencyLabels[currency]}
+                      {
+                        currencyLabels[
+                          currency
+                        ]
+                      }
                     </option>
                   ),
                 )}
@@ -314,17 +377,20 @@ export default function GoalForm({
               <ChevronDown
                 size={17}
                 aria-hidden
-                className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#657972]"
+                className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-muted"
               />
             </span>
           )}
 
           {errors.currencyCode && (
             <p
-              className="mt-2 text-sm text-red-700"
+              className="mt-2 text-sm text-danger"
               role="alert"
             >
-              {errors.currencyCode.message}
+              {
+                errors.currencyCode
+                  .message
+              }
             </p>
           )}
         </div>
@@ -332,7 +398,7 @@ export default function GoalForm({
         <div>
           <label
             htmlFor="goal-target"
-            className="text-sm font-semibold text-[#173c32]"
+            className="type-label"
           >
             Target amount
           </label>
@@ -349,23 +415,33 @@ export default function GoalForm({
                 ? 'true'
                 : 'false'
             }
-            className={fieldClasses}
-            {...register('targetAmount', {
-              setValueAs: (
-                value: string,
-              ) =>
-                value === ''
-                  ? Number.NaN
-                  : Number(value),
-            })}
+            className={
+              fieldClasses
+            }
+            {...register(
+              'targetAmount',
+              {
+                setValueAs: (
+                  value: string,
+                ) =>
+                  value === ''
+                    ? Number.NaN
+                    : Number(
+                        value,
+                      ),
+              },
+            )}
           />
 
           {errors.targetAmount && (
             <p
-              className="mt-2 text-sm text-red-700"
+              className="mt-2 text-sm text-danger"
               role="alert"
             >
-              {errors.targetAmount.message}
+              {
+                errors.targetAmount
+                  .message
+              }
             </p>
           )}
         </div>
@@ -374,11 +450,11 @@ export default function GoalForm({
       <div>
         <label
           htmlFor="goal-target-date"
-          className="text-sm font-semibold text-[#173c32]"
+          className="type-label"
         >
           Target date
 
-          <span className="ml-2 font-normal text-[#7a8984]">
+          <span className="ml-2 font-normal text-subtle">
             Optional
           </span>
         </label>
@@ -388,30 +464,33 @@ export default function GoalForm({
           type="date"
           disabled={isSubmitting}
           className={`${fieldClasses} cursor-pointer`}
-          {...register('targetDate')}
+          {...register(
+            'targetDate',
+          )}
         />
 
-        <p className="mt-2 text-xs leading-5 text-[#657972]">
-          A target date gives the goal direction
-          without making it rigid.
+        <p className="type-caption mt-2">
+          A target date gives the
+          goal direction without
+          making it rigid.
         </p>
       </div>
 
       {submitError && (
         <div
-          className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          className="rounded-xl border border-danger/20 bg-danger-soft px-4 py-3 text-sm text-danger"
           role="alert"
         >
           {submitError}
         </div>
       )}
 
-      <div className="flex flex-col-reverse gap-3 border-t border-[#dedbd2] pt-6 sm:flex-row sm:justify-end">
+      <div className="flex flex-col-reverse gap-3 border-t border-line pt-6 sm:flex-row sm:justify-end">
         <button
           type="button"
           disabled={isSubmitting}
           onClick={onCancel}
-          className="cursor-pointer rounded-full border border-[#d8d6ce] px-5 py-2.5 text-sm font-semibold text-[#173c32] transition hover:bg-[#efede7] disabled:cursor-not-allowed disabled:opacity-60"
+          className="cursor-pointer rounded-full border border-line bg-surface px-5 py-2.5 text-sm font-semibold text-ink transition hover:bg-surface-muted disabled:cursor-not-allowed disabled:opacity-60"
         >
           Cancel
         </button>
@@ -419,7 +498,7 @@ export default function GoalForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="cursor-pointer rounded-full bg-[#174f43] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#236a58] disabled:cursor-not-allowed disabled:opacity-60"
+          className="cursor-pointer rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-inverse transition hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isSubmitting
             ? isEditing

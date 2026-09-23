@@ -131,7 +131,7 @@ export default function TwoFactorAuthenticationCard() {
           className="
             grid
             gap-3
-            py-5
+            py-4
             md:grid-cols-[180px_minmax(0,1fr)_auto]
             md:items-center
             md:gap-8
@@ -244,7 +244,7 @@ export default function TwoFactorAuthenticationCard() {
                   )
                 }
                 className="
-                  rounded-md
+                  rounded-full
                   border border-line-strong
                   bg-surface
                   px-3 py-1.5
@@ -270,7 +270,7 @@ export default function TwoFactorAuthenticationCard() {
                   inline-flex
                   items-center
                   gap-1.5
-                  rounded-md
+                  rounded-full
                   border border-line-strong
                   bg-surface
                   px-3 py-1.5
@@ -305,7 +305,7 @@ export default function TwoFactorAuthenticationCard() {
             className="
               grid
               gap-3
-              py-5
+              py-4
               md:grid-cols-[180px_minmax(0,1fr)_auto]
               md:items-center
               md:gap-8
@@ -338,7 +338,7 @@ export default function TwoFactorAuthenticationCard() {
                   )
                 }
                 className="
-                  rounded-md
+                  rounded-full
                   border border-line-strong
                   bg-surface
                   px-3 py-1.5

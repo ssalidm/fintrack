@@ -11,8 +11,12 @@ import {
 } from 'react'
 
 import { ApiClientError } from '../../../api/ApiClientError'
+import RefreshButton from '../../../components/actions/RefreshButton'
 import PageHeader from '../../../components/layout/PageHeader'
 import PageShell from '../../../components/layout/PageShell'
+import StatusTabs from '../../../components/navigation/StatusTabs'
+import EmptyState from '../../../components/ui/EmptyState'
+import ErrorPanel from '../../../components/ui/ErrorPanel'
 import type {
   BudgetCategoryLimit,
   BudgetStatus,
@@ -31,8 +35,6 @@ import {
   useBudgets,
   useDeleteBudgetLimit,
 } from '../hooks/useBudgets'
-import RefreshButton from '../../../components/actions/RefreshButton'
-import StatusTabs from '../../../components/navigation/StatusTabs'
 
 interface LimitModalTarget {
   limit?: BudgetCategoryLimit
@@ -41,15 +43,15 @@ interface LimitModalTarget {
 
 type ActionTarget =
   | {
-    kind: 'ARCHIVE_BUDGET'
-    budget: BudgetSummary
-  }
+      kind: 'ARCHIVE_BUDGET'
+      budget: BudgetSummary
+    }
   | {
-    kind: 'REMOVE_LIMIT'
-    budgetId: string
-    limit: BudgetCategoryLimit
-    categoryName: string
-  }
+      kind: 'REMOVE_LIMIT'
+      budgetId: string
+      limit: BudgetCategoryLimit
+      categoryName: string
+    }
 
 const statusOptions = [
   {
@@ -65,8 +67,13 @@ const statusOptions = [
   label: string
 }>
 
-function formatMonth(value: string) {
-  const [year, month] = value
+function formatMonth(
+  value: string,
+) {
+  const [
+    year,
+    month,
+  ] = value
     .slice(0, 7)
     .split('-')
     .map(Number)
@@ -78,7 +85,11 @@ function formatMonth(value: string) {
       year: 'numeric',
     },
   ).format(
-    new Date(year, month - 1, 1),
+    new Date(
+      year,
+      month - 1,
+      1,
+    ),
   )
 }
 
@@ -98,56 +109,70 @@ function preferredBudgetId(
   const currentMonth =
     currentMonthKey()
 
-  const currentBudget = budgets.find(
-    (budget) =>
-      budget.budgetMonth.slice(
-        0,
-        7,
-      ) === currentMonth,
-  )
+  const currentBudget =
+    budgets.find(
+      (budget) =>
+        budget.budgetMonth.slice(
+          0,
+          7,
+        ) === currentMonth,
+    )
 
   if (currentBudget) {
     return currentBudget.id
   }
 
-  const latestPastBudget = budgets
-    .filter(
-      (budget) =>
-        budget.budgetMonth.slice(
-          0,
-          7,
-        ) < currentMonth,
-    )
-    .toSorted((left, right) =>
-      right.budgetMonth.localeCompare(
-        left.budgetMonth,
-      ),
-    )[0]
+  const latestPastBudget =
+    budgets
+      .filter(
+        (budget) =>
+          budget.budgetMonth.slice(
+            0,
+            7,
+          ) < currentMonth,
+      )
+      .toSorted(
+        (
+          left,
+          right,
+        ) =>
+          right.budgetMonth.localeCompare(
+            left.budgetMonth,
+          ),
+      )[0]
 
   if (latestPastBudget) {
     return latestPastBudget.id
   }
 
-  const nearestFutureBudget =
-    budgets.toSorted((left, right) =>
-      left.budgetMonth.localeCompare(
-        right.budgetMonth,
-      ),
-    )[0]
-
-  return nearestFutureBudget?.id ?? ''
+  return (
+    budgets.toSorted(
+      (
+        left,
+        right,
+      ) =>
+        left.budgetMonth.localeCompare(
+          right.budgetMonth,
+        ),
+    )[0]?.id ?? ''
+  )
 }
 
 function budgetTimingLabel(
   budgetMonth: string,
 ) {
   const month =
-    budgetMonth.slice(0, 7)
+    budgetMonth.slice(
+      0,
+      7,
+    )
 
   const currentMonth =
     currentMonthKey()
 
-  if (month === currentMonth) {
+  if (
+    month === currentMonth
+  ) {
     return 'Current'
   }
 
@@ -163,8 +188,13 @@ function actionKind(
 }
 
 export default function BudgetsPage() {
-  const [status, setStatus] =
-    useState<BudgetStatus>('ACTIVE')
+  const [
+    status,
+    setStatus,
+  ] =
+    useState<BudgetStatus>(
+      'ACTIVE',
+    )
 
   const [
     selectedBudgetId,
@@ -179,9 +209,10 @@ export default function BudgetsPage() {
   const [
     editingBudget,
     setEditingBudget,
-  ] = useState<BudgetSummary | null>(
-    null,
-  )
+  ] =
+    useState<BudgetSummary | null>(
+      null,
+    )
 
   const [
     limitModalTarget,
@@ -194,14 +225,17 @@ export default function BudgetsPage() {
   const [
     actionTarget,
     setActionTarget,
-  ] = useState<ActionTarget | null>(
-    null,
-  )
+  ] =
+    useState<ActionTarget | null>(
+      null,
+    )
 
   const [
     actionError,
     setActionError,
-  ] = useState<string | null>(null)
+  ] = useState<string | null>(
+    null,
+  )
 
   const [
     isRefreshing,
@@ -211,10 +245,12 @@ export default function BudgetsPage() {
   const budgetsQuery =
     useBudgets(status)
 
-  const budgets = useMemo(
-    () => budgetsQuery.data ?? [],
-    [budgetsQuery.data],
-  )
+  const budgets =
+    useMemo(
+      () =>
+        budgetsQuery.data ?? [],
+      [budgetsQuery.data],
+    )
 
   const activeBudgetId =
     budgets.some(
@@ -223,10 +259,14 @@ export default function BudgetsPage() {
         selectedBudgetId,
     )
       ? selectedBudgetId
-      : preferredBudgetId(budgets)
+      : preferredBudgetId(
+          budgets,
+        )
 
   const budgetQuery =
-    useBudget(activeBudgetId)
+    useBudget(
+      activeBudgetId,
+    )
 
   const performanceQuery =
     useBudgetPerformance(
@@ -293,34 +333,36 @@ export default function BudgetsPage() {
         actionTarget.kind ===
         'ARCHIVE_BUDGET'
       ) {
-        await archiveBudget.mutateAsync({
-          budgetId:
-            actionTarget.budget.id,
-
-          payload: {
+        await archiveBudget.mutateAsync(
+          {
+            budgetId:
+              actionTarget.budget.id,
+            payload: {
+              version:
+                actionTarget.budget
+                  .version,
+            },
+          },
+        )
+      } else {
+        await deleteLimit.mutateAsync(
+          {
+            budgetId:
+              actionTarget.budgetId,
+            limitId:
+              actionTarget.limit.id,
             version:
-              actionTarget.budget
+              actionTarget.limit
                 .version,
           },
-        })
-      } else {
-        await deleteLimit.mutateAsync({
-          budgetId:
-            actionTarget.budgetId,
-
-          limitId:
-            actionTarget.limit.id,
-
-          version:
-            actionTarget.limit
-              .version,
-        })
+        )
       }
 
       setActionTarget(null)
     } catch (error) {
       setActionError(
-        error instanceof ApiClientError
+        error instanceof
+        ApiClientError
           ? error.message
           : 'The change could not be completed.',
       )
@@ -329,10 +371,10 @@ export default function BudgetsPage() {
 
   const actionSubjectName =
     actionTarget?.kind ===
-      'ARCHIVE_BUDGET'
+    'ARCHIVE_BUDGET'
       ? actionTarget.budget.name
       : actionTarget?.kind ===
-        'REMOVE_LIMIT'
+          'REMOVE_LIMIT'
         ? actionTarget.categoryName
         : ''
 
@@ -345,32 +387,52 @@ export default function BudgetsPage() {
         actions={
           <>
             <RefreshButton
-              isRefreshing={isRefreshing}
-              onRefresh={refreshPage}
+              isRefreshing={
+                isRefreshing
+              }
+              onRefresh={
+                refreshPage
+              }
+              label="Refresh budgets"
+              iconOnly
             />
 
             <button
               type="button"
               onClick={() =>
-                setIsCreateOpen(true)
+                setIsCreateOpen(
+                  true,
+                )
               }
-              className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#236a58]"
+              className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-inverse transition hover:bg-primary-hover"
             >
-              <Plus size={17} />
+              <Plus
+                size={18}
+                aria-hidden
+              />
+
               New budget
             </button>
           </>
         }
       />
 
-      <section className="feature-reveal feature-reveal-delay-1 mt-8 rounded-[1.5rem] border border-[#dedbd2] bg-[#fffdf8] p-4 sm:p-5">
+      <section className="feature-reveal feature-reveal-delay-1 mt-10 rounded-2xl border border-line/50 bg-surface p-4 sm:p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <StatusTabs
             value={status}
-            options={statusOptions}
-            onChange={(nextStatus) => {
-              setStatus(nextStatus)
-              setSelectedBudgetId('')
+            options={
+              statusOptions
+            }
+            onChange={(
+              nextStatus,
+            ) => {
+              setStatus(
+                nextStatus,
+              )
+              setSelectedBudgetId(
+                '',
+              )
             }}
             ariaLabel="Budget status"
             variant="pill"
@@ -380,26 +442,33 @@ export default function BudgetsPage() {
             <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
               <label
                 htmlFor="budget-selector"
-                className="shrink-0 text-xs font-semibold uppercase tracking-[0.12em] text-[#657972]"
+                className="type-eyebrow shrink-0"
               >
                 Viewing
               </label>
 
               <select
                 id="budget-selector"
-                value={activeBudgetId}
+                value={
+                  activeBudgetId
+                }
                 onChange={(event) =>
                   setSelectedBudgetId(
-                    event.target.value,
+                    event.target
+                      .value,
                   )
                 }
-                className="min-w-0 cursor-pointer rounded-xl border border-[#d8d6ce] bg-[#f7f5ef] px-4 py-2.5 pr-11 text-sm font-semibold text-[#173c32] outline-none transition focus:border-[#39725d] focus:ring-2 focus:ring-[#39725d]/15 sm:min-w-72"
+                className="min-w-0 cursor-pointer rounded-xl border border-line bg-surface-muted px-4 py-2.5 pr-11 text-sm font-semibold text-ink outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/10 sm:min-w-72"
               >
                 {budgets.map(
                   (budget) => (
                     <option
-                      key={budget.id}
-                      value={budget.id}
+                      key={
+                        budget.id
+                      }
+                      value={
+                        budget.id
+                      }
                     >
                       {budgetTimingLabel(
                         budget.budgetMonth,
@@ -408,7 +477,8 @@ export default function BudgetsPage() {
                       {formatMonth(
                         budget.budgetMonth,
                       )}{' '}
-                      · {budget.name} ·{' '}
+                      · {budget.name}{' '}
+                      ·{' '}
                       {
                         budget.currencyCode
                       }
@@ -423,109 +493,112 @@ export default function BudgetsPage() {
 
       {budgetsQuery.isPending ? (
         <div className="feature-reveal feature-reveal-delay-2 mt-6 space-y-5">
-          <div className="h-28 animate-pulse rounded-[1.75rem] bg-[#e9e7e0]" />
-
-          <div className="h-72 animate-pulse rounded-[1.75rem] bg-[#e9e7e0]" />
+          <div className="h-28 animate-pulse rounded-2xl border border-line/50 bg-surface-muted/50" />
+          <div className="h-72 animate-pulse rounded-2xl border border-line/50 bg-surface-muted/50" />
         </div>
       ) : budgetsQuery.isError ? (
-        <section className="feature-reveal feature-reveal-delay-2 mt-6 rounded-[1.75rem] border border-[#e8c8bf] bg-[#fff8f4] p-8 text-center">
-          <h2 className="font-serif text-2xl text-[#173c32]">
-            Your budgets could not
-            be loaded
-          </h2>
-
-          <p className="mt-2 text-sm text-[#657972]">
-            Check the connection and
-            try again.
-          </p>
-
-          <button
-            type="button"
-            onClick={() => {
-              void budgetsQuery.refetch()
-            }}
-            className="mt-5 cursor-pointer rounded-full border border-[#d8d6ce] px-5 py-2.5 text-sm font-semibold text-[#173c32] transition hover:bg-[#efede7]"
-          >
-            Try again
-          </button>
-        </section>
+        <ErrorPanel
+          title="Your budgets could not be loaded"
+          message={
+            budgetsQuery.error instanceof
+            ApiClientError
+              ? budgetsQuery.error
+                  .message
+              : 'Check the connection and try again.'
+          }
+          onRetry={() =>
+            void budgetsQuery.refetch()
+          }
+          className="feature-reveal feature-reveal-delay-2 mt-6"
+        />
       ) : budgets.length === 0 ? (
-        <section className="feature-reveal feature-reveal-delay-2 mt-6 rounded-[1.75rem] border border-dashed border-[#cfcac0] bg-[#fffdf8] px-6 py-16 text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#e7efe9] text-[#236a58]">
-            <WalletCards size={25} />
-          </div>
-
-          <h2 className="mt-6 font-serif text-3xl text-[#173c32]">
-            {status === 'ACTIVE'
+        <EmptyState
+          icon={
+            <WalletCards
+              size={22}
+              aria-hidden
+            />
+          }
+          title={
+            status === 'ACTIVE'
               ? 'Give this month some shape'
-              : 'No past plans yet'}
-          </h2>
-
-          <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-[#657972]">
-            {status === 'ACTIVE'
+              : 'No past plans yet'
+          }
+          description={
+            status === 'ACTIVE'
               ? 'Start with a monthly plan, then add limits only to the expense categories that deserve attention.'
-              : 'Archived budgets will stay here as a quiet record of how your plans changed.'}
-          </p>
+              : 'Archived budgets will stay here as a record of how your plans changed.'
+          }
+          action={
+            status === 'ACTIVE' ? (
+              <button
+                type="button"
+                onClick={() =>
+                  setIsCreateOpen(
+                    true,
+                  )
+                }
+                className="mt-5 inline-flex cursor-pointer items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-inverse transition hover:bg-primary-hover"
+              >
+                <Plus
+                  size={16}
+                  aria-hidden
+                />
 
-          {status === 'ACTIVE' ? (
-            <button
-              type="button"
-              onClick={() =>
-                setIsCreateOpen(true)
-              }
-              className="mt-7 inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#174f43] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#236a58]"
-            >
-              <Plus size={17} />
-              Create your first budget
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() =>
-                setStatus('ACTIVE')
-              }
-              className="mt-7 cursor-pointer rounded-full border border-[#bfcfc6] px-5 py-2.5 text-sm font-semibold text-[#174f43] transition hover:bg-[#e7efe9]"
-            >
-              View current plans
-            </button>
-          )}
-        </section>
+                Create your first
+                budget
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() =>
+                  setStatus(
+                    'ACTIVE',
+                  )
+                }
+                className="mt-5 cursor-pointer rounded-full border border-line px-5 py-2.5 text-sm font-semibold text-primary transition hover:bg-accent-soft"
+              >
+                View current plans
+              </button>
+            )
+          }
+          variant="solid"
+          className="feature-reveal feature-reveal-delay-2 mt-6"
+        />
       ) : budgetQuery.isError ? (
-        <section className="feature-reveal feature-reveal-delay-2 mt-6 rounded-[1.75rem] border border-[#e8c8bf] bg-[#fff8f4] p-8 text-center">
-          <h2 className="font-serif text-2xl text-[#173c32]">
-            This budget could not be
-            opened
-          </h2>
-
-          <button
-            type="button"
-            onClick={() => {
-              void budgetQuery.refetch()
-            }}
-            className="mt-5 cursor-pointer rounded-full border border-[#d8d6ce] px-5 py-2.5 text-sm font-semibold text-[#173c32] transition hover:bg-[#efede7]"
-          >
-            Try again
-          </button>
-        </section>
+        <ErrorPanel
+          title="This budget could not be opened"
+          message={
+            budgetQuery.error instanceof
+            ApiClientError
+              ? budgetQuery.error
+                  .message
+              : 'Please try again.'
+          }
+          onRetry={() =>
+            void budgetQuery.refetch()
+          }
+          className="feature-reveal feature-reveal-delay-2 mt-6"
+        />
       ) : budgetQuery.isPending ||
         !selectedBudget ? (
         <div className="feature-reveal feature-reveal-delay-2 mt-6 space-y-5">
-          <div className="h-28 animate-pulse rounded-[1.75rem] bg-[#e9e7e0]" />
-
-          <div className="h-72 animate-pulse rounded-[1.75rem] bg-[#e9e7e0]" />
+          <div className="h-28 animate-pulse rounded-2xl border border-line/50 bg-surface-muted/50" />
+          <div className="h-72 animate-pulse rounded-2xl border border-line/50 bg-surface-muted/50" />
         </div>
       ) : (
         <div className="feature-reveal feature-reveal-delay-2 mt-6 space-y-6">
-          <section className="flex flex-col gap-5 rounded-[1.75rem] border border-[#dedbd2] bg-[#f1eee6] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-7">
-            <div className="flex items-start gap-4">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#dfece4] text-[#236a58]">
+          <section className="flex flex-col gap-5 rounded-2xl border border-line/50 bg-surface p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+            <div className="flex items-start gap-3">
+              <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent">
                 <CalendarRange
-                  size={21}
+                  size={18}
+                  aria-hidden
                 />
               </div>
 
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#657972]">
+                <p className="type-eyebrow">
                   {formatMonth(
                     selectedBudget
                       .budgetMonth,
@@ -537,64 +610,74 @@ export default function BudgetsPage() {
                   }
                 </p>
 
-                <h2 className="mt-2 font-serif text-3xl text-[#173c32]">
-                  {selectedBudget.name}
+                <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-ink">
+                  {
+                    selectedBudget.name
+                  }
                 </h2>
 
                 {selectedBudget.status ===
                   'ARCHIVED' && (
-                    <p className="mt-2 text-sm text-[#8a5f20]">
-                      This plan is
-                      archived and
-                      read-only.
-                    </p>
-                  )}
+                  <p className="mt-1 text-xs font-medium text-warning">
+                    This plan is
+                    archived and
+                    read-only.
+                  </p>
+                )}
               </div>
             </div>
 
             {selectedBudget.status ===
               'ACTIVE' && (
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setEditingBudget(
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setEditingBudget(
+                      selectedBudget,
+                    )
+                  }
+                  className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-line bg-surface px-4 py-2.5 text-sm font-semibold text-ink transition hover:bg-surface-muted"
+                >
+                  <Pencil
+                    size={15}
+                    aria-hidden
+                  />
+
+                  Rename
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActionError(
+                      null,
+                    )
+
+                    setActionTarget({
+                      kind:
+                        'ARCHIVE_BUDGET',
+                      budget:
                         selectedBudget,
-                      )
-                    }
-                    className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#cbc7bc] bg-[#fffdf8] px-4 py-2.5 text-sm font-semibold text-[#173c32] transition hover:bg-white"
-                  >
-                    <Pencil
-                      size={15}
-                    />
-                    Rename
-                  </button>
+                    })
+                  }}
+                  className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-danger/20 bg-surface px-4 py-2.5 text-sm font-semibold text-danger transition hover:bg-danger-soft"
+                >
+                  <Archive
+                    size={15}
+                    aria-hidden
+                  />
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActionError(null)
-
-                      setActionTarget({
-                        kind:
-                          'ARCHIVE_BUDGET',
-                        budget:
-                          selectedBudget,
-                      })
-                    }}
-                    className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#e0c8bf] bg-[#fffdf8] px-4 py-2.5 text-sm font-semibold text-[#9a4c3a] transition hover:bg-[#fff1ec]"
-                  >
-                    <Archive
-                      size={15}
-                    />
-                    Archive
-                  </button>
-                </div>
-              )}
+                  Archive
+                </button>
+              </div>
+            )}
           </section>
 
           <BudgetPerformancePanel
-            budget={selectedBudget}
+            budget={
+              selectedBudget
+            }
             performance={
               performanceQuery.data
             }
@@ -604,29 +687,36 @@ export default function BudgetsPage() {
             isError={
               performanceQuery.isError
             }
-            onRetry={() => {
+            onRetry={() =>
               void performanceQuery.refetch()
-            }}
+            }
             onAddLimit={() =>
-              setLimitModalTarget({})
+              setLimitModalTarget(
+                {},
+              )
             }
             onEditLimit={(
               limit,
               categoryName,
             ) =>
-              setLimitModalTarget({
-                limit,
-                categoryName,
-              })
+              setLimitModalTarget(
+                {
+                  limit,
+                  categoryName,
+                },
+              )
             }
             onRemoveLimit={(
               limit,
               categoryName,
             ) => {
-              setActionError(null)
+              setActionError(
+                null,
+              )
 
               setActionTarget({
-                kind: 'REMOVE_LIMIT',
+                kind:
+                  'REMOVE_LIMIT',
                 budgetId:
                   selectedBudget.id,
                 limit,
@@ -640,16 +730,22 @@ export default function BudgetsPage() {
       {isCreateOpen && (
         <BudgetModal
           onClose={() =>
-            setIsCreateOpen(false)
+            setIsCreateOpen(
+              false,
+            )
           }
         />
       )}
 
       {editingBudget && (
         <BudgetModal
-          budget={editingBudget}
+          budget={
+            editingBudget
+          }
           onClose={() =>
-            setEditingBudget(null)
+            setEditingBudget(
+              null,
+            )
           }
         />
       )}
@@ -673,7 +769,9 @@ export default function BudgetsPage() {
               unavailableCategoryIds
             }
             onClose={() =>
-              setLimitModalTarget(null)
+              setLimitModalTarget(
+                null,
+              )
             }
           />
         )}
@@ -690,11 +788,15 @@ export default function BudgetsPage() {
             archiveBudget.isPending ||
             deleteLimit.isPending
           }
-          errorMessage={actionError}
-          onCancel={closeActionDialog}
-          onConfirm={() => {
+          errorMessage={
+            actionError
+          }
+          onCancel={
+            closeActionDialog
+          }
+          onConfirm={() =>
             void confirmAction()
-          }}
+          }
         />
       )}
     </PageShell>

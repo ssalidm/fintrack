@@ -20,7 +20,7 @@ export default function PageHeader({
           {eyebrow}
         </p>
 
-        <h1 className="type-page-title mt-3">
+        <h1 className="text-2xl font-semibold tracking-[-0.025em] sm:text-3xl mt-2">
           {title}
         </h1>
 

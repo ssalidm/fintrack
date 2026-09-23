@@ -2,13 +2,19 @@ import {
   Ban,
   CalendarDays,
   Pencil,
-  RefreshCw,
   X,
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import {
+  useEffect,
+  useState,
+} from 'react'
 
 import { ApiClientError } from '../../../api/ApiClientError'
+import RefreshButton from '../../../components/actions/RefreshButton'
+import StatusTabs from '../../../components/navigation/StatusTabs'
+import ErrorPanel from '../../../components/ui/ErrorPanel'
 import Pagination from '../../../components/ui/Pagination'
+import { formatMoney } from '../../../utils/formatters'
 import type {
   GoalContribution,
   GoalContributionStatus,
@@ -24,8 +30,14 @@ interface ContributionHistoryDrawerProps {
 }
 
 const statusOptions = [
-  { value: 'POSTED', label: 'Counted' },
-  { value: 'VOIDED', label: 'Voided' },
+  {
+    value: 'POSTED',
+    label: 'Counted',
+  },
+  {
+    value: 'VOIDED',
+    label: 'Voided',
+  },
 ] satisfies Array<{
   value: GoalContributionStatus
   label: string
@@ -33,74 +45,124 @@ const statusOptions = [
 
 const contributionPageSize = 5
 
-function formatMoney(amount: number, currencyCode: string) {
-  return new Intl.NumberFormat('en-ZA', {
-    style: 'currency',
-    currency: currencyCode,
-    maximumFractionDigits: 2,
-  }).format(amount)
+function parseLocalDate(
+  value: string,
+) {
+  const [
+    year,
+    month,
+    day,
+  ] = value
+    .split('-')
+    .map(Number)
+
+  return new Date(
+    year,
+    month - 1,
+    day,
+  )
 }
 
-function parseLocalDate(value: string) {
-  const [year, month, day] = value.split('-').map(Number)
-  return new Date(year, month - 1, day)
+function formatDate(
+  value: string,
+) {
+  return new Intl.DateTimeFormat(
+    'en-ZA',
+    {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    },
+  ).format(
+    parseLocalDate(value),
+  )
 }
 
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat('en-ZA', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  }).format(parseLocalDate(value))
-}
-
-function formatTimestamp(value: string) {
-  return new Intl.DateTimeFormat('en-ZA', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(new Date(value))
+function formatTimestamp(
+  value: string,
+) {
+  return new Intl.DateTimeFormat(
+    'en-ZA',
+    {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    },
+  ).format(
+    new Date(value),
+  )
 }
 
 export default function ContributionHistoryDrawer({
   goal,
   onClose,
 }: ContributionHistoryDrawerProps) {
-  const [status, setStatus] =
-    useState<GoalContributionStatus>('POSTED')
-
-  const [page, setPage] = useState(0)
-
-  const [editingContribution, setEditingContribution] =
-    useState<GoalContribution | null>(null)
-
-  const [voidingContribution, setVoidingContribution] =
-    useState<GoalContribution | null>(null)
-
-  const contributionsQuery = useGoalContributions(
-    goal.id,
+  const [
     status,
-    page,
-    contributionPageSize,
-  )
+    setStatus,
+  ] =
+    useState<GoalContributionStatus>(
+      'POSTED',
+    )
 
-  const contributions = contributionsQuery.data?.items ?? []
-  const pagination = contributionsQuery.data
+  const [
+    page,
+    setPage,
+  ] = useState(0)
+
+  const [
+    editingContribution,
+    setEditingContribution,
+  ] =
+    useState<GoalContribution | null>(
+      null,
+    )
+
+  const [
+    voidingContribution,
+    setVoidingContribution,
+  ] =
+    useState<GoalContribution | null>(
+      null,
+    )
+
+  const contributionsQuery =
+    useGoalContributions(
+      goal.id,
+      status,
+      page,
+      contributionPageSize,
+    )
+
+  const contributions =
+    contributionsQuery.data
+      ?.items ?? []
+
+  const pagination =
+    contributionsQuery.data
 
   const firstVisibleContribution =
-    pagination && contributions.length > 0
-      ? pagination.page * pagination.size + 1
+    pagination &&
+    contributions.length > 0
+      ? pagination.page *
+          pagination.size +
+        1
       : 0
 
   const lastVisibleContribution =
-    pagination && contributions.length > 0
+    pagination &&
+    contributions.length > 0
       ? Math.min(
-          firstVisibleContribution + contributions.length - 1,
+          firstVisibleContribution +
+            contributions.length -
+            1,
           pagination.totalElements,
         )
       : 0
 
   useEffect(() => {
-    function handleEscape(event: KeyboardEvent) {
+    function handleEscape(
+      event: KeyboardEvent,
+    ) {
       if (
         event.key === 'Escape' &&
         !editingContribution &&
@@ -110,14 +172,26 @@ export default function ContributionHistoryDrawer({
       }
     }
 
-    document.addEventListener('keydown', handleEscape)
+    document.addEventListener(
+      'keydown',
+      handleEscape,
+    )
 
     return () => {
-      document.removeEventListener('keydown', handleEscape)
+      document.removeEventListener(
+        'keydown',
+        handleEscape,
+      )
     }
-  }, [editingContribution, voidingContribution, onClose])
+  }, [
+    editingContribution,
+    voidingContribution,
+    onClose,
+  ])
 
-  function changeStatus(nextStatus: GoalContributionStatus) {
+  function changeStatus(
+    nextStatus: GoalContributionStatus,
+  ) {
     setStatus(nextStatus)
     setPage(0)
   }
@@ -135,23 +209,23 @@ export default function ContributionHistoryDrawer({
         role="dialog"
         aria-modal="true"
         aria-labelledby="contribution-history-title"
-        className="absolute inset-y-0 right-0 flex w-full max-w-2xl flex-col bg-[#f7f5ef] shadow-2xl"
+        className="absolute inset-y-0 right-0 flex w-full max-w-2xl flex-col bg-app shadow-2xl"
       >
-        <header className="border-b border-[#dedbd2] px-6 py-6 sm:px-8">
+        <header className="border-b border-line px-6 py-6 sm:px-8">
           <div className="flex items-start justify-between gap-5">
             <div>
-              <p className="text-xs font-semibold tracking-[0.15em] text-[#657972]">
-                EVERY STEP COUNTS
+              <p className="type-eyebrow">
+                Every step counts
               </p>
 
               <h2
                 id="contribution-history-title"
-                className="mt-3 font-serif text-4xl tracking-[-0.03em] text-[#173c32]"
+                className="type-page-title mt-3"
               >
                 Contribution history
               </h2>
 
-              <p className="mt-2 text-sm text-[#657972]">
+              <p className="type-body mt-2">
                 {goal.name}
               </p>
             </div>
@@ -159,120 +233,123 @@ export default function ContributionHistoryDrawer({
             <button
               type="button"
               onClick={onClose}
-              className="cursor-pointer rounded-full border border-[#d8d6ce] p-2 text-[#657972] transition hover:bg-[#ebe9e3] hover:text-[#173c32]"
+              className="grid size-9 cursor-pointer place-items-center rounded-full border border-line bg-surface text-muted transition hover:bg-surface-muted hover:text-ink"
               aria-label="Close"
               title="Close history"
             >
-              <X size={20} />
+              <X
+                size={18}
+                aria-hidden
+              />
             </button>
           </div>
 
-          <div className="mt-6 grid grid-cols-2 overflow-hidden rounded-2xl border border-[#d8ded8] bg-[#eaf0e9]">
+          <div className="mt-6 grid grid-cols-2 overflow-hidden rounded-xl border border-line/50 bg-surface">
             <div className="p-4">
-              <p className="text-xs text-[#657972]">Saved so far</p>
+              <p className="text-xs text-muted">
+                Saved so far
+              </p>
 
-              <p className="mt-1 font-serif text-2xl text-[#173c32]">
-                {formatMoney(goal.currentAmount, goal.currencyCode)}
+              <p className="mt-1 text-lg font-semibold text-ink">
+                {formatMoney(
+                  goal.currentAmount,
+                  goal.currencyCode,
+                )}
               </p>
             </div>
 
-            <div className="border-l border-[#d4ddd5] p-4">
-              <p className="text-xs text-[#657972]">Goal progress</p>
+            <div className="border-l border-line/50 p-4">
+              <p className="text-xs text-muted">
+                Goal progress
+              </p>
 
-              <p className="mt-1 font-serif text-2xl text-[#39725d]">
-                {Math.round(goal.progressPercentage)}%
+              <p className="mt-1 text-lg font-semibold text-success">
+                {Math.round(
+                  goal.progressPercentage,
+                )}
+                %
               </p>
             </div>
           </div>
         </header>
 
-        <div className="flex items-center justify-between gap-4 border-b border-[#dedbd2] px-6 sm:px-8">
-          <div className="flex gap-6">
-            {statusOptions.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => changeStatus(option.value)}
-                className={`cursor-pointer border-b-2 py-4 text-sm font-semibold transition ${
-                  status === option.value
-                    ? 'border-[#39725d] text-[#173c32]'
-                    : 'border-transparent text-[#7a8984] hover:text-[#173c32]'
-                }`}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
+        <div className="flex items-center justify-between gap-4 border-b border-line px-6 py-3 sm:px-8">
+          <StatusTabs
+            value={status}
+            options={
+              statusOptions
+            }
+            onChange={
+              changeStatus
+            }
+            ariaLabel="Contribution status"
+            variant="pill"
+          />
 
-          <button
-            type="button"
-            onClick={() => void contributionsQuery.refetch()}
-            disabled={contributionsQuery.isFetching}
-            className="cursor-pointer rounded-full p-2 text-[#657972] transition hover:bg-[#e7ece7] hover:text-[#39725d] disabled:cursor-not-allowed disabled:opacity-60"
-            aria-label="Refresh contributions"
-            title="Refresh contribution history"
-          >
-            <RefreshCw
-              size={17}
-              aria-hidden
-              className={contributionsQuery.isFetching ? 'animate-spin' : ''}
-            />
-          </button>
+          <RefreshButton
+            isRefreshing={
+              contributionsQuery.isFetching
+            }
+            onRefresh={
+              contributionsQuery.refetch
+            }
+            label="Refresh contributions"
+            iconOnly
+          />
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-6 sm:px-8">
           {contributionsQuery.isPending && (
             <div className="animate-pulse space-y-3">
-              {[1, 2, 3, 4].map((item) => (
-                <div
-                  key={item}
-                  className="h-24 rounded-2xl bg-[#e5e8e1]"
-                />
-              ))}
+              {[1, 2, 3, 4].map(
+                (item) => (
+                  <div
+                    key={item}
+                    className="h-24 rounded-xl bg-surface-muted"
+                  />
+                ),
+              )}
             </div>
           )}
 
           {contributionsQuery.error && (
-            <section
-              role="alert"
-              className="rounded-2xl border border-red-200 bg-red-50 p-5"
-            >
-              <h3 className="font-serif text-2xl text-red-950">
-                We couldn’t load the history
-              </h3>
-
-              <p className="mt-2 text-sm text-red-700">
-                {contributionsQuery.error instanceof ApiClientError
-                  ? contributionsQuery.error.message
-                  : 'Please try again.'}
-              </p>
-
-              <button
-                type="button"
-                onClick={() => void contributionsQuery.refetch()}
-                className="mt-4 cursor-pointer text-sm font-semibold text-red-800 underline underline-offset-4"
-              >
-                Try again
-              </button>
-            </section>
+            <ErrorPanel
+              title="We couldn’t load the history"
+              message={
+                contributionsQuery.error instanceof
+                ApiClientError
+                  ? contributionsQuery
+                      .error.message
+                  : 'Please try again.'
+              }
+              onRetry={() =>
+                void contributionsQuery.refetch()
+              }
+            />
           )}
 
           {!contributionsQuery.isPending &&
             !contributionsQuery.error &&
-            contributions.length === 0 && (
+            contributions.length ===
+              0 && (
               <section className="py-14 text-center">
-                <span className="mx-auto grid size-12 place-items-center rounded-full bg-[#e3eee7] text-[#39725d]">
-                  <CalendarDays size={21} aria-hidden />
+                <span className="mx-auto grid size-11 place-items-center rounded-xl bg-accent-soft text-accent">
+                  <CalendarDays
+                    size={19}
+                    aria-hidden
+                  />
                 </span>
 
-                <h3 className="mt-4 font-serif text-2xl text-[#173c32]">
-                  {status === 'POSTED'
+                <h3 className="mt-4 text-xl font-semibold text-ink">
+                  {status ===
+                  'POSTED'
                     ? 'No contributions yet'
                     : 'Nothing has been voided'}
                 </h3>
 
-                <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-[#657972]">
-                  {status === 'POSTED'
+                <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-muted">
+                  {status ===
+                  'POSTED'
                     ? 'Your progress entries will appear here as you add to this goal.'
                     : 'Contributions removed from the total will remain visible here.'}
                 </p>
@@ -281,105 +358,152 @@ export default function ContributionHistoryDrawer({
 
           {!contributionsQuery.isPending &&
             !contributionsQuery.error &&
-            contributions.length > 0 && (
+            contributions.length >
+              0 && (
               <div className="space-y-3">
-                {contributions.map((contribution) => (
-                  <article
-                    key={contribution.id}
-                    className={`rounded-2xl border p-5 ${
-                      contribution.status === 'VOIDED'
-                        ? 'border-[#ead8d1] bg-[#fbf4f1]'
-                        : 'border-[#dedbd2] bg-[#fffdf8]'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-5">
-                      <div className="min-w-0">
-                        <p
-                          className={`font-serif text-2xl ${
-                            contribution.status === 'VOIDED'
-                              ? 'text-[#8a675d] line-through'
-                              : 'text-[#173c32]'
-                          }`}
-                        >
-                          {formatMoney(
-                            contribution.amount,
-                            goal.currencyCode,
-                          )}
-                        </p>
-
-                        <p className="mt-1 flex items-center gap-2 text-xs text-[#657972]">
-                          <CalendarDays size={14} aria-hidden />
-                          {formatDate(contribution.contributionDate)}
-                        </p>
-                      </div>
-
-                      {contribution.status === 'POSTED' && (
-                        <div className="flex shrink-0 items-center gap-1">
-                          <button
-                            type="button"
-                            onClick={() => setEditingContribution(contribution)}
-                            className="cursor-pointer rounded-full p-2 text-[#657972] transition hover:bg-[#e6efe9] hover:text-[#39725d]"
-                            aria-label="Edit contribution"
-                            title="Edit contribution"
+                {contributions.map(
+                  (
+                    contribution,
+                  ) => (
+                    <article
+                      key={
+                        contribution.id
+                      }
+                      className={`rounded-xl border p-5 ${
+                        contribution.status ===
+                        'VOIDED'
+                          ? 'border-danger/20 bg-danger-soft/40'
+                          : 'border-line/50 bg-surface'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-5">
+                        <div className="min-w-0">
+                          <p
+                            className={`text-lg font-semibold ${
+                              contribution.status ===
+                              'VOIDED'
+                                ? 'text-muted line-through'
+                                : 'text-ink'
+                            }`}
                           >
-                            <Pencil size={17} aria-hidden />
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => setVoidingContribution(contribution)}
-                            className="cursor-pointer rounded-full p-2 text-[#657972] transition hover:bg-[#f2e7df] hover:text-[#9b5845]"
-                            aria-label="Void contribution"
-                            title="Void contribution"
-                          >
-                            <Ban size={17} aria-hidden />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    {contribution.note && (
-                      <p className="mt-4 text-sm leading-6 text-[#526b63]">
-                        {contribution.note}
-                      </p>
-                    )}
-
-                    {contribution.status === 'VOIDED' && (
-                      <div className="mt-4 border-t border-[#ead8d1] pt-4">
-                        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#9b5845]">
-                          Voided
-                        </p>
-
-                        <p className="mt-2 text-sm text-[#76574f]">
-                          {contribution.voidReason}
-                        </p>
-
-                        {contribution.voidedAt && (
-                          <p className="mt-2 text-xs text-[#8a746d]">
-                            {formatTimestamp(contribution.voidedAt)}
+                            {formatMoney(
+                              contribution.amount,
+                              goal.currencyCode,
+                            )}
                           </p>
+
+                          <p className="mt-1 flex items-center gap-2 text-xs text-muted">
+                            <CalendarDays
+                              size={14}
+                              aria-hidden
+                            />
+
+                            {formatDate(
+                              contribution.contributionDate,
+                            )}
+                          </p>
+                        </div>
+
+                        {contribution.status ===
+                          'POSTED' && (
+                          <div className="flex shrink-0 items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setEditingContribution(
+                                  contribution,
+                                )
+                              }
+                              className="grid size-8 cursor-pointer place-items-center rounded-full text-muted transition hover:bg-accent-soft hover:text-accent"
+                              aria-label="Edit contribution"
+                              title="Edit contribution"
+                            >
+                              <Pencil
+                                size={15}
+                                aria-hidden
+                              />
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setVoidingContribution(
+                                  contribution,
+                                )
+                              }
+                              className="grid size-8 cursor-pointer place-items-center rounded-full text-muted transition hover:bg-danger-soft hover:text-danger"
+                              aria-label="Void contribution"
+                              title="Void contribution"
+                            >
+                              <Ban
+                                size={15}
+                                aria-hidden
+                              />
+                            </button>
+                          </div>
                         )}
                       </div>
-                    )}
-                  </article>
-                ))}
+
+                      {contribution.note && (
+                        <p className="mt-3 text-sm leading-6 text-muted">
+                          {
+                            contribution.note
+                          }
+                        </p>
+                      )}
+
+                      {contribution.status ===
+                        'VOIDED' && (
+                        <div className="mt-4 border-t border-danger/20 pt-4">
+                          <p className="type-eyebrow text-danger">
+                            Voided
+                          </p>
+
+                          <p className="mt-2 text-sm text-danger">
+                            {
+                              contribution.voidReason
+                            }
+                          </p>
+
+                          {contribution.voidedAt && (
+                            <p className="mt-2 text-xs text-subtle">
+                              {formatTimestamp(
+                                contribution.voidedAt,
+                              )}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </article>
+                  ),
+                )}
               </div>
             )}
         </div>
 
         {pagination &&
           !contributionsQuery.error &&
-          pagination.totalElements > 0 && (
-            <footer className="border-t border-[#dedbd2] bg-[#fffdf8] px-6 py-4 sm:px-8">
+          pagination.totalElements >
+            0 && (
+            <footer className="border-t border-line bg-surface px-6 py-4 sm:px-8">
               <Pagination
                 label="Contribution history pages"
-                page={pagination.page}
-                totalPages={pagination.totalPages}
-                onPageChange={setPage}
-                isFetching={contributionsQuery.isFetching}
+                page={
+                  pagination.page
+                }
+                totalPages={
+                  pagination.totalPages
+                }
+                onPageChange={
+                  setPage
+                }
+                isFetching={
+                  contributionsQuery.isFetching
+                }
                 showPageNumbers
                 summary={
-                  contributions.length > 0
+                  contributions.length >
+                  0
                     ? `Showing ${firstVisibleContribution}–${lastVisibleContribution} of ${pagination.totalElements}`
                     : 'No contributions on this page'
                 }
@@ -391,16 +515,28 @@ export default function ContributionHistoryDrawer({
       {editingContribution && (
         <EditContributionModal
           goal={goal}
-          contribution={editingContribution}
-          onClose={() => setEditingContribution(null)}
+          contribution={
+            editingContribution
+          }
+          onClose={() =>
+            setEditingContribution(
+              null,
+            )
+          }
         />
       )}
 
       {voidingContribution && (
         <VoidContributionModal
           goal={goal}
-          contribution={voidingContribution}
-          onClose={() => setVoidingContribution(null)}
+          contribution={
+            voidingContribution
+          }
+          onClose={() =>
+            setVoidingContribution(
+              null,
+            )
+          }
         />
       )}
     </div>
