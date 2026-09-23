@@ -26,7 +26,7 @@ interface MfaRecoveryCodesDialogProps {
 }
 
 const passwordInputClasses =
-  'w-full rounded-xl border border-line bg-white px-4 py-3 pr-12 text-sm ' +
+  'w-full rounded-xl border border-line bg-surface px-4 py-3 pr-12 text-sm ' +
   'text-ink outline-none transition focus:border-accent focus:ring-4 ' +
   'focus:ring-accent/15 disabled:cursor-not-allowed disabled:opacity-60'
 
