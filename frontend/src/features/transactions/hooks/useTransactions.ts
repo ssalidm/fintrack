@@ -16,7 +16,6 @@ import type {
   VoidTransactionRequest,
 } from '../api/types'
 import { categorySpendingQueryKeys } from '../../categories/hooks/useCategorySpending'
-import { cashFlowQueryKeys } from '../../dashboard/hooks/useCashFlowReport'
 
 export const defaultTransactionFilters: TransactionFilters = {
   status: 'POSTED',
@@ -74,9 +73,6 @@ async function invalidateFinancialData(
     }),
     queryClient.invalidateQueries({
       queryKey: dashboardSummaryQueryKey,
-    }),
-    queryClient.invalidateQueries({
-      queryKey: cashFlowQueryKeys.all,
     }),
     queryClient.invalidateQueries({
       queryKey: categorySpendingQueryKeys.all,
