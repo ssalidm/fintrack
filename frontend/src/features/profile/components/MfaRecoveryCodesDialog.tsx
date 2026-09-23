@@ -26,9 +26,9 @@ interface MfaRecoveryCodesDialogProps {
 }
 
 const passwordInputClasses =
-  'w-full rounded-xl border border-[#d9d6cc] bg-white px-4 py-3 pr-12 text-sm ' +
-  'text-[#173c32] outline-none transition focus:border-[#5f8f7e] focus:ring-4 ' +
-  'focus:ring-[#dce9e2] disabled:cursor-not-allowed disabled:opacity-60'
+  'w-full rounded-xl border border-line bg-white px-4 py-3 pr-12 text-sm ' +
+  'text-ink outline-none transition focus:border-accent focus:ring-4 ' +
+  'focus:ring-accent/15 disabled:cursor-not-allowed disabled:opacity-60'
 
 export default function MfaRecoveryCodesDialog({
   onClose,
@@ -95,7 +95,7 @@ export default function MfaRecoveryCodesDialog({
       }
       className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-[#102c25]/65 p-5 backdrop-blur-sm"
     >
-      <div className="relative my-auto w-full max-w-lg rounded-3xl border border-white/20 bg-[#fffdf8] p-6 shadow-2xl sm:p-8">
+      <div className="relative my-auto w-full max-w-lg rounded-3xl border border-line bg-surface p-6 shadow-2xl sm:p-8">
         {recoveryCodes ? (
           <RecoveryCodesPanel
             codes={recoveryCodes}
@@ -110,30 +110,30 @@ export default function MfaRecoveryCodesDialog({
                 regenerateCodes.isPending
               }
               onClick={onClose}
-              className="absolute right-5 top-5 grid size-9 cursor-pointer place-items-center rounded-full text-[#657972] transition hover:bg-[#edf2ee] hover:text-[#173c32] disabled:cursor-not-allowed disabled:opacity-50"
+              className="absolute right-5 top-5 grid size-9 cursor-pointer place-items-center rounded-full text-muted transition hover:bg-surface-muted hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
             >
               <X size={18} aria-hidden />
             </button>
 
-            <span className="grid size-12 place-items-center rounded-2xl bg-[#e0eee8] text-[#1F7A5C]">
+            <span className="grid size-12 place-items-center rounded-2xl bg-accent-soft text-accent">
               <KeyRound
                 size={22}
                 aria-hidden
               />
             </span>
 
-            <p className="mt-6 text-xs font-semibold tracking-[0.15em] text-[#1F7A5C]">
+            <p className="mt-6 text-xs font-semibold tracking-[0.15em] text-accent">
               RECOVERY ACCESS
             </p>
 
             <h2
               id="recovery-codes-title"
-              className="mt-3 pr-10 font-serif text-3xl text-[#173c32]"
+              className="mt-3 pr-10 font-serif text-3xl text-ink"
             >
               Generate new recovery codes
             </h2>
 
-            <p className="mt-3 text-sm leading-6 text-[#657972]">
+            <p className="mt-3 text-sm leading-6 text-muted">
               Once generated, every previous
               recovery code will immediately stop
               working.
@@ -144,7 +144,7 @@ export default function MfaRecoveryCodesDialog({
               onSubmit={form.handleSubmit(submit)}
               noValidate
             >
-              <label className="block text-sm font-semibold text-[#294e43]">
+              <label className="block text-sm font-semibold text-ink">
                 Current password
 
                 <span className="relative mt-2 block">
@@ -178,7 +178,7 @@ export default function MfaRecoveryCodesDialog({
                         ? 'Hide current password'
                         : 'Show current password'
                     }
-                    className="absolute right-3 top-1/2 grid size-8 -translate-y-1/2 cursor-pointer place-items-center rounded-lg text-[#657972] hover:bg-[#edf2ee] hover:text-[#174f43]"
+                    className="absolute right-3 top-1/2 grid size-8 -translate-y-1/2 cursor-pointer place-items-center rounded-lg text-muted hover:bg-surface-muted hover:text-primary"
                   >
                     {showPassword ? (
                       <EyeOff
@@ -196,7 +196,7 @@ export default function MfaRecoveryCodesDialog({
 
                 {form.formState.errors
                   .currentPassword && (
-                  <span className="mt-2 block text-xs font-medium text-[#ad573e]">
+                  <span className="mt-2 block text-xs font-medium text-danger">
                     {
                       form.formState.errors
                         .currentPassword.message
@@ -208,7 +208,7 @@ export default function MfaRecoveryCodesDialog({
               <div>
                 <label
                   htmlFor="regenerateMfaCode"
-                  className="block text-center text-sm font-semibold text-[#294e43]"
+                  className="block text-center text-sm font-semibold text-ink"
                 >
                   Authenticator code
                 </label>
@@ -245,7 +245,7 @@ export default function MfaRecoveryCodesDialog({
                   <p
                     id="regenerate-mfa-code-error"
                     role="alert"
-                    className="mt-2 text-center text-xs font-medium text-[#ad573e]"
+                    className="mt-2 text-center text-xs font-medium text-danger"
                   >
                     {
                       form.formState.errors.code
@@ -258,7 +258,7 @@ export default function MfaRecoveryCodesDialog({
               {formError && (
                 <p
                   role="alert"
-                  className="rounded-xl bg-[#f8e8e1] px-4 py-3 text-sm text-[#8d432f]"
+                  className="rounded-xl bg-danger-soft px-4 py-3 text-sm text-danger"
                 >
                   {formError}
                 </p>
@@ -269,7 +269,7 @@ export default function MfaRecoveryCodesDialog({
                 disabled={
                   regenerateCodes.isPending
                 }
-                className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#103d34] disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-inverse transition hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {regenerateCodes.isPending && (
                   <LoaderCircle
