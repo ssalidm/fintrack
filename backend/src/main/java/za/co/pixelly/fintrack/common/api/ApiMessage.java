@@ -45,6 +45,9 @@ public final class ApiMessage {
         public static final String UPDATED = "Profile updated successfully";
         public static final String PASSWORD_UPDATED = "Password changed successfully";
         public static final String EMAIL_CHANGE_REQUESTED = "Email change verification sent";
+        public static final String SESSIONS_FETCHED = "Active sessions retrieved successfully";
+        public static final String SESSION_REVOKED = "Session signed out successfully";
+        public static final String OTHER_SESSIONS_REVOKED = "Other sessions signed out successfully";
     }
 
     /*

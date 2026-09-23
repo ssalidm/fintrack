@@ -2,7 +2,6 @@ import {
   useCallback,
   useEffect,
   useRef,
-  useState,
 } from 'react'
 
 import { env } from '../../../config/env'
@@ -10,6 +9,11 @@ import { env } from '../../../config/env'
 interface GoogleCredentialResponse {
   readonly credential?: string
 }
+
+type GoogleButtonText =
+  | 'signin_with'
+  | 'signup_with'
+  | 'continue_with'
 
 interface GoogleIdentityApi {
   initialize(options: {
@@ -27,7 +31,7 @@ interface GoogleIdentityApi {
       theme: 'outline'
       size: 'large'
       text: GoogleButtonText
-      shape: 'rectangular'
+      shape: 'pill'
       logo_alignment: 'left'
       width: number
     },
@@ -46,20 +50,15 @@ type GoogleWindow = Window & {
   google?: GoogleApi
 }
 
-type GoogleButtonText =
-  | 'signin_with'
-  | 'signup_with'
-  | 'continue_with'
-
 interface GoogleSignInButtonProps {
-  disabled?: boolean
-  text?: GoogleButtonText
+  readonly disabled?: boolean
+  readonly text?: GoogleButtonText
 
-  onCredential: (
+  readonly onCredential: (
     credential: string,
   ) => void | Promise<void>
 
-  onError?: (
+  readonly onError?: (
     message: string,
   ) => void
 }
@@ -76,10 +75,8 @@ let credentialHandler:
     ) => void | Promise<void>)
   | null = null
 
-
 function loadGoogleScript():
   Promise<void> {
-
   const googleWindow =
     window as GoogleWindow
 
@@ -94,7 +91,6 @@ function loadGoogleScript():
   googleScriptPromise =
     new Promise(
       (resolve, reject) => {
-
         const existing =
           document.getElementById(
             'google-identity-services',
@@ -159,14 +155,12 @@ function loadGoogleScript():
   return googleScriptPromise
 }
 
-
 function initializeGoogle(
   clientId: string,
 ) {
   const google =
-    (
-      window as GoogleWindow
-    ).google
+    (window as GoogleWindow)
+      .google
 
   if (!google) {
     throw new Error(
@@ -203,42 +197,35 @@ function initializeGoogle(
     clientId
 }
 
-
 export default function GoogleSignInButton({
   disabled = false,
-  text = 'signin_with',
+  text = 'continue_with',
   onCredential,
   onError,
 }: GoogleSignInButtonProps) {
-
   const containerRef =
     useRef<HTMLDivElement>(null)
 
-  const [ready, setReady] =
-    useState(false)
+  const hasRenderedRef =
+    useRef(false)
 
   const renderGoogleButton =
     useCallback(() => {
-
       const container =
         containerRef.current
 
       const google =
-        (
-          window as GoogleWindow
-        ).google
+        (window as GoogleWindow)
+          .google
 
       if (
         !container ||
-        !google
+        !google ||
+        hasRenderedRef.current
       ) {
         return
       }
 
-      /*
-       * Google's standard button supports
-       * a maximum width of 400px.
-       */
       const width =
         Math.min(
           Math.floor(
@@ -251,9 +238,6 @@ export default function GoogleSignInButton({
         return
       }
 
-      container.innerHTML =
-        ''
-
       google.accounts.id.renderButton(
         container,
         {
@@ -261,15 +245,15 @@ export default function GoogleSignInButton({
           theme: 'outline',
           size: 'large',
           text,
-          shape: 'rectangular',
+          shape: 'pill',
           logo_alignment: 'left',
           width,
         },
       )
 
-      setReady(true)
+      hasRenderedRef.current =
+        true
     }, [text])
-
 
   useEffect(() => {
     const clientId =
@@ -283,8 +267,6 @@ export default function GoogleSignInButton({
       onCredential
 
     let cancelled = false
-    let resizeObserver:
-      ResizeObserver | null = null
 
     async function initialize() {
       try {
@@ -299,21 +281,6 @@ export default function GoogleSignInButton({
         )
 
         renderGoogleButton()
-
-        if (
-          containerRef.current
-        ) {
-          resizeObserver =
-            new ResizeObserver(
-              () => {
-                renderGoogleButton()
-              },
-            )
-
-          resizeObserver.observe(
-            containerRef.current,
-          )
-        }
       } catch (error) {
         if (cancelled) {
           return
@@ -332,8 +299,6 @@ export default function GoogleSignInButton({
     return () => {
       cancelled = true
 
-      resizeObserver?.disconnect()
-
       if (
         credentialHandler ===
         onCredential
@@ -348,33 +313,24 @@ export default function GoogleSignInButton({
     renderGoogleButton,
   ])
 
-
   if (!env.googleClientId) {
     return null
   }
 
-
   return (
-    <div
-      className={
-        disabled
-          ? 'pointer-events-none w-full opacity-60'
-          : 'w-full'
-      }
-      aria-busy={
-        !ready || disabled
-      }
-    >
+  <div
+    className={
+      disabled
+        ? 'pointer-events-none w-full opacity-60'
+        : 'w-full'
+    }
+  >
+    <div className="relative h-[40px] w-full overflow-hidden rounded-full">
       <div
         ref={containerRef}
-        className="flex min-h-11 w-full justify-center"
+        className="absolute inset-0 w-full"
       />
-
-      {!ready && (
-        <p className="mt-2 text-center text-xs text-[#657972]">
-          Loading Google sign-in…
-        </p>
-      )}
     </div>
-  )
+  </div>
+)
 }

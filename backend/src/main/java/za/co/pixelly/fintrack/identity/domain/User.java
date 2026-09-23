@@ -76,6 +76,9 @@ public class User {
     @Column(name = "last_login_at")
     private Instant lastLoginAt;
 
+    @Column(name = "password_changed_at")
+    private Instant passwordChangedAt;
+
     @Column(
         name = "created_at",
         nullable = false
@@ -257,6 +260,7 @@ public class User {
         Instant now
     ) {
         passwordHash = newPasswordHash;
+        passwordChangedAt = now;
         failedLoginAttempts = 0;
         lockedUntil = null;
         updatedAt = now;

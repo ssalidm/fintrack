@@ -13,6 +13,7 @@ import {
   HomePage,
   NotFoundPage,
   SupportPage,
+  CompleteRegistrationPage,
   LoginPage,
   MfaChallengePage,
   RegisterPage,
@@ -59,6 +60,10 @@ export const router = createBrowserRouter([
       {
         element: <AuthLayout />,
         children: [
+          {
+            path: '/register/complete',
+            element: <CompleteRegistrationPage />,
+          },
           {
             path: '/login',
             element: <LoginPage />,

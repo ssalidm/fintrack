@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import za.co.pixelly.fintrack.identity.domain.AuthSession;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,5 +35,28 @@ public interface AuthSessionRepository extends JpaRepository<AuthSession, UUID> 
     Page<AuthSession> findAllByUserIdOrderByCreatedAtDesc(
         UUID userId,
         Pageable pageable
+    );
+
+    List<AuthSession> findAllByUserIdAndRevokedAtIsNullAndExpiresAtAfterOrderByLastSeenAtDesc(
+        UUID userId,
+        Instant now
+    );
+
+    @Modifying
+    @Query("""
+        update AuthSession session
+           set session.revokedAt = :now,
+               session.revocationReason = :reason,
+               session.version = session.version + 1
+         where session.userId = :userId
+           and session.id <> :currentSessionId
+           and session.revokedAt is null
+           and session.expiresAt > :now
+        """)
+    int revokeActiveByUserIdExcludingSession(
+        @Param("userId") UUID userId,
+        @Param("currentSessionId") UUID currentSessionId,
+        @Param("now") Instant now,
+        @Param("reason") String reason
     );
 }

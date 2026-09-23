@@ -16,16 +16,16 @@ export default function PageHeader({
   return (
     <header className="feature-reveal flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#657972]">
+        <p className="type-eyebrow">
           {eyebrow}
         </p>
 
-        <h1 className="mt-3 font-serif text-4xl tracking-[-0.03em] text-[#173c32] sm:text-5xl">
+        <h1 className="type-page-title mt-3">
           {title}
         </h1>
 
         {description && (
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#657972] sm:text-base">
+          <p className="type-body mt-3 max-w-2xl sm:text-base">
             {description}
           </p>
         )}

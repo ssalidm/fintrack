@@ -1,73 +1,135 @@
-import {useState} from 'react'
-import {zodResolver} from '@hookform/resolvers/zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { CheckCircle2 } from 'lucide-react'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
 import {
   Link,
   useNavigate,
   useSearchParams,
 } from 'react-router'
-import {useForm} from 'react-hook-form'
-import {ApiClientError} from '../../../api/ApiClientError'
-import {authApi} from '../api/authApi'
+
+import { ApiClientError } from '../../../api/ApiClientError'
+import { authApi } from '../api/authApi'
+import AuthAlert from '../components/AuthAlert'
+import AuthButton from '../components/AuthButton'
+import AuthField from '../components/AuthField'
+import AuthHeader from '../components/AuthHeader'
+import AuthInput from '../components/AuthInput'
+import AuthPanel from '../components/AuthPanel'
 import PasswordVisibilityButton from '../components/PasswordVisibilityButton'
 import {
   resetPasswordSchema,
   type ResetPasswordFormValues,
 } from '../validation/resetPasswordSchema'
 
-const inputClasses =
-  'block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-[#1F7A5C] focus:ring-2 focus:ring-[#1F7A5C]/20 disabled:cursor-not-allowed disabled:bg-slate-100'
-
 export default function ResetPasswordPage() {
-  const [searchParams] = useSearchParams()
-  const navigate = useNavigate()
+  const [searchParams] =
+    useSearchParams()
 
-  const token = searchParams.get('token')?.trim() ?? ''
+  const navigate =
+    useNavigate()
 
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmation, setShowConfirmation] = useState(false)
-  const [successMessage, setSuccessMessage] = useState<string | null>(null)
-  const [submitError, setSubmitError] = useState<string | null>(null)
+  const token =
+    searchParams
+      .get('token')
+      ?.trim() ?? ''
+
+  const [
+    showPassword,
+    setShowPassword,
+  ] = useState(false)
+
+  const [
+    showConfirmation,
+    setShowConfirmation,
+  ] = useState(false)
+
+  const [
+    successMessage,
+    setSuccessMessage,
+  ] = useState<string | null>(
+    null,
+  )
+
+  const [
+    submitError,
+    setSubmitError,
+  ] = useState<string | null>(
+    null,
+  )
 
   const {
     register,
     handleSubmit,
     setError,
-    formState: {errors, isSubmitting},
-  } = useForm<ResetPasswordFormValues>({
-    resolver: zodResolver(resetPasswordSchema),
-    defaultValues: {
-      newPassword: '',
-      confirmPassword: '',
+    formState: {
+      errors,
+      isSubmitting,
     },
-  })
+  } =
+    useForm<ResetPasswordFormValues>({
+      resolver: zodResolver(
+        resetPasswordSchema,
+      ),
+      defaultValues: {
+        newPassword: '',
+        confirmPassword: '',
+      },
+    })
 
-  async function onSubmit(values: ResetPasswordFormValues) {
+  async function onSubmit(
+    values: ResetPasswordFormValues,
+  ) {
     setSubmitError(null)
 
     try {
-      const response = await authApi.resetPassword({
-        token,
-        newPassword: values.newPassword,
-      })
+      const response =
+        await authApi.resetPassword({
+          token,
+          newPassword:
+            values.newPassword,
+        })
 
       setSuccessMessage(
         response.message ||
-        'Your password has been reset. Please sign in again.',
+          'Your password has been reset. Please sign in again.',
       )
 
-      // Remove the consumed token from the address bar.
-      navigate('/reset-password', {replace: true})
+      navigate(
+        '/reset-password',
+        {
+          replace: true,
+        },
+      )
     } catch (error) {
-      if (!(error instanceof ApiClientError)) {
-        setSubmitError('Something went wrong. Please try again.')
+      if (
+        !(
+          error instanceof
+          ApiClientError
+        )
+      ) {
+        setSubmitError(
+          'Something went wrong. Please try again.',
+        )
+
         return
       }
 
-      if (error.validationErrors?.newPassword) {
-        setError('newPassword', {
-          type: 'server',
-          message: error.validationErrors.newPassword,
-        })
+      if (
+        error.validationErrors
+          ?.newPassword
+      ) {
+        setError(
+          'newPassword',
+          {
+            type: 'server',
+            message:
+              error
+                .validationErrors
+                .newPassword,
+          },
+        )
+
         return
       }
 
@@ -81,246 +143,223 @@ export default function ResetPasswordPage() {
 
   if (successMessage) {
     return (
-      <section
-        className="w-full max-w-md text-center"
-        aria-labelledby="reset-password-title"
-      >
+      <AuthPanel className="auth-panel-enter">
         <div
-          className="mx-auto grid size-14 place-items-center rounded-full bg-emerald-100 text-[#1F7A5C]"
-          aria-hidden="true"
+          aria-labelledby="reset-password-title"
         >
-          <svg
-            className="size-7"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="m5 12 4 4L19 6"/>
-          </svg>
+          <span className="mb-5 grid size-10 place-items-center rounded-full bg-[#e5f1eb] text-[#16805f]">
+            <CheckCircle2
+              size={20}
+              aria-hidden
+            />
+          </span>
+
+          <AuthHeader
+            title="Reset successful"
+            description={
+              successMessage
+            }
+            titleId="reset-password-title"
+          />
+
+          <div className="mt-6">
+            <AuthButton
+              type="button"
+              onClick={() =>
+                navigate('/login')
+              }
+            >
+              Continue to sign in
+            </AuthButton>
+          </div>
         </div>
-
-        <p className="mt-5 text-sm font-semibold text-[#1F7A5C]">
-          Password updated
-        </p>
-
-        <h1
-          id="reset-password-title"
-          className="mt-2 text-3xl font-semibold text-slate-950"
-        >
-          Reset successful
-        </h1>
-
-        <p className="mt-3 text-sm leading-6 text-slate-600">
-          {successMessage}
-        </p>
-
-        <Link
-          to="/login"
-          className="mt-7 inline-flex rounded-lg bg-[#1F7A5C] px-5 py-2.5 font-semibold text-white transition hover:bg-[#19664D] focus:outline-none focus:ring-2 focus:ring-[#1F7A5C] focus:ring-offset-2"
-        >
-          Continue to sign in
-        </Link>
-      </section>
+      </AuthPanel>
     )
   }
 
   if (!token) {
     return (
-      <section
-        className="w-full max-w-md text-center"
-        aria-labelledby="reset-password-title"
-      >
+      <AuthPanel className="auth-panel-enter">
         <div
-          className="mx-auto grid size-14 place-items-center rounded-full bg-red-100 text-red-600"
-          aria-hidden="true"
+          aria-labelledby="reset-password-title"
         >
-          <svg
-            className="size-7"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-          >
-            <path d="M12 8v5"/>
-            <path d="M12 17h.01"/>
-            <circle cx="12" cy="12" r="9"/>
-          </svg>
+          <AuthHeader
+            title="Reset link missing"
+            description="Open the complete password reset link from the email we sent you."
+            titleId="reset-password-title"
+          />
+
+          <p className="mt-6 text-sm text-[#657972]">
+            Need another link?{' '}
+            <Link
+              to="/forgot-password"
+              className="font-semibold text-[#16805f] transition hover:text-[#0d4f3f] hover:underline"
+            >
+              Request a new one
+            </Link>
+          </p>
         </div>
-
-        <h1
-          id="reset-password-title"
-          className="mt-6 text-3xl font-semibold text-slate-950"
-        >
-          Reset token missing
-        </h1>
-
-        <p className="mt-3 text-sm leading-6 text-slate-600">
-          Open the complete password reset link from your email.
-        </p>
-
-        <Link
-          to="/forgot-password"
-          className="mt-7 inline-flex font-semibold text-[#1F7A5C] hover:underline"
-        >
-          Request a new reset link
-        </Link>
-      </section>
+      </AuthPanel>
     )
   }
 
   return (
-    <section
-      className="w-full max-w-md"
-      aria-labelledby="reset-password-title"
-    >
-      <header>
-        <p className="text-sm font-semibold text-[#1F7A5C]">
-          Account recovery
-        </p>
-
-        <h1
-          id="reset-password-title"
-          className="mt-2 text-3xl font-semibold tracking-tight text-slate-950"
-        >
-          Create a new password
-        </h1>
-
-        <p className="mt-2 text-sm leading-6 text-slate-600">
-          Choose a strong password that you haven’t used before.
-        </p>
-      </header>
-
-      <form
-        className="mt-8 space-y-5"
-        onSubmit={handleSubmit(onSubmit)}
-        noValidate
+    <AuthPanel className="auth-panel-enter">
+      <div
+        aria-labelledby="reset-password-title"
       >
-        <div>
-          <label
+        <AuthHeader
+          title="Create a new password"
+          description="Choose a strong password that you haven’t used before."
+          titleId="reset-password-title"
+        />
+
+        <form
+          className="mt-6 space-y-4"
+          onSubmit={
+            handleSubmit(
+              onSubmit,
+            )
+          }
+          noValidate
+        >
+          <AuthField
+            label="New password"
             htmlFor="newPassword"
-            className="text-sm font-medium text-slate-800"
+            error={
+              errors.newPassword
+                ?.message
+            }
+            hint={
+              !errors.newPassword
+                ? 'Use 12–72 characters with uppercase, lowercase, a number and a symbol.'
+                : undefined
+            }
           >
-            New password
-          </label>
+            <div className="relative">
+              <AuthInput
+                id="newPassword"
+                type={
+                  showPassword
+                    ? 'text'
+                    : 'password'
+                }
+                autoComplete="new-password"
+                autoFocus
+                disabled={
+                  isSubmitting
+                }
+                hasError={
+                  Boolean(
+                    errors.newPassword,
+                  )
+                }
+                aria-invalid={
+                  errors.newPassword
+                    ? 'true'
+                    : 'false'
+                }
+                className="pr-12"
+                {...register(
+                  'newPassword',
+                )}
+              />
 
-          <div className="relative mt-2">
-            <input
-              id="newPassword"
-              type={showPassword ? 'text' : 'password'}
-              autoComplete="new-password"
-              disabled={isSubmitting}
-              aria-invalid={errors.newPassword ? 'true' : 'false'}
-              aria-describedby={
-                errors.newPassword
-                  ? 'newPassword-error'
-                  : 'newPassword-help'
-              }
-              className={`${inputClasses} pr-12`}
-              {...register('newPassword')}
-            />
+              <PasswordVisibilityButton
+                visible={
+                  showPassword
+                }
+                fieldLabel="new password"
+                onToggle={() =>
+                  setShowPassword(
+                    (visible) =>
+                      !visible,
+                  )
+                }
+              />
+            </div>
+          </AuthField>
 
-            <PasswordVisibilityButton
-              visible={showPassword}
-              fieldLabel="new password"
-              onToggle={() => setShowPassword((visible) => !visible)}
-            />
-          </div>
-
-          {errors.newPassword ? (
-            <p
-              id="newPassword-error"
-              className="mt-1.5 text-sm text-red-600"
-              role="alert"
-            >
-              {errors.newPassword.message}
-            </p>
-          ) : (
-            <p
-              id="newPassword-help"
-              className="mt-1.5 text-xs text-slate-500"
-            >
-              Use 12–72 characters with uppercase, lowercase, number, and
-              symbol.
-            </p>
-          )}
-        </div>
-
-        <div>
-          <label
+          <AuthField
+            label="Confirm new password"
             htmlFor="confirmPassword"
-            className="text-sm font-medium text-slate-800"
+            error={
+              errors.confirmPassword
+                ?.message
+            }
           >
-            Confirm new password
-          </label>
+            <div className="relative">
+              <AuthInput
+                id="confirmPassword"
+                type={
+                  showConfirmation
+                    ? 'text'
+                    : 'password'
+                }
+                autoComplete="new-password"
+                disabled={
+                  isSubmitting
+                }
+                hasError={
+                  Boolean(
+                    errors.confirmPassword,
+                  )
+                }
+                aria-invalid={
+                  errors.confirmPassword
+                    ? 'true'
+                    : 'false'
+                }
+                className="pr-12"
+                {...register(
+                  'confirmPassword',
+                )}
+              />
 
-          <div className="relative mt-2">
-            <input
-              id="confirmPassword"
-              type={showConfirmation ? 'text' : 'password'}
-              autoComplete="new-password"
-              disabled={isSubmitting}
-              aria-invalid={
-                errors.confirmPassword ? 'true' : 'false'
-              }
-              aria-describedby={
-                errors.confirmPassword
-                  ? 'confirmPassword-error'
-                  : undefined
-              }
-              className={`${inputClasses} pr-12`}
-              {...register('confirmPassword')}
-            />
+              <PasswordVisibilityButton
+                visible={
+                  showConfirmation
+                }
+                fieldLabel="confirmed password"
+                onToggle={() =>
+                  setShowConfirmation(
+                    (visible) =>
+                      !visible,
+                  )
+                }
+              />
+            </div>
+          </AuthField>
 
-            <PasswordVisibilityButton
-              visible={showConfirmation}
-              fieldLabel="confirmed password"
-              onToggle={() =>
-                setShowConfirmation((visible) => !visible)
-              }
-            />
-          </div>
-
-          {errors.confirmPassword && (
-            <p
-              id="confirmPassword-error"
-              className="mt-1.5 text-sm text-red-600"
-              role="alert"
-            >
-              {errors.confirmPassword.message}
-            </p>
+          {submitError && (
+            <AuthAlert variant="error">
+              {submitError}
+            </AuthAlert>
           )}
-        </div>
 
-        {submitError && (
-          <div
-            className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
-            role="alert"
+          <AuthButton
+            type="submit"
+            disabled={
+              isSubmitting
+            }
+            loading={
+              isSubmitting
+            }
+            loadingLabel="Resetting password…"
           >
-            {submitError}
-          </div>
-        )}
+            Reset password
+          </AuthButton>
+        </form>
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="flex w-full justify-center rounded-lg bg-[#1F7A5C] px-4 py-2.5 font-semibold text-white transition hover:bg-[#19664D] focus:outline-none focus:ring-2 focus:ring-[#1F7A5C] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {isSubmitting ? 'Resetting password…' : 'Reset password'}
-        </button>
-      </form>
-
-      <p className="mt-6 text-center text-sm">
-        <Link
-          to="/login"
-          className="font-semibold text-[#1F7A5C] hover:underline"
-        >
-          Return to sign in
-        </Link>
-      </p>
-    </section>
+        <p className="mt-5 text-center text-sm text-[#657972]">
+          <Link
+            to="/login"
+            className="font-semibold text-[#16805f] transition hover:text-[#0d4f3f] hover:underline"
+          >
+            Return to sign in
+          </Link>
+        </p>
+      </div>
+    </AuthPanel>
   )
 }

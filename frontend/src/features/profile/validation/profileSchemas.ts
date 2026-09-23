@@ -5,17 +5,36 @@ export const profileDetailsSchema = z.object({
     .string()
     .trim()
     .min(1, 'First name is required')
-    .max(100, 'First name cannot exceed 100 characters'),
+    .max(
+      100,
+      'First name cannot exceed 100 characters',
+    ),
+
   lastName: z
     .string()
     .trim()
     .min(1, 'Last name is required')
-    .max(100, 'Last name cannot exceed 100 characters'),
+    .max(
+      100,
+      'Last name cannot exceed 100 characters',
+    ),
+
+  preferredName: z
+    .string()
+    .trim()
+    .max(
+      100,
+      'Preferred name cannot exceed 100 characters',
+    ),
+
   timeZone: z
     .string()
     .trim()
     .min(1, 'Time zone is required')
-    .max(64, 'Time zone cannot exceed 64 characters'),
+    .max(
+      64,
+      'Time zone cannot exceed 64 characters',
+    ),
 })
 
 export type ProfileDetailsFormValues =

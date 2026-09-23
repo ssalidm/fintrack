@@ -20,6 +20,7 @@ public record UserProfileResponse(
     Instant emailVerifiedAt,
     List<String> roles,
     Instant lastLoginAt,
+    Instant passwordChangedAt,
     Instant createdAt,
     Instant updatedAt,
     Long version
@@ -41,6 +42,7 @@ public record UserProfileResponse(
             user.getEmailVerifiedAt(),
             List.copyOf(roles),
             user.getLastLoginAt(),
+            user.getPasswordChangedAt(),
             user.getCreatedAt(),
             user.getUpdatedAt(),
             user.getVersion()

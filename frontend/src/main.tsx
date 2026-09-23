@@ -2,6 +2,7 @@ import {StrictMode, Suspense} from 'react'
 import {createRoot} from 'react-dom/client'
 import {RouterProvider} from "react-router";
 import {router} from "./app/router.tsx";
+import '@fontsource-variable/manrope'
 import './index.css'
 import AuthProvider from "./features/auth/context/AuthProvider.tsx";
 import {QueryClientProvider} from "@tanstack/react-query";

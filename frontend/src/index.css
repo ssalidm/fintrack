@@ -1,6 +1,185 @@
 @import "tailwindcss";
 
+/* -------------------------------------------------------------------------- */
+/* Design tokens                                                              */
+/* -------------------------------------------------------------------------- */
+
+:root {
+  scrollbar-gutter: stable;
+  color-scheme: light;
+
+  /* Typography */
+  --salif-font-ui:
+    "Manrope Variable",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    sans-serif;
+
+  /* Application surfaces */
+  --salif-color-background: #f4f3ec;
+  --salif-color-surface: #fffdf8;
+  --salif-color-surface-muted: #eef2ed;
+  --salif-color-surface-strong: #e5ebe6;
+
+  /* Text */
+  --salif-color-text: #173c32;
+  --salif-color-text-muted: #657972;
+  --salif-color-text-subtle: #829087;
+  --salif-color-text-inverse: #ffffff;
+
+  /* Brand */
+  --salif-color-primary: #174f43;
+  --salif-color-primary-hover: #103d34;
+  --salif-color-accent: #16805f;
+  --salif-color-accent-soft: #dfece3;
+
+  /* Borders */
+  --salif-color-border: #dedbd2;
+  --salif-color-border-strong: #c4cec6;
+
+  /* Feedback */
+  --salif-color-danger: #ad573e;
+  --salif-color-danger-soft: #f8e8e1;
+
+  --salif-color-success: #245b49;
+  --salif-color-success-soft: #e2eee7;
+
+  --salif-color-warning: #9a6828;
+  --salif-color-warning-soft: #f4ead5;
+
+  /* Shadows */
+  --salif-shadow-card:
+    0 12px 36px rgba(23, 60, 50, 0.06);
+
+  --salif-shadow-panel:
+    0 20px 55px rgba(9, 47, 40, 0.11);
+
+  /* Select arrow */
+  --salif-select-chevron:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='m6 8 4 4 4-4' stroke='%23657972' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+
+  font-family: var(--salif-font-ui);
+  color: var(--salif-color-text);
+  background: var(--salif-color-background);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/*
+ * Dark mode is not enabled yet.
+ *
+ * When we add the theme toggle later, setting:
+ *
+ *   <html data-theme="dark">
+ *
+ * will switch these semantic tokens without requiring individual pages
+ * to know anything about dark mode.
+ */
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --salif-color-background: #0d1512;
+  --salif-color-surface: #121d19;
+  --salif-color-surface-muted: #18251f;
+  --salif-color-surface-strong: #1e2d27;
+
+  --salif-color-text: #edf5f1;
+  --salif-color-text-muted: #a5b7af;
+  --salif-color-text-subtle: #81948b;
+  --salif-color-text-inverse: #0d1512;
+
+  --salif-color-primary: #58b998;
+  --salif-color-primary-hover: #6ac6a6;
+  --salif-color-accent: #63c7a3;
+  --salif-color-accent-soft: #17382e;
+
+  --salif-color-border: #293a33;
+  --salif-color-border-strong: #3b5047;
+
+  --salif-color-danger: #ef8f77;
+  --salif-color-danger-soft: #3a211b;
+
+  --salif-color-success: #82d0b3;
+  --salif-color-success-soft: #16342a;
+
+  --salif-color-warning: #e0b66e;
+  --salif-color-warning-soft: #352b19;
+
+  --salif-shadow-card:
+    0 12px 36px rgba(0, 0, 0, 0.18);
+
+  --salif-shadow-panel:
+    0 20px 55px rgba(0, 0, 0, 0.28);
+
+  --salif-select-chevron:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='m6 8 4 4 4-4' stroke='%23A5B7AF' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* -------------------------------------------------------------------------- */
+/* Tailwind theme                                                             */
+/* -------------------------------------------------------------------------- */
+
+@theme inline {
+  --font-sans: var(--salif-font-ui);
+  --font-serif: var(--salif-font-ui);
+
+  --color-app: var(--salif-color-background);
+  --color-surface: var(--salif-color-surface);
+  --color-surface-muted: var(--salif-color-surface-muted);
+  --color-surface-strong: var(--salif-color-surface-strong);
+
+  --color-ink: var(--salif-color-text);
+  --color-muted: var(--salif-color-text-muted);
+  --color-subtle: var(--salif-color-text-subtle);
+  --color-inverse: var(--salif-color-text-inverse);
+
+  --color-primary: var(--salif-color-primary);
+  --color-primary-hover: var(--salif-color-primary-hover);
+
+  --color-accent: var(--salif-color-accent);
+  --color-accent-soft: var(--salif-color-accent-soft);
+
+  --color-line: var(--salif-color-border);
+  --color-line-strong: var(--salif-color-border-strong);
+
+  --color-danger: var(--salif-color-danger);
+  --color-danger-soft: var(--salif-color-danger-soft);
+
+  --color-success: var(--salif-color-success);
+  --color-success-soft: var(--salif-color-success-soft);
+
+  --color-warning: var(--salif-color-warning);
+  --color-warning-soft: var(--salif-color-warning-soft);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Base                                                                       */
+/* -------------------------------------------------------------------------- */
+
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    background: var(--salif-color-background);
+    color: var(--salif-color-text);
+    font-family: var(--salif-font-ui);
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
   a[href]:not([aria-disabled='true']),
   button:not(:disabled),
   [role='button']:not([aria-disabled='true']) {
@@ -11,46 +190,59 @@
   [aria-disabled='true'] {
     cursor: not-allowed;
   }
+
+  select {
+    appearance: none;
+    padding-right: 2.75rem;
+    background-image: var(--salif-select-chevron);
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.1rem;
+  }
 }
 
-:root {
-  scrollbar-gutter: stable;
+/* -------------------------------------------------------------------------- */
+/* Typography                                                                 */
+/* -------------------------------------------------------------------------- */
 
-  font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
-  color: #0f172a;
-  background: #f8fafc;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@layer components {
+  .type-page-title {
+    @apply text-4xl font-bold leading-[1.05] tracking-[-0.04em] text-ink sm:text-5xl;
+  }
+
+  .type-section-title {
+    @apply text-2xl font-semibold leading-tight tracking-[-0.025em] text-ink;
+  }
+
+  .type-card-title {
+    @apply text-lg font-semibold leading-snug tracking-[-0.015em] text-ink;
+  }
+
+  .type-body {
+    @apply text-sm leading-6 text-muted;
+  }
+
+  .type-eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.16em] text-muted;
+  }
+
+  .type-label {
+    @apply text-sm font-semibold text-ink;
+  }
+
+  .type-caption {
+    @apply text-xs leading-5 text-subtle;
+  }
 }
 
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-button,
-input,
-select,
-textarea {
-  font: inherit;
-}
-
-select {
-  appearance: none;
-  padding-right: 1rem;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='m6 8 4 4 4-4' stroke='%23657972' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 1rem center;
-  background-size: 1.1rem;
-}
+/* -------------------------------------------------------------------------- */
+/* Sidebar                                                                    */
+/* -------------------------------------------------------------------------- */
 
 .salif-sidebar-scrollbar {
-  scrollbar-color: rgba(213, 228, 221, 0.28) transparent;
+  scrollbar-color:
+    rgba(213, 228, 221, 0.28)
+    transparent;
   scrollbar-gutter: stable;
   scrollbar-width: thin;
 }
@@ -65,12 +257,18 @@ select {
 
 .salif-sidebar-scrollbar::-webkit-scrollbar-thumb {
   border-radius: 999px;
-  background: rgba(213, 228, 221, 0.22);
+  background:
+    rgba(213, 228, 221, 0.22);
 }
 
 .salif-sidebar-scrollbar:hover::-webkit-scrollbar-thumb {
-  background: rgba(213, 228, 221, 0.38);
+  background:
+    rgba(213, 228, 221, 0.38);
 }
+
+/* -------------------------------------------------------------------------- */
+/* Dashboard surface                                                          */
+/* -------------------------------------------------------------------------- */
 
 .dashboard-app-surface {
   background:
@@ -98,6 +296,7 @@ select {
   z-index: -1;
   content: '';
   pointer-events: none;
+
   background-image:
     linear-gradient(
       rgba(13, 79, 63, 0.03) 1px,
@@ -108,21 +307,59 @@ select {
       rgba(13, 79, 63, 0.03) 1px,
       transparent 1px
     );
+
   background-size: 56px 56px;
-  mask-image: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.5),
-    transparent 76%
-  );
+
+  mask-image:
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.5),
+      transparent 76%
+    );
 }
 
-.dashboard-app-surface .border-\[\#dedbd2\] {
-  border-color: #c4cec6;
+/*
+ * Temporary compatibility rule.
+ *
+ * Some dashboard components still use border-[#dedbd2].
+ * Remove this once those components use border-line or
+ * border-line-strong.
+ */
+.dashboard-app-surface
+  .border-\[\#dedbd2\] {
+  border-color:
+    var(--salif-color-border-strong);
 }
 
-html {
-  scroll-behavior: smooth;
+/* -------------------------------------------------------------------------- */
+/* Authentication surface                                                     */
+/* -------------------------------------------------------------------------- */
+
+.auth-surface-grid {
+  background-image:
+    linear-gradient(
+      rgba(13, 79, 63, 0.055) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(13, 79, 63, 0.055) 1px,
+      transparent 1px
+    );
+
+  background-size: 48px 48px;
+
+  mask-image:
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.7),
+      transparent 82%
+    );
 }
+
+/* -------------------------------------------------------------------------- */
+/* Homepage                                                                   */
+/* -------------------------------------------------------------------------- */
 
 .home-anchor {
   scroll-margin-top: 5rem;
@@ -142,7 +379,8 @@ html {
 
 .home-hero-enter {
   animation:
-    home-hero-enter 650ms
+    home-hero-enter
+    650ms
     cubic-bezier(0.22, 1, 0.36, 1)
     backwards;
 }
@@ -158,35 +396,24 @@ html {
 .home-scroll-reveal {
   opacity: 0;
   transform: translateY(18px);
+
   transition:
-    opacity 620ms
+    opacity
+      620ms
       cubic-bezier(0.22, 1, 0.36, 1),
-    transform 620ms
+    transform
+      620ms
       cubic-bezier(0.22, 1, 0.36, 1);
+
   transition-delay:
-    var(--home-reveal-delay, 0ms);
+    var(
+      --home-reveal-delay,
+      0ms
+    );
+
   will-change:
     opacity,
     transform;
-}
-
-.auth-surface-grid {
-  background-image:
-    linear-gradient(
-      rgba(13, 79, 63, 0.055) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      90deg,
-      rgba(13, 79, 63, 0.055) 1px,
-      transparent 1px
-    );
-  background-size: 48px 48px;
-  mask-image: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.7),
-    transparent 82%
-  );
 }
 
 .home-scroll-reveal[data-visible='true'] {
@@ -206,8 +433,10 @@ html {
 
 .home-chart-bar {
   transform-origin: bottom;
+
   animation:
-    home-chart-grow 720ms
+    home-chart-grow
+    720ms
     cubic-bezier(0.22, 1, 0.36, 1)
     backwards;
 }
@@ -224,48 +453,18 @@ html {
 
 .home-progress-bar {
   transform-origin: left;
+
   animation:
-    home-progress-grow 800ms
+    home-progress-grow
+    800ms
     500ms
     cubic-bezier(0.22, 1, 0.36, 1)
     backwards;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-
-  .home-hero-enter,
-  .home-chart-bar,
-  .home-progress-bar {
-    animation: none;
-  }
-
-  .home-scroll-reveal {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-}
-
-@media (max-height: 760px) {
-  .salif-sidebar {
-    padding-block: 1rem;
-  }
-
-  .salif-sidebar-brand {
-    padding-bottom: 1rem;
-  }
-
-  .salif-sidebar-nav {
-    margin-top: 1rem;
-  }
-
-  .salif-sidebar-status {
-    display: none;
-  }
-}
+/* -------------------------------------------------------------------------- */
+/* Dashboard animations                                                       */
+/* -------------------------------------------------------------------------- */
 
 @keyframes dashboard-reveal {
   from {
@@ -280,8 +479,11 @@ html {
 }
 
 .dashboard-reveal {
-  animation: dashboard-reveal 420ms
-    cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation:
+    dashboard-reveal
+    420ms
+    cubic-bezier(0.22, 1, 0.36, 1)
+    backwards;
 }
 
 .dashboard-reveal-delay-1 {
@@ -304,11 +506,9 @@ html {
   animation-delay: 300ms;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .dashboard-reveal {
-    animation: none;
-  }
-}
+/* -------------------------------------------------------------------------- */
+/* Shared feature animations                                                  */
+/* -------------------------------------------------------------------------- */
 
 @keyframes feature-fade-in {
   from {
@@ -321,7 +521,11 @@ html {
 }
 
 .feature-fade-in {
-  animation: feature-fade-in 320ms ease-out backwards;
+  animation:
+    feature-fade-in
+    320ms
+    ease-out
+    backwards;
 }
 
 .feature-fade-in-delay-1 {
@@ -330,12 +534,6 @@ html {
 
 .feature-fade-in-delay-2 {
   animation-delay: 140ms;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .feature-fade-in {
-    animation: none;
-  }
 }
 
 .feature-fade-in-delay-3 {
@@ -355,8 +553,11 @@ html {
 }
 
 .feature-reveal {
-  animation: feature-reveal 420ms
-    cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation:
+    feature-reveal
+    420ms
+    cubic-bezier(0.22, 1, 0.36, 1)
+    backwards;
 }
 
 .feature-reveal-delay-1 {
@@ -367,15 +568,13 @@ html {
   animation-delay: 160ms;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .feature-reveal {
-    animation: none;
-  }
-}
-
 .feature-reveal-delay-3 {
   animation-delay: 240ms;
 }
+
+/* -------------------------------------------------------------------------- */
+/* Authentication animations                                                  */
+/* -------------------------------------------------------------------------- */
 
 @keyframes auth-panel-enter {
   from {
@@ -390,8 +589,11 @@ html {
 }
 
 .auth-panel-enter {
-  animation: auth-panel-enter 460ms
-    cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation:
+    auth-panel-enter
+    460ms
+    cubic-bezier(0.22, 1, 0.36, 1)
+    backwards;
 }
 
 @keyframes auth-message-in {
@@ -405,7 +607,11 @@ html {
 }
 
 .auth-message-in {
-  animation: auth-message-in 220ms ease-out backwards;
+  animation:
+    auth-message-in
+    220ms
+    ease-out
+    backwards;
 }
 
 @keyframes auth-success-pop {
@@ -421,14 +627,60 @@ html {
 }
 
 .auth-success-pop {
-  animation: auth-success-pop 480ms
-    cubic-bezier(0.22, 1, 0.36, 1) 100ms backwards;
+  animation:
+    auth-success-pop
+    480ms
+    cubic-bezier(0.22, 1, 0.36, 1)
+    100ms
+    backwards;
 }
 
+/* -------------------------------------------------------------------------- */
+/* Responsive adjustments                                                     */
+/* -------------------------------------------------------------------------- */
+
+@media (max-height: 760px) {
+  .salif-sidebar {
+    padding-block: 1rem;
+  }
+
+  .salif-sidebar-brand {
+    padding-bottom: 1rem;
+  }
+
+  .salif-sidebar-nav {
+    margin-top: 1rem;
+  }
+
+  .salif-sidebar-status {
+    display: none;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Accessibility                                                              */
+/* -------------------------------------------------------------------------- */
+
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .home-hero-enter,
+  .home-chart-bar,
+  .home-progress-bar,
+  .dashboard-reveal,
+  .feature-fade-in,
+  .feature-reveal,
   .auth-panel-enter,
   .auth-message-in,
   .auth-success-pop {
     animation: none;
+  }
+
+  .home-scroll-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }

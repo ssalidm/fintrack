@@ -7,10 +7,12 @@ import org.springframework.transaction.annotation.Transactional;
 import za.co.pixelly.fintrack.identity.api.ChangePasswordRequest;
 import za.co.pixelly.fintrack.identity.api.UpdateUserProfileRequest;
 import za.co.pixelly.fintrack.identity.api.UserProfileResponse;
+import za.co.pixelly.fintrack.identity.api.UserSessionResponse;
 import za.co.pixelly.fintrack.identity.application.exceptions.InvalidCurrentPasswordException;
 import za.co.pixelly.fintrack.identity.application.exceptions.PasswordReuseException;
 import za.co.pixelly.fintrack.identity.application.exceptions.UserProfileConflictException;
 import za.co.pixelly.fintrack.identity.application.exceptions.UserProfileNotFoundException;
+import za.co.pixelly.fintrack.identity.domain.AuthSession;
 import za.co.pixelly.fintrack.identity.domain.User;
 import za.co.pixelly.fintrack.identity.persistence.AuthSessionRepository;
 import za.co.pixelly.fintrack.identity.persistence.RefreshTokenRepository;
@@ -34,7 +36,9 @@ public class DefaultUserProfileService implements UserProfileService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     private static final String PASSWORD_CHANGE_REASON = "PASSWORD_CHANGED";
-
+    private static final String USER_SESSION_REVOCATION_REASON = "USER_REVOKED_SESSION";
+    private static final String USER_OTHER_SESSIONS_REVOCATION_REASON =
+        "USER_REVOKED_OTHER_SESSIONS";
 
     @Override
     @Transactional(readOnly = true)
@@ -146,6 +150,95 @@ public class DefaultUserProfileService implements UserProfileService {
                 userId,
                 now,
                 PASSWORD_CHANGE_REASON
+            );
+    }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserSessionResponse> getSessions(UUID userId, UUID currentSessionId) {
+        Instant now = Instant.now();
+
+        return authSessionRepository.
+            findAllByUserIdAndRevokedAtIsNullAndExpiresAtAfterOrderByLastSeenAtDesc(
+                userId,
+                now
+            )
+            .stream()
+            .map(session ->
+                UserSessionResponse.from(
+                    session,
+                    currentSessionId
+                )
+            )
+            .toList();
+    }
+
+
+    @Override
+    @Transactional
+    public void revokeSession(
+        UUID userId,
+        UUID currentSessionId,
+        UUID sessionId
+    ) {
+        if (currentSessionId.equals(sessionId)) {
+            throw new UserProfileConflictException(
+                "The current session cannot be revoked from session management"
+            );
+        }
+
+        AuthSession session =
+            authSessionRepository
+                .findByIdAndUserId(
+                    sessionId,
+                    userId
+                )
+                .orElseThrow(
+                    () ->
+                        new UserProfileConflictException(
+                            "Session not found"
+                        )
+                );
+
+        Instant now = Instant.now();
+
+        refreshTokenRepository
+            .revokeActiveBySessionId(
+                sessionId,
+                now,
+                USER_SESSION_REVOCATION_REASON
+            );
+
+        session.revoke(
+            now,
+            USER_SESSION_REVOCATION_REASON
+        );
+    }
+
+
+    @Override
+    @Transactional
+    public void revokeOtherSessions(
+        UUID userId,
+        UUID currentSessionId
+    ) {
+        Instant now = Instant.now();
+
+        refreshTokenRepository
+            .revokeActiveByUserIdExcludingSession(
+                userId,
+                currentSessionId,
+                now,
+                USER_OTHER_SESSIONS_REVOCATION_REASON
+            );
+
+        authSessionRepository
+            .revokeActiveByUserIdExcludingSession(
+                userId,
+                currentSessionId,
+                now,
+                USER_OTHER_SESSIONS_REVOCATION_REASON
             );
     }
 

@@ -12,6 +12,10 @@ export const SupportPage = lazy(
   () => import('../pages/SupportPage'),
 )
 
+export const CompleteRegistrationPage = lazy(
+  () => import('../features/auth/pages/CompleteRegistrationPage'),
+)
+
 export const RegisterPage = lazy(
   () => import('../features/auth/pages/RegisterPage'),
 )
@@ -77,7 +81,7 @@ export const CategoriesPage = lazy(
 export const ProfilePage = lazy(
   () =>
     import(
-      '../features/profile/pages/ProfilePage'
+      '../pages/ProfilePage'
     ),
 )
 

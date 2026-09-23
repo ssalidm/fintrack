@@ -1,6 +1,8 @@
 import { apiRequest } from '../../../api/client'
 
 import type {
+  StartRegistrationRequest,
+  CompleteRegistrationRequest,
   ConfirmEmailChangeRequest,
   ForgotPasswordRequest,
   LoginRequest,
@@ -18,7 +20,32 @@ import type {
   VerifyEmailRequest,
 } from './types'
 
+
 export const authApi = {
+  startRegistration(
+    request: StartRegistrationRequest,
+  ) {
+    return apiRequest<void>(
+      '/auth/registration/start',
+      {
+        method: 'POST',
+        body: request,
+      },
+    )
+  },
+
+  completeRegistration(
+    request: CompleteRegistrationRequest,
+  ) {
+    return apiRequest<void>(
+      '/auth/registration/complete',
+      {
+        method: 'POST',
+        body: request,
+      },
+    )
+  },
+  
   register(request: RegisterRequest) {
     return apiRequest<RegisterResponse>(
       '/auth/register',

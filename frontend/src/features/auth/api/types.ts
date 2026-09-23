@@ -4,6 +4,19 @@ export type UserStatus =
   | 'LOCKED'
   | 'DEACTIVATED'
 
+export interface StartRegistrationRequest {
+  readonly email: string
+}
+
+export interface CompleteRegistrationRequest {
+  readonly token: string
+  readonly firstName: string
+  readonly lastName: string
+  readonly preferredName?: string
+  readonly password: string
+  readonly acceptTerms: boolean
+}
+
 export interface RegisterRequest {
   readonly email: string
   readonly password: string
