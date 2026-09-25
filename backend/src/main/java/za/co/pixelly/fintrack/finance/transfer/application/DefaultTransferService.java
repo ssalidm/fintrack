@@ -14,7 +14,7 @@ import za.co.pixelly.fintrack.finance.account.application.exceptions.AccountNotF
 import za.co.pixelly.fintrack.finance.account.domain.Account;
 import za.co.pixelly.fintrack.finance.account.domain.AccountStatus;
 import za.co.pixelly.fintrack.finance.account.persistence.AccountRepository;
-import za.co.pixelly.fintrack.finance.transaction.persistence.TransferSpecifications;
+import za.co.pixelly.fintrack.finance.transfer.persistence.TransferSpecifications;
 import za.co.pixelly.fintrack.finance.transfer.api.CreateTransferRequest;
 import za.co.pixelly.fintrack.finance.transfer.api.TransferQuery;
 import za.co.pixelly.fintrack.finance.transfer.api.TransferResponse;
