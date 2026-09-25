@@ -10,31 +10,31 @@ import {
   useState,
 } from 'react'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import RefreshButton from '../../../components/actions/RefreshButton'
-import PageHeader from '../../../components/layout/PageHeader'
-import PageShell from '../../../components/layout/PageShell'
-import StatusTabs from '../../../components/navigation/StatusTabs'
-import EmptyState from '../../../components/ui/EmptyState'
-import ErrorPanel from '../../../components/ui/ErrorPanel'
+import { ApiClientError } from '@/api/ApiClientError'
+import RefreshButton from '@/components/actions/RefreshButton'
+import PageHeader from '@/components/layout/PageHeader'
+import PageShell from '@/components/layout/PageShell'
+import StatusTabs from '@/components/navigation/StatusTabs'
+import EmptyState from '@/components/ui/EmptyState'
+import ErrorPanel from '@/components/ui/ErrorPanel'
 import type {
   BudgetCategoryLimit,
   BudgetStatus,
   BudgetSummary,
-} from '../api/types'
+} from '@/features/budgets/api/types'
 import BudgetActionDialog, {
   type BudgetActionKind,
-} from '../components/BudgetActionDialog'
-import BudgetLimitModal from '../components/BudgetLimitModal'
-import BudgetModal from '../components/BudgetModal'
-import BudgetPerformancePanel from '../components/BudgetPerformancePanel'
+} from '@/features/budgets/components/BudgetActionDialog'
+import BudgetLimitModal from '@/features/budgets/components/BudgetLimitModal'
+import BudgetModal from '@/features/budgets/components/BudgetModal'
+import BudgetPerformancePanel from '@/features/budgets/components/BudgetPerformancePanel'
 import {
   useArchiveBudget,
   useBudget,
   useBudgetPerformance,
   useBudgets,
   useDeleteBudgetLimit,
-} from '../hooks/useBudgets'
+} from '@/features/budgets/hooks/useBudgets'
 
 interface LimitModalTarget {
   limit?: BudgetCategoryLimit

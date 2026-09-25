@@ -8,21 +8,21 @@ import {
   useNavigate,
 } from 'react-router'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import AuthAlert from '../components/AuthAlert'
-import AuthButton from '../components/AuthButton'
-import AuthDivider from '../components/AuthDivider'
-import AuthField from '../components/AuthField'
-import AuthHeader from '../components/AuthHeader'
-import AuthInput from '../components/AuthInput'
-import AuthPanel from '../components/AuthPanel'
-import GoogleSignInButton from '../components/GoogleSignInButton'
-import PasswordVisibilityButton from '../components/PasswordVisibilityButton'
-import { useAuth } from '../context/useAuth'
+import { ApiClientError } from '@/api/ApiClientError'
+import AuthAlert from '@/features/auth/components/AuthAlert'
+import AuthButton from '@/features/auth/components/AuthButton'
+import AuthDivider from '@/features/auth/components/AuthDivider'
+import AuthField from '@/features/auth/components/AuthField'
+import AuthHeader from '@/features/auth/components/AuthHeader'
+import AuthInput from '@/features/auth/components/AuthInput'
+import AuthPanel from '@/features/auth/components/AuthPanel'
+import GoogleSignInButton from '@/features/auth/components/GoogleSignInButton'
+import PasswordVisibilityButton from '@/features/auth/components/PasswordVisibilityButton'
+import { useAuth } from '@/features/auth/context/useAuth'
 import {
   loginSchema,
   type LoginFormValues,
-} from '../validation/loginSchema'
+} from '@/features/auth/validation/loginSchema'
 
 function getRedirectPath(
   state: unknown,
@@ -424,7 +424,7 @@ export default function LoginPage() {
           action={
             <Link
               to="/forgot-password"
-              className="text-xs font-semibold text-[#16805f] transition hover:text-[#0d4f3f] hover:underline"
+              className="text-xs font-semibold text-accent transition hover:text-primary hover:underline"
             >
               Forgot password?
             </Link>
@@ -517,7 +517,7 @@ export default function LoginPage() {
         }
       />
 
-      <p className="mt-6 text-center text-sm text-[#66766f]">
+      <p className="mt-6 text-center text-sm text-muted">
         Don’t have an account?{' '}
 
         <Link

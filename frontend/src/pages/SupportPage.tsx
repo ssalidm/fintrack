@@ -1,6 +1,3 @@
-import { useRef, useState } from 'react'
-import type { SubmitEvent } from 'react'
-import { Link } from 'react-router'
 import {
   ArrowRight,
   CheckCircle2,
@@ -8,19 +5,26 @@ import {
   KeyRound,
   LifeBuoy,
   LoaderCircle,
-  Mail,
   MailCheck,
   ShieldCheck,
 } from 'lucide-react'
+import {
+  useRef,
+  useState,
+} from 'react'
+import type { SubmitEvent } from 'react'
+import { Link } from 'react-router'
 
-import { ApiClientError } from '../api/ApiClientError'
-import PublicPageLayout from '../components/layout/PublicPageLayout'
+import { ApiClientError } from '@/api/ApiClientError'
 import {
   supportApi,
   supportTopics,
-} from '../features/support/api/supportApi'
-import type { SupportTopic } from '../features/support/api/supportApi'
-import SupportVerification from '../features/support/components/SupportVerification'
+} from '@/features/support/api/supportApi'
+import type { SupportTopic } from '@/features/support/api/supportApi'
+import SupportVerification from '@/features/support/components/SupportVerification'
+import PublicNavbar from '@/components/layout/PublicNavbar'
+import PublicFooter from '@/components/layout/PublicFooter'
+
 
 const siteKey =
   import.meta.env.VITE_TURNSTILE_SITE_KEY?.trim() ?? ''
@@ -49,23 +53,23 @@ const initialValues: SupportFormValues = {
 
 const helpLinks = [
   {
-    title: 'Reset your password',
+    title: 'Reset password',
     description:
-      'Request a new reset email if you cannot remember your password.',
+      'Request a new password reset email.',
     to: '/forgot-password',
     Icon: KeyRound,
   },
   {
-    title: 'Verify your email',
+    title: 'Verify email',
     description:
-      'Request another verification email to finish setting up your account.',
+      'Send another verification email.',
     to: '/resend-verification',
     Icon: MailCheck,
   },
   {
-    title: 'Review account security',
+    title: 'Account security',
     description:
-      'Sign in to review your sessions, password and two-factor authentication.',
+      'Review sessions, password and 2FA.',
     to: '/profile',
     Icon: ShieldCheck,
   },
@@ -73,36 +77,36 @@ const helpLinks = [
 
 const questions = [
   {
-    question: 'I received a password reset email I did not request.',
+    question:
+      'I received a reset email I did not request.',
     answer:
-      'Receiving a reset email does not by itself mean your password was changed. If you did not request it, do not use or share its reset link. You can ignore the email. If you notice unfamiliar activity or receive repeated unexpected emails, review your account security and contact support.',
+      'Receiving the email does not mean your password was changed. Do not use or share the reset link. If you notice unfamiliar account activity, review your account security and contact support.',
   },
   {
-    question: 'My password reset link has expired or already been used.',
+    question:
+      'My reset link has expired.',
     answer:
-      'Request a new email from the password reset page and use the link in the latest message. If you requested several emails, avoid using an older link.',
+      'Request a new password reset email and use the link from the most recent message.',
   },
   {
-    question: 'I have not received the email I requested.',
+    question:
+      'I have not received an email.',
     answer:
-      'Check your spam or junk folder and confirm that you entered the address associated with your account. Allow a little time for delivery before requesting another email. For privacy, the request confirmation does not tell you whether an account exists.',
+      'Check your spam or junk folder and confirm that you entered the email address associated with your account.',
   },
   {
-    question: 'What information should I include when contacting support?',
+    question:
+      'What should I include in my message?',
     answer:
-      'Describe what you were trying to do, what happened instead, the approximate time, and any error message you saw. Include your browser and device if relevant. Never send passwords, reset links, verification codes, recovery codes or bank details. Remove private information from screenshots.',
+      'Tell us what you were trying to do, what happened instead, and any error message you saw. Never include passwords, recovery codes or bank details.',
   },
 ]
 
-const focusClasses =
-  'focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#16805f]'
-
 const fieldClasses =
-  'mt-2 block w-full rounded-xl border border-[#bfd2c8] ' +
-  'bg-[#fffdf8] px-4 py-3 text-sm text-[#123e33] outline-none ' +
-  'transition placeholder:text-[#819188] focus:border-[#e0ad51] ' +
-  'focus:ring-2 focus:ring-[#e0ad51] ' +
-  'disabled:cursor-not-allowed disabled:opacity-70'
+  'mt-2 block w-full rounded-xl border border-line bg-app px-4 py-3 ' +
+  'text-sm text-ink outline-none transition placeholder:text-subtle ' +
+  'focus:border-accent focus:ring-4 focus:ring-accent/10 ' +
+  'disabled:cursor-not-allowed disabled:opacity-60'
 
 function FieldError({
   id,
@@ -114,25 +118,61 @@ function FieldError({
   if (!message) return null
 
   return (
-    <p id={id} role="alert" className="mt-2 text-xs text-[#ffd8bd]">
+    <p
+      id={id}
+      role="alert"
+      className="mt-2 text-xs font-medium text-danger"
+    >
       {message}
     </p>
   )
 }
 
 export default function SupportPage() {
-  const [values, setValues] =
-    useState<SupportFormValues>({ ...initialValues })
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
-  const [submitError, setSubmitError] = useState<string | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSubmitted, setIsSubmitted] = useState(false)
-  const [turnstileToken, setTurnstileToken] = useState('')
-  const [verificationKey, setVerificationKey] = useState(0)
+  const [
+    values,
+    setValues,
+  ] = useState<SupportFormValues>({
+    ...initialValues,
+  })
 
-  const submittingRef = useRef(false)
+  const [
+    fieldErrors,
+    setFieldErrors,
+  ] = useState<FieldErrors>({})
 
-  function updateField<K extends keyof SupportFormValues>(
+  const [
+    submitError,
+    setSubmitError,
+  ] = useState<string | null>(null)
+
+  const [
+    isSubmitting,
+    setIsSubmitting,
+  ] = useState(false)
+
+  const [
+    isSubmitted,
+    setIsSubmitted,
+  ] = useState(false)
+
+  const [
+    turnstileToken,
+    setTurnstileToken,
+  ] = useState('')
+
+  const [
+    verificationKey,
+    setVerificationKey,
+  ] = useState(0)
+
+
+  const submittingRef =
+    useRef(false)
+
+  function updateField<
+    K extends keyof SupportFormValues,
+  >(
     field: K,
     value: SupportFormValues[K],
   ) {
@@ -149,10 +189,17 @@ export default function SupportPage() {
     setSubmitError(null)
   }
 
-  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
+  async function handleSubmit(
+    event: SubmitEvent<HTMLFormElement>,
+  ) {
     event.preventDefault()
 
-    if (submittingRef.current || isSubmitted) return
+    if (
+      submittingRef.current ||
+      isSubmitted
+    ) {
+      return
+    }
 
     const payload = {
       name: values.name.trim(),
@@ -165,32 +212,50 @@ export default function SupportPage() {
 
     const errors: FieldErrors = {}
 
-    if (payload.name.length < 2 || payload.name.length > 100) {
-      errors.name = 'Enter a name between 2 and 100 characters.'
+    if (
+      payload.name.length < 2 ||
+      payload.name.length > 100
+    ) {
+      errors.name =
+        'Enter a name between 2 and 100 characters.'
     }
 
     if (
       !payload.email ||
       payload.email.length > 254 ||
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+        payload.email,
+      )
     ) {
-      errors.email = 'Enter a valid email address.'
+      errors.email =
+        'Enter a valid email address.'
     }
 
     if (
       payload.message.length < 10 ||
-      payload.message.length > MAX_MESSAGE_LENGTH
+      payload.message.length >
+      MAX_MESSAGE_LENGTH
     ) {
-      errors.message = 'Enter a message between 10 and 4,000 characters.'
+      errors.message =
+        'Enter a message between 10 and 2,000 characters.'
     }
 
     setFieldErrors(errors)
     setSubmitError(null)
 
-    if (Object.keys(errors).length > 0) return
+    if (
+      Object.keys(errors).length > 0
+    ) {
+      return
+    }
 
-    if (!siteKey || !turnstileToken) {
-      setSubmitError('Please complete the security check before sending.')
+    if (
+      !siteKey ||
+      !turnstileToken
+    ) {
+      setSubmitError(
+        'Please complete the security check before sending.',
+      )
       return
     }
 
@@ -198,21 +263,30 @@ export default function SupportPage() {
     setIsSubmitting(true)
 
     try {
-      await supportApi.contact(payload)
+      await supportApi.contact(
+        payload,
+      )
 
-      setValues({ ...initialValues })
+      setValues({
+        ...initialValues,
+      })
+
       setFieldErrors({})
       setIsSubmitted(true)
     } catch (error) {
-      if (error instanceof ApiClientError) {
-        const validation = error.validationErrors
+      if (
+        error instanceof ApiClientError
+      ) {
+        const validation =
+          error.validationErrors
 
         if (validation) {
           setFieldErrors({
             name: validation.name,
             email: validation.email,
             topic: validation.topic,
-            message: validation.message,
+            message:
+              validation.message,
           })
 
           setSubmitError(
@@ -220,21 +294,28 @@ export default function SupportPage() {
               ? 'Please complete the security check again.'
               : 'Please review the form and try again.',
           )
-        } else if (error.status === 429) {
+        } else if (
+          error.status === 429
+        ) {
           setSubmitError(
-            'Too many support requests. Please wait before trying again. Your message is still here.',
+            'Too many support requests. Please wait before trying again.',
           )
-        } else if (error.isNetworkError) {
+        } else if (
+          error.isNetworkError
+        ) {
           setSubmitError(
-            'We could not confirm your submission. Check your connection before trying again. Your message is still here.',
+            'We could not confirm your submission. Check your connection and try again.',
           )
-        } else if (error.status >= 500) {
+        } else if (
+          error.status >= 500
+        ) {
           setSubmitError(
-            'Support is temporarily unavailable. Please try again shortly. Your message is still here.',
+            'Support is temporarily unavailable. Please try again shortly.',
           )
         } else {
           setSubmitError(
-            error.message || 'Your request could not be completed.',
+            error.message ||
+            'Your request could not be completed.',
           )
         }
       } else {
@@ -243,150 +324,227 @@ export default function SupportPage() {
         )
       }
     } finally {
-      // Verification tokens must not be reused for another attempt.
       setTurnstileToken('')
-      setVerificationKey((current) => current + 1)
+
+      setVerificationKey(
+        (current) =>
+          current + 1,
+      )
+
       setIsSubmitting(false)
-      submittingRef.current = false
+
+      submittingRef.current =
+        false
     }
   }
 
   return (
-    <PublicPageLayout>
-      <header className="mx-auto max-w-[720px] text-center">
-        <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.17em] text-[#16805f]">
-          <LifeBuoy size={16} aria-hidden />
-          Salif support
-        </span>
-
-        <h1 className="mt-4 font-serif text-4xl leading-tight tracking-[-0.04em] text-[#103b30] sm:text-5xl lg:text-6xl">
-          A little help goes a long way.
-        </h1>
-
-        <p className="mx-auto mt-5 max-w-[600px] text-base leading-7 text-[#536d63]">
-          Find your way back into your account, get answers, or contact
-          support. You do not need to sign in to get in touch.
-        </p>
-
-        <span
-          aria-hidden
-          className="mx-auto mt-7 block h-1 w-12 rounded-full bg-[#d7a84d]"
-        />
-      </header>
-
-      <section
-        aria-label="Account help shortcuts"
-        className="mt-10 grid border-y border-[#d9d4c8] md:grid-cols-3"
+    <div className="relative min-h-screen overflow-x-clip bg-app text-ink">
+      {/* Shared navbar + hero atmosphere */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[560px] overflow-hidden"
+        aria-hidden
       >
-        {helpLinks.map(({ title, description, to, Icon }, index) => (
-          <Link
-            key={to}
-            to={to}
-            className={`group flex items-start gap-3 py-6 transition hover:bg-[#e6eee5]/60 ${
-              index > 0
-                ? 'border-t border-[#d9d4c8] md:border-l md:border-t-0 md:pl-5 lg:pl-7'
-                : ''
-            } ${
-              index < helpLinks.length - 1
-                ? 'md:pr-5 lg:pr-7'
-                : ''
-            } ${focusClasses}`}
-          >
-            <Icon
-              size={21}
-              className="mt-0.5 shrink-0 text-[#16805f]"
-              aria-hidden
-            />
+        {/* soft brand washes */}
+        <div className="absolute -left-36 -top-32 size-[28rem] rounded-full bg-accent-soft/70 blur-[110px]" />
 
-            <div className="min-w-0 flex-1">
-              <h2 className="text-sm font-semibold text-[#103b30]">
-                {title}
-              </h2>
+        <div className="absolute -right-40 -top-20 size-[25rem] rounded-full bg-warning-soft/45 blur-[110px]" />
 
-              <p className="mt-2 text-xs leading-6 text-[#657972]">
-                {description}
-              </p>
-            </div>
+        {/* subtle grid */}
+        <div className="absolute inset-0 opacity-[0.28] [background-image:linear-gradient(to_right,var(--salif-color-border)_1px,transparent_1px),linear-gradient(to_bottom,var(--salif-color-border)_1px,transparent_1px)] [background-size:42px_42px] [mask-image:linear-gradient(to_bottom,black_0%,rgba(0,0,0,0.65)_58%,transparent_100%)]" />
 
-            <ArrowRight
-              size={15}
-              className="mt-1 shrink-0 text-[#956624] transition-transform group-hover:translate-x-1"
-              aria-hidden
-            />
-          </Link>
-        ))}
-      </section>
+        {/* larger architectural lines */}
+        <div className="absolute left-[8%] top-20 h-[320px] w-[320px] rounded-full border border-line/50" />
+        <div className="absolute left-[8%] top-20 h-[240px] w-[240px] translate-x-10 translate-y-10 rounded-full border border-line/35" />
 
-      <div className="mt-9 grid items-start gap-9 lg:grid-cols-[1.1fr_0.9fr] lg:gap-12">
-        <section
-          aria-labelledby="contact-title"
-          className="relative overflow-hidden rounded-[1.75rem] bg-[#0d4f3f] p-6 text-white shadow-[0_18px_45px_rgba(13,79,63,0.12)] sm:p-8"
-        >
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -right-16 -top-20 size-56 rounded-full border border-white/10"
-          />
+        <div className="absolute right-[10%] top-28 h-px w-40 rotate-[-12deg] bg-line" />
+        <div className="absolute right-[8%] top-40 h-px w-24 rotate-[-12deg] bg-line/70" />
+      </div>
 
-          <div className="relative">
-            <div className="flex items-center gap-3">
-              <Mail size={24} className="text-[#e4bd70]" aria-hidden />
+      <a
+        href="#main-content"
+        className="sr-only z-[70] rounded-lg bg-surface px-4 py-3 text-sm font-semibold text-ink focus:fixed focus:left-4 focus:top-4 focus:not-sr-only"
+      >
+        Skip to content
+      </a>
 
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#a9d0c1]">
-                Get in touch
-              </p>
-            </div>
+      {/* Navbar */}
+      <PublicNavbar />
 
-            <h2
-              id="contact-title"
-              className="mt-4 font-serif text-3xl tracking-[-0.025em] sm:text-4xl"
-            >
-              How can we help?
-            </h2>
 
-            {isSubmitted ? (
-              <div className="mt-7">
-                <div role="status">
-                  <CheckCircle2
-                    size={34}
-                    className="text-[#e4bd70]"
+      <main
+        id="main-content"
+        tabIndex={-1}
+      >
+        {/* Hero */}
+
+        <section className="relative z-10">
+          <div className="mx-auto max-w-[1240px] px-5 pb-16 pt-14 sm:px-8 sm:pb-20 sm:pt-18 lg:px-12 lg:pb-24">
+            <div className="grid items-end gap-10 lg:grid-cols-[1fr_auto]">
+              <div className="max-w-[690px]">
+                <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-accent">
+                  <LifeBuoy
+                    size={15}
                     aria-hidden
                   />
 
-                  <h3 className="mt-4 font-serif text-2xl">
-                    Your request has been submitted.
-                  </h3>
-
-                  <p className="mt-3 text-sm leading-7 text-[#c5ddd4]">
-                    Thank you for getting in touch. Any reply will go to
-                    the email address you provided.
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSubmitError(null)
-                    setIsSubmitted(false)
-                  }}
-                  className="mt-6 cursor-pointer rounded-full border border-white/30 px-5 py-3 text-sm font-semibold transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
-                >
-                  Send another message
-                </button>
-              </div>
-            ) : (
-              <>
-                <p className="mt-3 text-sm leading-7 text-[#c5ddd4]">
-                  Tell us what happened and send your message directly
-                  to the Salif support team.
+                  Salif support
                 </p>
 
+                <h1 className="mt-4 text-4xl font-bold leading-[1.02] tracking-[-0.045em] text-ink sm:text-5xl lg:text-[3.6rem]">
+                  How can we Help
+                  <span className="blocks text-accent">
+                    ?
+                  </span>
+                </h1>
+
+                <p className="mt-4 max-w-xl text-base leading-7 text-muted">
+                  Start with a quick account fix or send us a message.
+                </p>
+              </div>
+
+              <div className="hidden pb-1 lg:block">
+                <div className="flex items-center gap-3 rounded-full border border-line bg-surface/55 px-4 py-2.5 text-sm text-muted backdrop-blur-sm">
+                  <span className="size-2 rounded-full bg-success" />
+
+                  Support is available without signing in
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Quick links */}
+
+        <section className="border-y border-line bg-surface">
+          <div
+            aria-label="Account help shortcuts"
+            className="mx-auto grid max-w-[1240px] px-5 sm:px-8 md:grid-cols-3 lg:px-12"
+          >
+            {helpLinks.map(
+              (
+                {
+                  title,
+                  description,
+                  to,
+                  Icon,
+                },
+                index,
+              ) => (
+                <Link
+                  key={to}
+                  to={to}
+                  className={`group flex items-center gap-4 py-6 transition hover:bg-surface-muted/60 md:px-6 ${index === 0
+                    ? 'md:pl-0'
+                    : 'border-t border-line md:border-l md:border-t-0'
+                    }`}
+                >
+                  <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent">
+                    <Icon
+                      size={18}
+                      aria-hidden
+                    />
+                  </span>
+
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-ink">
+                      {title}
+                    </p>
+
+                    <p className="mt-1 text-xs leading-5 text-muted">
+                      {description}
+                    </p>
+                  </div>
+
+                  <ArrowRight
+                    size={16}
+                    className="shrink-0 text-subtle transition-transform group-hover:translate-x-1 group-hover:text-accent"
+                    aria-hidden
+                  />
+                </Link>
+              ),
+            )}
+          </div>
+        </section>
+
+        {/* Contact + FAQ */}
+
+        <section className="bg-surface">
+          <div className="mx-auto grid max-w-[1240px] gap-14 px-5 py-16 sm:px-8 lg:grid-cols-[1.08fr_0.92fr] lg:px-12 lg:py-20">
+            {/* Contact */}
+
+            <section
+              aria-labelledby="contact-title"
+              className="max-w-[680px]"
+            >
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-accent">
+                Contact us
+              </p>
+
+              <h2
+                id="contact-title"
+                className="mt-3 text-3xl font-bold tracking-[-0.035em] text-ink"
+              >
+                Send a message
+              </h2>
+
+              <p className="mt-3 text-sm leading-6 text-muted">
+                You do not need to sign
+                in.
+              </p>
+
+              {isSubmitted ? (
+                <div
+                  role="status"
+                  className="mt-8 border-t border-line pt-8"
+                >
+                  <span className="grid size-12 place-items-center rounded-2xl bg-success-soft text-success">
+                    <CheckCircle2
+                      size={24}
+                      aria-hidden
+                    />
+                  </span>
+
+                  <h3 className="mt-5 text-xl font-semibold text-ink">
+                    Message sent
+                  </h3>
+
+                  <p className="mt-2 max-w-md text-sm leading-6 text-muted">
+                    We received your
+                    request. Any reply will
+                    go to the email address
+                    you provided.
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSubmitError(null)
+                      setIsSubmitted(
+                        false,
+                      )
+                    }}
+                    className="mt-6 rounded-full border border-line-strong px-5 py-2.5 text-sm font-semibold text-ink transition hover:border-accent hover:text-accent"
+                  >
+                    Send another message
+                  </button>
+                </div>
+              ) : (
                 <form
-                  onSubmit={(event) => void handleSubmit(event)}
-                  className="mt-6"
-                  aria-busy={isSubmitting}
+                  onSubmit={(event) =>
+                    void handleSubmit(
+                      event,
+                    )
+                  }
+                  className="mt-8"
+                  aria-busy={
+                    isSubmitting
+                  }
                 >
                   <fieldset
-                    disabled={isSubmitting}
+                    disabled={
+                      isSubmitting
+                    }
                     className="min-w-0 space-y-5"
                   >
                     <legend className="sr-only">
@@ -397,9 +555,9 @@ export default function SupportPage() {
                       <div>
                         <label
                           htmlFor="support-name"
-                          className="text-sm font-semibold text-[#edf5f0]"
+                          className="text-sm font-semibold text-ink"
                         >
-                          Your name
+                          Name
                         </label>
 
                         <input
@@ -410,30 +568,46 @@ export default function SupportPage() {
                           required
                           minLength={2}
                           maxLength={100}
-                          value={values.name}
-                          onChange={(event) =>
-                            updateField('name', event.target.value)
+                          value={
+                            values.name
                           }
-                          aria-invalid={Boolean(fieldErrors.name)}
+                          onChange={(
+                            event,
+                          ) =>
+                            updateField(
+                              'name',
+                              event.target
+                                .value,
+                            )
+                          }
+                          aria-invalid={Boolean(
+                            fieldErrors.name,
+                          )}
                           aria-describedby={
-                            fieldErrors.name ? 'support-name-error' : undefined
+                            fieldErrors.name
+                              ? 'support-name-error'
+                              : undefined
                           }
                           placeholder="Your name"
-                          className={fieldClasses}
+                          className={
+                            fieldClasses
+                          }
                         />
 
                         <FieldError
                           id="support-name-error"
-                          message={fieldErrors.name}
+                          message={
+                            fieldErrors.name
+                          }
                         />
                       </div>
 
                       <div>
                         <label
                           htmlFor="support-email"
-                          className="text-sm font-semibold text-[#edf5f0]"
+                          className="text-sm font-semibold text-ink"
                         >
-                          Email address
+                          Email
                         </label>
 
                         <input
@@ -443,21 +617,37 @@ export default function SupportPage() {
                           autoComplete="email"
                           required
                           maxLength={254}
-                          value={values.email}
-                          onChange={(event) =>
-                            updateField('email', event.target.value)
+                          value={
+                            values.email
                           }
-                          aria-invalid={Boolean(fieldErrors.email)}
+                          onChange={(
+                            event,
+                          ) =>
+                            updateField(
+                              'email',
+                              event.target
+                                .value,
+                            )
+                          }
+                          aria-invalid={Boolean(
+                            fieldErrors.email,
+                          )}
                           aria-describedby={
-                            fieldErrors.email ? 'support-email-error' : undefined
+                            fieldErrors.email
+                              ? 'support-email-error'
+                              : undefined
                           }
                           placeholder="you@example.com"
-                          className={fieldClasses}
+                          className={
+                            fieldClasses
+                          }
                         />
 
                         <FieldError
                           id="support-email-error"
-                          message={fieldErrors.email}
+                          message={
+                            fieldErrors.email
+                          }
                         />
                       </div>
                     </div>
@@ -465,47 +655,82 @@ export default function SupportPage() {
                     <div>
                       <label
                         htmlFor="support-topic"
-                        className="text-sm font-semibold text-[#edf5f0]"
+                        className="text-sm font-semibold text-ink"
                       >
-                        What is this about?
+                        Topic
                       </label>
 
                       <select
                         id="support-topic"
                         name="topic"
-                        value={values.topic}
-                        onChange={(event) =>
+                        value={
+                          values.topic
+                        }
+                        onChange={(
+                          event,
+                        ) =>
                           updateField(
                             'topic',
-                            event.target.value as SupportTopic,
+                            event.target
+                              .value as SupportTopic,
                           )
                         }
-                        aria-invalid={Boolean(fieldErrors.topic)}
+                        aria-invalid={Boolean(
+                          fieldErrors.topic,
+                        )}
                         aria-describedby={
-                          fieldErrors.topic ? 'support-topic-error' : undefined
+                          fieldErrors.topic
+                            ? 'support-topic-error'
+                            : undefined
                         }
-                        className={`${fieldClasses} cursor-pointer pr-10`}
+                        className={`${fieldClasses} cursor-pointer`}
                       >
-                        {supportTopics.map((item) => (
-                          <option key={item.value} value={item.value}>
-                            {item.label}
-                          </option>
-                        ))}
+                        {supportTopics.map(
+                          (item) => (
+                            <option
+                              key={
+                                item.value
+                              }
+                              value={
+                                item.value
+                              }
+                            >
+                              {
+                                item.label
+                              }
+                            </option>
+                          ),
+                        )}
                       </select>
 
                       <FieldError
                         id="support-topic-error"
-                        message={fieldErrors.topic}
+                        message={
+                          fieldErrors.topic
+                        }
                       />
                     </div>
 
                     <div>
-                      <label
-                        htmlFor="support-message"
-                        className="text-sm font-semibold text-[#edf5f0]"
-                      >
-                        Your message
-                      </label>
+                      <div className="flex items-center justify-between gap-4">
+                        <label
+                          htmlFor="support-message"
+                          className="text-sm font-semibold text-ink"
+                        >
+                          Message
+                        </label>
+
+                        <span className="text-xs tabular-nums text-subtle">
+                          {
+                            values.message
+                              .length
+                          }
+                          /
+                          {
+                            MAX_MESSAGE_LENGTH
+                          }
+                        </span>
+                      </div>
 
                       <textarea
                         id="support-message"
@@ -513,35 +738,38 @@ export default function SupportPage() {
                         required
                         rows={6}
                         minLength={10}
-                        maxLength={MAX_MESSAGE_LENGTH}
-                        value={values.message}
-                        onChange={(event) =>
-                          updateField('message', event.target.value)
+                        maxLength={
+                          MAX_MESSAGE_LENGTH
                         }
-                        aria-invalid={Boolean(fieldErrors.message)}
-                        aria-describedby={`support-message-help support-message-count${
-                          fieldErrors.message ? ' support-message-error' : ''
-                        }`}
-                        placeholder="What were you trying to do, and what happened instead?"
+                        value={
+                          values.message
+                        }
+                        onChange={(
+                          event,
+                        ) =>
+                          updateField(
+                            'message',
+                            event.target
+                              .value,
+                          )
+                        }
+                        aria-invalid={Boolean(
+                          fieldErrors.message,
+                        )}
+                        aria-describedby={
+                          fieldErrors.message
+                            ? 'support-message-error'
+                            : undefined
+                        }
+                        placeholder="Tell us what happened..."
                         className={`${fieldClasses} resize-y`}
                       />
 
-                      <div className="mt-2 flex items-start justify-between gap-4 text-xs leading-5 text-[#c5ddd4]">
-                        <p id="support-message-help">
-                          Include the approximate time and any error message.
-                        </p>
-
-                        <span
-                          id="support-message-count"
-                          className="shrink-0 tabular-nums"
-                        >
-                          {values.message.length}/{MAX_MESSAGE_LENGTH}
-                        </span>
-                      </div>
-
                       <FieldError
                         id="support-message-error"
-                        message={fieldErrors.message}
+                        message={
+                          fieldErrors.message
+                        }
                       />
                     </div>
 
@@ -550,8 +778,10 @@ export default function SupportPage() {
                       className="absolute -left-[10000px] top-0 h-px w-px overflow-hidden"
                     >
                       <label htmlFor="support-website">
-                        Leave this field empty
+                        Leave this field
+                        empty
                       </label>
+
                       <input
                         id="support-website"
                         name="website"
@@ -559,46 +789,63 @@ export default function SupportPage() {
                         autoComplete="off"
                         tabIndex={-1}
                         maxLength={200}
-                        value={values.website}
-                        onChange={(event) =>
-                          updateField('website', event.target.value)
+                        value={
+                          values.website
+                        }
+                        onChange={(
+                          event,
+                        ) =>
+                          updateField(
+                            'website',
+                            event.target
+                              .value,
+                          )
                         }
                       />
                     </div>
 
-                    <div className="flex items-start gap-2.5 border-t border-white/15 pt-4">
+                    <div className="flex items-start gap-3 rounded-xl bg-warning-soft px-4 py-3">
                       <ShieldCheck
                         size={16}
-                        className="mt-1 shrink-0 text-[#e4bd70]"
+                        className="mt-0.5 shrink-0 text-warning"
                         aria-hidden
                       />
 
-                      <p className="text-xs leading-6 text-[#c5ddd4]">
-                        Do not include passwords, reset links, verification
-                        codes, recovery codes or bank details.
+                      <p className="text-xs leading-5 text-ink">
+                        Never send
+                        passwords, recovery
+                        codes or bank
+                        details.
                       </p>
                     </div>
 
                     {siteKey ? (
                       <SupportVerification
-                        key={verificationKey}
-                        siteKey={siteKey}
-                        onTokenChange={setTurnstileToken}
+                        key={
+                          verificationKey
+                        }
+                        siteKey={
+                          siteKey
+                        }
+                        onTokenChange={
+                          setTurnstileToken
+                        }
                       />
                     ) : (
                       <p
                         role="alert"
-                        className="rounded-xl bg-[#fff0e7] px-4 py-3 text-sm leading-6 text-[#873d28]"
+                        className="rounded-xl bg-danger-soft px-4 py-3 text-sm text-danger"
                       >
-                        The contact form is temporarily unavailable.
-                        Please try again later.
+                        The contact form is
+                        temporarily
+                        unavailable.
                       </p>
                     )}
 
                     {submitError && (
                       <p
                         role="alert"
-                        className="rounded-xl bg-[#fff0e7] px-4 py-3 text-sm leading-6 text-[#873d28]"
+                        className="rounded-xl bg-danger-soft px-4 py-3 text-sm text-danger"
                       >
                         {submitError}
                       </p>
@@ -606,8 +853,12 @@ export default function SupportPage() {
 
                     <button
                       type="submit"
-                      disabled={isSubmitting || !siteKey || !turnstileToken}
-                      className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[#e0ad51] px-5 py-3.5 text-sm font-bold text-[#143d30] transition hover:bg-[#edbf69] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-60"
+                      disabled={
+                        isSubmitting ||
+                        !siteKey ||
+                        !turnstileToken
+                      }
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-inverse transition hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {isSubmitting ? (
                         <>
@@ -616,64 +867,89 @@ export default function SupportPage() {
                             className="animate-spin"
                             aria-hidden
                           />
+
                           Sending…
                         </>
                       ) : (
                         <>
                           Send message
-                          <ArrowRight size={17} aria-hidden />
+
+                          <ArrowRight
+                            size={16}
+                            aria-hidden
+                          />
                         </>
                       )}
                     </button>
                   </fieldset>
                 </form>
-              </>
-            )}
-          </div>
-        </section>
+              )}
+            </section>
 
-        <section aria-labelledby="questions-title" className="lg:pt-2">
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#16805f]">
-            Useful answers
-          </p>
+            {/* FAQ */}
 
-          <h2
-            id="questions-title"
-            className="mt-2 font-serif text-3xl tracking-[-0.025em] text-[#103b30]"
-          >
-            Before you write
-          </h2>
+            <aside className="lg:border-l lg:border-line lg:pl-12">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-accent">
+                Common questions
+              </p>
 
-          <p className="mt-3 text-sm leading-6 text-[#657972]">
-            A few answers to help you take the next step.
-          </p>
+              <h2 className="mt-3 text-2xl font-bold tracking-[-0.03em] text-ink">
+                You may not need to wait
+              </h2>
 
-          <div className="mt-5 divide-y divide-[#d9d4c8] border-y border-[#d9d4c8]">
-            {questions.map((item, index) => (
-              <details
-                key={item.question}
-                className="group py-5"
-                open={index === 0}
-              >
-                <summary
-                  className={`flex cursor-pointer list-none items-start justify-between gap-4 rounded-sm text-sm font-semibold leading-6 text-[#123e33] [&::-webkit-details-marker]:hidden ${focusClasses}`}
-                >
-                  {item.question}
-                  <ChevronDown
-                    size={17}
-                    className="mt-1 shrink-0 text-[#16805f] transition-transform group-open:rotate-180"
-                    aria-hidden
-                  />
-                </summary>
+              <div className="mt-7 divide-y divide-line border-y border-line">
+                {questions.map(
+                  (
+                    item,
+                    index,
+                  ) => (
+                    <details
+                      key={
+                        item.question
+                      }
+                      open={
+                        index === 0
+                      }
+                      className="group py-5"
+                    >
+                      <summary className="flex cursor-pointer list-none items-start justify-between gap-4 text-sm font-semibold leading-6 text-ink [&::-webkit-details-marker]:hidden">
+                        {
+                          item.question
+                        }
 
-                <p className="mt-3 pr-5 text-sm leading-7 text-[#657972]">
-                  {item.answer}
+                        <ChevronDown
+                          size={17}
+                          className="mt-1 shrink-0 text-accent transition-transform group-open:rotate-180"
+                          aria-hidden
+                        />
+                      </summary>
+
+                      <p className="mt-3 pr-6 text-sm leading-6 text-muted">
+                        {item.answer}
+                      </p>
+                    </details>
+                  ),
+                )}
+              </div>
+
+              <div className="mt-9">
+                <p className="text-sm font-semibold text-ink">
+                  Still stuck?
                 </p>
-              </details>
-            ))}
+
+                <p className="mt-2 text-sm leading-6 text-muted">
+                  Send us the details and
+                  we’ll take a look.
+                </p>
+              </div>
+            </aside>
           </div>
         </section>
-      </div>
-    </PublicPageLayout>
+      </main>
+
+      {/* Footer */}
+
+      <PublicFooter />
+    </div>
   )
 }

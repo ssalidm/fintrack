@@ -10,11 +10,11 @@ import { Link } from 'react-router'
 import {
   formatDateOnly,
   formatMoney,
-} from '../../../../utils/formatters'
-import { useAccounts } from '../../../accounts/hooks/useAccounts'
-import { useCategories } from '../../../categories/hooks/useCategories'
-import type { Transaction } from '../../../transactions/api/types'
-import { useTransactions } from '../../../transactions/hooks/useTransactions'
+} from '@/utils/formatters'
+import { useAccounts } from '@/features/accounts/hooks/useAccounts'
+import { useCategories } from '@/features/categories/hooks/useCategories'
+import type { Transaction } from '@/features/transactions/api/types'
+import { useTransactions } from '@/features/transactions/hooks/useTransactions'
 
 const filters = {
   status: 'POSTED' as const,

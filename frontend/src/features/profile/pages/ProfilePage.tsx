@@ -5,21 +5,21 @@ import {
 } from 'react'
 import { useNavigate } from 'react-router'
 
-import { ApiClientError } from '../api/ApiClientError'
-import PageHeader from '../components/layout/PageHeader'
-import PageShell from '../components/layout/PageShell'
-import SettingsList from '../components/settings/SettingsList'
-import { useAuth } from '../features/auth/context/useAuth'
-import ChangeEmailForm from '../features/profile/components/ChangeEmailForm'
-import ChangePasswordForm from '../features/profile/components/ChangePasswordForm'
-import PasswordChangedDialog from '../features/profile/components/PasswordChangedDialog'
-import ProfileAvatarEditor from '../features/profile/components/ProfileAvatarEditor'
-import ProfileDetailsForm from '../features/profile/components/ProfileDetailsForm'
-import ProfileSessions from '../features/profile/components/ProfileSessions'
-import ThemePreferenceSetting from '../features/profile/components/ThemePreferenceSetting'
-import TwoFactorAuthenticationCard from '../features/profile/components/TwoFactorAuthenticationCard'
-import { useProfile } from '../features/profile/hooks/useProfile'
-import { formatDate } from '../utils/dateFormatter'
+import { ApiClientError } from '@/api/ApiClientError'
+import PageHeader from '@/components/layout/PageHeader'
+import PageShell from '@/components/layout/PageShell'
+import SettingsList from '@/components/settings/SettingsList'
+import { useAuth } from '@/features/auth/context/useAuth'
+import ChangeEmailForm from '@/features/profile/components/ChangeEmailForm'
+import ChangePasswordForm from '@/features/profile/components/ChangePasswordForm'
+import PasswordChangedDialog from '@/features/profile/components/PasswordChangedDialog'
+import ProfileAvatarEditor from '@/features/profile/components/ProfileAvatarEditor'
+import ProfileDetailsForm from '@/features/profile/components/ProfileDetailsForm'
+import ProfileSessions from '@/features/profile/components/ProfileSessions'
+import ThemePreferenceSetting from '@/features/profile/components/ThemePreferenceSetting'
+import TwoFactorAuthenticationCard from '@/features/profile/components/TwoFactorAuthenticationCard'
+import { useProfile } from '@/features/profile/hooks/useProfile'
+import { formatDate } from '@/utils/dateFormatter'
 
 function formatStatus(
   status: string,
@@ -187,7 +187,7 @@ export default function ProfilePage() {
         className="
           feature-reveal
           feature-reveal-delay-2
-          mt-10
+          mt-3
           rounded-2xl
           border border-line/50
           bg-surface/75
@@ -212,10 +212,10 @@ export default function ProfilePage() {
         className="
           feature-reveal
           feature-reveal-delay-2
-          mt-8
+          mt-3
           rounded-2xl
           border border-line/40
-          bg-surface/25
+          bg-surface/75
           p-6
           sm:p-7
         "
@@ -234,7 +234,7 @@ export default function ProfilePage() {
         className="
         feature-reveal
         feature-reveal-delay-2
-        mt-8
+        mt-3
         rounded-2xl
         border border-line/50
         bg-surface/75
@@ -266,7 +266,7 @@ export default function ProfilePage() {
         className="
           feature-reveal
           feature-reveal-delay-3
-          mt-8
+          mt-3
           rounded-2xl
           border border-line/60
           bg-surface/75
@@ -287,7 +287,7 @@ export default function ProfilePage() {
         className="
           feature-reveal
           feature-reveal-delay-3
-          mt-8
+          mt-3
           rounded-2xl
           border border-line/40
           bg-surface/75

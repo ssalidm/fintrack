@@ -4,18 +4,19 @@ import {
   useQueryClient,
   type QueryClient,
 } from '@tanstack/react-query'
-import type { PageResponse } from '../../../api/types'
-import { accountQueryKeys } from '../../accounts/hooks/useAccounts'
-import { useAuthenticatedRequest } from '../../auth/hooks/useAuthenticatedRequest'
-import { dashboardSummaryQueryKey } from '../../dashboard/hooks/useDashboardSummary'
+import type { PageResponse } from '@/api/types'
+import { accountQueryKeys } from '@/features/accounts/hooks/useAccounts'
+import { useAuthenticatedRequest } from '@/features/auth/hooks/useAuthenticatedRequest'
+import { dashboardSummaryQueryKey } from '@/features/dashboard/hooks/useDashboardSummary'
 import type {
   CreateTransactionRequest,
   Transaction,
   TransactionFilters,
   UpdateTransactionRequest,
   VoidTransactionRequest,
-} from '../api/types'
-import { categorySpendingQueryKeys } from '../../categories/hooks/useCategorySpending'
+} from '@/features/transactions/api/types'
+import { categorySpendingQueryKeys } from '@/features/categories/hooks/useCategorySpending'
+import { cashFlowQueryKeys } from '@/features/dashboard/hooks/useCashFlowReport'
 
 export const defaultTransactionFilters: TransactionFilters = {
   status: 'POSTED',
@@ -73,6 +74,9 @@ async function invalidateFinancialData(
     }),
     queryClient.invalidateQueries({
       queryKey: dashboardSummaryQueryKey,
+    }),
+    queryClient.invalidateQueries({
+      queryKey: cashFlowQueryKeys.all,
     }),
     queryClient.invalidateQueries({
       queryKey: categorySpendingQueryKeys.all,

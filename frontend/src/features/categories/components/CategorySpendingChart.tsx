@@ -4,8 +4,8 @@ import {
   RefreshCw,
 } from 'lucide-react'
 
-import type { MonthlyCategorySpending } from '../api/types'
-import { useCategorySpending } from '../hooks/useCategorySpending'
+import type { MonthlyCategorySpending } from '@/features/categories/api/types'
+import { useCategorySpending } from '@/features/categories/hooks/useCategorySpending'
 
 interface SpendingItem
   extends MonthlyCategorySpending {

@@ -9,27 +9,27 @@ import {
   Plus,
 } from 'lucide-react'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import RefreshButton from '../../../components/actions/RefreshButton'
-import PageHeader from '../../../components/layout/PageHeader'
-import PageShell from '../../../components/layout/PageShell'
-import EmptyState from '../../../components/ui/EmptyState'
-import ErrorPanel from '../../../components/ui/ErrorPanel'
-import Pagination from '../../../components/ui/Pagination'
-import { formatDateOnly, formatMoney } from '../../../utils/formatters'
-import { useAccounts } from '../../accounts/hooks/useAccounts'
-import { useCategories } from '../../categories/hooks/useCategories'
+import { ApiClientError } from '@/api/ApiClientError'
+import RefreshButton from '@/components/actions/RefreshButton'
+import PageHeader from '@/components/layout/PageHeader'
+import PageShell from '@/components/layout/PageShell'
+import EmptyState from '@/components/ui/EmptyState'
+import ErrorPanel from '@/components/ui/ErrorPanel'
+import Pagination from '@/components/ui/Pagination'
+import { formatDateOnly, formatMoney } from '@/utils/formatters'
+import { useAccounts } from '@/features/accounts/hooks/useAccounts'
+import { useCategories } from '@/features/categories/hooks/useCategories'
 import type {
   Transaction,
   TransactionFilters,
   TransactionType,
-} from '../api/types'
-import TransactionModal from '../components/TransactionModal'
-import VoidTransactionModal from '../components/VoidTransactionModal'
+} from '@/features/transactions/api/types'
+import TransactionModal from '@/features/transactions/components/TransactionModal'
+import VoidTransactionModal from '@/features/transactions/components/VoidTransactionModal'
 import {
   defaultTransactionFilters,
   useTransactions,
-} from '../hooks/useTransactions'
+} from '@/features/transactions/hooks/useTransactions'
 
 const transactionTypeLabels = {
   INCOME: 'Income',

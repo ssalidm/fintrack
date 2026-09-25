@@ -13,7 +13,7 @@ import type {
   BudgetCategoryLimit,
   BudgetCategoryPerformance,
   BudgetPerformance,
-} from '../api/types'
+} from '@/features/budgets/api/types'
 
 interface BudgetPerformancePanelProps {
   budget: Budget

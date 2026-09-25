@@ -1,5 +1,5 @@
-import FormDrawer from '../../../components/ui/FormDrawer'
-import type { BudgetCategoryLimit } from '../api/types'
+import FormDrawer from '@/components/ui/FormDrawer'
+import type { BudgetCategoryLimit } from '@/features/budgets/api/types'
 import BudgetLimitForm from './BudgetLimitForm'
 
 interface BudgetLimitModalProps {

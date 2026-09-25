@@ -10,29 +10,29 @@ import {
   Plus,
 } from 'lucide-react'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import RefreshButton from '../../../components/actions/RefreshButton'
-import PageHeader from '../../../components/layout/PageHeader'
-import PageShell from '../../../components/layout/PageShell'
-import StatusTabs from '../../../components/navigation/StatusTabs'
-import EmptyState from '../../../components/ui/EmptyState'
-import ErrorPanel from '../../../components/ui/ErrorPanel'
-import Pagination from '../../../components/ui/Pagination'
+import { ApiClientError } from '@/api/ApiClientError'
+import RefreshButton from '@/components/actions/RefreshButton'
+import PageHeader from '@/components/layout/PageHeader'
+import PageShell from '@/components/layout/PageShell'
+import StatusTabs from '@/components/navigation/StatusTabs'
+import EmptyState from '@/components/ui/EmptyState'
+import ErrorPanel from '@/components/ui/ErrorPanel'
+import Pagination from '@/components/ui/Pagination'
 import {
   formatDateOnly,
   formatMoney,
-} from '../../../utils/formatters'
-import { useAccounts } from '../../accounts/hooks/useAccounts'
+} from '@/utils/formatters'
+import { useAccounts } from '@/features/accounts/hooks/useAccounts'
 import type {
   Transfer,
   TransferStatus,
-} from '../api/types'
-import TransferModal from '../components/TransferModal'
-import VoidTransferModal from '../components/VoidTransferModal'
+} from '@/features/transfers/api/types'
+import TransferModal from '@/features/transfers/components/TransferModal'
+import VoidTransferModal from '@/features/transfers/components/VoidTransferModal'
 import {
   defaultTransferFilters,
   useTransfers,
-} from '../hooks/useTransfers'
+} from '@/features/transfers/hooks/useTransfers'
 
 const transferStatusOptions = [
   {

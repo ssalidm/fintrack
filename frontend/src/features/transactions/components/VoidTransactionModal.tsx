@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { CircleSlash2 } from 'lucide-react'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import ConfirmationDialog from '../../../components/ui/ConfirmationDialog'
-import type { Transaction } from '../api/types'
-import { useVoidTransaction } from '../hooks/useTransactions'
+import { ApiClientError } from '@/api/ApiClientError'
+import ConfirmationDialog from '@/components/ui/ConfirmationDialog'
+import type { Transaction } from '@/features/transactions/api/types'
+import { useVoidTransaction } from '@/features/transactions/hooks/useTransactions'
 
 interface VoidTransactionModalProps {
   transaction: Transaction

@@ -4,8 +4,8 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 
-import { useAuthenticatedRequest } from '../../auth/hooks/useAuthenticatedRequest'
-import type { UserSession } from '../api/types'
+import { useAuthenticatedRequest } from '@/features/auth/hooks/useAuthenticatedRequest'
+import type { UserSession } from '@/features/profile/api/types'
 
 export const profileSessionsQueryKey = [
   'profile',

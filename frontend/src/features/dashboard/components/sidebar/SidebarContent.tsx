@@ -5,8 +5,8 @@ import {
 } from 'lucide-react'
 import { NavLink } from 'react-router'
 
-import { useProfile } from '../../../profile/hooks/useProfile'
-import ThemeToggle from '../../../theme/components/ThemeToggle'
+import { useProfile } from '@/features/profile/hooks/useProfile'
+import ThemeToggle from '@/features/theme/components/ThemeToggle'
 import SalifLogo from './SalifLogo'
 import {
   sidebarNavigationItems,

@@ -4,7 +4,9 @@ import type {
 
 interface AuthAlertProps
   extends PropsWithChildren {
-  readonly variant?: 'error' | 'success'
+  readonly variant?:
+    | 'error'
+    | 'success'
 }
 
 export default function AuthAlert({
@@ -14,14 +16,14 @@ export default function AuthAlert({
   const styles =
     variant === 'success'
       ? `
-        border-[#cde2d7]
-        bg-[#eef6f1]
-        text-[#315f4f]
+        border-success/30
+        bg-success-soft
+        text-success
       `
       : `
-        border-red-200
-        bg-red-50
-        text-red-700
+        border-danger/30
+        bg-danger-soft
+        text-danger
       `
 
   return (

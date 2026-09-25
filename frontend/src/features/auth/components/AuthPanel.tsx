@@ -13,14 +13,14 @@ export default function AuthPanel({
   return (
     <section
       className={`
+        auth-panel-enter
         mx-auto
         w-full
         max-w-[420px]
         rounded-2xl
-        border border-white/70
-        bg-white/70
-        shadow-[0_20px_55px_rgba(9,47,40,0.05)]
-        ring-1 ring-[#0d4f3f]/5
+        border border-line
+        bg-surface/82
+        shadow-[var(--salif-shadow-panel)]
         backdrop-blur-xl
 
         lg:grid
@@ -31,19 +31,17 @@ export default function AuthPanel({
         ${className}
       `}
     >
-      {/* Desktop intro only */}
-      <div className="hidden lg:flex lg:items-center lg:px-12 lg:py-12">
+      <div className="hidden lg:flex lg:items-center">
         <AuthIntro />
       </div>
 
-      {/* divider */}
       <div
         className="hidden items-center lg:flex"
-        aria-hidden="true">
-        <div className="h-[60%] w-px bg-[#d9e0dc]" />
+        aria-hidden
+      >
+        <div className="h-[60%] w-px bg-line" />
       </div>
 
-      {/* Auth form */}
       <div className="min-w-0 px-5 py-7 sm:px-7 sm:py-8 lg:flex lg:items-center lg:px-12 lg:py-12">
         <div className="mx-auto w-full min-w-0 max-w-[350px]">
           {children}

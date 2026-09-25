@@ -16,10 +16,10 @@ import {
   vi,
 } from 'vitest'
 
-import { useAuth } from '../context/useAuth'
+import { useAuth } from '@/features/auth/context/useAuth'
 import MfaChallengePage from './MfaChallengePage'
 
-vi.mock('../context/useAuth', () => ({
+vi.mock('@/features/auth/context/useAuth', () => ({
   useAuth: vi.fn(),
 }))
 
@@ -52,21 +52,21 @@ function renderMfaPage(
       initialEntries: [
         withChallenge
           ? {
-              pathname:
-                '/login/mfa',
+            pathname:
+              '/login/mfa',
 
-              state: {
-                challenge: {
-                  challengeToken:
-                    'challenge-token',
+            state: {
+              challenge: {
+                challengeToken:
+                  'challenge-token',
 
-                  expiresAt:
-                    '2026-09-09T20:00:00Z',
-                },
-
-                from: '/dashboard',
+                expiresAt:
+                  '2026-09-09T20:00:00Z',
               },
-            }
+
+              from: '/dashboard',
+            },
+          }
           : '/login/mfa',
       ],
     },
@@ -97,6 +97,18 @@ describe('MfaChallengePage', () => {
       status: 'unauthenticated',
 
       login: vi.fn(),
+
+      googleLogin: vi.fn(
+        async () => ({
+          status: 'AUTHENTICATED' as const,
+          token: {
+            accessToken: 'access-token',
+            refreshToken: 'refresh-token',
+            tokenType: 'Bearer',
+            expiresIn: 900,
+          },
+        }),
+      ),
 
       verifyMfa: verifyMfaMock,
 

@@ -3,7 +3,7 @@ import { createContext } from 'react'
 import type {
   ResolvedTheme,
   ThemePreference,
-} from '../themePreference'
+} from '@/features/theme/themePreference'
 
 export interface ThemeContextValue {
   preference: ThemePreference

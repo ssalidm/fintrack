@@ -29,20 +29,11 @@ export default function AuthIntro() {
   return (
     <div className="flex h-full flex-col px-12 py-12 xl:px-14">
       <div>
-        <h2
-          className="
-            max-w-md
-            text-[2.5rem]
-            font-semibold
-            leading-[1.08]
-            tracking-[-0.04em]
-            text-[#092f28]
-          "
-        >
+        <h2 className="max-w-md text-[2.5rem] font-semibold leading-[1.08] tracking-[-0.04em] text-ink">
           Welcome to Salif
         </h2>
 
-        <p className="mt-3 max-w-sm text-sm leading-6 text-[#66766f]">
+        <p className="mt-3 max-w-sm text-sm leading-6 text-muted">
           A clearer way to understand and manage your money.
         </p>
       </div>
@@ -58,7 +49,7 @@ export default function AuthIntro() {
               key={title}
               className="flex items-start gap-4"
             >
-              <span className="grid size-8 shrink-0 place-items-center text-[#16805f]">
+              <span className="grid size-8 shrink-0 place-items-center text-accent">
                 <Icon
                   size={21}
                   strokeWidth={1.7}
@@ -67,11 +58,11 @@ export default function AuthIntro() {
               </span>
 
               <div>
-                <h3 className="text-sm font-semibold text-[#173c32]">
+                <h3 className="text-sm font-semibold text-ink">
                   {title}
                 </h3>
 
-                <p className="mt-1 max-w-[290px] text-[13px] leading-5 text-[#718078]">
+                <p className="mt-1 max-w-[290px] text-[13px] leading-5 text-muted">
                   {description}
                 </p>
               </div>

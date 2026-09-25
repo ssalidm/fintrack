@@ -25,7 +25,7 @@ export default function DashboardFooter() {
         "
       >
         <p>
-          © {currentYear} Salif. Your money,
+          &copy; {currentYear} Salif. Your money,
           made clearer.
         </p>
 

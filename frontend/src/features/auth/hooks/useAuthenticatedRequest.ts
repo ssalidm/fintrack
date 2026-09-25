@@ -1,8 +1,8 @@
 import {useCallback, useEffect, useRef} from 'react'
-import {ApiClientError} from '../../../api/ApiClientError'
-import {apiRequest, type ApiRequestOptions} from '../../../api/client'
-import type {ApiResult} from '../../../api/types'
-import {useAuth} from '../context/useAuth'
+import {ApiClientError} from '@/api/ApiClientError'
+import {apiRequest, type ApiRequestOptions} from '@/api/client'
+import type {ApiResult} from '@/api/types'
+import {useAuth} from '@/features/auth/context/useAuth'
 
 type AuthenticatedRequestOptions = Omit<
   ApiRequestOptions,

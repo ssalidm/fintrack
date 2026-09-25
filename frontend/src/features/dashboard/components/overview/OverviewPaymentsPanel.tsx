@@ -6,10 +6,10 @@ import {
 import { useMemo } from 'react'
 import { Link } from 'react-router'
 
-import { formatMoney } from '../../../../utils/formatters'
-import { useAccounts } from '../../../accounts/hooks/useAccounts'
-import { useRecurringTransactions } from '../../../recurring/hooks/useRecurringTransactions'
-import type { RecurringTransactionDue } from '../../api/types'
+import { formatMoney } from '@/utils/formatters'
+import { useAccounts } from '@/features/accounts/hooks/useAccounts'
+import { useRecurringTransactions } from '@/features/recurring/hooks/useRecurringTransactions'
+import type { RecurringTransactionDue } from '@/features/dashboard/api/types'
 
 interface OverviewPaymentsPanelProps {
   readonly dueTransactions: RecurringTransactionDue[]

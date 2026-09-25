@@ -3,13 +3,13 @@ import {
   LoaderCircle,
 } from 'lucide-react'
 
-import SettingsList from '../../../components/settings/SettingsList'
-import type { UserSession } from '../api/types'
+import SettingsList from '@/components/settings/SettingsList'
+import type { UserSession } from '@/features/profile/api/types'
 import {
   useProfileSessions,
   useRevokeOtherProfileSessions,
   useRevokeProfileSession,
-} from '../hooks/useProfileSessions'
+} from '@/features/profile/hooks/useProfileSessions'
 
 import { useState } from 'react'
 import SessionSignOutDialog from './SessionSignOutDialog'

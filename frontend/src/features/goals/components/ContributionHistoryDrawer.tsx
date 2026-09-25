@@ -9,18 +9,18 @@ import {
   useState,
 } from 'react'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import RefreshButton from '../../../components/actions/RefreshButton'
-import StatusTabs from '../../../components/navigation/StatusTabs'
-import ErrorPanel from '../../../components/ui/ErrorPanel'
-import Pagination from '../../../components/ui/Pagination'
-import { formatMoney } from '../../../utils/formatters'
+import { ApiClientError } from '@/api/ApiClientError'
+import RefreshButton from '@/components/actions/RefreshButton'
+import StatusTabs from '@/components/navigation/StatusTabs'
+import ErrorPanel from '@/components/ui/ErrorPanel'
+import Pagination from '@/components/ui/Pagination'
+import { formatMoney } from '@/utils/formatters'
 import type {
   GoalContribution,
   GoalContributionStatus,
   SavingsGoal,
 } from '../api/types'
-import { useGoalContributions } from '../hooks/useGoals'
+import { useGoalContributions } from '@/features/goals/hooks/useGoals'
 import EditContributionModal from './EditContributionModal'
 import VoidContributionModal from './VoidContributionModal'
 
@@ -142,21 +142,21 @@ export default function ContributionHistoryDrawer({
 
   const firstVisibleContribution =
     pagination &&
-    contributions.length > 0
+      contributions.length > 0
       ? pagination.page *
-          pagination.size +
-        1
+      pagination.size +
+      1
       : 0
 
   const lastVisibleContribution =
     pagination &&
-    contributions.length > 0
+      contributions.length > 0
       ? Math.min(
-          firstVisibleContribution +
-            contributions.length -
-            1,
-          pagination.totalElements,
-        )
+        firstVisibleContribution +
+        contributions.length -
+        1,
+        pagination.totalElements,
+      )
       : 0
 
   useEffect(() => {
@@ -317,9 +317,9 @@ export default function ContributionHistoryDrawer({
               title="We couldn’t load the history"
               message={
                 contributionsQuery.error instanceof
-                ApiClientError
+                  ApiClientError
                   ? contributionsQuery
-                      .error.message
+                    .error.message
                   : 'Please try again.'
               }
               onRetry={() =>
@@ -331,7 +331,7 @@ export default function ContributionHistoryDrawer({
           {!contributionsQuery.isPending &&
             !contributionsQuery.error &&
             contributions.length ===
-              0 && (
+            0 && (
               <section className="py-14 text-center">
                 <span className="mx-auto grid size-11 place-items-center rounded-xl bg-accent-soft text-accent">
                   <CalendarDays
@@ -342,14 +342,14 @@ export default function ContributionHistoryDrawer({
 
                 <h3 className="mt-4 text-xl font-semibold text-ink">
                   {status ===
-                  'POSTED'
+                    'POSTED'
                     ? 'No contributions yet'
                     : 'Nothing has been voided'}
                 </h3>
 
                 <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-muted">
                   {status ===
-                  'POSTED'
+                    'POSTED'
                     ? 'Your progress entries will appear here as you add to this goal.'
                     : 'Contributions removed from the total will remain visible here.'}
                 </p>
@@ -359,7 +359,7 @@ export default function ContributionHistoryDrawer({
           {!contributionsQuery.isPending &&
             !contributionsQuery.error &&
             contributions.length >
-              0 && (
+            0 && (
               <div className="space-y-3">
                 {contributions.map(
                   (
@@ -369,22 +369,20 @@ export default function ContributionHistoryDrawer({
                       key={
                         contribution.id
                       }
-                      className={`rounded-xl border p-5 ${
-                        contribution.status ===
-                        'VOIDED'
+                      className={`rounded-xl border p-5 ${contribution.status ===
+                          'VOIDED'
                           ? 'border-danger/20 bg-danger-soft/40'
                           : 'border-line/50 bg-surface'
-                      }`}
+                        }`}
                     >
                       <div className="flex items-start justify-between gap-5">
                         <div className="min-w-0">
                           <p
-                            className={`text-lg font-semibold ${
-                              contribution.status ===
-                              'VOIDED'
+                            className={`text-lg font-semibold ${contribution.status ===
+                                'VOIDED'
                                 ? 'text-muted line-through'
                                 : 'text-ink'
-                            }`}
+                              }`}
                           >
                             {formatMoney(
                               contribution.amount,
@@ -406,42 +404,42 @@ export default function ContributionHistoryDrawer({
 
                         {contribution.status ===
                           'POSTED' && (
-                          <div className="flex shrink-0 items-center gap-1">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setEditingContribution(
-                                  contribution,
-                                )
-                              }
-                              className="grid size-8 cursor-pointer place-items-center rounded-full text-muted transition hover:bg-accent-soft hover:text-accent"
-                              aria-label="Edit contribution"
-                              title="Edit contribution"
-                            >
-                              <Pencil
-                                size={15}
-                                aria-hidden
-                              />
-                            </button>
+                            <div className="flex shrink-0 items-center gap-1">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setEditingContribution(
+                                    contribution,
+                                  )
+                                }
+                                className="grid size-8 cursor-pointer place-items-center rounded-full text-muted transition hover:bg-accent-soft hover:text-accent"
+                                aria-label="Edit contribution"
+                                title="Edit contribution"
+                              >
+                                <Pencil
+                                  size={15}
+                                  aria-hidden
+                                />
+                              </button>
 
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setVoidingContribution(
-                                  contribution,
-                                )
-                              }
-                              className="grid size-8 cursor-pointer place-items-center rounded-full text-muted transition hover:bg-danger-soft hover:text-danger"
-                              aria-label="Void contribution"
-                              title="Void contribution"
-                            >
-                              <Ban
-                                size={15}
-                                aria-hidden
-                              />
-                            </button>
-                          </div>
-                        )}
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setVoidingContribution(
+                                    contribution,
+                                  )
+                                }
+                                className="grid size-8 cursor-pointer place-items-center rounded-full text-muted transition hover:bg-danger-soft hover:text-danger"
+                                aria-label="Void contribution"
+                                title="Void contribution"
+                              >
+                                <Ban
+                                  size={15}
+                                  aria-hidden
+                                />
+                              </button>
+                            </div>
+                          )}
                       </div>
 
                       {contribution.note && (
@@ -454,26 +452,26 @@ export default function ContributionHistoryDrawer({
 
                       {contribution.status ===
                         'VOIDED' && (
-                        <div className="mt-4 border-t border-danger/20 pt-4">
-                          <p className="type-eyebrow text-danger">
-                            Voided
-                          </p>
-
-                          <p className="mt-2 text-sm text-danger">
-                            {
-                              contribution.voidReason
-                            }
-                          </p>
-
-                          {contribution.voidedAt && (
-                            <p className="mt-2 text-xs text-subtle">
-                              {formatTimestamp(
-                                contribution.voidedAt,
-                              )}
+                          <div className="mt-4 border-t border-danger/20 pt-4">
+                            <p className="type-eyebrow text-danger">
+                              Voided
                             </p>
-                          )}
-                        </div>
-                      )}
+
+                            <p className="mt-2 text-sm text-danger">
+                              {
+                                contribution.voidReason
+                              }
+                            </p>
+
+                            {contribution.voidedAt && (
+                              <p className="mt-2 text-xs text-subtle">
+                                {formatTimestamp(
+                                  contribution.voidedAt,
+                                )}
+                              </p>
+                            )}
+                          </div>
+                        )}
                     </article>
                   ),
                 )}
@@ -484,7 +482,7 @@ export default function ContributionHistoryDrawer({
         {pagination &&
           !contributionsQuery.error &&
           pagination.totalElements >
-            0 && (
+          0 && (
             <footer className="border-t border-line bg-surface px-6 py-4 sm:px-8">
               <Pagination
                 label="Contribution history pages"
@@ -503,7 +501,7 @@ export default function ContributionHistoryDrawer({
                 showPageNumbers
                 summary={
                   contributions.length >
-                  0
+                    0
                     ? `Showing ${firstVisibleContribution}–${lastVisibleContribution} of ${pagination.totalElements}`
                     : 'No contributions on this page'
                 }

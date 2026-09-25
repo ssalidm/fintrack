@@ -5,8 +5,8 @@ import {
 
 import {
   sidebarItemBase,
-} from '../../dashboard/components/sidebar/sidebarStyles'
-import { useTheme } from '../context/useTheme'
+} from '@/features/dashboard/components/sidebar/sidebarStyles'
+import { useTheme } from '@/features/theme/context/useTheme'
 
 interface ThemeToggleProps {
   readonly isCollapsed?: boolean

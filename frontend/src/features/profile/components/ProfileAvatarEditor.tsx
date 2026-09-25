@@ -8,14 +8,14 @@ import {
   useState,
 } from 'react'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import type { UserProfile } from '../api/types'
-import { useProfileAvatar } from '../hooks/useProfileAvatar'
+import { ApiClientError } from '@/api/ApiClientError'
+import type { UserProfile } from '@/features/profile/api/types'
+import { useProfileAvatar } from '@/features/profile/hooks/useProfileAvatar'
 import {
   useDeleteProfileAvatar,
   useUploadProfileAvatar,
-} from '../hooks/useProfileAvatarMutations'
-import { prepareProfileAvatar } from '../utils/prepareProfileAvatar'
+} from '@/features/profile/hooks/useProfileAvatarMutations'
+import { prepareProfileAvatar } from '@/features/profile/utils/prepareProfileAvatar'
 import ProfileAvatar from './ProfileAvatar'
 
 interface ProfileAvatarEditorProps {

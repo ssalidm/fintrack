@@ -5,9 +5,9 @@ import {
 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
-import { formatMoney } from '../../../../utils/formatters'
-import type { MonthlyCashFlow } from '../../api/types'
-import { useCashFlowReport } from '../../hooks/useCashFlowReport'
+import { formatMoney } from '@/utils/formatters'
+import type { MonthlyCashFlow } from '@/features/dashboard/api/types'
+import { useCashFlowReport } from '@/features/dashboard/hooks/useCashFlowReport'
 
 interface Point {
   readonly monthStart: string

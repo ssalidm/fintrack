@@ -6,8 +6,8 @@ import {
 import { useState } from 'react'
 import { Link } from 'react-router'
 
-import { formatMoney } from '../../../../utils/formatters'
-import type { DashboardSummary } from '../../api/types'
+import { formatMoney } from '@/utils/formatters'
+import type { DashboardSummary } from '@/features/dashboard/api/types'
 
 interface OverviewBalancePanelProps {
   readonly summary: DashboardSummary

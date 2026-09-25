@@ -5,8 +5,8 @@ import {
 } from 'lucide-react'
 import { Link } from 'react-router'
 
-import { formatMoney } from '../../../../utils/formatters'
-import { useGoals } from '../../../goals/hooks/useGoals'
+import { formatMoney } from '@/utils/formatters'
+import { useGoals } from '@/features/goals/hooks/useGoals'
 
 function clampPercentage(value: number) {
   return Math.min(Math.max(value, 0), 100)

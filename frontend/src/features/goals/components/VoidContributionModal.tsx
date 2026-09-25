@@ -3,17 +3,17 @@ import { AlertTriangle } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import ConfirmationDialog from '../../../components/ui/ConfirmationDialog'
+import { ApiClientError } from '@/api/ApiClientError'
+import ConfirmationDialog from '@/components/ui/ConfirmationDialog'
 import type {
   GoalContribution,
   SavingsGoal,
-} from '../api/types'
-import { useVoidGoalContribution } from '../hooks/useGoals'
+} from '@/features/goals/api/types'
+import { useVoidGoalContribution } from '@/features/goals/hooks/useGoals'
 import {
   voidContributionSchema,
   type VoidContributionFormValues,
-} from '../validation/goalSchemas'
+} from '@/features/goals/validation/goalSchemas'
 
 interface VoidContributionModalProps {
   goal: SavingsGoal

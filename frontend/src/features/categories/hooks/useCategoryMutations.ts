@@ -1,11 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useAuthenticatedRequest } from '../../auth/hooks/useAuthenticatedRequest'
+import { useAuthenticatedRequest } from '@/features/auth/hooks/useAuthenticatedRequest'
 import type {
   ArchiveCategoryRequest,
   Category,
   CreateCategoryRequest,
   UpdateCategoryRequest,
-} from '../api/types'
+} from '@/features/categories/api/types'
 import { categoryQueryKeys } from './useCategories'
 
 interface UpdateCategoryVariables {

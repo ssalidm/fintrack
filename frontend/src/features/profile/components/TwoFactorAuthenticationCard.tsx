@@ -6,16 +6,16 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import type { MfaSetup } from '../api/types'
+import { ApiClientError } from '@/api/ApiClientError'
+import type { MfaSetup } from '@/features/profile/api/types'
 import {
   useMfaStatus,
   useStartMfaSetup,
-} from '../hooks/useMfaManagement'
+} from '@/features/profile/hooks/useMfaManagement'
 import MfaDisableDialog from './MfaDisableDialog'
 import MfaRecoveryCodesDialog from './MfaRecoveryCodesDialog'
 import MfaSetupDialog from './MfaSetupDialog'
-import SettingsList from '../../../components/settings/SettingsList'
+import SettingsList from '@/components/settings/SettingsList'
 
 type Notice = {
   tone: 'success' | 'error'

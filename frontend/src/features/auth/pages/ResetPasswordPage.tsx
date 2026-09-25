@@ -8,19 +8,19 @@ import {
   useSearchParams,
 } from 'react-router'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import { authApi } from '../api/authApi'
-import AuthAlert from '../components/AuthAlert'
-import AuthButton from '../components/AuthButton'
-import AuthField from '../components/AuthField'
-import AuthHeader from '../components/AuthHeader'
-import AuthInput from '../components/AuthInput'
-import AuthPanel from '../components/AuthPanel'
-import PasswordVisibilityButton from '../components/PasswordVisibilityButton'
+import { ApiClientError } from '@/api/ApiClientError'
+import { authApi } from '@/features/auth/api/authApi'
+import AuthAlert from '@/features/auth/components/AuthAlert'
+import AuthButton from '@/features/auth/components/AuthButton'
+import AuthField from '@/features/auth/components/AuthField'
+import AuthHeader from '@/features/auth/components/AuthHeader'
+import AuthInput from '@/features/auth/components/AuthInput'
+import AuthPanel from '@/features/auth/components/AuthPanel'
+import PasswordVisibilityButton from '@/features/auth/components/PasswordVisibilityButton'
 import {
   resetPasswordSchema,
   type ResetPasswordFormValues,
-} from '../validation/resetPasswordSchema'
+} from '@/features/auth/validation/resetPasswordSchema'
 
 export default function ResetPasswordPage() {
   const [searchParams] =

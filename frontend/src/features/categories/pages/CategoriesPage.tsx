@@ -9,22 +9,22 @@ import {
   Tags,
 } from 'lucide-react'
 
-import RefreshButton from '../../../components/actions/RefreshButton'
-import PageHeader from '../../../components/layout/PageHeader'
-import PageShell from '../../../components/layout/PageShell'
-import StatusTabs from '../../../components/navigation/StatusTabs'
-import ConfirmationDialog from '../../../components/ui/ConfirmationDialog'
-import EmptyState from '../../../components/ui/EmptyState'
-import ErrorPanel from '../../../components/ui/ErrorPanel'
+import RefreshButton from '@/components/actions/RefreshButton'
+import PageHeader from '@/components/layout/PageHeader'
+import PageShell from '@/components/layout/PageShell'
+import StatusTabs from '@/components/navigation/StatusTabs'
+import ConfirmationDialog from '@/components/ui/ConfirmationDialog'
+import EmptyState from '@/components/ui/EmptyState'
+import ErrorPanel from '@/components/ui/ErrorPanel'
 import type {
   Category,
   CategoryStatus,
   CategoryType,
-} from '../api/types'
-import CategoryModal from '../components/CategoryModal'
-import CategorySpendingChart from '../components/CategorySpendingChart'
-import { useCategories } from '../hooks/useCategories'
-import { useArchiveCategory } from '../hooks/useCategoryMutations'
+} from '@/features/categories/api/types'
+import CategoryModal from '@/features/categories/components/CategoryModal'
+import CategorySpendingChart from '@/features/categories/components/CategorySpendingChart'
+import { useCategories } from '@/features/categories/hooks/useCategories'
+import { useArchiveCategory } from '@/features/categories/hooks/useCategoryMutations'
 
 const typeOptions = [
   {

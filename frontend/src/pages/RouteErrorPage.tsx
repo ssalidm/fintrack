@@ -9,7 +9,7 @@ import {
   useRouteError,
 } from 'react-router'
 
-import salifLogoGreen from '../assets/brand/salif-logo-green.svg'
+import salifLogoGreen from '@/assets/brand/salif-logo-green.svg'
 
 function getErrorMessage(error: unknown): string {
   if (isRouteErrorResponse(error)) {

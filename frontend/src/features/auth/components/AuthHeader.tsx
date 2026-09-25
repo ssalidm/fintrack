@@ -13,19 +13,13 @@ export default function AuthHeader({
     <header>
       <h1
         id={titleId}
-        className="
-          text-2xl
-          font-semibold
-          leading-tight
-          tracking-[-0.025em]
-          text-[#092f28]
-        "
+        className="text-2xl font-semibold leading-tight tracking-[-0.025em] text-ink"
       >
         {title}
       </h1>
 
       {description && (
-        <p className="mt-2 text-[13px] leading-5 text-[#6f7d76]">
+        <p className="mt-2 text-[13px] leading-5 text-muted">
           {description}
         </p>
       )}

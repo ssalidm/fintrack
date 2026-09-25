@@ -4,7 +4,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 
-import { useAuthenticatedRequest } from '../../auth/hooks/useAuthenticatedRequest'
+import { useAuthenticatedRequest } from '@/features/auth/hooks/useAuthenticatedRequest'
 import type {
   ConfirmMfaSetupRequest,
   ConfirmMfaSetupResponse,
@@ -13,7 +13,7 @@ import type {
   MfaSetup,
   MfaStatus,
   RegenerateMfaRecoveryCodesRequest,
-} from '../api/types'
+} from '@/features/profile/api/types'
 
 export const mfaStatusQueryKey = [
   'profile',

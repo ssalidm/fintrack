@@ -1,5 +1,5 @@
-import FormDrawer from '../../../components/ui/FormDrawer'
-import type { Category } from '../api/types'
+import FormDrawer from '@/components/ui/FormDrawer'
+import type { Category } from '@/features/categories/api/types'
 import CategoryForm from './CategoryForm'
 
 interface CategoryModalProps {

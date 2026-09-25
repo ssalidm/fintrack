@@ -3,14 +3,14 @@ import { Info } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import FormDrawer from '../../../components/ui/FormDrawer'
-import type { SavingsGoal } from '../api/types'
-import { useAddGoalContribution } from '../hooks/useGoals'
+import { ApiClientError } from '@/api/ApiClientError'
+import FormDrawer from '@/components/ui/FormDrawer'
+import type { SavingsGoal } from '@/features/goals/api/types'
+import { useAddGoalContribution } from '@/features/goals/hooks/useGoals'
 import {
   contributionFormSchema,
   type ContributionFormValues,
-} from '../validation/goalSchemas'
+} from '@/features/goals/validation/goalSchemas'
 
 interface ContributionModalProps {
   goal: SavingsGoal

@@ -5,7 +5,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 
-import {useAuthenticatedRequest} from '../../auth/hooks/useAuthenticatedRequest'
+import {useAuthenticatedRequest} from '@/features/auth/hooks/useAuthenticatedRequest'
 
 import type {
   Budget,
@@ -17,7 +17,7 @@ import type {
   CreateBudgetRequest,
   UpdateBudgetLimitRequest,
   UpdateBudgetRequest,
-} from '../api/types'
+} from '@/features/budgets/api/types'
 
 export const budgetQueryKeys = {
   all: ['budgets'] as const,

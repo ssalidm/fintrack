@@ -4,10 +4,10 @@ import {
 } from 'react'
 import { Ban } from 'lucide-react'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import ConfirmationDialog from '../../../components/ui/ConfirmationDialog'
-import type { Transfer } from '../api/types'
-import { useVoidTransfer } from '../hooks/useTransfers'
+import { ApiClientError } from '@/api/ApiClientError'
+import ConfirmationDialog from '@/components/ui/ConfirmationDialog'
+import type { Transfer } from '@/features/transfers/api/types'
+import { useVoidTransfer } from '@/features/transfers/hooks/useTransfers'
 
 interface VoidTransferModalProps {
   transfer: Transfer

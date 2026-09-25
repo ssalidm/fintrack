@@ -30,18 +30,19 @@ export default function AuthButton({
         items-center justify-center
         gap-2
         rounded-full
-        bg-[#0d4f3f]
+        bg-primary
         px-4
         text-sm font-semibold
-        text-white
+        text-inverse
         transition
 
-        hover:bg-[#092f28]
+        hover:bg-primary-hover
 
         focus:outline-none
         focus:ring-2
-        focus:ring-[#16805f]/40
+        focus:ring-accent/40
         focus:ring-offset-2
+        focus:ring-offset-surface
 
         disabled:cursor-not-allowed
         disabled:opacity-60

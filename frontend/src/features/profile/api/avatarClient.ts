@@ -1,6 +1,6 @@
-import { ApiClientError } from '../../../api/ApiClientError'
-import type { ApiResponse } from '../../../api/types'
-import { env } from '../../../config/env'
+import { ApiClientError } from '@/api/ApiClientError'
+import type { ApiResponse } from '@/api/types'
+import { env } from '@/config/env'
 
 function buildUrl() {
   return `${env.apiBaseUrl}/profile/avatar`

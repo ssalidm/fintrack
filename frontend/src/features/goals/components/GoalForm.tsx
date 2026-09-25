@@ -6,17 +6,17 @@ import {
 } from 'react'
 import { useForm } from 'react-hook-form'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import type { SavingsGoal } from '../api/types'
+import { ApiClientError } from '@/api/ApiClientError'
+import type { SavingsGoal } from '@/features/goals/api/types'
 import {
   useCreateGoal,
   useUpdateGoal,
-} from '../hooks/useGoals'
+} from '@/features/goals/hooks/useGoals'
 import {
   goalCurrencies,
   goalFormSchema,
   type GoalFormValues,
-} from '../validation/goalSchemas'
+} from '@/features/goals/validation/goalSchemas'
 
 interface GoalFormProps {
   goal?: SavingsGoal

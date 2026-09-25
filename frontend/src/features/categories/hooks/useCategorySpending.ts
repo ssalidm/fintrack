@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-import { useAuthenticatedRequest } from '../../auth/hooks/useAuthenticatedRequest'
-import type { MonthlyCategorySpending } from '../api/types'
+import { useAuthenticatedRequest } from '@/features/auth/hooks/useAuthenticatedRequest'
+import type { MonthlyCategorySpending } from '@/features/categories/api/types'
 
 function getCurrentMonthStart() {
   const now = new Date()

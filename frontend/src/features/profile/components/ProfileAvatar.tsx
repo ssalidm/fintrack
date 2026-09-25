@@ -1,15 +1,15 @@
 import {
   useEffect,
-  useState,
+  useRef,
 } from 'react'
 
-import type { UserProfile } from '../api/types'
-import { useProfileAvatar } from '../hooks/useProfileAvatar'
+import type { UserProfile } from '@/features/profile/api/types'
+import { useProfileAvatar } from '@/features/profile/hooks/useProfileAvatar'
 
 interface ProfileAvatarProps {
   readonly profile:
-    | UserProfile
-    | undefined
+  | UserProfile
+  | undefined
   readonly className: string
   readonly imageClassName?: string
 }
@@ -28,9 +28,8 @@ function initialsFor(
     profile?.lastName?.trim() ||
     ''
 
-  return `${first[0] ?? 'S'}${
-    last[0] ?? ''
-  }`.toUpperCase()
+  return `${first[0] ?? 'S'}${last[0] ?? ''
+    }`.toUpperCase()
 }
 
 function displayNameFor(
@@ -53,35 +52,28 @@ export default function ProfileAvatar({
   const avatarQuery =
     useProfileAvatar()
 
-  const [
-    imageUrl,
-    setImageUrl,
-  ] = useState<string | null>(
-    null,
-  )
+  const imageRef = useRef<HTMLImageElement>(null,)
+  const avatarBlob = avatarQuery.data
 
   useEffect(() => {
-    const blob =
-      avatarQuery.data
-
-    if (!blob) {
-      setImageUrl(null)
+    if (!avatarBlob) {
       return
     }
 
-    const nextUrl =
-      URL.createObjectURL(
-        blob,
-      )
+    const imageUrl = URL.createObjectURL(avatarBlob)
 
-    setImageUrl(nextUrl)
+    const image = imageRef.current
+
+    if (image) {
+      image.src = imageUrl
+    }
 
     return () => {
       URL.revokeObjectURL(
-        nextUrl,
+        imageUrl,
       )
     }
-  }, [avatarQuery.data])
+  }, [avatarBlob])
 
   return (
     <span
@@ -97,9 +89,9 @@ export default function ProfileAvatar({
         ${className}
       `}
     >
-      {imageUrl ? (
+      {avatarBlob ? (
         <img
-          src={imageUrl}
+          ref={imageRef}
           alt={`${displayNameFor(profile)} profile`}
           className={`
             h-full w-full

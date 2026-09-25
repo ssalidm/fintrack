@@ -3,11 +3,13 @@ import {
   Navigate,
 } from 'react-router'
 
-import AdminRoute from '../features/admin/components/AdminRoute.tsx'
-import ProtectedRoute from '../features/auth/components/ProtectedRoute.tsx'
-import AuthLayout from '../features/auth/layouts/AuthLayout.tsx'
-import DashboardLayout from '../features/dashboard/layouts/DashboardLayout.tsx'
-import RouteErrorPage from '../pages/RouteErrorPage.tsx'
+import AdminRoute from '@/features/admin/components/AdminRoute.tsx'
+import ProtectedRoute from '@/features/auth/components/ProtectedRoute.tsx'
+import AuthLayout from '@/features/auth/layouts/AuthLayout.tsx'
+import DashboardLayout from '@/features/dashboard/layouts/DashboardLayout.tsx'
+import RouteErrorPage from '@/pages/RouteErrorPage.tsx'
+import RootLayout from '@/components/layout/RootLayout'
+
 
 import {
   HomePage,
@@ -39,6 +41,7 @@ import {
 
 export const router = createBrowserRouter([
   {
+    element: <RootLayout />,
     errorElement: <RouteErrorPage />,
     children: [
       {

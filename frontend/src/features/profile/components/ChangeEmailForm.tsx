@@ -13,18 +13,18 @@ import {
   useForm,
 } from 'react-hook-form'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import OtpCodeInput from '../../auth/components/OtpCodeInput'
+import { ApiClientError } from '@/api/ApiClientError'
+import OtpCodeInput from '@/features/auth/components/OtpCodeInput'
 import {
   formatCooldown,
   useRequestCooldown,
-} from '../../auth/hooks/useRequestCooldown'
-import { useMfaStatus } from '../hooks/useMfaManagement'
-import { useChangeEmail } from '../hooks/useProfileMutations'
+} from '@/features/auth/hooks/useRequestCooldown'
+import { useMfaStatus } from '@/features/profile/hooks/useMfaManagement'
+import { useChangeEmail } from '@/features/profile/hooks/useProfileMutations'
 import {
   changeEmailSchema,
   type ChangeEmailFormValues,
-} from '../validation/profileSchemas'
+} from '@/features/profile/validation/profileSchemas'
 
 interface ChangeEmailFormProps {
   currentEmail: string

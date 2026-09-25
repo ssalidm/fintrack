@@ -18,19 +18,19 @@ import {
   useParams,
 } from 'react-router'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import RefreshButton from '../../../components/actions/RefreshButton'
-import PageHeader from '../../../components/layout/PageHeader'
-import PageShell from '../../../components/layout/PageShell'
-import ConfirmationDialog from '../../../components/ui/ConfirmationDialog'
-import ErrorPanel from '../../../components/ui/ErrorPanel'
-import Pagination from '../../../components/ui/Pagination'
-import type { UserStatus } from '../../profile/api/types'
-import { useProfile } from '../../profile/hooks/useProfile'
+import { ApiClientError } from '@/api/ApiClientError'
+import RefreshButton from '@/components/actions/RefreshButton'
+import PageHeader from '@/components/layout/PageHeader'
+import PageShell from '@/components/layout/PageShell'
+import ConfirmationDialog from '@/components/ui/ConfirmationDialog'
+import ErrorPanel from '@/components/ui/ErrorPanel'
+import Pagination from '@/components/ui/Pagination'
+import type { UserStatus } from '@/features/profile/api/types'
+import { useProfile } from '@/features/profile/hooks/useProfile'
 import type {
   AdminUser,
   AdminUserSession,
-} from '../api/types'
+} from '@/features/admin/api/types'
 import {
   useActivateAdminUser,
   useDeactivateAdminUser,
@@ -39,7 +39,7 @@ import {
 import {
   useAdminUser,
   useAdminUserSessions,
-} from '../hooks/useAdminUsers'
+} from '@/features/admin/hooks/useAdminUsers'
 
 const SESSION_PAGE_SIZE = 8
 
@@ -127,16 +127,16 @@ function describeUserAgent(
     )
       ? 'Microsoft Edge'
       : userAgent.includes(
-            'Chrome/',
-          )
+        'Chrome/',
+      )
         ? 'Google Chrome'
         : userAgent.includes(
-              'Firefox/',
-            )
+          'Firefox/',
+        )
           ? 'Mozilla Firefox'
           : userAgent.includes(
-                'Safari/',
-              )
+            'Safari/',
+          )
             ? 'Safari'
             : 'Browser session'
 
@@ -146,23 +146,23 @@ function describeUserAgent(
     )
       ? 'Windows'
       : userAgent.includes(
-            'Android',
-          )
+        'Android',
+      )
         ? 'Android'
         : userAgent.includes(
-              'iPhone',
-            ) ||
-            userAgent.includes(
-              'iPad',
-            )
+          'iPhone',
+        ) ||
+          userAgent.includes(
+            'iPad',
+          )
           ? 'iOS'
           : userAgent.includes(
-                'Mac OS',
-              )
+            'Mac OS',
+          )
             ? 'macOS'
             : userAgent.includes(
-                  'Linux',
-                )
+              'Linux',
+            )
               ? 'Linux'
               : null
 
@@ -204,11 +204,10 @@ function SessionRow({
     <article className="grid gap-4 px-5 py-4 sm:grid-cols-[minmax(0,1.5fr)_1fr_auto] sm:items-center sm:px-6">
       <div className="flex min-w-0 items-start gap-3">
         <span
-          className={`mt-0.5 grid size-9 shrink-0 place-items-center rounded-xl ${
-            session.active
+          className={`mt-0.5 grid size-9 shrink-0 place-items-center rounded-xl ${session.active
               ? 'bg-success-soft text-success'
               : 'bg-surface-strong text-muted'
-          }`}
+            }`}
         >
           <Laptop2
             size={16}
@@ -254,11 +253,10 @@ function SessionRow({
 
       <div className="sm:text-right">
         <span
-          className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold ${
-            session.active
+          className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold ${session.active
               ? 'bg-success-soft text-success'
               : 'bg-surface-strong text-muted'
-          }`}
+            }`}
         >
           {session.active
             ? 'Active'
@@ -268,10 +266,10 @@ function SessionRow({
         <p className="mt-1.5 text-[11px] text-subtle">
           {session.active
             ? `Expires ${formatDateTime(
-                session.expiresAt,
-              )}`
+              session.expiresAt,
+            )}`
             : session.revocationReason ??
-              'Expired'}
+            'Expired'}
         </p>
       </div>
     </article>
@@ -331,8 +329,8 @@ export default function AdminUserDetailsPage() {
   const canManageUser =
     Boolean(
       user &&
-        !targetIsAdmin &&
-        !targetIsSelf,
+      !targetIsAdmin &&
+      !targetIsSelf,
     )
 
   const sessionsQuery =
@@ -425,7 +423,7 @@ export default function AdminUserDetailsPage() {
     } catch (error) {
       setActionError(
         error instanceof
-        ApiClientError
+          ApiClientError
           ? error.message
           : 'The admin action could not be completed.',
       )
@@ -469,9 +467,9 @@ export default function AdminUserDetailsPage() {
           title="We couldn’t load this user"
           message={
             userQuery.error instanceof
-            ApiClientError
+              ApiClientError
               ? userQuery.error
-                  .message
+                .message
               : 'The user may no longer exist or the request could not be completed.'
           }
           onRetry={() =>
@@ -522,8 +520,8 @@ export default function AdminUserDetailsPage() {
       confirmLabel: string
       icon: typeof Ban
       tone:
-        | 'primary'
-        | 'danger'
+      | 'primary'
+      | 'danger'
     }
   >
 
@@ -563,7 +561,7 @@ export default function AdminUserDetailsPage() {
 
             {canManageUser &&
               (user.status ===
-              'DEACTIVATED' ? (
+                'DEACTIVATED' ? (
                 <button
                   type="button"
                   onClick={() => {
@@ -619,15 +617,14 @@ export default function AdminUserDetailsPage() {
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <span
-                className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${
-                  statusClasses[
-                    user.status
+                className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${statusClasses[
+                  user.status
                   ]
-                }`}
+                  }`}
               >
                 {
                   statusLabels[
-                    user.status
+                  user.status
                   ]
                 }
               </span>
@@ -695,20 +692,20 @@ export default function AdminUserDetailsPage() {
 
       {(targetIsAdmin ||
         targetIsSelf) && (
-        <div className="feature-reveal mt-5 flex items-start gap-3 rounded-2xl border border-warning/20 bg-warning-soft p-4 text-sm leading-6 text-warning">
-          <ShieldCheck
-            size={18}
-            className="mt-0.5 shrink-0"
-            aria-hidden
-          />
+          <div className="feature-reveal mt-5 flex items-start gap-3 rounded-2xl border border-warning/20 bg-warning-soft p-4 text-sm leading-6 text-warning">
+            <ShieldCheck
+              size={18}
+              className="mt-0.5 shrink-0"
+              aria-hidden
+            />
 
-          <p>
-            {targetIsSelf
-              ? 'Your administrator account is read-only here. Use Profile for your own account settings.'
-              : 'Administrators are peers in Salif v1, so another administrator’s access and sessions cannot be changed.'}
-          </p>
-        </div>
-      )}
+            <p>
+              {targetIsSelf
+                ? 'Your administrator account is read-only here. Use Profile for your own account settings.'
+                : 'Administrators are peers in Salif v1, so another administrator’s access and sessions cannot be changed.'}
+            </p>
+          </div>
+        )}
 
       <section className="feature-reveal feature-reveal-delay-2 mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
         <article className="rounded-2xl border border-line/50 bg-surface p-5 sm:p-6">
@@ -846,7 +843,7 @@ export default function AdminUserDetailsPage() {
                 !sessionsQuery.data ||
                 sessionsQuery.data
                   .totalElements ===
-                  0 ||
+                0 ||
                 revokeSessions.isPending
               }
               onClick={() => {
@@ -890,10 +887,10 @@ export default function AdminUserDetailsPage() {
                 title="We couldn’t load this user’s sessions"
                 message={
                   sessionsQuery.error instanceof
-                  ApiClientError
+                    ApiClientError
                     ? sessionsQuery
-                        .error
-                        .message
+                      .error
+                      .message
                     : 'Please try again.'
                 }
                 onRetry={() =>
@@ -907,7 +904,7 @@ export default function AdminUserDetailsPage() {
             !sessionsQuery.isError &&
             sessionsQuery.data
               .items.length ===
-              0 && (
+            0 && (
               <div className="px-6 py-12 text-center">
                 <Clock3
                   size={22}
@@ -979,7 +976,7 @@ export default function AdminUserDetailsPage() {
         (() => {
           const copy =
             confirmationCopy[
-              confirmation
+            confirmation
             ]
 
           const ConfirmationIcon =

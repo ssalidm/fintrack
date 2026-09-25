@@ -5,8 +5,8 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 
-import { useTheme } from '../../theme/context/useTheme'
-import type { ThemePreference } from '../../theme/themePreference'
+import { useTheme } from '@/features/theme/context/useTheme'
+import type { ThemePreference } from '@/features/theme/themePreference'
 
 interface ThemeOption {
   value: ThemePreference

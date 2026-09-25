@@ -15,36 +15,37 @@ export default function AuthInput({
   return (
     <input
       className={`
-        block h-9 w-full
-        rounded-md
+        block h-10 w-full
+        rounded-lg
         border
-        bg-white/80
+        bg-app
         px-3
         text-[13px]
-        text-[#092f28]
+        text-ink
         outline-none
         transition
-        placeholder:text-[#9aa49f]
+        placeholder:text-subtle
 
         ${
           hasError
             ? `
-              border-red-400
-              focus:border-red-500
+              border-danger
+              focus:border-danger
               focus:ring-2
-              focus:ring-red-500/10
+              focus:ring-danger/15
             `
             : `
-              border-[#c9d0cc]
-              hover:border-[#adb9b3]
-              focus:border-[#16805f]
+              border-line
+              hover:border-line-strong
+              focus:border-accent
               focus:ring-2
-              focus:ring-[#16805f]/10
+              focus:ring-accent/15
             `
         }
 
         disabled:cursor-not-allowed
-        disabled:bg-[#f1f1ed]
+        disabled:bg-surface-muted
+        disabled:text-subtle
 
         ${className}
       `}

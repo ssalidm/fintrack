@@ -12,22 +12,22 @@ import {
   useNavigate,
 } from 'react-router'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import type { MfaChallengeResponse } from '../api/types'
-import AuthAlert from '../components/AuthAlert'
-import AuthButton from '../components/AuthButton'
-import AuthField from '../components/AuthField'
-import AuthHeader from '../components/AuthHeader'
-import AuthInput from '../components/AuthInput'
-import AuthPanel from '../components/AuthPanel'
-import OtpCodeInput from '../components/OtpCodeInput'
-import { useAuth } from '../context/useAuth'
+import { ApiClientError } from '@/api/ApiClientError'
+import type { MfaChallengeResponse } from '@/features/auth/api/types'
+import AuthAlert from '@/features/auth/components/AuthAlert'
+import AuthButton from '@/features/auth/components/AuthButton'
+import AuthField from '@/features/auth/components/AuthField'
+import AuthHeader from '@/features/auth/components/AuthHeader'
+import AuthInput from '@/features/auth/components/AuthInput'
+import AuthPanel from '@/features/auth/components/AuthPanel'
+import OtpCodeInput from '@/features/auth/components/OtpCodeInput'
+import { useAuth } from '@/features/auth/context/useAuth'
 import {
   mfaCodeSchema,
   mfaRecoverySchema,
   type MfaCodeFormValues,
   type MfaRecoveryFormValues,
-} from '../validation/mfaSchemas'
+} from '@/features/auth/validation/mfaSchemas'
 
 interface MfaLocationState {
   challenge: MfaChallengeResponse

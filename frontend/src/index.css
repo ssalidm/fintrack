@@ -338,12 +338,12 @@
 .auth-surface-grid {
   background-image:
     linear-gradient(
-      rgba(13, 79, 63, 0.055) 1px,
+      rgba(23, 60, 50, 0.055) 1px,
       transparent 1px
     ),
     linear-gradient(
       90deg,
-      rgba(13, 79, 63, 0.055) 1px,
+      rgba(23, 60, 50, 0.055) 1px,
       transparent 1px
     );
 
@@ -352,8 +352,30 @@
   mask-image:
     linear-gradient(
       to bottom,
-      rgba(0, 0, 0, 0.7),
-      transparent 82%
+      rgba(0, 0, 0, 0.78),
+      rgba(0, 0, 0, 0.42) 62%,
+      transparent 92%
+    );
+}
+
+[data-theme='dark'] .auth-surface-grid {
+  background-image:
+    linear-gradient(
+      rgba(99, 199, 163, 0.09) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(99, 199, 163, 0.09) 1px,
+      transparent 1px
+    );
+
+  mask-image:
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.9),
+      rgba(0, 0, 0, 0.58) 65%,
+      transparent 94%
     );
 }
 

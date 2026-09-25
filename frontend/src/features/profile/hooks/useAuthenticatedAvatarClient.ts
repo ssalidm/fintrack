@@ -4,13 +4,13 @@ import {
   useRef,
 } from 'react'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import { useAuth } from '../../auth/context/useAuth'
+import { ApiClientError } from '@/api/ApiClientError'
+import { useAuth } from '@/features/auth/context/useAuth'
 import {
   deleteProfileAvatar,
   fetchProfileAvatar,
   uploadProfileAvatar,
-} from '../api/avatarClient'
+} from '@/features/profile/api/avatarClient'
 
 export default function useAuthenticatedAvatarClient() {
   const {

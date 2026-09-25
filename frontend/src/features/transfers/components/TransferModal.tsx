@@ -1,4 +1,4 @@
-import FormDrawer from '../../../components/ui/FormDrawer'
+import FormDrawer from '@/components/ui/FormDrawer'
 import TransferForm from './TransferForm'
 
 interface TransferModalProps {

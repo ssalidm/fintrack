@@ -11,13 +11,13 @@ import {
   type UseFormRegisterReturn,
 } from 'react-hook-form'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import { useChangePassword } from '../hooks/useProfileMutations'
+import { ApiClientError } from '@/api/ApiClientError'
+import { useChangePassword } from '@/features/profile/hooks/useProfileMutations'
 import {
   changePasswordSchema,
   type ChangePasswordFormValues,
-} from '../validation/profileSchemas'
-import { formatDate } from '../../../utils/dateFormatter'
+} from '@/features/profile/validation/profileSchemas'
+import { formatDate } from '@/utils/dateFormatter'
 
 interface ChangePasswordFormProps {
   readonly passwordChangedAt: string | null

@@ -3,14 +3,14 @@ import { Check, LoaderCircle, X, Pencil } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import type { UserProfile } from '../api/types'
-import { useUpdateProfile } from '../hooks/useProfileMutations'
+import { ApiClientError } from '@/api/ApiClientError'
+import type { UserProfile } from '@/features/profile/api/types'
+import { useUpdateProfile } from '@/features/profile/hooks/useProfileMutations'
 import {
   profileDetailsSchema,
   type ProfileDetailsFormValues,
-} from '../validation/profileSchemas'
-import SettingsList from '../../../components/settings/SettingsList'
+} from '@/features/profile/validation/profileSchemas'
+import SettingsList from '@/components/settings/SettingsList'
 
 interface ProfileDetailsFormProps {
   readonly profile: UserProfile

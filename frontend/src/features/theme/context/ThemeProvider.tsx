@@ -10,8 +10,9 @@ import {
   readStoredTheme,
   resolveTheme,
   THEME_STORAGE_KEY,
+  type ResolvedTheme,
   type ThemePreference,
-} from '../themePreference'
+} from '@/features/theme/themePreference'
 import {
   ThemeContext,
   type ThemeContextValue,
@@ -33,11 +34,44 @@ export default function ThemeProvider({
     )
 
   const [
-    resolvedTheme,
-    setResolvedTheme,
-  ] = useState(() =>
-    resolveTheme(preference),
+    systemTheme,
+    setSystemTheme,
+  ] = useState<ResolvedTheme>(
+    () => resolveTheme('system')
   )
+
+  const resolvedTheme =
+    preference === 'system'
+      ? systemTheme
+      : preference
+
+  useEffect(() => {
+    const mediaQuery =
+      window.matchMedia('(prefers-color-scheme: dark)',
+      )
+
+    function handleChange(
+      event: MediaQueryListEvent,
+    ) {
+      setSystemTheme(
+        event.matches
+          ? 'dark'
+          : 'light'
+      )
+    }
+
+    mediaQuery.addEventListener(
+      'change',
+      handleChange
+    )
+
+    return () => {
+      mediaQuery.removeEventListener(
+        'change',
+        handleChange,
+      )
+    }
+  }, [])
 
   useEffect(() => {
     window.localStorage.setItem(
@@ -45,52 +79,13 @@ export default function ThemeProvider({
       preference,
     )
 
-    if (
-      preference !== 'system'
-    ) {
-      setResolvedTheme(
-        preference,
-      )
-      applyResolvedTheme(
-        preference,
-      )
-      return
-    }
-
-    const mediaQuery =
-      window.matchMedia(
-        '(prefers-color-scheme: dark)',
-      )
-
-    function syncSystemTheme() {
-      const nextTheme =
-        mediaQuery.matches
-          ? 'dark'
-          : 'light'
-
-      setResolvedTheme(
-        nextTheme,
-      )
-
-      applyResolvedTheme(
-        nextTheme,
-      )
-    }
-
-    syncSystemTheme()
-
-    mediaQuery.addEventListener(
-      'change',
-      syncSystemTheme,
+    applyResolvedTheme(
+      resolvedTheme,
     )
-
-    return () => {
-      mediaQuery.removeEventListener(
-        'change',
-        syncSystemTheme,
-      )
-    }
-  }, [preference])
+  }, [
+    preference,
+    resolvedTheme
+  ])
 
   const value =
     useMemo<ThemeContextValue>(

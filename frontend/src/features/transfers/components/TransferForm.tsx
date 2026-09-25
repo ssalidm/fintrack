@@ -5,12 +5,12 @@ import {
   useWatch,
 } from 'react-hook-form'
 
-import { useAccounts } from '../../accounts/hooks/useAccounts'
-import { useCreateTransfer } from '../hooks/useTransfers'
+import { useAccounts } from '@/features/accounts/hooks/useAccounts'
+import { useCreateTransfer } from '@/features/transfers/hooks/useTransfers'
 import {
   transferSchema,
   type TransferFormValues,
-} from '../validation/transferSchema'
+} from '@/features/transfers/validation/transferSchema'
 
 interface TransferFormProps {
   onCancel: () => void

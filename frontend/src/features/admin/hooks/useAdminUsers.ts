@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
 
-import type { PageResponse } from '../../../api/types'
-import { useAuthenticatedRequest } from '../../auth/hooks/useAuthenticatedRequest'
+import type { PageResponse } from '@/api/types'
+import { useAuthenticatedRequest } from '@/features/auth/hooks/useAuthenticatedRequest'
 import type {
   AdminUser,
   AdminUserSession,
-} from '../api/types'
+} from '@/features/admin/api/types'
 
 export const adminUserQueryKeys = {
   all: ['admin', 'users'] as const,

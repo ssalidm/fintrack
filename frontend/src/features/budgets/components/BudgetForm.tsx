@@ -5,17 +5,17 @@ import {
 } from 'react'
 import { useForm } from 'react-hook-form'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import type { BudgetSummary } from '../api/types'
+import { ApiClientError } from '@/api/ApiClientError'
+import type { BudgetSummary } from '@/features/budgets/api/types'
 import {
   useCreateBudget,
   useUpdateBudget,
-} from '../hooks/useBudgets'
+} from '@/features/budgets/hooks/useBudgets'
 import {
   budgetCurrencies,
   budgetFormSchema,
   type BudgetFormValues,
-} from '../validation/budgetSchemas'
+} from '@/features/budgets/validation/budgetSchemas'
 
 interface BudgetFormProps {
   budget?: BudgetSummary

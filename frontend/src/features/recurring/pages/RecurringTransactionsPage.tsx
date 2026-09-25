@@ -16,33 +16,33 @@ import {
   X,
 } from 'lucide-react'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import RefreshButton from '../../../components/actions/RefreshButton'
-import PageHeader from '../../../components/layout/PageHeader'
-import PageShell from '../../../components/layout/PageShell'
-import StatusTabs from '../../../components/navigation/StatusTabs'
-import ConfirmationDialog from '../../../components/ui/ConfirmationDialog'
-import EmptyState from '../../../components/ui/EmptyState'
-import ErrorPanel from '../../../components/ui/ErrorPanel'
+import { ApiClientError } from '@/api/ApiClientError'
+import RefreshButton from '@/components/actions/RefreshButton'
+import PageHeader from '@/components/layout/PageHeader'
+import PageShell from '@/components/layout/PageShell'
+import StatusTabs from '@/components/navigation/StatusTabs'
+import ConfirmationDialog from '@/components/ui/ConfirmationDialog'
+import EmptyState from '@/components/ui/EmptyState'
+import ErrorPanel from '@/components/ui/ErrorPanel'
 import {
   formatDateOnly,
   formatMoney,
-} from '../../../utils/formatters'
-import { useAccounts } from '../../accounts/hooks/useAccounts'
-import { useCategories } from '../../categories/hooks/useCategories'
+} from '@/utils/formatters'
+import { useAccounts } from '@/features/accounts/hooks/useAccounts'
+import { useCategories } from '@/features/categories/hooks/useCategories'
 import type {
   RecurringFrequency,
   RecurringTransaction,
   RecurringTransactionStatus,
-} from '../api/types'
-import RecurringTransactionModal from '../components/RecurringTransactionModal'
+} from '@/features/recurring/api/types'
+import RecurringTransactionModal from '@/features/recurring/components/RecurringTransactionModal'
 import {
   useArchiveRecurringTransaction,
   usePauseRecurringTransaction,
   usePostDueRecurringTransaction,
   useRecurringTransactions,
   useResumeRecurringTransaction,
-} from '../hooks/useRecurringTransactions'
+} from '@/features/recurring/hooks/useRecurringTransactions'
 
 const statusOptions = [
   {

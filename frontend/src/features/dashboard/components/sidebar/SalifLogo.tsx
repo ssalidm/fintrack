@@ -1,4 +1,4 @@
-import salifLogoLight from '../../../../assets/brand/salif-logo-light.png'
+import salifLogoLight from '@/assets/brand/salif-logo-light.png'
 
 interface SalifLogoProps {
   readonly compact?: boolean

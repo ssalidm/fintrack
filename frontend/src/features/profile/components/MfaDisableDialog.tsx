@@ -12,13 +12,13 @@ import {
   useForm,
 } from 'react-hook-form'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import OtpCodeInput from '../../auth/components/OtpCodeInput'
-import { useDisableMfa } from '../hooks/useMfaManagement'
+import { ApiClientError } from '@/api/ApiClientError'
+import OtpCodeInput from '@/features/auth/components/OtpCodeInput'
+import { useDisableMfa } from '@/features/profile/hooks/useMfaManagement'
 import {
   disableMfaSchema,
   type DisableMfaFormValues,
-} from '../validation/profileSchemas'
+} from '@/features/profile/validation/profileSchemas'
 
 interface MfaDisableDialogProps {
   onClose: () => void

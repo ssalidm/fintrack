@@ -13,21 +13,21 @@ import {
   useWatch,
 } from 'react-hook-form'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import { useAccounts } from '../../accounts/hooks/useAccounts'
-import { useCategories } from '../../categories/hooks/useCategories'
+import { ApiClientError } from '@/api/ApiClientError'
+import { useAccounts } from '@/features/accounts/hooks/useAccounts'
+import { useCategories } from '@/features/categories/hooks/useCategories'
 import type {
   ManualTransactionType,
   Transaction,
-} from '../api/types'
+} from '@/features/transactions/api/types'
 import {
   useCreateTransaction,
   useUpdateTransaction,
-} from '../hooks/useTransactions'
+} from '@/features/transactions/hooks/useTransactions'
 import {
   transactionFormSchema,
   type TransactionFormValues,
-} from '../validation/transactionSchema'
+} from '@/features/transactions/validation/transactionSchema'
 
 interface TransactionFormProps {
   transaction?: Transaction

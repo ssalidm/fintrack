@@ -6,7 +6,7 @@ import type {
   LoginResponse,
   MfaRecoverRequest,
   MfaVerifyRequest,
-} from '../api/types'
+} from '@/features/auth/api/types'
 
 export type AuthStatus =
   | 'checking'

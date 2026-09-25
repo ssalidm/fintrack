@@ -7,26 +7,26 @@ import {
   WalletCards,
 } from 'lucide-react'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import RefreshButton from '../../../components/actions/RefreshButton'
-import PageHeader from '../../../components/layout/PageHeader'
-import PageShell from '../../../components/layout/PageShell'
-import StatusTabs from '../../../components/navigation/StatusTabs'
-import ConfirmationDialog from '../../../components/ui/ConfirmationDialog'
-import EmptyState from '../../../components/ui/EmptyState'
-import ErrorPanel from '../../../components/ui/ErrorPanel'
-import { formatMoney } from '../../../utils/formatters'
+import { ApiClientError } from '@/api/ApiClientError'
+import RefreshButton from '@/components/actions/RefreshButton'
+import PageHeader from '@/components/layout/PageHeader'
+import PageShell from '@/components/layout/PageShell'
+import StatusTabs from '@/components/navigation/StatusTabs'
+import ConfirmationDialog from '@/components/ui/ConfirmationDialog'
+import EmptyState from '@/components/ui/EmptyState'
+import ErrorPanel from '@/components/ui/ErrorPanel'
+import { formatMoney } from '@/utils/formatters'
 import type {
   Account,
   AccountStatus,
   AccountType,
-} from '../api/types'
-import AccountModal from '../components/AccountModal'
+} from '@/features/accounts/api/types'
+import AccountModal from '@/features/accounts/components/AccountModal'
 import {
   useAccountBalances,
   useAccounts,
   useArchiveAccount,
-} from '../hooks/useAccounts'
+} from '@/features/accounts/hooks/useAccounts'
 
 const accountTypeLabels = {
   CASH: 'Cash',

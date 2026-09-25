@@ -1,5 +1,5 @@
-import FormDrawer from '../../../components/ui/FormDrawer'
-import type { RecurringTransaction } from '../api/types'
+import FormDrawer from '@/components/ui/FormDrawer'
+import type { RecurringTransaction } from '@/features/recurring/api/types'
 import RecurringTransactionForm from './RecurringTransactionForm'
 
 interface RecurringTransactionModalProps {

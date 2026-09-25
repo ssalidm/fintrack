@@ -3,7 +3,7 @@ import {
   X,
 } from 'lucide-react'
 
-import ModalDialog from '../../../components/ui/ModalDialog'
+import ModalDialog from '@/components/ui/ModalDialog'
 
 interface SessionSignOutDialogProps {
   readonly title: string

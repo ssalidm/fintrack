@@ -1,6 +1,6 @@
 import {useQuery} from '@tanstack/react-query'
-import {useAuthenticatedRequest} from '../../auth/hooks/useAuthenticatedRequest'
-import type {UserProfile} from '../api/types'
+import {useAuthenticatedRequest} from '@/features/auth/hooks/useAuthenticatedRequest'
+import type {UserProfile} from '@/features/profile/api/types'
 
 export const profileQueryKey = ['profile'] as const
 

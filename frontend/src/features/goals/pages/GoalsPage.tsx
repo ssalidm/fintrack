@@ -15,29 +15,29 @@ import {
   TrendingUp,
 } from 'lucide-react'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import RefreshButton from '../../../components/actions/RefreshButton'
-import PageHeader from '../../../components/layout/PageHeader'
-import PageShell from '../../../components/layout/PageShell'
-import StatusTabs from '../../../components/navigation/StatusTabs'
-import EmptyState from '../../../components/ui/EmptyState'
-import ErrorPanel from '../../../components/ui/ErrorPanel'
-import { formatMoney } from '../../../utils/formatters'
+import { ApiClientError } from '@/api/ApiClientError'
+import RefreshButton from '@/components/actions/RefreshButton'
+import PageHeader from '@/components/layout/PageHeader'
+import PageShell from '@/components/layout/PageShell'
+import StatusTabs from '@/components/navigation/StatusTabs'
+import EmptyState from '@/components/ui/EmptyState'
+import ErrorPanel from '@/components/ui/ErrorPanel'
+import { formatMoney } from '@/utils/formatters'
 import type {
   SavingsGoal,
   SavingsGoalStatus,
-} from '../api/types'
-import ContributionHistoryDrawer from '../components/ContributionHistoryDrawer'
-import ContributionModal from '../components/ContributionModal'
+} from '@/features/goals/api/types'
+import ContributionHistoryDrawer from '@/features/goals/components/ContributionHistoryDrawer'
+import ContributionModal from '@/features/goals/components/ContributionModal'
 import GoalActionDialog, {
   type GoalAction,
-} from '../components/GoalActionDialog'
-import GoalModal from '../components/GoalModal'
+} from '@/features/goals/components/GoalActionDialog'
+import GoalModal from '@/features/goals/components/GoalModal'
 import {
   useArchiveGoal,
   useCompleteGoal,
   useGoals,
-} from '../hooks/useGoals'
+} from '@/features/goals/hooks/useGoals'
 
 const statusOptions = [
   {

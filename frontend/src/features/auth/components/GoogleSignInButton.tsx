@@ -1,10 +1,12 @@
 import {
   useCallback,
+  useContext,
   useEffect,
   useRef,
 } from 'react'
 
 import { env } from '../../../config/env'
+import { ThemeContext } from '../../theme/context/ThemeContext'
 
 interface GoogleCredentialResponse {
   readonly credential?: string
@@ -14,6 +16,10 @@ type GoogleButtonText =
   | 'signin_with'
   | 'signup_with'
   | 'continue_with'
+
+type GoogleButtonTheme =
+  | 'outline'
+  | 'outline_dark'
 
 interface GoogleIdentityApi {
   initialize(options: {
@@ -28,7 +34,7 @@ interface GoogleIdentityApi {
     parent: HTMLElement,
     options: {
       type: 'standard'
-      theme: 'outline'
+      theme: GoogleButtonTheme
       size: 'large'
       text: GoogleButtonText
       shape: 'pill'
@@ -197,6 +203,16 @@ function initializeGoogle(
     clientId
 }
 
+function getDocumentTheme():
+  'light' | 'dark' {
+  return document
+    .documentElement
+    .dataset
+    .theme === 'dark'
+    ? 'dark'
+    : 'light'
+}
+
 export default function GoogleSignInButton({
   disabled = false,
   text = 'continue_with',
@@ -206,8 +222,25 @@ export default function GoogleSignInButton({
   const containerRef =
     useRef<HTMLDivElement>(null)
 
-  const hasRenderedRef =
-    useRef(false)
+  /*
+   * Use ThemeContext directly rather than
+   * useTheme().
+   *
+   * Production is wrapped in ThemeProvider,
+   * but isolated component/page tests may not be.
+   */
+  const themeContext =
+    useContext(ThemeContext)
+
+  const resolvedTheme =
+    themeContext?.resolvedTheme ??
+    getDocumentTheme()
+
+  const googleTheme:
+    GoogleButtonTheme =
+      resolvedTheme === 'dark'
+        ? 'outline_dark'
+        : 'outline'
 
   const renderGoogleButton =
     useCallback(() => {
@@ -220,8 +253,7 @@ export default function GoogleSignInButton({
 
       if (
         !container ||
-        !google ||
-        hasRenderedRef.current
+        !google
       ) {
         return
       }
@@ -238,11 +270,18 @@ export default function GoogleSignInButton({
         return
       }
 
+      /*
+       * Google owns the rendered button.
+       * Clear the previous button before
+       * rendering it with the current theme.
+       */
+      container.replaceChildren()
+
       google.accounts.id.renderButton(
         container,
         {
           type: 'standard',
-          theme: 'outline',
+          theme: googleTheme,
           size: 'large',
           text,
           shape: 'pill',
@@ -250,10 +289,10 @@ export default function GoogleSignInButton({
           width,
         },
       )
-
-      hasRenderedRef.current =
-        true
-    }, [text])
+    }, [
+      googleTheme,
+      text,
+    ])
 
   useEffect(() => {
     const clientId =
@@ -318,19 +357,19 @@ export default function GoogleSignInButton({
   }
 
   return (
-  <div
-    className={
-      disabled
-        ? 'pointer-events-none w-full opacity-60'
-        : 'w-full'
-    }
-  >
-    <div className="relative h-[40px] w-full overflow-hidden rounded-full">
-      <div
-        ref={containerRef}
-        className="absolute inset-0 w-full"
-      />
+    <div
+      className={
+        disabled
+          ? 'pointer-events-none w-full opacity-60'
+          : 'w-full'
+      }
+    >
+      <div className="relative h-[40px] w-full overflow-hidden rounded-full">
+        <div
+          ref={containerRef}
+          className="absolute inset-0 w-full"
+        />
+      </div>
     </div>
-  </div>
-)
+  )
 }

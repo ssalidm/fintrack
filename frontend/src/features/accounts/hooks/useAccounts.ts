@@ -3,8 +3,8 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query'
-import { dashboardSummaryQueryKey } from '../../dashboard/hooks/useDashboardSummary'
-import { useAuthenticatedRequest } from '../../auth/hooks/useAuthenticatedRequest'
+import { dashboardSummaryQueryKey } from '@/features/dashboard/hooks/useDashboardSummary'
+import { useAuthenticatedRequest } from '@/features/auth/hooks/useAuthenticatedRequest'
 import type {
   Account,
   AccountBalance,
@@ -12,7 +12,7 @@ import type {
   ArchiveAccountRequest,
   CreateAccountRequest,
   UpdateAccountRequest,
-} from '../api/types'
+} from '@/features/accounts/api/types'
 
 export const accountQueryKeys = {
   all: ['accounts'] as const,

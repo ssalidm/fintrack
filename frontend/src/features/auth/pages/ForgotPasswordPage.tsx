@@ -7,22 +7,22 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import { authApi } from '../api/authApi'
-import AuthAlert from '../components/AuthAlert'
-import AuthButton from '../components/AuthButton'
-import AuthField from '../components/AuthField'
-import AuthHeader from '../components/AuthHeader'
-import AuthInput from '../components/AuthInput'
-import AuthPanel from '../components/AuthPanel'
+import { ApiClientError } from '@/api/ApiClientError'
+import { authApi } from '@/features/auth/api/authApi'
+import AuthAlert from '@/features/auth/components/AuthAlert'
+import AuthButton from '@/features/auth/components/AuthButton'
+import AuthField from '@/features/auth/components/AuthField'
+import AuthHeader from '@/features/auth/components/AuthHeader'
+import AuthInput from '@/features/auth/components/AuthInput'
+import AuthPanel from '@/features/auth/components/AuthPanel'
 import {
   formatCooldown,
   useRequestCooldown,
-} from '../hooks/useRequestCooldown'
+} from '@/features/auth/hooks/useRequestCooldown'
 import {
   forgotPasswordSchema,
   type ForgotPasswordFormValues,
-} from '../validation/forgotPasswordSchema'
+} from '@/features/auth/validation/forgotPasswordSchema'
 
 const PASSWORD_RESET_COOLDOWN_KEY =
   'salif:cooldown:password-reset'
@@ -99,7 +99,7 @@ export default function ForgotPasswordPage() {
 
       setSuccessMessage(
         response.message ||
-          'If an eligible account exists, password reset instructions will be sent.',
+        'If an eligible account exists, password reset instructions will be sent.',
       )
 
       cooldown.startCooldown()
@@ -159,24 +159,28 @@ export default function ForgotPasswordPage() {
         <div
           aria-labelledby="forgot-password-title"
         >
-          <span className="mb-5 grid size-10 place-items-center rounded-full bg-[#e5f1eb] text-[#16805f]">
+          <span className="mb-5 grid size-11 place-items-center rounded-full bg-success-soft text-success">
             <CheckCircle2
-              size={20}
+              size={21}
               aria-hidden
             />
           </span>
 
           <AuthHeader
             title="Check your inbox"
-            description={
-              successMessage
-            }
+            description={successMessage}
             titleId="forgot-password-title"
           />
 
-          <p className="mt-3 break-all text-sm font-semibold text-[#173c32]">
-            {submittedEmail}
-          </p>
+          <div className="mt-5 rounded-xl border border-line bg-app px-4 py-3">
+            <p className="text-xs font-medium text-muted">
+              Reset instructions sent to
+            </p>
+
+            <p className="mt-1 break-all text-sm font-semibold text-ink">
+              {submittedEmail}
+            </p>
+          </div>
 
           {submitError && (
             <div className="mt-5">
@@ -198,24 +202,32 @@ export default function ForgotPasswordPage() {
               )
             }
             className="
-              mt-6
-              flex h-10 w-full
-              cursor-pointer
-              items-center
-              justify-center
-              gap-2
-              rounded-full
-              border border-[#16805f]
-              px-4
-              text-sm font-semibold
-              text-[#16805f]
-              transition
-              hover:bg-[#e8f2ed]
-              disabled:cursor-not-allowed
-              disabled:border-[#cbd8d1]
-              disabled:bg-[#eef3f0]
-              disabled:text-[#6e837a]
-            "
+            mt-6
+            inline-flex h-10 w-full
+            items-center justify-center
+            gap-2
+            rounded-full
+            border border-line-strong
+            bg-surface
+            px-4
+            text-sm font-semibold
+            text-ink
+            transition
+
+            hover:border-accent
+            hover:text-accent
+
+            focus:outline-none
+            focus:ring-2
+            focus:ring-accent/30
+            focus:ring-offset-2
+            focus:ring-offset-surface
+
+            disabled:cursor-not-allowed
+            disabled:border-line
+            disabled:bg-surface-muted
+            disabled:text-subtle
+          "
           >
             {isRequesting && (
               <LoaderCircle
@@ -229,19 +241,17 @@ export default function ForgotPasswordPage() {
               ? 'Sending another email…'
               : cooldown.isCoolingDown
                 ? `Send again in ${formatCooldown(
-                    cooldown.remainingSeconds,
-                  )}`
+                  cooldown.remainingSeconds,
+                )}`
                 : 'Send another reset email'}
           </button>
 
-          <p className="mt-5 text-center text-sm text-[#657972]">
-            <Link
-              to="/login"
-              className="font-semibold text-[#16805f] transition hover:text-[#0d4f3f] hover:underline"
-            >
-              Return to sign in
-            </Link>
-          </p>
+          <Link
+            to="/login"
+            className="mt-3 inline-flex h-10 w-full items-center justify-center rounded-full bg-primary px-4 text-sm font-semibold text-inverse transition hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-accent/30 focus:ring-offset-2 focus:ring-offset-surface"
+          >
+            Return to sign in
+          </Link>
         </div>
       </AuthPanel>
     )
@@ -319,16 +329,16 @@ export default function ForgotPasswordPage() {
           >
             {cooldown.isCoolingDown
               ? `Available in ${formatCooldown(
-                  cooldown.remainingSeconds,
-                )}`
+                cooldown.remainingSeconds,
+              )}`
               : 'Send reset instructions'}
           </AuthButton>
         </form>
 
-        <p className="mt-5 text-center text-sm text-[#657972]">
+        <p className="mt-5 text-center text-sm text-muted">
           <Link
             to="/login"
-            className="font-semibold text-[#16805f] transition hover:text-[#0d4f3f] hover:underline"
+            className="font-semibold text-accent transition hover:text-primary hover:underline"
           >
             Return to sign in
           </Link>

@@ -11,13 +11,13 @@ import {
 
 import {
   ApiClientError,
-} from '../../../api/ApiClientError'
+} from '@/api/ApiClientError'
 import {
   apiRequest,
-} from '../../../api/client'
+} from '@/api/client'
 import {
   useAuth,
-} from '../context/useAuth'
+} from '@/features/auth/context/useAuth'
 import {
   useAuthenticatedRequest,
 } from './useAuthenticatedRequest'
@@ -79,25 +79,29 @@ describe(
       vi.mocked(
         useAuth,
       ).mockReturnValue({
-        accessToken:
-          'expired-access-token',
+        accessToken: 'expired-access-token',
 
         status: 'authenticated',
 
         login: vi.fn(
           async () => ({
-            status:
-              'AUTHENTICATED' as const,
-
+            status: 'AUTHENTICATED' as const,
             tokens: {
-              accessToken:
-                'access-token',
-
-              refreshToken:
-                'refresh-token',
-
+              accessToken: 'access-token',
+              refreshToken: 'refresh-token',
               tokenType: 'Bearer',
+              expiresIn: 900,
+            },
+          }),
+        ),
 
+        googleLogin: vi.fn(
+          async () => ({
+            status: 'AUTHENTICATED' as const,
+            token: {
+              accessToken: 'access-token',
+              refreshToken: 'refresh-token',
+              tokenType: 'Bearer',
               expiresIn: 900,
             },
           }),

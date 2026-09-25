@@ -12,14 +12,14 @@ import {
 } from 'react-hook-form'
 import QRCode from 'react-qr-code'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import OtpCodeInput from '../../auth/components/OtpCodeInput'
-import type { MfaSetup } from '../api/types'
+import { ApiClientError } from '@/api/ApiClientError'
+import OtpCodeInput from '@/features/auth/components/OtpCodeInput'
+import type { MfaSetup } from '@/features/profile/api/types'
 import { useConfirmMfaSetup } from '../hooks/useMfaManagement'
 import {
   confirmMfaSetupSchema,
   type ConfirmMfaSetupFormValues,
-} from '../validation/profileSchemas'
+} from '@/features/profile/validation/profileSchemas'
 import RecoveryCodesPanel from './RecoveryCodesPanel'
 
 interface MfaSetupDialogProps {

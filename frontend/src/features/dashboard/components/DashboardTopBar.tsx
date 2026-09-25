@@ -17,10 +17,10 @@ import {
   useNavigate,
 } from 'react-router'
 
-import { useAuth } from '../../auth/context/useAuth'
-import ProfileAvatar from '../../profile/components/ProfileAvatar'
-import { useProfile } from '../../profile/hooks/useProfile'
-import useDashboardNotifications from '../hooks/useDashboardNotifications'
+import { useAuth } from '@/features/auth/context/useAuth'
+import ProfileAvatar from '@/features/profile/components/ProfileAvatar'
+import { useProfile } from '@/features/profile/hooks/useProfile'
+import useDashboardNotifications from '@/features/dashboard/hooks/useDashboardNotifications'
 import DashboardCalendarMenu from './DashboardCalendarMenu'
 
 function routeTitle(

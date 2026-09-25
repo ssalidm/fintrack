@@ -6,17 +6,17 @@ import {
 } from 'react'
 import { useForm } from 'react-hook-form'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import { useCategories } from '../../categories/hooks/useCategories'
-import type { BudgetCategoryLimit } from '../api/types'
+import { ApiClientError } from '@/api/ApiClientError'
+import { useCategories } from '@/features/categories/hooks/useCategories'
+import type { BudgetCategoryLimit } from '@/features/budgets/api/types'
 import {
   useAddBudgetLimit,
   useUpdateBudgetLimit,
-} from '../hooks/useBudgets'
+} from '@/features/budgets/hooks/useBudgets'
 import {
   budgetLimitSchema,
   type BudgetLimitFormValues,
-} from '../validation/budgetSchemas'
+} from '@/features/budgets/validation/budgetSchemas'
 
 interface BudgetLimitFormProps {
   budgetId: string

@@ -5,12 +5,12 @@ import {
 import { useState } from 'react'
 import { Outlet } from 'react-router'
 
-import DashboardFooter from '../components/DashboardFooter'
-import DashboardTopBar from '../components/DashboardTopBar'
-import DashboardSidebar from '../components/sidebar/DashboardSidebar'
-import SalifLogo from '../components/sidebar/SalifLogo'
-import SidebarContent from '../components/sidebar/SidebarContent'
-import useSidebarPreference from '../hooks/useSidebarPreference'
+import DashboardFooter from '@/features/dashboard/components/DashboardFooter'
+import DashboardTopBar from '@/features/dashboard/components/DashboardTopBar'
+import DashboardSidebar from '@/features/dashboard/components/sidebar/DashboardSidebar'
+import SalifLogo from '@/features/dashboard/components/sidebar/SalifLogo'
+import SidebarContent from '@/features/dashboard/components/sidebar/SidebarContent'
+import useSidebarPreference from '@/features/dashboard/hooks/useSidebarPreference'
 
 export default function DashboardLayout() {
   const [
@@ -82,10 +82,9 @@ export default function DashboardLayout() {
           flex-col
           transition-[margin-left]
           duration-200
-          ${
-            sidebar.isCollapsed
-              ? 'lg:ml-20'
-              : 'lg:ml-[18.5rem]'
+          ${sidebar.isCollapsed
+            ? 'lg:ml-20'
+            : 'lg:ml-[18.5rem]'
           }
         `}
       >

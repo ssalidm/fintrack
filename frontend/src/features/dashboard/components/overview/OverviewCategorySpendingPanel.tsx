@@ -9,8 +9,8 @@ import {
 } from 'react'
 import { Link } from 'react-router'
 
-import { formatMoney } from '../../../../utils/formatters'
-import { useCategorySpending } from '../../../categories/hooks/useCategorySpending'
+import { formatMoney } from '@/utils/formatters'
+import { useCategorySpending } from '@/features/categories/hooks/useCategorySpending'
 
 interface SpendingSlice {
   key: string
@@ -98,9 +98,9 @@ export default function OverviewCategorySpendingPanel() {
 
   const activeCurrency =
     selectedCurrency &&
-    currencyCodes.includes(
-      selectedCurrency,
-    )
+      currencyCodes.includes(
+        selectedCurrency,
+      )
       ? selectedCurrency
       : currencyCodes[0]
 
@@ -171,8 +171,6 @@ export default function OverviewCategorySpendingPanel() {
       0,
     )
 
-  let accumulatedShare = 0
-
   return (
     <section className="overflow-hidden rounded-2xl border border-line/50 bg-surface shadow-[0_10px_30px_rgba(23,60,50,0.05)]">
       <header className="flex flex-wrap items-start justify-between gap-4 border-b border-line/50 px-5 py-4">
@@ -199,38 +197,38 @@ export default function OverviewCategorySpendingPanel() {
         <div className="flex items-center gap-3">
           {currencyCodes.length >
             1 && (
-            <select
-              value={
-                activeCurrency
-              }
-              onChange={(event) =>
-                setSelectedCurrency(
-                  event.target.value,
-                )
-              }
-              aria-label="Spending currency"
-              className="cursor-pointer rounded-lg border border-line bg-app py-1.5 pr-8 pl-3 text-xs font-semibold text-ink outline-none transition focus:border-accent"
-            >
-              {currencyCodes.map(
-                (
-                  currencyCode,
-                ) => (
-                  <option
-                    key={
-                      currencyCode
-                    }
-                    value={
-                      currencyCode
-                    }
-                  >
-                    {
-                      currencyCode
-                    }
-                  </option>
-                ),
-              )}
-            </select>
-          )}
+              <select
+                value={
+                  activeCurrency
+                }
+                onChange={(event) =>
+                  setSelectedCurrency(
+                    event.target.value,
+                  )
+                }
+                aria-label="Spending currency"
+                className="cursor-pointer rounded-lg border border-line bg-app py-1.5 pr-8 pl-3 text-xs font-semibold text-ink outline-none transition focus:border-accent"
+              >
+                {currencyCodes.map(
+                  (
+                    currencyCode,
+                  ) => (
+                    <option
+                      key={
+                        currencyCode
+                      }
+                      value={
+                        currencyCode
+                      }
+                    >
+                      {
+                        currencyCode
+                      }
+                    </option>
+                  ),
+                )}
+              </select>
+            )}
 
           <Link
             to="/categories"
@@ -280,7 +278,7 @@ export default function OverviewCategorySpendingPanel() {
 
       {spendingQuery.isSuccess &&
         sourceItems.length ===
-          0 && (
+        0 && (
           <div className="px-5 py-14 text-center">
             <span className="mx-auto grid size-11 place-items-center rounded-xl bg-accent-soft text-accent">
               <PieChart
@@ -339,8 +337,24 @@ export default function OverviewCategorySpendingPanel() {
                       const share =
                         totalSpent > 0
                           ? item.amount /
-                            totalSpent
+                          totalSpent
                           : 0
+
+                      const accumulatedShare =
+                        slices
+                          .slice(0, index)
+                          .reduce(
+                            (
+                              total,
+                              slice,
+                            ) =>
+                              total +
+                              (totalSpent > 0
+                                ? slice.amount /
+                                totalSpent
+                                : 0),
+                            0,
+                          )
 
                       const dashLength =
                         DONUT_CIRCUMFERENCE *
@@ -349,9 +363,6 @@ export default function OverviewCategorySpendingPanel() {
                       const dashOffset =
                         -DONUT_CIRCUMFERENCE *
                         accumulatedShare
-
-                      accumulatedShare +=
-                        share
 
                       return (
                         <circle
@@ -372,17 +383,16 @@ export default function OverviewCategorySpendingPanel() {
                           fill="none"
                           stroke={
                             sliceColours[
-                              index %
-                                sliceColours.length
+                            index %
+                            sliceColours.length
                             ]
                           }
                           strokeWidth={
                             DONUT_STROKE_WIDTH
                           }
-                          strokeDasharray={`${dashLength} ${
-                            DONUT_CIRCUMFERENCE -
+                          strokeDasharray={`${dashLength} ${DONUT_CIRCUMFERENCE -
                             dashLength
-                          }`}
+                            }`}
                           strokeDashoffset={
                             dashOffset
                           }
@@ -397,7 +407,7 @@ export default function OverviewCategorySpendingPanel() {
                             (
                             {Math.round(
                               share *
-                                100,
+                              100,
                             )}
                             %)
                           </title>
@@ -425,7 +435,7 @@ export default function OverviewCategorySpendingPanel() {
                         transactionCount
                       }{' '}
                       {transactionCount ===
-                      1
+                        1
                         ? 'expense'
                         : 'expenses'}
                     </p>
@@ -444,10 +454,10 @@ export default function OverviewCategorySpendingPanel() {
                     const share =
                       totalSpent > 0
                         ? (
-                            item.amount /
-                            totalSpent
-                          ) *
-                          100
+                          item.amount /
+                          totalSpent
+                        ) *
+                        100
                         : 0
 
                     return (
@@ -462,8 +472,8 @@ export default function OverviewCategorySpendingPanel() {
                           style={{
                             backgroundColor:
                               sliceColours[
-                                index %
-                                  sliceColours.length
+                              index %
+                              sliceColours.length
                               ],
                           }}
                           aria-hidden
@@ -481,7 +491,7 @@ export default function OverviewCategorySpendingPanel() {
                               item.transactionCount
                             }{' '}
                             {item.transactionCount ===
-                            1
+                              1
                               ? 'transaction'
                               : 'transactions'}
                           </p>
@@ -510,15 +520,15 @@ export default function OverviewCategorySpendingPanel() {
 
               {sourceItems.length >
                 5 && (
-                <p className="mt-4 text-[11px] leading-5 text-subtle">
-                  Smaller
-                  categories are
-                  grouped into
-                  “Other” to keep
-                  the chart easy to
-                  read.
-                </p>
-              )}
+                  <p className="mt-4 text-[11px] leading-5 text-subtle">
+                    Smaller
+                    categories are
+                    grouped into
+                    “Other” to keep
+                    the chart easy to
+                    read.
+                  </p>
+                )}
             </div>
           </div>
         )}

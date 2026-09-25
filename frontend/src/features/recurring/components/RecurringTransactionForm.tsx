@@ -10,22 +10,22 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CalendarClock } from 'lucide-react'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import { useAccounts } from '../../accounts/hooks/useAccounts'
-import { useCategories } from '../../categories/hooks/useCategories'
+import { ApiClientError } from '@/api/ApiClientError'
+import { useAccounts } from '@/features/accounts/hooks/useAccounts'
+import { useCategories } from '@/features/categories/hooks/useCategories'
 import type {
   CreateRecurringTransactionRequest,
   RecurringTransaction,
   UpdateRecurringTransactionRequest,
-} from '../api/types'
+} from '@/features/recurring/api/types'
 import {
   useCreateRecurringTransaction,
   useUpdateRecurringTransaction,
-} from '../hooks/useRecurringTransactions'
+} from '@/features/recurring/hooks/useRecurringTransactions'
 import {
   recurringTransactionSchema,
   type RecurringTransactionFormValues,
-} from '../validation/recurringTransactionSchema'
+} from '@/features/recurring/validation/recurringTransactionSchema'
 
 interface RecurringTransactionFormProps {
   schedule?: RecurringTransaction | null

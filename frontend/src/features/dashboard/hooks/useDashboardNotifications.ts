@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 
-import { useRecurringTransactions } from '../../recurring/hooks/useRecurringTransactions'
+import { useRecurringTransactions } from '@/features/recurring/hooks/useRecurringTransactions'
 import { useDashboardSummary } from './useDashboardSummary'
 
 function formatLocalDate(

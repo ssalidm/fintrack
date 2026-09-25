@@ -2,15 +2,15 @@ import { useEffect } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 
-import type { Category } from '../api/types'
+import type { Category } from '@/features/categories/api/types'
 import {
   useCreateCategory,
   useUpdateCategory,
-} from '../hooks/useCategoryMutations'
+} from '@/features/categories/hooks/useCategoryMutations'
 import {
   categorySchema,
   type CategoryFormValues,
-} from '../validation/categorySchema'
+} from '@/features/categories/validation/categorySchema'
 
 interface CategoryFormProps {
   category?: Category | null

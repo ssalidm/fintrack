@@ -14,12 +14,12 @@ import {
   useSearchParams,
 } from 'react-router'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import { authApi } from '../api/authApi'
-import AuthAlert from '../components/AuthAlert'
-import AuthButton from '../components/AuthButton'
-import AuthHeader from '../components/AuthHeader'
-import AuthPanel from '../components/AuthPanel'
+import { ApiClientError } from '@/api/ApiClientError'
+import { authApi } from '@/features/auth/api/authApi'
+import AuthAlert from '@/features/auth/components/AuthAlert'
+import AuthButton from '@/features/auth/components/AuthButton'
+import AuthHeader from '@/features/auth/components/AuthHeader'
+import AuthPanel from '@/features/auth/components/AuthPanel'
 
 type VerificationStatus =
   | 'verifying'

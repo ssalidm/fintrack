@@ -6,21 +6,21 @@ import {
   useNavigate,
 } from 'react-router'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import { authApi } from '../api/authApi'
-import AuthAlert from '../components/AuthAlert'
-import AuthButton from '../components/AuthButton'
-import AuthDivider from '../components/AuthDivider'
-import AuthField from '../components/AuthField'
-import AuthHeader from '../components/AuthHeader'
-import AuthInput from '../components/AuthInput'
-import AuthPanel from '../components/AuthPanel'
-import GoogleSignInButton from '../components/GoogleSignInButton'
-import { useAuth } from '../context/useAuth'
+import { ApiClientError } from '@/api/ApiClientError'
+import { authApi } from '@/features/auth/api/authApi'
+import AuthAlert from '@/features/auth/components/AuthAlert'
+import AuthButton from '@/features/auth/components/AuthButton'
+import AuthDivider from '@/features/auth/components/AuthDivider'
+import AuthField from '@/features/auth/components/AuthField'
+import AuthHeader from '@/features/auth/components/AuthHeader'
+import AuthInput from '@/features/auth/components/AuthInput'
+import AuthPanel from '@/features/auth/components/AuthPanel'
+import GoogleSignInButton from '@/features/auth/components/GoogleSignInButton'
+import { useAuth } from '@/features/auth/context/useAuth'
 import {
   startRegistrationSchema,
   type StartRegistrationFormValues,
-} from '../validation/startRegistrationSchema'
+} from '@/features/auth/validation/startRegistrationSchema'
 
 export default function RegisterPage() {
   const navigate = useNavigate()
@@ -215,17 +215,17 @@ export default function RegisterPage() {
           titleId="registration-title"
         />
 
-        <div className="mt-6 rounded-lg border border-[#d8e6df] bg-[#f1f7f4] px-4 py-3 text-center">
-          <p className="text-xs text-[#718078]">
+        <div className="mt-6 rounded-lg border border-line bg-success-soft px-4 py-3 text-center">
+          <p className="text-xs text-muted">
             Registration email sent to
           </p>
 
-          <p className="mt-1 break-all text-sm font-semibold text-[#173c32]">
+          <p className="mt-1 break-all text-sm font-semibold text-ink">
             {submittedEmail}
           </p>
         </div>
 
-        <p className="mt-4 text-center text-sm leading-6 text-[#66766f]">
+        <p className="mt-4 text-center text-sm leading-6 text-muted">
           Open the link in the email to
           finish setting up your profile
           and password.
@@ -236,17 +236,17 @@ export default function RegisterPage() {
           onClick={() =>
             setSubmittedEmail(null)
           }
-          className="mt-6 w-full text-center text-sm font-semibold text-[#16805f] transition hover:text-[#0d4f3f] hover:underline"
+          className="mt-6 inline-flex h-10 w-full items-center justify-center rounded-full border border-line-strong bg-surface px-4 text-sm font-semibold text-ink transition hover:border-accent hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent/30 focus:ring-offset-2 focus:ring-offset-surface"
         >
           Use a different email
         </button>
 
-        <p className="mt-5 text-center text-sm text-[#66766f]">
+        <p className="mt-5 text-center text-sm text-muted">
           Already have an account?{' '}
 
           <Link
             to="/login"
-            className="font-semibold text-[#16805f] hover:text-[#0d4f3f] hover:underline"
+            className="font-semibold text-accent hover:text-primary hover:underline"
           >
             Sign in
           </Link>
@@ -348,7 +348,7 @@ export default function RegisterPage() {
         }
       />
 
-      <p className="mt-6 text-center text-sm text-[#66766f]">
+      <p className="mt-6 text-center text-sm text-muted">
         Already have an account?{' '}
 
         <Link

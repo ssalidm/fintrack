@@ -3,8 +3,8 @@ import {
   CheckCircle2,
 } from 'lucide-react'
 
-import ConfirmationDialog from '../../../components/ui/ConfirmationDialog'
-import type { SavingsGoal } from '../api/types'
+import ConfirmationDialog from '@/components/ui/ConfirmationDialog'
+import type { SavingsGoal } from '@/features/goals/api/types'
 
 export type GoalAction =
   | 'complete'

@@ -4,17 +4,17 @@ import {
   useQueryClient,
   type QueryClient,
 } from '@tanstack/react-query'
-import type { PageResponse } from '../../../api/types'
-import { accountQueryKeys } from '../../accounts/hooks/useAccounts'
-import { useAuthenticatedRequest } from '../../auth/hooks/useAuthenticatedRequest'
-import { dashboardSummaryQueryKey } from '../../dashboard/hooks/useDashboardSummary'
-import { transactionQueryKeys } from '../../transactions/hooks/useTransactions'
+import type { PageResponse } from '@/api/types'
+import { accountQueryKeys } from '@/features/accounts/hooks/useAccounts'
+import { useAuthenticatedRequest } from '@/features/auth/hooks/useAuthenticatedRequest'
+import { dashboardSummaryQueryKey } from '@/features/dashboard/hooks/useDashboardSummary'
+import { transactionQueryKeys } from '@/features/transactions/hooks/useTransactions'
 import type {
   CreateTransferRequest,
   Transfer,
   TransferFilters,
   VoidTransferRequest,
-} from '../api/types'
+} from '@/features/transfers/api/types'
 
 export const defaultTransferFilters: TransferFilters = {
   status: 'POSTED',

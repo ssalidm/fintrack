@@ -7,11 +7,11 @@ import {
 } from 'lucide-react'
 import { Link } from 'react-router'
 
-import { formatMoney } from '../../../../utils/formatters'
+import { formatMoney } from '@/utils/formatters'
 import {
   useBudgetPerformance,
   useBudgets,
-} from '../../../budgets/hooks/useBudgets'
+} from '@/features/budgets/hooks/useBudgets'
 
 function currentMonthKey() {
   const now = new Date()

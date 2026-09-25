@@ -7,10 +7,8 @@ interface AuthFieldProps
   extends PropsWithChildren {
   readonly label: string
   readonly htmlFor: string
-
   readonly error?: string
   readonly hint?: ReactNode
-
   readonly optional?: boolean
   readonly action?: ReactNode
 }
@@ -29,12 +27,12 @@ export default function AuthField({
       <div className="flex items-center justify-between gap-3">
         <label
           htmlFor={htmlFor}
-          className="text-sm font-medium text-[#173c32]"
+          className="text-sm font-medium text-ink"
         >
           {label}
 
           {optional && (
-            <span className="ml-1 font-normal text-[#8a958f]">
+            <span className="ml-1 font-normal text-subtle">
               (optional)
             </span>
           )}
@@ -50,13 +48,13 @@ export default function AuthField({
       {error ? (
         <p
           id={`${htmlFor}-error`}
-          className="mt-1.5 text-xs leading-5 text-red-600"
+          className="mt-1.5 text-xs leading-5 text-danger"
           role="alert"
         >
           {error}
         </p>
       ) : hint ? (
-        <div className="mt-1.5 text-xs leading-5 text-[#78867f]">
+        <div className="mt-1.5 text-xs leading-5 text-muted">
           {hint}
         </div>
       ) : null}

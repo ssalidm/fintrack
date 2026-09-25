@@ -10,16 +10,16 @@ import {
   UsersRound,
 } from 'lucide-react'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import RefreshButton from '../../../components/actions/RefreshButton'
-import PageHeader from '../../../components/layout/PageHeader'
-import PageShell from '../../../components/layout/PageShell'
-import EmptyState from '../../../components/ui/EmptyState'
-import ErrorPanel from '../../../components/ui/ErrorPanel'
-import Pagination from '../../../components/ui/Pagination'
-import type { UserStatus } from '../../profile/api/types'
-import type { AdminUser } from '../api/types'
-import { useAdminUsers } from '../hooks/useAdminUsers'
+import { ApiClientError } from '@/api/ApiClientError'
+import RefreshButton from '@/components/actions/RefreshButton'
+import PageHeader from '@/components/layout/PageHeader'
+import PageShell from '@/components/layout/PageShell'
+import EmptyState from '@/components/ui/EmptyState'
+import ErrorPanel from '@/components/ui/ErrorPanel'
+import Pagination from '@/components/ui/Pagination'
+import type { UserStatus } from '@/features/profile/api/types'
+import type { AdminUser } from '@/features/admin/api/types'
+import { useAdminUsers } from '@/features/admin/hooks/useAdminUsers'
 
 const PAGE_SIZE = 12
 

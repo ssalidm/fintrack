@@ -12,13 +12,13 @@ import {
   useForm,
 } from 'react-hook-form'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import OtpCodeInput from '../../auth/components/OtpCodeInput'
-import { useRegenerateMfaRecoveryCodes } from '../hooks/useMfaManagement'
+import { ApiClientError } from '@/api/ApiClientError'
+import OtpCodeInput from '@/features/auth/components/OtpCodeInput'
+import { useRegenerateMfaRecoveryCodes } from '@/features/profile/hooks/useMfaManagement'
 import {
   regenerateRecoveryCodesSchema,
   type RegenerateRecoveryCodesFormValues,
-} from '../validation/profileSchemas'
+} from '@/features/profile/validation/profileSchemas'
 import RecoveryCodesPanel from './RecoveryCodesPanel'
 
 interface MfaRecoveryCodesDialogProps {

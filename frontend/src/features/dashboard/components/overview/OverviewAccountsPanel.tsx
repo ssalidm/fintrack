@@ -9,9 +9,9 @@ import {
 } from 'lucide-react'
 import { Link } from 'react-router'
 
-import { formatMoney } from '../../../../utils/formatters'
-import type { AccountType } from '../../../accounts/api/types'
-import { useAccountBalances } from '../../../accounts/hooks/useAccounts'
+import { formatMoney } from '@/utils/formatters'
+import type { AccountType } from '@/features/accounts/api/types'
+import { useAccountBalances } from '@/features/accounts/hooks/useAccounts'
 
 function accountIcon(
   type: AccountType,

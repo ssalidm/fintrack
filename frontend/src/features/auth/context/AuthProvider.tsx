@@ -7,22 +7,22 @@ import {
   type ReactNode,
 } from 'react'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import { queryClient } from '../../../api/queryClient'
-import { authApi } from '../api/authApi'
+import { ApiClientError } from '@/api/ApiClientError'
+import { queryClient } from '@/api/queryClient'
+import { authApi } from '@/features/auth/api/authApi'
 import type {
   GoogleLoginRequest,
   LoginRequest,
   MfaRecoverRequest,
   MfaVerifyRequest,
   TokenResponse,
-} from '../api/types'
+} from '@/features/auth/api/types'
 import {
   AuthContext,
   type AuthContextValue,
   type AuthStatus,
 } from './AuthContext'
-import { disableGoogleAutoSelect } from '../utils/googleIdentity'
+import { disableGoogleAutoSelect } from '@/features/auth/utils/googleIdentity'
 
 
 const REFRESH_TOKEN_KEY =
