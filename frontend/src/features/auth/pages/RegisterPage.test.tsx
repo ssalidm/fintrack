@@ -30,6 +30,13 @@ vi.mock('@/features/auth/context/useAuth', () => ({
   useAuth: vi.fn(),
 }))
 
+vi.mock(
+  '@/features/auth/components/GoogleSignInButton',
+  () => ({
+    default: () => null,
+  }),
+)
+
 const startRegistrationMock = vi.mocked(authApi.startRegistration)
 
 function renderRegisterPage() {
