@@ -17,8 +17,6 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.exc.InvalidFormatException;
 import za.co.pixelly.fintrack.common.api.ApiResponse;
-import za.co.pixelly.fintrack.reporting.application.InvalidReportingRangeException;
-import za.co.pixelly.fintrack.reporting.application.ReportingResourceNotFoundException;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -147,42 +145,6 @@ public class GlobalExceptionHandler {
                 ApiResponse.error(
                     HttpStatus.CONFLICT,
                     "The resource was modified by another request"
-                )
-            );
-    }
-
-    @ExceptionHandler(
-        InvalidReportingRangeException.class
-    )
-    ResponseEntity<ApiResponse<Void>>
-    handleInvalidReportingRange(
-        InvalidReportingRangeException exception
-    ) {
-        return ResponseEntity
-            .badRequest()
-            .body(
-                ApiResponse.error(
-                    HttpStatus.BAD_REQUEST,
-                    exception.getMessage()
-                )
-            );
-    }
-
-    @ExceptionHandler(
-        ReportingResourceNotFoundException.class
-    )
-    ResponseEntity<ApiResponse<Void>>
-    handleReportingResourceNotFound(
-        ReportingResourceNotFoundException exception
-    ) {
-        return ResponseEntity
-            .status(
-                HttpStatus.NOT_FOUND
-            )
-            .body(
-                ApiResponse.error(
-                    HttpStatus.NOT_FOUND,
-                    exception.getMessage()
                 )
             );
     }
