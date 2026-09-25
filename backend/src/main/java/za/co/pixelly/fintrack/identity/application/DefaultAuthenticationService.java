@@ -5,7 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import za.co.pixelly.fintrack.common.Util;
-import za.co.pixelly.fintrack.finance.account.application.exceptions.AccountNotActiveException;
+import za.co.pixelly.fintrack.identity.application.exceptions.UserAccountNotActiveException;
 import za.co.pixelly.fintrack.config.security.JwtProperties;
 import za.co.pixelly.fintrack.identity.api.*;
 import za.co.pixelly.fintrack.identity.application.exceptions.InvalidCredentialsException;
@@ -76,7 +76,7 @@ public class DefaultAuthenticationService implements AuthenticationService {
         if (!user.isActive()) {
 
             if (user.isPendingVerification()) {
-                throw new AccountNotActiveException();
+                throw new UserAccountNotActiveException();
             }
 
             throw new InvalidCredentialsException();

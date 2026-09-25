@@ -1,7 +1,7 @@
-package za.co.pixelly.fintrack.finance.account.application.exceptions;
+package za.co.pixelly.fintrack.identity.application.exceptions;
 
-public class AccountNotActiveException extends RuntimeException {
-    public AccountNotActiveException() {
+public class UserAccountNotActiveException extends RuntimeException {
+    public UserAccountNotActiveException() {
         super("Email verification is required before login");
     }
 }
