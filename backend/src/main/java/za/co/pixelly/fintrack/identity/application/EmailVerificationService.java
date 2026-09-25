@@ -13,7 +13,8 @@ import za.co.pixelly.fintrack.identity.persistence.EmailVerificationTokenReposit
 import za.co.pixelly.fintrack.identity.persistence.UserRepository;
 
 import java.time.Instant;
-import java.util.Locale;
+
+import static za.co.pixelly.fintrack.identity.application.EmailAddressNormalizer.normalize;
 
 @Service
 @RequiredArgsConstructor
@@ -39,10 +40,10 @@ public class EmailVerificationService {
             tokenCodec.hash(rawToken);
 
         EmailVerificationToken token = tokenRepository
-                .findByTokenHashForUpdate(tokenHash)
-                .orElseThrow(
-                    InvalidEmailVerificationTokenException::new
-                );
+            .findByTokenHashForUpdate(tokenHash)
+            .orElseThrow(
+                InvalidEmailVerificationTokenException::new
+            );
 
         if (!token.isUsable(now)) {
             throw new InvalidEmailVerificationTokenException();
@@ -68,12 +69,8 @@ public class EmailVerificationService {
 
     @Transactional
     public void resend(String email) {
-
-        String normalizedEmail =
-            email.trim().toLowerCase(Locale.ROOT);
-
         userRepository
-            .findByEmail(normalizedEmail)
+            .findByEmail(normalize(email))
             .filter(User::isPendingVerification)
             .ifPresent(this::issueToken);
     }

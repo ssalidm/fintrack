@@ -27,7 +27,6 @@ import za.co.pixelly.fintrack.finance.transfer.persistence.TransferRepository;
 
 import java.util.UUID;
 
-import static za.co.pixelly.fintrack.common.Util.normalizeNullable;
 import static za.co.pixelly.fintrack.common.concurrency.VersionGuard.requireCurrent;
 
 
@@ -161,5 +160,15 @@ public class DefaultTransferService implements TransferService {
         }
 
         return account;
+    }
+
+    private String normalizeNullable(String value) {
+        if (value == null) {
+            return null;
+        }
+
+        String trimmed = value.trim();
+
+        return trimmed.isEmpty() ? null : trimmed;
     }
 }

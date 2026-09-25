@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import za.co.pixelly.fintrack.common.Util;
 import za.co.pixelly.fintrack.identity.application.exceptions.UserAccountNotActiveException;
 import za.co.pixelly.fintrack.config.security.JwtProperties;
 import za.co.pixelly.fintrack.identity.api.*;
@@ -18,6 +17,8 @@ import za.co.pixelly.fintrack.identity.persistence.*;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+
+import static za.co.pixelly.fintrack.identity.application.EmailAddressNormalizer.normalize;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +43,7 @@ public class DefaultAuthenticationService implements AuthenticationService {
         String userAgent
     ) {
         Instant now = Instant.now();
-        String email = Util.normalizeEmail(request.email());
+        String email = normalize(request.email());
 
         User user = userRepository
             .findByEmail(email)

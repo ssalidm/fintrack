@@ -21,6 +21,8 @@ import java.time.Instant;
 import java.util.Locale;
 import java.util.UUID;
 
+import static za.co.pixelly.fintrack.identity.application.EmailAddressNormalizer.normalize;
+
 @Service
 @RequiredArgsConstructor
 public class EmailChangeService {
@@ -68,10 +70,7 @@ public class EmailChangeService {
             throw new InvalidCurrentPasswordException();
         }
 
-        String newEmail =
-            normalizeEmail(
-                requestedEmail
-            );
+        String newEmail = normalize(requestedEmail);
 
         if (user.getEmail().equals(newEmail)) {
             throw new EmailUnchangedException();
@@ -239,13 +238,5 @@ public class EmailChangeService {
                 now,
                 "EMAIL_CHANGED"
             );
-    }
-
-    private String normalizeEmail(
-        String email
-    ) {
-        return email
-            .trim()
-            .toLowerCase(Locale.ROOT);
     }
 }

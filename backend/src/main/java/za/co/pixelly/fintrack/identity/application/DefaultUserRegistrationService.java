@@ -5,7 +5,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import za.co.pixelly.fintrack.common.Util;
 import za.co.pixelly.fintrack.identity.api.RegisterRequest;
 import za.co.pixelly.fintrack.identity.api.RegisterResponse;
 import za.co.pixelly.fintrack.identity.application.exceptions.DuplicateEmailException;
@@ -15,6 +14,8 @@ import za.co.pixelly.fintrack.identity.domain.UserRole;
 import za.co.pixelly.fintrack.identity.persistence.ApplicationRoleRepository;
 import za.co.pixelly.fintrack.identity.persistence.UserRepository;
 import za.co.pixelly.fintrack.identity.persistence.UserRoleRepository;
+
+import static za.co.pixelly.fintrack.identity.application.EmailAddressNormalizer.normalize;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +32,7 @@ public class DefaultUserRegistrationService implements UserRegistrationService {
     @Override
     @Transactional
     public RegisterResponse register(RegisterRequest request) {
-        String email = Util.normalizeEmail(request.email());
+        String email = normalize(request.email());
 
         if (userRepository.existsByEmail(email)) {
             throw new DuplicateEmailException();

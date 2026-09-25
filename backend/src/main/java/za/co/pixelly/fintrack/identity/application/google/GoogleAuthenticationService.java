@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import za.co.pixelly.fintrack.common.Util;
 import za.co.pixelly.fintrack.identity.api.LoginResponse;
 import za.co.pixelly.fintrack.identity.application.EmailVerificationService;
 import za.co.pixelly.fintrack.identity.application.LoginCompletionService;
@@ -23,6 +22,8 @@ import za.co.pixelly.fintrack.identity.persistence.UserRoleRepository;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Locale;
+
+import static za.co.pixelly.fintrack.identity.application.EmailAddressNormalizer.normalize;
 
 @Service
 @RequiredArgsConstructor
@@ -83,9 +84,7 @@ public class GoogleAuthenticationService {
         Instant now
     ) {
         String email =
-            Util.normalizeEmail(
-                identity.email()
-            );
+            normalize(identity.email());
 
         /*
          * Never automatically connect a new Google

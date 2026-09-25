@@ -28,7 +28,6 @@ import za.co.pixelly.fintrack.finance.transaction.persistence.TransactionSpecifi
 import java.time.Instant;
 import java.util.UUID;
 
-import static za.co.pixelly.fintrack.common.Util.normalizeNullable;
 import static za.co.pixelly.fintrack.common.concurrency.VersionGuard.requireCurrent;
 
 @Service
@@ -62,8 +61,8 @@ public class DefaultTransactionService implements TransactionService {
             transactionType,
             request.amount(),
             request.transactionDate(),
-            normalizeNullable(request.description()),
-            normalizeNullable(request.merchantName()),
+            request.description(),
+            request.merchantName(),
             now
         );
 

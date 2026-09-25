@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import za.co.pixelly.fintrack.common.Util;
 import za.co.pixelly.fintrack.identity.application.exceptions.InvalidCredentialsException;
 import za.co.pixelly.fintrack.identity.application.exceptions.UserProfileNotFoundException;
 import za.co.pixelly.fintrack.identity.domain.AuthSession;
@@ -19,6 +18,8 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
+
+import static za.co.pixelly.fintrack.identity.application.EmailAddressNormalizer.normalize;
 
 @Service
 @RequiredArgsConstructor
@@ -65,10 +66,7 @@ public class GoogleIdentityLinkService {
             throw new InvalidCredentialsException();
         }
 
-        String googleEmail =
-            Util.normalizeEmail(
-                googleIdentity.email()
-            );
+        String googleEmail = normalize(googleIdentity.email());
 
         /*
          * The ACCOUNT_LINK_REQUIRED flow is only

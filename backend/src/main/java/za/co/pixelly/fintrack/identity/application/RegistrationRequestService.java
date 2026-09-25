@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import za.co.pixelly.fintrack.common.Util;
 import za.co.pixelly.fintrack.config.security.EmailVerificationProperties;
 import za.co.pixelly.fintrack.identity.domain.RegistrationRequest;
 import za.co.pixelly.fintrack.identity.persistence.RegistrationRequestRepository;
@@ -12,6 +11,8 @@ import za.co.pixelly.fintrack.identity.persistence.UserRepository;
 
 import java.time.Clock;
 import java.time.Instant;
+
+import static za.co.pixelly.fintrack.identity.application.EmailAddressNormalizer.normalize;
 
 @Service
 @RequiredArgsConstructor
@@ -29,10 +30,7 @@ public class RegistrationRequestService {
     public void start(
         String rawEmail
     ) {
-        String email =
-            Util.normalizeEmail(
-                rawEmail
-            );
+        String email = normalize(rawEmail);
 
         /*
          * Deliberately return normally when
