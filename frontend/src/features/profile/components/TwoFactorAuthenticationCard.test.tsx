@@ -23,7 +23,7 @@ const mocks = vi.hoisted(() => ({
 }))
 
 vi.mock(
-  '../hooks/useMfaManagement',
+  '@/features/profile/hooks/useMfaManagement',
   () => ({
     useMfaStatus: () => mocks.status(),
     useStartMfaSetup: () => ({
@@ -102,7 +102,7 @@ describe(
 
         await user.click(
           screen.getByRole('button', {
-            name: 'Set up now',
+            name: 'Set up',
           }),
         )
 
@@ -136,7 +136,7 @@ describe(
 
         expect(
           screen.getByText(
-            '7 recovery codes left',
+            /7\s+remaining/,
           ),
         ).toBeInTheDocument()
       },

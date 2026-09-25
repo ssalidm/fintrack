@@ -4,7 +4,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query'
-import {useAuthenticatedRequest} from '../../auth/hooks/useAuthenticatedRequest'
+import {useAuthenticatedRequest} from '@/features/auth/hooks/useAuthenticatedRequest'
 import type {
   CreateRecurringTransactionRequest,
   RecurringTransaction,
@@ -12,7 +12,7 @@ import type {
   RecurringTransactionStatus,
   RecurringTransactionVersionRequest,
   UpdateRecurringTransactionRequest,
-} from '../api/types'
+} from '@/features/recurring/api/types'
 
 export const recurringTransactionQueryKeys = {
   all: ['recurring-transactions'] as const,

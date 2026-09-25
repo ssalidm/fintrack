@@ -87,6 +87,9 @@ public abstract class AbstractIntegrationTest {
     protected JdbcTemplate jdbcTemplate;
 
     @Autowired
+    protected TestRegistrationEmailSender registrationEmailSender;
+
+    @Autowired
     protected TestEmailVerificationSender emailSender;
 
     @Autowired
@@ -107,6 +110,7 @@ public abstract class AbstractIntegrationTest {
     void configureIdentityTestClient() {
 
         emailChangeSender.clear();
+        registrationEmailSender.clear();
 
         identityTestClient =
             new IdentityTestClient(
@@ -179,6 +183,12 @@ public abstract class AbstractIntegrationTest {
 
         @Autowired
         MockMvc mockMvc;
+
+        @Bean
+        TestRegistrationEmailSender
+        registrationEmailSender() {
+            return new TestRegistrationEmailSender();
+        }
 
         @Bean
         TestEmailVerificationSender emailVerificationSender() {

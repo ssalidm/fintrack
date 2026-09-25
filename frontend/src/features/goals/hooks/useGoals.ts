@@ -4,8 +4,8 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 
-import type {PageResponse} from '../../../api/types'
-import {useAuthenticatedRequest} from '../../auth/hooks/useAuthenticatedRequest'
+import type {PageResponse} from '@/api/types'
+import {useAuthenticatedRequest} from '@/features/auth/hooks/useAuthenticatedRequest'
 
 import type {
   CreateGoalContributionRequest,
@@ -18,7 +18,7 @@ import type {
   UpdateGoalContributionRequest,
   UpdateSavingsGoalRequest,
   VoidGoalContributionRequest,
-} from '../api/types'
+} from '@/features/goals/api/types'
 
 export const goalQueryKeys = {
   all: ['goals'] as const,

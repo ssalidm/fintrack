@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
-import { useAuthenticatedRequest } from '../../auth/hooks/useAuthenticatedRequest'
+import { useAuthenticatedRequest } from '@/features/auth/hooks/useAuthenticatedRequest'
 import type {
   Category,
   CategoryStatus,
   CategoryType,
-} from '../api/types'
+} from '@/features/categories/api/types'
 
 export const categoryQueryKeys = {
   all: ['categories'] as const,

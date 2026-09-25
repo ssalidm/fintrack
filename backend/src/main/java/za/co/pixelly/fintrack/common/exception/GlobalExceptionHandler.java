@@ -44,6 +44,21 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(InvalidRegistrationTokenException.class)
+    ResponseEntity<ApiResponse<Void>>
+    handleInvalidRegistrationToken(
+        InvalidRegistrationTokenException exception
+    ) {
+        return ResponseEntity
+            .badRequest()
+            .body(
+                ApiResponse.error(
+                    HttpStatus.BAD_REQUEST,
+                    exception.getMessage()
+                )
+            );
+    }
+
     @ExceptionHandler({
         DuplicateEmailException.class,
         EmailUnchangedException.class

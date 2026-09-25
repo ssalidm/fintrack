@@ -1,5 +1,5 @@
-import FormDrawer from '../../../components/ui/FormDrawer'
-import type { Account } from '../api/types'
+import FormDrawer from '@/components/ui/FormDrawer'
+import type { Account } from '@/features/accounts/api/types'
 import AccountForm from './AccountForm'
 
 interface AccountModalProps {

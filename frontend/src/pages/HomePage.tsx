@@ -5,23 +5,19 @@ import {
   ChartNoAxesCombined,
   Check,
   LockKeyhole,
-  Menu,
   ShieldCheck,
   Sparkles,
   Target,
   WalletCards,
-  X,
 } from 'lucide-react'
-import {
-  useEffect,
-  useState,
-} from 'react'
+
 import { Link } from 'react-router'
 
-import salifLogoGreen from '../assets/brand/salif-logo-green.svg'
-import salifLogoLight from '../assets/brand/salif-logo-light.svg'
-import ScrollReveal from '../components/motion/ScrollReveal'
-import { useAuth } from '../features/auth/context/useAuth'
+import ScrollReveal from '@/components/motion/ScrollReveal'
+import { useAuth } from '@/features/auth/context/useAuth'
+import PublicNavbar from '@/components/layout/PublicNavbar'
+import PublicFooter from '@/components/layout/PublicFooter'
+
 
 const features = [
   {
@@ -30,8 +26,8 @@ const features = [
     title: 'Know what you have',
     description:
       'Bring your accounts and everyday transactions together without losing sight of the details.',
-    accent: 'bg-[#d8eadf] text-[#146047]',
-    border: 'group-hover:border-[#8fbea7]',
+    accent:
+      'bg-accent-soft text-accent',
   },
   {
     icon: CalendarClock,
@@ -39,8 +35,8 @@ const features = [
     title: 'See what comes next',
     description:
       'Keep recurring payments, overdue commitments and upcoming expenses where you can act on them.',
-    accent: 'bg-[#f1dfb8] text-[#865b13]',
-    border: 'group-hover:border-[#d7b36b]',
+    accent:
+      'bg-warning-soft text-warning',
   },
   {
     icon: Target,
@@ -48,57 +44,56 @@ const features = [
     title: 'Give every goal a finish line',
     description:
       'Turn progress into something visible with savings goals, contributions and monthly budgets.',
-    accent: 'bg-[#dce8eb] text-[#356474]',
-    border: 'group-hover:border-[#8fb3be]',
+    accent:
+      'bg-success-soft text-success',
   },
 ]
 
 const monthlyBars = [
-  { income: 72, spending: 47, label: 'Jan' },
-  { income: 82, spending: 58, label: 'Feb' },
-  { income: 66, spending: 44, label: 'Mar' },
-  { income: 91, spending: 62, label: 'Apr' },
-  { income: 78, spending: 51, label: 'May' },
-  { income: 95, spending: 67, label: 'Jun' },
+  {
+    income: 72,
+    spending: 47,
+    label: 'Jan',
+  },
+  {
+    income: 82,
+    spending: 58,
+    label: 'Feb',
+  },
+  {
+    income: 66,
+    spending: 44,
+    label: 'Mar',
+  },
+  {
+    income: 91,
+    spending: 62,
+    label: 'Apr',
+  },
+  {
+    income: 78,
+    spending: 51,
+    label: 'May',
+  },
+  {
+    income: 95,
+    spending: 67,
+    label: 'Jun',
+  },
 ]
 
-interface BrandLogoProps {
-  compact?: boolean
-  light?: boolean
-}
-
-function BrandLogo({
-  compact = false,
-  light = false,
-}: BrandLogoProps) {
-  return (
-    <img
-      src={
-        light
-          ? salifLogoLight
-          : salifLogoGreen
-      }
-      alt="Salif"
-      className={`h-auto transition-[width] duration-300 motion-reduce:transition-none ${
-        compact
-          ? 'w-23 sm:w-25'
-          : 'w-27 sm:w-31'
-      }`}
-    />
-  )
-}
 
 function FinancePreview() {
   return (
-    <div className="home-hero-enter home-hero-enter-delay-2 relative mx-auto w-full max-w-[570px] pb-10 sm:pb-12">
-      <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-[#0d4f3f] p-5 text-white shadow-[0_30px_90px_rgba(13,79,63,0.28)] sm:p-7">
+    <div className="home-hero-enter home-hero-enter-delay-2 relative mx-auto w-full max-w-[500px] pb-10 sm:pb-12">
+      <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-[#0d4f3f] p-5 text-white shadow-[0_30px_90px_rgba(13,79,63,0.24)] sm:p-6">
         <div className="flex items-start justify-between gap-5">
           <div>
             <p className="text-xs font-semibold tracking-[0.14em] text-[#a9d0c1]">
               YOUR MONTH AT A GLANCE
             </p>
 
-            <p className="mt-3 font-serif text-3xl sm:text-4xl">
+            <p className="mt-3 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
               R13,430
             </p>
 
@@ -112,7 +107,7 @@ function FinancePreview() {
           </span>
         </div>
 
-        <div className="mt-8 rounded-2xl border border-white/[0.06] bg-white/[0.07] p-4 sm:p-5">
+        <div className="mt-7 rounded-2xl border border-white/[0.06] bg-white/[0.07] p-4 sm:p-5">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-[#a9d0c1]">
@@ -132,36 +127,39 @@ function FinancePreview() {
             </span>
           </div>
 
-          <div className="mt-6 flex h-36 items-end justify-between gap-2 sm:gap-4">
+          <div className="mt-6 flex h-32 items-end justify-between gap-2 sm:gap-3">
             {monthlyBars.map(
-              (month, index) => (
+              (
+                month,
+                index,
+              ) => (
                 <div
                   key={month.label}
                   className="flex h-full min-w-0 flex-1 flex-col justify-end"
                 >
                   <div className="flex flex-1 items-end justify-center gap-1 sm:gap-1.5">
                     <span
-                      className="home-chart-bar w-2.5 rounded-t-full bg-[#77bea0] sm:w-3.5"
+                      className="home-chart-bar w-2.5 rounded-t-full bg-[#77bea0] sm:w-3"
                       style={{
                         height: `${month.income}%`,
-                        animationDelay:
-                          `${300 + index * 55}ms`,
+                        animationDelay: `${300 +
+                          index * 55
+                          }ms`,
                       }}
-                      title={`${month.label} income`}
                     />
 
                     <span
-                      className="home-chart-bar w-2.5 rounded-t-full bg-[#e0ad51] sm:w-3.5"
+                      className="home-chart-bar w-2.5 rounded-t-full bg-[#e0ad51] sm:w-3"
                       style={{
                         height: `${month.spending}%`,
-                        animationDelay:
-                          `${350 + index * 55}ms`,
+                        animationDelay: `${350 +
+                          index * 55
+                          }ms`,
                       }}
-                      title={`${month.label} spending`}
                     />
                   </div>
 
-                  <span className="mt-2 text-center text-[11px] text-[#a8c9bd]">
+                  <span className="mt-2 text-center text-[10px] text-[#a8c9bd]">
                     {month.label}
                   </span>
                 </div>
@@ -183,9 +181,9 @@ function FinancePreview() {
         </div>
       </div>
 
-      <div className="absolute bottom-0 left-3 right-3 rounded-2xl border border-[#d6d2c8] bg-[#fffefb] p-4 shadow-[0_18px_45px_rgba(13,79,63,0.16)] sm:left-auto sm:right-[-1rem] sm:w-[282px]">
+      <div className="absolute bottom-0 left-3 right-3 rounded-2xl border border-line bg-surface p-4 shadow-[var(--salif-shadow-card)] sm:left-auto sm:right-[-0.75rem] sm:w-[270px]">
         <div className="flex items-center gap-3">
-          <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#d8eadf] text-[#146047]">
+          <span className="grid size-10 shrink-0 place-items-center rounded-full bg-accent-soft text-accent">
             <Target
               size={18}
               aria-hidden
@@ -194,17 +192,17 @@ function FinancePreview() {
 
           <div className="min-w-0 flex-1">
             <div className="flex items-center justify-between gap-3">
-              <p className="truncate text-sm font-semibold text-[#123e33]">
+              <p className="truncate text-sm font-semibold text-ink">
                 Emergency fund
               </p>
 
-              <span className="text-xs font-bold text-[#167457]">
+              <span className="text-xs font-bold text-accent">
                 68%
               </span>
             </div>
 
-            <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#e5e4dd]">
-              <div className="home-progress-bar h-full w-[68%] rounded-full bg-[#26906c]" />
+            <div className="mt-2 h-2 overflow-hidden rounded-full bg-surface-strong">
+              <div className="home-progress-bar h-full w-[68%] rounded-full bg-accent" />
             </div>
           </div>
         </div>
@@ -214,35 +212,7 @@ function FinancePreview() {
 }
 
 export default function HomePage() {
-  const { status } = useAuth()
-
-  const [isCompact, setIsCompact] =
-    useState(false)
-
-  const [isMenuOpen, setIsMenuOpen] =
-    useState(false)
-
-  useEffect(() => {
-    function updateHeader() {
-      setIsCompact(
-        window.scrollY > 32,
-      )
-    }
-
-    updateHeader()
-
-    window.addEventListener(
-      'scroll',
-      updateHeader,
-      { passive: true },
-    )
-
-    return () =>
-      window.removeEventListener(
-        'scroll',
-        updateHeader,
-      )
-  }, [])
+  const { status } = useAuth()  
 
   const isAuthenticated =
     status === 'authenticated'
@@ -258,256 +228,66 @@ export default function HomePage() {
       : 'Start with Salif'
 
   return (
-    <div className="min-h-screen overflow-x-clip bg-[#f4f1e8] text-[#123e33]">
-      <header
-        className={`sticky top-0 z-50 border-b transition-[background-color,border-color,box-shadow] duration-300 motion-reduce:transition-none ${
-          isCompact
-            ? 'border-[#d5d0c4] bg-[#fffdf8]/97 shadow-[0_8px_28px_rgba(18,62,51,0.08)]'
-            : 'border-transparent bg-[#f4f1e8]/92'
-        } backdrop-blur-xl`}
+    <div className="relative min-h-screen overflow-x-clip bg-app text-ink">
+      {/* Shared navbar + hero atmosphere */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[720px] overflow-hidden"
+        aria-hidden
       >
-        <div
-          className={`mx-auto flex max-w-[1240px] items-center justify-between px-5 transition-[height] duration-300 motion-reduce:transition-none sm:px-8 lg:px-12 ${
-            isCompact
-              ? 'h-15'
-              : 'h-20'
-          }`}
-        >
-          <Link
-            to="/"
-            aria-label="Salif home"
-            className="cursor-pointer"
-          >
-            <BrandLogo
-              compact={isCompact}
-            />
-          </Link>
+        {/* soft brand washes */}
+        <div className="absolute -left-40 -top-40 size-[34rem] rounded-full bg-accent-soft/75 blur-[120px]" />
 
-          <nav
-            className="hidden items-center gap-8 md:flex"
-            aria-label="Home navigation"
-          >
-            {[
-              [
-                'Features',
-                '#features',
-              ],
-              [
-                'How it helps',
-                '#how-it-helps',
-              ],
-              [
-                'Security',
-                '#security',
-              ],
-            ].map(
-              ([label, href]) => (
-                <a
-                  key={href}
-                  href={href}
-                  className="relative py-2 text-sm font-semibold text-[#47645a] transition hover:text-[#0d4f3f] after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:origin-left after:scale-x-0 after:rounded-full after:bg-[#d09b3c] after:transition-transform hover:after:scale-x-100"
-                >
-                  {label}
-                </a>
-              ),
-            )}
-          </nav>
+        <div className="absolute -right-44 -top-28 size-[30rem] rounded-full bg-warning-soft/45 blur-[120px]" />
 
-          <div className="flex items-center gap-2 sm:gap-3">
-            {!isAuthenticated && (
-              <Link
-                to="/login"
-                className="hidden cursor-pointer px-3 py-2 text-sm font-semibold text-[#0d4f3f] transition hover:text-[#16805f] sm:inline-flex"
-              >
-                Sign in
-              </Link>
-            )}
+        {/* subtle grid */}
+        <div className="absolute inset-0 opacity-[0.26] [background-image:linear-gradient(to_right,var(--salif-color-border)_1px,transparent_1px),linear-gradient(to_bottom,var(--salif-color-border)_1px,transparent_1px)] [background-size:44px_44px] [mask-image:linear-gradient(to_bottom,black_0%,rgba(0,0,0,0.68)_60%,transparent_100%)]" />
 
-            <Link
-              to={
-                primaryDestination
-              }
-              className={`hidden cursor-pointer items-center gap-2 rounded-full bg-[#0d4f3f] text-sm font-semibold text-white shadow-sm transition-[padding,background-color,transform] duration-300 hover:-translate-y-0.5 hover:bg-[#146b52] sm:inline-flex ${
-                isCompact
-                  ? 'px-4 py-2'
-                  : 'px-5 py-2.5'
-              }`}
-            >
-              {primaryLabel}
+        {/* architectural circles */}
+        <div className="absolute left-[7%] top-24 h-[380px] w-[380px] rounded-full border border-line/50" />
 
-              <ArrowRight
-                size={16}
-                aria-hidden
-              />
-            </Link>
+        <div className="absolute left-[7%] top-24 h-[285px] w-[285px] translate-x-[47px] translate-y-[47px] rounded-full border border-line/35" />
 
-            <button
-              type="button"
-              onClick={() =>
-                setIsMenuOpen(
-                  (open) => !open,
-                )
-              }
-              className="grid size-10 cursor-pointer place-items-center rounded-full border border-[#cfcbc0] bg-white/60 text-[#123e33] transition hover:border-[#96ac9f] hover:bg-white md:hidden"
-              aria-label={
-                isMenuOpen
-                  ? 'Close navigation'
-                  : 'Open navigation'
-              }
-              aria-expanded={
-                isMenuOpen
-              }
-              aria-controls="home-mobile-navigation"
-            >
-              {isMenuOpen ? (
-                <X
-                  size={20}
-                  aria-hidden
-                />
-              ) : (
-                <Menu
-                  size={20}
-                  aria-hidden
-                />
-              )}
-            </button>
-          </div>
-        </div>
+        {/* angled detail */}
+        <div className="absolute right-[9%] top-32 h-px w-44 rotate-[-12deg] bg-line" />
 
-        <div
-          id="home-mobile-navigation"
-          className={`grid border-t border-[#ded9cd] bg-[#fffdf8] transition-[grid-template-rows,opacity] duration-300 md:hidden ${
-            isMenuOpen
-              ? 'grid-rows-[1fr] opacity-100'
-              : 'pointer-events-none grid-rows-[0fr] opacity-0'
-          }`}
-        >
-          <div className="overflow-hidden">
-            <nav
-              className="mx-auto flex max-w-[1240px] flex-col gap-1 px-5 py-4"
-              aria-label="Mobile home navigation"
-            >
-              {[
-                [
-                  'Features',
-                  '#features',
-                ],
-                [
-                  'How it helps',
-                  '#how-it-helps',
-                ],
-                [
-                  'Security',
-                  '#security',
-                ],
-              ].map(
-                ([label, href]) => (
-                  <a
-                    key={href}
-                    href={href}
-                    onClick={() =>
-                      setIsMenuOpen(
-                        false,
-                      )
-                    }
-                    className="rounded-xl px-3 py-2.5 text-sm font-semibold text-[#36584d] transition hover:bg-[#e5eee8] hover:text-[#0d4f3f]"
-                  >
-                    {label}
-                  </a>
-                ),
-              )}
+        <div className="absolute right-[7%] top-44 h-px w-28 rotate-[-12deg] bg-line/70" />
+      </div>
 
-              <div className="mt-3 grid grid-cols-2 gap-2 border-t border-[#e5e1d7] pt-4">
-                {!isAuthenticated && (
-                  <Link
-                    to="/login"
-                    onClick={() =>
-                      setIsMenuOpen(
-                        false,
-                      )
-                    }
-                    className="inline-flex items-center justify-center rounded-full border border-[#cfcabe] px-4 py-2.5 text-sm font-semibold text-[#0d4f3f]"
-                  >
-                    Sign in
-                  </Link>
-                )}
-
-                <Link
-                  to={
-                    primaryDestination
-                  }
-                  onClick={() =>
-                    setIsMenuOpen(
-                      false,
-                    )
-                  }
-                  className={`inline-flex items-center justify-center gap-2 rounded-full bg-[#0d4f3f] px-4 py-2.5 text-sm font-semibold text-white ${
-                    isAuthenticated
-                      ? 'col-span-2'
-                      : ''
-                  }`}
-                >
-                  {primaryLabel}
-
-                  <ArrowRight
-                    size={15}
-                    aria-hidden
-                  />
-                </Link>
-              </div>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <PublicNavbar />
 
       <main>
-        <section className="relative overflow-hidden">
-          <div
-            className="absolute -left-32 top-12 size-80 rounded-full bg-[#b9ddca]/55 blur-3xl"
-            aria-hidden
-          />
+        {/* HERO */}
 
-          <div
-            className="absolute -right-28 bottom-0 size-96 rounded-full bg-[#e7c77e]/35 blur-3xl"
-            aria-hidden
-          />
-
-          <div className="relative mx-auto grid max-w-[1240px] gap-14 px-5 py-16 sm:px-8 sm:py-20 lg:grid-cols-[0.94fr_1.06fr] lg:items-center lg:px-12 lg:py-24">
+        <section className="relative z-10">
+          <div className="mx-auto grid max-w-[1240px] gap-12 px-5 pb-20 pt-14 sm:px-8 sm:pb-24 sm:pt-18 lg:grid-cols-[1.08fr_0.92fr] lg:items-center lg:px-12 lg:pb-28 lg:pt-20">
             <div>
-              <div className="home-hero-enter inline-flex items-center gap-2 rounded-full border border-[#bdcfc5] bg-white/70 px-3.5 py-2 text-xs font-bold tracking-[0.07em] text-[#315d4f] shadow-sm">
+              <div className="home-hero-enter inline-flex items-center gap-2 rounded-full border border-line bg-surface/55 px-3.5 py-2 text-xs font-bold tracking-[0.07em] text-muted shadow-sm backdrop-blur-sm">
                 <BadgeCheck
                   size={16}
-                  className="text-[#16805f]"
+                  className="text-accent"
                   aria-hidden
                 />
 
                 PERSONAL FINANCE, IN ORDER
               </div>
 
-              <h1 className="home-hero-enter home-hero-enter-delay-1 mt-7 max-w-2xl font-serif text-5xl leading-[0.98] tracking-[-0.045em] text-[#103b30] sm:text-6xl lg:text-[4.75rem]">
-                See your money clearly.{' '}
+              <h1 className="home-hero-enter home-hero-enter-delay-1 mt-7 max-w-2xl text-5xl font-bold leading-[0.98] tracking-[-0.05em] text-ink sm:text-6xl lg:text-[4.5rem]">
+                See your money clearly.
 
-                <span className="text-[#16805f]">
+                <span className="block text-accent">
                   Save with purpose.
                 </span>
               </h1>
 
               <div className="home-hero-enter home-hero-enter-delay-2">
-                <p className="mt-7 max-w-xl text-base leading-7 text-[#4f6a60] sm:text-lg sm:leading-8">
-                  Salif brings your
-                  accounts, spending,
-                  budgets and goals into
-                  one confident view—so
-                  every decision has
-                  context.
+                <p className="mt-6 max-w-xl text-base leading-7 text-muted sm:text-lg">
+                  Accounts, spending, budgets and goals — together in one clear view.
                 </p>
 
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                   <Link
-                    to={
-                      primaryDestination
-                    }
-                    className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-full bg-[#0d4f3f] px-6 py-3.5 font-semibold text-white shadow-[0_12px_28px_rgba(13,79,63,0.18)] transition hover:-translate-y-0.5 hover:bg-[#146b52] hover:shadow-[0_16px_34px_rgba(13,79,63,0.24)]"
+                    to={primaryDestination}
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3.5 font-semibold text-inverse shadow-sm transition hover:-translate-y-0.5 hover:bg-primary-hover"
                   >
                     {primaryLabel}
 
@@ -520,19 +300,18 @@ export default function HomePage() {
                   {!isAuthenticated && (
                     <Link
                       to="/login"
-                      className="inline-flex cursor-pointer items-center justify-center rounded-full border border-[#bfc9c2] bg-white/65 px-6 py-3.5 font-semibold text-[#0d4f3f] transition hover:border-[#78a28e] hover:bg-white"
+                      className="inline-flex items-center justify-center rounded-full border border-line-strong bg-surface/55 px-6 py-3.5 font-semibold text-ink backdrop-blur-sm transition hover:border-accent hover:bg-surface"
                     >
-                      I already have an
-                      account
+                      Sign in
                     </Link>
                   )}
                 </div>
 
-                <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm font-medium text-[#587068]">
+                <div className="mt-7 flex flex-wrap gap-x-6 gap-y-3 text-sm font-medium text-muted">
                   <span className="flex items-center gap-2">
                     <Check
                       size={16}
-                      className="text-[#16805f]"
+                      className="text-accent"
                       aria-hidden
                     />
 
@@ -542,7 +321,7 @@ export default function HomePage() {
                   <span className="flex items-center gap-2">
                     <Check
                       size={16}
-                      className="text-[#16805f]"
+                      className="text-accent"
                       aria-hidden
                     />
 
@@ -556,7 +335,9 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="border-y border-[#d9d4c8] bg-[#0d4f3f] text-white">
+        {/* VALUE STRIP */}
+
+        <section className="border-y border-white/10 bg-[#0d4f3f] text-white">
           <div className="mx-auto grid max-w-[1240px] gap-5 px-5 py-5 text-center sm:grid-cols-3 sm:px-8 lg:px-12">
             {[
               [
@@ -581,13 +362,12 @@ export default function HomePage() {
               ) => (
                 <div
                   key={title}
-                  className={`py-2 ${
-                    index > 0
-                      ? 'border-t border-white/10 pt-5 sm:border-l sm:border-t-0 sm:pt-2'
-                      : ''
-                  }`}
+                  className={`py-2 ${index > 0
+                    ? 'border-t border-white/10 pt-5 sm:border-l sm:border-t-0 sm:pt-2'
+                    : ''
+                    }`}
                 >
-                  <p className="font-serif text-xl text-[#f6f1e5]">
+                  <p className="text-lg font-semibold text-white">
                     {title}
                   </p>
 
@@ -600,23 +380,25 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* FEATURES */}
+
         <section
           id="features"
-          className="home-anchor border-b border-[#ded9cd] bg-[#fffdf8]"
+          className="home-anchor border-b border-line bg-surface"
         >
           <ScrollReveal className="mx-auto max-w-[1240px] px-5 py-20 sm:px-8 lg:px-12 lg:py-24">
             <div className="grid gap-8 lg:grid-cols-[0.75fr_1.25fr] lg:items-end">
               <div>
-                <p className="text-xs font-bold tracking-[0.16em] text-[#16805f]">
+                <p className="text-xs font-bold tracking-[0.16em] text-accent">
                   A BETTER MONEY ROUTINE
                 </p>
 
-                <h2 className="mt-4 font-serif text-4xl leading-tight tracking-[-0.035em] text-[#103b30] sm:text-5xl">
+                <h2 className="mt-4 text-4xl font-bold leading-tight tracking-[-0.04em] text-ink sm:text-5xl">
                   Less noise. More knowing.
                 </h2>
               </div>
 
-              <p className="max-w-2xl text-base leading-7 text-[#536d63] lg:justify-self-end">
+              <p className="max-w-2xl text-base leading-7 text-muted lg:justify-self-end">
                 Understand today, prepare
                 for what is coming, and
                 keep meaningful goals
@@ -644,9 +426,7 @@ export default function HomePage() {
                         index * 85
                       }
                     >
-                      <article
-                        className={`group h-full rounded-3xl border border-[#dcd7cc] bg-[#f7f4ec] p-6 transition-[transform,border-color,background-color,box-shadow] duration-300 hover:-translate-y-1.5 hover:bg-white hover:shadow-[0_20px_48px_rgba(18,62,51,0.10)] sm:p-7 ${feature.border}`}
-                      >
+                      <article className="group h-full rounded-3xl border border-line bg-app p-6 transition-[transform,border-color,background-color,box-shadow] duration-300 hover:-translate-y-1.5 hover:border-line-strong hover:bg-surface hover:shadow-[var(--salif-shadow-card)] sm:p-7">
                         <span
                           className={`grid size-12 place-items-center rounded-2xl transition-transform duration-300 group-hover:scale-105 ${feature.accent}`}
                         >
@@ -656,19 +436,19 @@ export default function HomePage() {
                           />
                         </span>
 
-                        <p className="mt-7 text-xs font-bold tracking-[0.13em] text-[#64786f]">
+                        <p className="mt-7 text-xs font-bold tracking-[0.13em] text-subtle">
                           {
                             feature.eyebrow
                           }
                         </p>
 
-                        <h3 className="mt-3 font-serif text-2xl text-[#123e33]">
+                        <h3 className="mt-3 text-2xl font-semibold tracking-[-0.025em] text-ink">
                           {
                             feature.title
                           }
                         </h3>
 
-                        <p className="mt-3 text-base leading-7 text-[#5a7068]">
+                        <p className="mt-3 text-base leading-7 text-muted">
                           {
                             feature.description
                           }
@@ -682,24 +462,26 @@ export default function HomePage() {
           </ScrollReveal>
         </section>
 
+        {/* HOW IT HELPS */}
+
         <section
           id="how-it-helps"
-          className="home-anchor mx-auto max-w-[1240px] px-5 py-20 sm:px-8 lg:px-12 lg:py-28"
+          className="home-anchor bg-app"
         >
-          <ScrollReveal>
-            <div className="overflow-hidden rounded-[2rem] border border-[#cfd8d1] bg-[#dcebe2] shadow-[0_20px_55px_rgba(18,62,51,0.08)]">
+          <ScrollReveal className="mx-auto max-w-[1240px] px-5 py-20 sm:px-8 lg:px-12 lg:py-28">
+            <div className="overflow-hidden rounded-[2rem] border border-line bg-surface shadow-[var(--salif-shadow-card)]">
               <div className="grid lg:grid-cols-2">
                 <div className="p-7 sm:p-10 lg:p-14">
-                  <p className="text-xs font-bold tracking-[0.16em] text-[#146b52]">
+                  <p className="text-xs font-bold tracking-[0.16em] text-accent">
                     FROM REACTIVE TO READY
                   </p>
 
-                  <h2 className="mt-4 max-w-xl font-serif text-4xl leading-tight tracking-[-0.035em] text-[#103b30] sm:text-5xl">
+                  <h2 className="mt-4 max-w-xl text-4xl font-bold leading-tight tracking-[-0.04em] text-ink sm:text-5xl">
                     Your money should not
                     surprise you.
                   </h2>
 
-                  <p className="mt-5 max-w-xl text-base leading-7 text-[#47675b]">
+                  <p className="mt-5 max-w-xl text-base leading-7 text-muted">
                     Separate overdue
                     payments from what is
                     coming up, follow your
@@ -713,7 +495,7 @@ export default function HomePage() {
                     to={
                       primaryDestination
                     }
-                    className="group mt-8 inline-flex cursor-pointer items-center gap-2 font-semibold text-[#0d4f3f]"
+                    className="group mt-8 inline-flex items-center gap-2 font-semibold text-primary"
                   >
                     Build your financial
                     picture
@@ -738,7 +520,7 @@ export default function HomePage() {
                     </p>
 
                     <div className="mt-7 space-y-3">
-                      <div className="rounded-2xl border border-white/[0.06] bg-white/[0.08] p-4 transition hover:bg-white/[0.11]">
+                      <div className="rounded-2xl border border-white/[0.06] bg-white/[0.08] p-4">
                         <div className="flex items-center justify-between gap-4">
                           <div>
                             <p className="text-sm font-semibold">
@@ -750,13 +532,13 @@ export default function HomePage() {
                             </p>
                           </div>
 
-                          <p className="font-serif text-xl">
+                          <p className="text-xl font-semibold">
                             R8,500
                           </p>
                         </div>
                       </div>
 
-                      <div className="rounded-2xl border border-white/[0.06] bg-white/[0.08] p-4 transition hover:bg-white/[0.11]">
+                      <div className="rounded-2xl border border-white/[0.06] bg-white/[0.08] p-4">
                         <div className="flex items-center justify-between gap-4">
                           <div>
                             <p className="text-sm font-semibold">
@@ -778,7 +560,7 @@ export default function HomePage() {
                         </div>
                       </div>
 
-                      <div className="rounded-2xl border border-white/[0.06] bg-white/[0.08] p-4 transition hover:bg-white/[0.11]">
+                      <div className="rounded-2xl border border-white/[0.06] bg-white/[0.08] p-4">
                         <div className="flex items-center justify-between gap-4">
                           <div>
                             <p className="text-sm font-semibold">
@@ -807,18 +589,20 @@ export default function HomePage() {
           </ScrollReveal>
         </section>
 
+        {/* SECURITY */}
+
         <section
           id="security"
-          className="home-anchor border-y border-[#d9d4c8] bg-[#fffdf8]"
+          className="home-anchor border-y border-line bg-surface"
         >
           <ScrollReveal className="mx-auto grid max-w-[1240px] gap-12 px-5 py-20 sm:px-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-center lg:px-12 lg:py-24">
-            <div className="relative mx-auto grid size-56 place-items-center rounded-full bg-[#d8eadf] sm:size-64">
+            <div className="relative mx-auto grid size-56 place-items-center rounded-full bg-accent-soft sm:size-64">
               <div
-                className="absolute inset-3 rounded-full border border-dashed border-[#78aa93] motion-safe:animate-[spin_28s_linear_infinite]"
+                className="absolute inset-3 rounded-full border border-dashed border-line-strong motion-safe:animate-[spin_28s_linear_infinite]"
                 aria-hidden
               />
 
-              <div className="grid size-36 place-items-center rounded-full border border-[#8fbea7] bg-[#f8fcf9] text-[#16805f] shadow-[0_14px_35px_rgba(13,79,63,0.12)] sm:size-40">
+              <div className="grid size-36 place-items-center rounded-full border border-line bg-surface text-accent shadow-[var(--salif-shadow-card)] sm:size-40">
                 <ShieldCheck
                   size={62}
                   strokeWidth={1.4}
@@ -826,7 +610,7 @@ export default function HomePage() {
                 />
               </div>
 
-              <span className="absolute right-3 top-7 grid size-11 place-items-center rounded-full bg-[#0d4f3f] text-white shadow-lg">
+              <span className="absolute right-3 top-7 grid size-11 place-items-center rounded-full bg-primary text-inverse shadow-lg">
                 <LockKeyhole
                   size={19}
                   aria-hidden
@@ -835,17 +619,17 @@ export default function HomePage() {
             </div>
 
             <div>
-              <p className="text-xs font-bold tracking-[0.16em] text-[#16805f]">
+              <p className="text-xs font-bold tracking-[0.16em] text-accent">
                 SECURITY THAT STAYS VISIBLE
               </p>
 
-              <h2 className="mt-4 font-serif text-4xl leading-tight tracking-[-0.035em] text-[#103b30] sm:text-5xl">
+              <h2 className="mt-4 text-4xl font-bold leading-tight tracking-[-0.04em] text-ink sm:text-5xl">
                 Your financial information
                 deserves more than a
                 password.
               </h2>
 
-              <p className="mt-5 max-w-2xl text-base leading-7 text-[#536d63]">
+              <p className="mt-5 max-w-2xl text-base leading-7 text-muted">
                 Salif combines verified
                 email changes, protected
                 sessions, and optional
@@ -860,29 +644,33 @@ export default function HomePage() {
                   'Recovery codes',
                   'Verified email changes',
                   'Session revocation',
-                ].map((item) => (
-                  <p
-                    key={item}
-                    className="flex items-center gap-3 text-sm font-semibold text-[#36584d]"
-                  >
-                    <span className="grid size-7 place-items-center rounded-full bg-[#d8eadf] text-[#16805f]">
-                      <Check
-                        size={15}
-                        aria-hidden
-                      />
-                    </span>
+                ].map(
+                  (item) => (
+                    <p
+                      key={item}
+                      className="flex items-center gap-3 text-sm font-semibold text-ink"
+                    >
+                      <span className="grid size-7 place-items-center rounded-full bg-success-soft text-success">
+                        <Check
+                          size={15}
+                          aria-hidden
+                        />
+                      </span>
 
-                    {item}
-                  </p>
-                ))}
+                      {item}
+                    </p>
+                  ),
+                )}
               </div>
             </div>
           </ScrollReveal>
         </section>
 
-        <section className="px-5 py-20 sm:px-8 lg:py-28">
+        {/* CTA */}
+
+        <section className="bg-app px-5 py-20 sm:px-8 lg:py-28">
           <ScrollReveal className="mx-auto max-w-[1080px]">
-            <div className="relative overflow-hidden rounded-[2rem] bg-[#103b30] px-6 py-14 text-center text-white shadow-[0_26px_75px_rgba(13,79,63,0.22)] sm:px-12 sm:py-16">
+            <div className="relative overflow-hidden rounded-[2rem] bg-[#103b30] px-6 py-14 text-center text-white shadow-[0_26px_75px_rgba(13,79,63,0.20)] sm:px-12 sm:py-16">
               <div
                 className="absolute -left-20 -top-24 size-64 rounded-full bg-[#16805f]/35 blur-3xl"
                 aria-hidden
@@ -905,7 +693,7 @@ export default function HomePage() {
                   START WITH WHAT YOU HAVE
                 </p>
 
-                <h2 className="mx-auto mt-4 max-w-3xl font-serif text-4xl leading-tight sm:text-5xl">
+                <h2 className="mx-auto mt-4 max-w-3xl text-4xl font-bold leading-tight tracking-[-0.04em] sm:text-5xl">
                   Give your money a clearer
                   place to make sense.
                 </h2>
@@ -920,7 +708,7 @@ export default function HomePage() {
                   to={
                     primaryDestination
                   }
-                  className="mt-8 inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#f8f3e8] px-6 py-3.5 font-semibold text-[#0d4f3f] transition hover:-translate-y-0.5 hover:bg-white hover:shadow-lg"
+                  className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 font-semibold text-[#0d4f3f] transition hover:-translate-y-0.5 hover:shadow-lg"
                 >
                   {primaryLabel}
 
@@ -935,136 +723,9 @@ export default function HomePage() {
         </section>
       </main>
 
-      <footer className="border-t border-white/10 bg-[#092f28] text-[#c5ddd4]">
-        <div className="mx-auto max-w-[1240px] px-5 pb-7 pt-12 sm:px-8 lg:px-12 lg:pt-16">
-          <div className="grid gap-10 border-b border-white/10 pb-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_0.8fr_0.8fr_0.8fr]">
-            <div>
-              <BrandLogo light />
+      {/* FOOTER */}
 
-              <p className="mt-4 max-w-sm text-sm leading-6 text-[#a9c9bd]">
-                A calmer, clearer way to
-                understand your money, plan
-                ahead, and save with purpose.
-              </p>
-
-              <p className="mt-5 text-xs text-[#789f91]">
-                Personal finance, in order.
-              </p>
-            </div>
-
-            <div>
-              <h2 className="text-sm font-semibold text-white">
-                Product
-              </h2>
-
-              <nav
-                className="mt-4 flex flex-col items-start gap-3 text-sm"
-                aria-label="Product links"
-              >
-                <a
-                  href="#features"
-                  className="transition hover:text-white"
-                >
-                  Features
-                </a>
-
-                <a
-                  href="#how-it-helps"
-                  className="transition hover:text-white"
-                >
-                  How it helps
-                </a>
-
-                <a
-                  href="#security"
-                  className="transition hover:text-white"
-                >
-                  Security
-                </a>
-              </nav>
-            </div>
-
-            <div>
-              <h2 className="text-sm font-semibold text-white">
-                Account
-              </h2>
-
-              <nav
-                className="mt-4 flex flex-col items-start gap-3 text-sm"
-                aria-label="Account links"
-              >
-                <Link
-                  to="/login"
-                  className="transition hover:text-white"
-                >
-                  Sign in
-                </Link>
-
-                <Link
-                  to="/register"
-                  className="transition hover:text-white"
-                >
-                  Create account
-                </Link>
-
-                {isAuthenticated && (
-                  <Link
-                    to="/dashboard"
-                    className="transition hover:text-white"
-                  >
-                    Dashboard
-                  </Link>
-                )}
-              </nav>
-            </div>
-
-            <div>
-              <h2 className="text-sm font-semibold text-white">
-                Legal
-              </h2>
-
-              <nav
-                className="mt-4 flex flex-col items-start gap-3 text-sm"
-                aria-label="Legal links"
-              >
-                <Link
-                  to="/privacy"
-                  className="transition hover:text-white"
-                >
-                  Privacy policy
-                </Link>
-
-                <Link
-                  to="/terms"
-                  className="transition hover:text-white"
-                >
-                  Terms of use
-                </Link>
-
-                <Link
-                  to="/support"
-                  className="transition hover:text-white"
-                >
-                  Support
-                </Link>
-              </nav>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-3 pt-6 text-xs text-[#789f91] sm:flex-row sm:items-center sm:justify-between">
-            <p>
-              © {new Date().getFullYear()}{' '}
-              Salif. All rights reserved.
-            </p>
-
-            <p>
-              Salif helps organise financial
-              information and does not
-              provide financial advice.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <PublicFooter />
     </div>
   )
 }

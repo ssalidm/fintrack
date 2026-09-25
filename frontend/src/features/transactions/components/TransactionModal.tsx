@@ -1,5 +1,5 @@
-import FormDrawer from '../../../components/ui/FormDrawer'
-import type { Transaction } from '../api/types'
+import FormDrawer from '@/components/ui/FormDrawer'
+import type { Transaction } from '@/features/transactions/api/types'
 import TransactionForm from './TransactionForm'
 
 interface TransactionModalProps {

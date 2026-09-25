@@ -1,22 +1,21 @@
-import {zodResolver} from '@hookform/resolvers/zod'
+import { zodResolver } from '@hookform/resolvers/zod'
 import {
   useEffect,
   useState,
 } from 'react'
-import {useForm} from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 
-import {ApiClientError} from '../../../api/ApiClientError'
-
-import type {BudgetSummary} from '../api/types'
+import { ApiClientError } from '@/api/ApiClientError'
+import type { BudgetSummary } from '@/features/budgets/api/types'
 import {
   useCreateBudget,
   useUpdateBudget,
-} from '../hooks/useBudgets'
+} from '@/features/budgets/hooks/useBudgets'
 import {
   budgetCurrencies,
   budgetFormSchema,
   type BudgetFormValues,
-} from '../validation/budgetSchemas'
+} from '@/features/budgets/validation/budgetSchemas'
 
 interface BudgetFormProps {
   budget?: BudgetSummary
@@ -35,13 +34,12 @@ const currencyLabels = {
 >
 
 const fieldClasses =
-  'mt-2 block w-full rounded-xl border border-[#d8d6ce] ' +
-  'bg-[#fffdf8] px-4 py-3 text-[#173c32] outline-none ' +
-  'transition placeholder:text-[#98a39f] focus:border-[#39725d] ' +
-  'focus:ring-2 focus:ring-[#39725d]/15 disabled:bg-[#efede7]'
+  'mt-2 block w-full rounded-xl border border-line bg-surface px-4 py-3 text-ink outline-none transition placeholder:text-subtle focus:border-accent focus:ring-2 focus:ring-accent/10 disabled:bg-surface-muted disabled:text-muted'
 
 const budgetFormFields =
-  new Set<keyof BudgetFormValues>([
+  new Set<
+    keyof BudgetFormValues
+  >([
     'name',
     'budgetMonth',
     'currencyCode',
@@ -58,11 +56,12 @@ function isBudgetFormField(
 function currentMonth() {
   const date = new Date()
 
-  const localDate = new Date(
-    date.getTime() -
-      date.getTimezoneOffset() *
-        60_000,
-  )
+  const localDate =
+    new Date(
+      date.getTime() -
+        date.getTimezoneOffset() *
+          60_000,
+    )
 
   return localDate
     .toISOString()
@@ -73,23 +72,28 @@ function getDefaultValues(
   budget?: BudgetSummary,
 ): BudgetFormValues {
   return {
-    name: budget?.name ?? '',
-
+    name:
+      budget?.name ?? '',
     budgetMonth:
-      budget?.budgetMonth.slice(0, 7) ??
-      currentMonth(),
-
+      budget?.budgetMonth.slice(
+        0,
+        7,
+      ) ?? currentMonth(),
     currencyCode:
-      (
-        budget?.currencyCode as
-          | BudgetFormValues['currencyCode']
-          | undefined
-      ) ?? 'ZAR',
+      (budget?.currencyCode as
+        | BudgetFormValues['currencyCode']
+        | undefined) ??
+      'ZAR',
   }
 }
 
-function formatMonth(value: string) {
-  const [year, month] = value
+function formatMonth(
+  value: string,
+) {
+  const [
+    year,
+    month,
+  ] = value
     .slice(0, 7)
     .split('-')
     .map(Number)
@@ -101,7 +105,11 @@ function formatMonth(value: string) {
       year: 'numeric',
     },
   ).format(
-    new Date(year, month - 1, 1),
+    new Date(
+      year,
+      month - 1,
+      1,
+    ),
   )
 }
 
@@ -113,10 +121,13 @@ export default function BudgetForm({
   const [
     submitError,
     setSubmitError,
-  ] = useState<string | null>(null)
+  ] = useState<string | null>(
+    null,
+  )
 
   const createBudget =
     useCreateBudget()
+
   const updateBudget =
     useUpdateBudget()
 
@@ -132,17 +143,29 @@ export default function BudgetForm({
       errors,
       isSubmitting,
     },
-  } = useForm<BudgetFormValues>({
-    resolver: zodResolver(
-      budgetFormSchema,
-    ),
-    defaultValues:
-      getDefaultValues(budget),
-  })
+  } =
+    useForm<BudgetFormValues>(
+      {
+        resolver: zodResolver(
+          budgetFormSchema,
+        ),
+        defaultValues:
+          getDefaultValues(
+            budget,
+          ),
+      },
+    )
 
   useEffect(() => {
-    reset(getDefaultValues(budget))
-  }, [budget, reset])
+    reset(
+      getDefaultValues(
+        budget,
+      ),
+    )
+  }, [
+    budget,
+    reset,
+  ])
 
   async function onSubmit(
     values: BudgetFormValues,
@@ -151,22 +174,29 @@ export default function BudgetForm({
 
     try {
       if (budget) {
-        await updateBudget.mutateAsync({
-          budgetId: budget.id,
-
-          payload: {
-            version: budget.version,
-            name: values.name.trim(),
+        await updateBudget.mutateAsync(
+          {
+            budgetId:
+              budget.id,
+            payload: {
+              version:
+                budget.version,
+              name:
+                values.name.trim(),
+            },
           },
-        })
+        )
       } else {
-        await createBudget.mutateAsync({
-          name: values.name.trim(),
-          budgetMonth:
-            `${values.budgetMonth}-01`,
-          currencyCode:
-            values.currencyCode,
-        })
+        await createBudget.mutateAsync(
+          {
+            name:
+              values.name.trim(),
+            budgetMonth:
+              `${values.budgetMonth}-01`,
+            currencyCode:
+              values.currencyCode,
+          },
+        )
       }
 
       onSuccess()
@@ -183,22 +213,31 @@ export default function BudgetForm({
         return
       }
 
-      let hasFieldError = false
+      let hasFieldError =
+        false
 
-      if (error.validationErrors) {
+      if (
+        error.validationErrors
+      ) {
         Object.entries(
           error.validationErrors,
         ).forEach(
           ([field, message]) => {
             if (
-              isBudgetFormField(field)
+              isBudgetFormField(
+                field,
+              )
             ) {
-              setError(field, {
-                type: 'server',
-                message,
-              })
+              setError(
+                field,
+                {
+                  type: 'server',
+                  message,
+                },
+              )
 
-              hasFieldError = true
+              hasFieldError =
+                true
             }
           },
         )
@@ -216,14 +255,16 @@ export default function BudgetForm({
 
   return (
     <form
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleSubmit(
+        onSubmit,
+      )}
       className="space-y-6"
       noValidate
     >
       <div>
         <label
           htmlFor="budget-name"
-          className="text-sm font-semibold text-[#173c32]"
+          className="type-label"
         >
           Budget name
         </label>
@@ -240,13 +281,15 @@ export default function BudgetForm({
               ? 'true'
               : 'false'
           }
-          className={fieldClasses}
+          className={
+            fieldClasses
+          }
           {...register('name')}
         />
 
         {errors.name && (
           <p
-            className="mt-2 text-sm text-red-700"
+            className="mt-2 text-sm text-danger"
             role="alert"
           >
             {errors.name.message}
@@ -257,7 +300,7 @@ export default function BudgetForm({
       {isEditing ? (
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <p className="text-sm font-semibold text-[#173c32]">
+            <p className="type-label">
               Budget month
             </p>
 
@@ -269,7 +312,7 @@ export default function BudgetForm({
             />
 
             <div
-              className={`${fieldClasses} bg-[#efede7]`}
+              className={`${fieldClasses} bg-surface-muted`}
             >
               {formatMonth(
                 budget.budgetMonth,
@@ -278,7 +321,7 @@ export default function BudgetForm({
           </div>
 
           <div>
-            <p className="text-sm font-semibold text-[#173c32]">
+            <p className="type-label">
               Currency
             </p>
 
@@ -290,15 +333,17 @@ export default function BudgetForm({
             />
 
             <div
-              className={`${fieldClasses} bg-[#efede7]`}
+              className={`${fieldClasses} bg-surface-muted`}
             >
-              {budget.currencyCode}
+              {
+                budget.currencyCode
+              }
             </div>
           </div>
 
-          <p className="text-xs leading-5 text-[#657972] sm:col-span-2">
-            Month and currency stay fixed
-            so spending remains
+          <p className="type-caption sm:col-span-2">
+            Month and currency stay
+            fixed so spending remains
             comparable.
           </p>
         </div>
@@ -307,7 +352,7 @@ export default function BudgetForm({
           <div>
             <label
               htmlFor="budget-month"
-              className="text-sm font-semibold text-[#173c32]"
+              className="type-label"
             >
               Budget month
             </label>
@@ -315,7 +360,9 @@ export default function BudgetForm({
             <input
               id="budget-month"
               type="month"
-              disabled={isSubmitting}
+              disabled={
+                isSubmitting
+              }
               aria-invalid={
                 errors.budgetMonth
                   ? 'true'
@@ -329,7 +376,7 @@ export default function BudgetForm({
 
             {errors.budgetMonth && (
               <p
-                className="mt-2 text-sm text-red-700"
+                className="mt-2 text-sm text-danger"
                 role="alert"
               >
                 {
@@ -343,20 +390,22 @@ export default function BudgetForm({
           <div>
             <label
               htmlFor="budget-currency"
-              className="text-sm font-semibold text-[#173c32]"
+              className="type-label"
             >
               Currency
             </label>
 
             <select
               id="budget-currency"
-              disabled={isSubmitting}
+              disabled={
+                isSubmitting
+              }
               aria-invalid={
                 errors.currencyCode
                   ? 'true'
                   : 'false'
               }
-              className={`${fieldClasses} cursor-pointer`}
+              className={`${fieldClasses} cursor-pointer pr-10`}
               {...register(
                 'currencyCode',
               )}
@@ -379,7 +428,7 @@ export default function BudgetForm({
 
             {errors.currencyCode && (
               <p
-                className="mt-2 text-sm text-red-700"
+                className="mt-2 text-sm text-danger"
                 role="alert"
               >
                 {
@@ -394,19 +443,19 @@ export default function BudgetForm({
 
       {submitError && (
         <div
-          className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          className="rounded-xl border border-danger/20 bg-danger-soft px-4 py-3 text-sm text-danger"
           role="alert"
         >
           {submitError}
         </div>
       )}
 
-      <div className="flex flex-col-reverse gap-3 border-t border-[#dedbd2] pt-6 sm:flex-row sm:justify-end">
+      <div className="flex flex-col-reverse gap-3 border-t border-line pt-6 sm:flex-row sm:justify-end">
         <button
           type="button"
           disabled={isSubmitting}
           onClick={onCancel}
-          className="cursor-pointer rounded-full border border-[#d8d6ce] px-5 py-2.5 text-sm font-semibold text-[#173c32] transition hover:bg-[#efede7] disabled:cursor-not-allowed disabled:opacity-60"
+          className="cursor-pointer rounded-full border border-line bg-surface px-5 py-2.5 text-sm font-semibold text-ink transition hover:bg-surface-muted disabled:cursor-not-allowed disabled:opacity-60"
         >
           Cancel
         </button>
@@ -414,7 +463,7 @@ export default function BudgetForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="cursor-pointer rounded-full bg-[#174f43] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#236a58] disabled:cursor-not-allowed disabled:opacity-60"
+          className="cursor-pointer rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-inverse transition hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isSubmitting
             ? 'Saving…'

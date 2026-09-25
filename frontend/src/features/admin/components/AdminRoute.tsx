@@ -7,7 +7,7 @@ import {
   Outlet,
 } from 'react-router'
 
-import { useProfile } from '../../profile/hooks/useProfile'
+import { useProfile } from '@/features/profile/hooks/useProfile'
 
 export default function AdminRoute() {
   const profileQuery = useProfile()

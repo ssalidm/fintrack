@@ -13,7 +13,7 @@ import {
   vi,
 } from 'vitest'
 
-import { authApi } from '../api/authApi'
+import { authApi } from '@/features/auth/api/authApi'
 import AuthProvider from './AuthProvider'
 import { useAuth } from './useAuth'
 

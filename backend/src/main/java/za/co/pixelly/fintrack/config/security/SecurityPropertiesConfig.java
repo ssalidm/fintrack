@@ -11,7 +11,8 @@ import org.springframework.context.annotation.Configuration;
     PasswordResetProperties.class,
     LoginSecurityProperties.class,
     CorsProperties.class,
-    MfaProperties.class
+    MfaProperties.class,
+    GoogleIdentityProperties.class
 })
 public class SecurityPropertiesConfig {
 }

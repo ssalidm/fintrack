@@ -51,7 +51,7 @@ export default function OtpCodeInput({
     <div
       className={[
         'relative mx-auto flex w-fit gap-1.5 rounded-xl sm:gap-2',
-        'focus-within:outline-none focus-within:ring-2 focus-within:ring-[#1F7A5C]/25 focus-within:ring-offset-2',
+        'focus-within:outline-none focus-within:ring-2 focus-within:ring-accent/25 focus-within:ring-offset-2',
         disabled ? 'opacity-60' : '',
       ].join(' ')}
     >
@@ -91,15 +91,15 @@ export default function OtpCodeInput({
             key={index}
             aria-hidden
             className={[
-              'grid size-10 place-items-center rounded-xl border bg-white font-mono text-xl font-semibold text-slate-950 transition sm:size-12',
+              'grid size-10 place-items-center rounded-xl border bg-surface font-mono text-xl font-semibold text-ink transition sm:size-12',
 
               invalid
-                ? 'border-red-400 bg-red-50'
+                ? 'border-danger bg-danger-soft'
                 : isActive
-                  ? 'border-[#1F7A5C] shadow-[0_0_0_1px_rgba(31,122,92,0.12)]'
+                  ? 'border-accent shadow-[0_0_0_1px_rgba(31,122,92,0.12)]'
                   : digit
-                    ? 'border-[#86b5a3] bg-[#f4faf7]'
-                    : 'border-slate-300',
+                    ? 'border-line-strong bg-accent-soft'
+                    : 'border-line',
             ].join(' ')}
           >
             {digit}

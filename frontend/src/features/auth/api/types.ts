@@ -4,6 +4,19 @@ export type UserStatus =
   | 'LOCKED'
   | 'DEACTIVATED'
 
+export interface StartRegistrationRequest {
+  readonly email: string
+}
+
+export interface CompleteRegistrationRequest {
+  readonly token: string
+  readonly firstName: string
+  readonly lastName: string
+  readonly preferredName?: string
+  readonly password: string
+  readonly acceptTerms: boolean
+}
+
 export interface RegisterRequest {
   readonly email: string
   readonly password: string
@@ -28,6 +41,8 @@ export interface LoginRequest {
 export type LoginStatus =
   | 'AUTHENTICATED'
   | 'MFA_REQUIRED'
+  | 'EMAIL_VERIFICATION_REQUIRED'
+  | 'ACCOUNT_LINK_REQUIRED'
 
 export interface MfaChallengeResponse {
   readonly challengeToken: string
@@ -45,6 +60,14 @@ export interface TokenResponse {
   readonly refreshToken: string
   readonly tokenType: string
   readonly expiresIn: number
+}
+
+export interface GoogleLoginRequest {
+  readonly credential: string
+}
+
+export interface GoogleLinkRequest {
+  readonly credential: string
 }
 
 export interface RefreshRequest {
@@ -81,3 +104,4 @@ export interface ResetPasswordRequest {
 export interface ConfirmEmailChangeRequest {
   readonly token: string
 }
+

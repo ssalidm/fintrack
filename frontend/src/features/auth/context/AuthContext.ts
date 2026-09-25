@@ -2,10 +2,11 @@ import { createContext } from 'react'
 
 import type {
   LoginRequest,
+  GoogleLoginRequest,
   LoginResponse,
   MfaRecoverRequest,
   MfaVerifyRequest,
-} from '../api/types'
+} from '@/features/auth/api/types'
 
 export type AuthStatus =
   | 'checking'
@@ -18,7 +19,11 @@ export interface AuthContextValue {
 
   login: (
     request: LoginRequest,
-  ) => Promise<LoginResponse>
+  ) => Promise<LoginResponse>,
+
+  googleLogin: (
+    request: GoogleLoginRequest,
+  ) => Promise<LoginResponse>,
 
   verifyMfa: (
     request: MfaVerifyRequest,

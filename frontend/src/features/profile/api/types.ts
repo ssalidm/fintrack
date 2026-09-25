@@ -9,12 +9,14 @@ export interface UserProfile {
   readonly email: string
   readonly firstName: string
   readonly lastName: string
+  readonly preferredName: string | null
   readonly timeZone: string
   readonly status: UserStatus
   readonly emailVerified: boolean
   readonly emailVerifiedAt: string | null
   readonly roles: string[]
   readonly lastLoginAt: string | null
+  readonly passwordChangedAt: string | null
   readonly createdAt: string
   readonly updatedAt: string
   readonly version: number
@@ -24,6 +26,7 @@ export interface UpdateUserProfileRequest {
   version: number
   firstName: string
   lastName: string
+  preferredName?: string
   timeZone: string
 }
 
@@ -70,4 +73,13 @@ export interface RegenerateMfaRecoveryCodesRequest {
 
 export interface MfaRecoveryCodesResponse {
   readonly recoveryCodes: string[]
+}
+
+export interface UserSession {
+  readonly id: string
+  readonly createdAt: string
+  readonly lastSeenAt: string
+  readonly expiresAt: string
+  readonly userAgent: string | null
+  readonly current: boolean
 }

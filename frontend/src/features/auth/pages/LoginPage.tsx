@@ -1,8 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import {
-  LockKeyhole,
-  ShieldCheck,
-} from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
@@ -12,19 +8,21 @@ import {
   useNavigate,
 } from 'react-router'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import PasswordVisibilityButton from '../components/PasswordVisibilityButton'
-import { useAuth } from '../context/useAuth'
+import { ApiClientError } from '@/api/ApiClientError'
+import AuthAlert from '@/features/auth/components/AuthAlert'
+import AuthButton from '@/features/auth/components/AuthButton'
+import AuthDivider from '@/features/auth/components/AuthDivider'
+import AuthField from '@/features/auth/components/AuthField'
+import AuthHeader from '@/features/auth/components/AuthHeader'
+import AuthInput from '@/features/auth/components/AuthInput'
+import AuthPanel from '@/features/auth/components/AuthPanel'
+import GoogleSignInButton from '@/features/auth/components/GoogleSignInButton'
+import PasswordVisibilityButton from '@/features/auth/components/PasswordVisibilityButton'
+import { useAuth } from '@/features/auth/context/useAuth'
 import {
   loginSchema,
   type LoginFormValues,
-} from '../validation/loginSchema'
-
-const inputClasses =
-  'block w-full rounded-xl border border-[#d6d2c8] bg-[#fffdf8] px-3.5 py-3 ' +
-  'text-sm text-[#092f28] outline-none transition placeholder:text-slate-400 ' +
-  'focus:border-[#16805f] focus:ring-2 focus:ring-[#16805f]/20 ' +
-  'disabled:cursor-not-allowed disabled:bg-[#efede6]'
+} from '@/features/auth/validation/loginSchema'
 
 function getRedirectPath(
   state: unknown,
@@ -51,19 +49,69 @@ function getRedirectPath(
   return '/dashboard'
 }
 
+function hasGoogleLinkRequest(
+  state: unknown,
+): boolean {
+  if (
+    typeof state !== 'object' ||
+    state === null
+  ) {
+    return false
+  }
+
+  const {
+    googleLinkRequired,
+  } = state as {
+    googleLinkRequired?: unknown
+  }
+
+  return googleLinkRequired === true
+}
+
 export default function LoginPage() {
-  const [showPassword, setShowPassword] =
-    useState(false)
-
-  const [submitError, setSubmitError] =
-    useState<string | null>(null)
-
-  const { login, status } = useAuth()
+  /*
+   * These must be declared before any
+   * state initializer reads location.state.
+   */
   const navigate = useNavigate()
   const location = useLocation()
 
-  const redirectTo = getRedirectPath(
-    location.state,
+  const {
+    login,
+    googleLogin,
+    status,
+  } = useAuth()
+
+  const redirectTo =
+    getRedirectPath(
+      location.state,
+    )
+
+  const [
+    showPassword,
+    setShowPassword,
+  ] = useState(false)
+
+  const [
+    submitError,
+    setSubmitError,
+  ] = useState<string | null>(
+    null,
+  )
+
+  const [
+    googleSubmitting,
+    setGoogleSubmitting,
+  ] = useState(false)
+
+  const [
+    googleLinkRequired,
+    setGoogleLinkRequired,
+  ] = useState(
+    () =>
+      hasGoogleLinkRequest(
+        location.state,
+      ),
   )
 
   const {
@@ -75,7 +123,9 @@ export default function LoginPage() {
       isSubmitting,
     },
   } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
+    resolver:
+      zodResolver(loginSchema),
+
     defaultValues: {
       email: '',
       password: '',
@@ -88,61 +138,107 @@ export default function LoginPage() {
     setSubmitError(null)
 
     try {
-      const result = await login({
-        email: values.email.trim(),
-        password: values.password,
-      })
+      const result =
+        await login({
+          email:
+            values.email.trim(),
 
-      if (result.status === 'MFA_REQUIRED') {
+          password:
+            values.password,
+        })
+
+      if (
+        result.status ===
+        'MFA_REQUIRED'
+      ) {
         if (!result.mfaChallenge) {
           setSubmitError(
             'Salif returned an invalid authentication challenge.',
           )
+
           return
         }
 
-        navigate('/login/mfa', {
-          replace: true,
-          state: {
-            challenge: result.mfaChallenge,
-            from: redirectTo,
+        navigate(
+          '/login/mfa',
+          {
+            replace: true,
+
+            state: {
+              challenge:
+                result.mfaChallenge,
+
+              from:
+                redirectTo,
+            },
           },
-        })
+        )
 
         return
       }
 
-      navigate(redirectTo, {
-        replace: true,
-      })
+      navigate(
+        redirectTo,
+        {
+          replace: true,
+        },
+      )
     } catch (error) {
-      if (!(error instanceof ApiClientError)) {
+      if (
+        !(
+          error instanceof
+          ApiClientError
+        )
+      ) {
         setSubmitError(
           'Something went wrong. Please try again.',
         )
+
         return
       }
 
-      if (error.validationErrors?.email) {
-        setError('email', {
-          type: 'server',
-          message:
-            error.validationErrors.email,
-        })
-      }
+      let hasFieldError =
+        false
 
-      if (error.validationErrors?.password) {
-        setError('password', {
-          type: 'server',
-          message:
-            error.validationErrors.password,
-        })
+      if (
+        error.validationErrors
+          ?.email
+      ) {
+        setError(
+          'email',
+          {
+            type: 'server',
+
+            message:
+              error
+                .validationErrors
+                .email,
+          },
+        )
+
+        hasFieldError = true
       }
 
       if (
-        error.validationErrors?.email ||
-        error.validationErrors?.password
+        error.validationErrors
+          ?.password
       ) {
+        setError(
+          'password',
+          {
+            type: 'server',
+
+            message:
+              error
+                .validationErrors
+                .password,
+          },
+        )
+
+        hasFieldError = true
+      }
+
+      if (hasFieldError) {
         return
       }
 
@@ -154,7 +250,98 @@ export default function LoginPage() {
     }
   }
 
-  if (status === 'authenticated') {
+  async function handleGoogleCredential(
+    credential: string,
+  ) {
+    setSubmitError(null)
+    setGoogleSubmitting(true)
+
+    try {
+      const result =
+        await googleLogin({
+          credential,
+        })
+
+      if (
+        result.status ===
+        'AUTHENTICATED'
+      ) {
+        navigate(
+          redirectTo,
+          {
+            replace: true,
+          },
+        )
+
+        return
+      }
+
+      if (
+        result.status ===
+        'MFA_REQUIRED'
+      ) {
+        if (!result.mfaChallenge) {
+          setSubmitError(
+            'Salif returned an invalid authentication challenge.',
+          )
+
+          return
+        }
+
+        navigate(
+          '/login/mfa',
+          {
+            replace: true,
+
+            state: {
+              challenge:
+                result.mfaChallenge,
+
+              from:
+                redirectTo,
+            },
+          },
+        )
+
+        return
+      }
+
+      if (
+        result.status ===
+        'ACCOUNT_LINK_REQUIRED'
+      ) {
+        setGoogleLinkRequired(
+          true,
+        )
+
+        return
+      }
+
+      if (
+        result.status ===
+        'EMAIL_VERIFICATION_REQUIRED'
+      ) {
+        setSubmitError(
+          'Verify your email address before signing in.',
+        )
+      }
+    } catch (error) {
+      setSubmitError(
+        error instanceof ApiClientError
+          ? error.isNetworkError
+            ? 'We couldn’t connect to Salif right now. Please try again in a moment.'
+            : error.message
+          : 'Google sign-in could not be completed.',
+      )
+    } finally {
+      setGoogleSubmitting(false)
+    }
+  }
+
+  if (
+    status ===
+    'authenticated'
+  ) {
     return (
       <Navigate
         to={redirectTo}
@@ -164,96 +351,87 @@ export default function LoginPage() {
   }
 
   return (
-    <section
-      className="auth-panel-enter rounded-[2rem] border border-white/80 bg-white/64 p-6 shadow-[0_26px_80px_rgba(9,47,40,0.14)] ring-1 ring-[#0d4f3f]/5 backdrop-blur-2xl sm:p-8"
-      aria-labelledby="login-title"
-    >
-      <header>
-        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#16805f]">
-          <span className="grid size-7 place-items-center rounded-full bg-[#e0eee8]">
-            <LockKeyhole
-              size={14}
-              aria-hidden
-            />
-          </span>
+    <AuthPanel>
+      <AuthHeader
+        title="Welcome back"
+        description="Sign in to continue to Salif."
+        titleId="login-title"
+      />
 
-          Welcome back
+      {googleLinkRequired && (
+        <div className="mt-6">
+          <AuthAlert variant="success">
+            Sign in with your Salif
+            password to securely connect
+            your Google account.
+          </AuthAlert>
         </div>
-
-        <h1
-          id="login-title"
-          className="mt-4 font-serif text-4xl leading-tight tracking-[-0.025em] text-[#092f28]"
-        >
-          Sign in to Salif
-        </h1>
-
-        <p className="mt-2 text-sm leading-6 text-[#657972]">
-          Pick up where you left off and keep your money
-          moving with purpose.
-        </p>
-      </header>
+      )}
 
       <form
-        className="mt-7 space-y-5"
-        onSubmit={handleSubmit(onSubmit)}
+        className="mt-7 space-y-4"
+        onSubmit={
+          handleSubmit(
+            onSubmit,
+          )
+        }
         noValidate
       >
-        <div>
-          <label
-            htmlFor="email"
-            className="text-sm font-semibold text-[#173c32]"
-          >
-            Email
-          </label>
-
-          <input
+        <AuthField
+          label="Email"
+          htmlFor="email"
+          error={
+            errors.email?.message
+          }
+        >
+          <AuthInput
             id="email"
             type="email"
             autoComplete="email"
             inputMode="email"
-            disabled={isSubmitting}
+            autoFocus
+            disabled={
+              isSubmitting ||
+              googleSubmitting
+            }
+            hasError={
+              Boolean(
+                errors.email,
+              )
+            }
             aria-invalid={
-              errors.email ? 'true' : 'false'
+              errors.email
+                ? 'true'
+                : 'false'
             }
             aria-describedby={
               errors.email
                 ? 'email-error'
                 : undefined
             }
-            className={`mt-2 ${inputClasses}`}
-            {...register('email')}
+            {...register(
+              'email',
+            )}
           />
+        </AuthField>
 
-          {errors.email && (
-            <p
-              id="email-error"
-              className="mt-1.5 text-sm text-red-600"
-              role="alert"
-            >
-              {errors.email.message}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <div className="flex items-center justify-between gap-4">
-            <label
-              htmlFor="password"
-              className="text-sm font-semibold text-[#173c32]"
-            >
-              Password
-            </label>
-
+        <AuthField
+          label="Password"
+          htmlFor="password"
+          error={
+            errors.password?.message
+          }
+          action={
             <Link
               to="/forgot-password"
-              className="text-sm font-semibold text-[#16805f] transition hover:text-[#0d4f3f] hover:underline"
+              className="text-xs font-semibold text-accent transition hover:text-primary hover:underline"
             >
               Forgot password?
             </Link>
-          </div>
-
-          <div className="relative mt-2">
-            <input
+          }
+        >
+          <div className="relative">
+            <AuthInput
               id="password"
               type={
                 showPassword
@@ -261,7 +439,15 @@ export default function LoginPage() {
                   : 'password'
               }
               autoComplete="current-password"
-              disabled={isSubmitting}
+              disabled={
+                isSubmitting ||
+                googleSubmitting
+              }
+              hasError={
+                Boolean(
+                  errors.password,
+                )
+              }
               aria-invalid={
                 errors.password
                   ? 'true'
@@ -272,69 +458,66 @@ export default function LoginPage() {
                   ? 'password-error'
                   : undefined
               }
-              className={`${inputClasses} pr-12`}
-              {...register('password')}
+              className="pr-12"
+              {...register(
+                'password',
+              )}
             />
 
             <PasswordVisibilityButton
-              visible={showPassword}
+              visible={
+                showPassword
+              }
               fieldLabel="password"
               onToggle={() =>
                 setShowPassword(
-                  (visible) => !visible,
+                  (visible) =>
+                    !visible,
                 )
               }
             />
           </div>
-
-          {errors.password && (
-            <p
-              id="password-error"
-              className="mt-1.5 text-sm text-red-600"
-              role="alert"
-            >
-              {errors.password.message}
-            </p>
-          )}
-        </div>
+        </AuthField>
 
         {submitError && (
-          <div
-            className="auth-message-in rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700"
-            role="alert"
-          >
+          <AuthAlert>
             {submitError}
-          </div>
+          </AuthAlert>
         )}
 
-        <button
+        <AuthButton
           type="submit"
+          loading={
+            isSubmitting
+          }
+          loadingLabel="Signing in…"
           disabled={
-            isSubmitting ||
+            googleSubmitting ||
             status === 'checking'
           }
-          className="flex w-full justify-center rounded-full bg-[#0d4f3f] px-4 py-3 font-semibold text-white shadow-[0_10px_25px_rgba(13,79,63,0.18)] transition hover:-translate-y-0.5 hover:bg-[#092f28] focus:outline-none focus:ring-2 focus:ring-[#16805f] focus:ring-offset-2 disabled:translate-y-0 disabled:opacity-60"
         >
-          {isSubmitting
-            ? 'Signing in…'
-            : 'Sign in'}
-        </button>
+          Sign in
+        </AuthButton>
       </form>
 
-      <div className="mt-6 flex items-start gap-3 rounded-2xl bg-[#edf3ef] px-4 py-3 text-xs leading-5 text-[#526b63]">
-        <ShieldCheck
-          size={17}
-          className="mt-0.5 shrink-0 text-[#16805f]"
-          aria-hidden
-        />
+      <AuthDivider />
 
-        <span>
-          Protected by secure sessions and optional
-          multi-factor authentication.
-        </span>
-      </div>
+      <GoogleSignInButton
+        text="signin_with"
+        disabled={
+          googleSubmitting ||
+          isSubmitting ||
+          status === 'checking'
+        }
+        onCredential={
+          handleGoogleCredential
+        }
+        onError={
+          setSubmitError
+        }
+      />
 
-      <p className="mt-6 text-center text-sm text-[#657972]">
+      <p className="mt-6 text-center text-sm text-muted">
         Don’t have an account?{' '}
 
         <Link
@@ -344,6 +527,6 @@ export default function LoginPage() {
           Create an account
         </Link>
       </p>
-    </section>
+    </AuthPanel>
   )
 }

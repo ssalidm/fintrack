@@ -3,11 +3,11 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 
-import { useAuthenticatedRequest } from '../../auth/hooks/useAuthenticatedRequest'
+import { useAuthenticatedRequest } from '@/features/auth/hooks/useAuthenticatedRequest'
 import type {
   AdminUser,
   AdminUserVersionRequest,
-} from '../api/types'
+} from '@/features/admin/api/types'
 import { adminUserQueryKeys } from './useAdminUsers'
 
 interface ChangeAdminUserStatusVariables {

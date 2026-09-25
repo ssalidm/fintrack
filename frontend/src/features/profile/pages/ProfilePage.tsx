@@ -3,49 +3,43 @@ import {
   useRef,
   useState,
 } from 'react'
-import {
-  BadgeCheck,
-  CalendarDays,
-  Clock3,
-  Mail,
-  ShieldCheck,
-} from 'lucide-react'
 import { useNavigate } from 'react-router'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import PageHeader from '../../../components/layout/PageHeader'
-import PageShell from '../../../components/layout/PageShell'
-import { useAuth } from '../../auth/context/useAuth'
-import ChangeEmailForm from '../components/ChangeEmailForm'
-import ChangePasswordForm from '../components/ChangePasswordForm'
-import PasswordChangedDialog from '../components/PasswordChangedDialog'
-import ProfileDetailsForm from '../components/ProfileDetailsForm'
-import TwoFactorAuthenticationCard from '../components/TwoFactorAuthenticationCard'
-import { useProfile } from '../hooks/useProfile'
+import { ApiClientError } from '@/api/ApiClientError'
+import PageHeader from '@/components/layout/PageHeader'
+import PageShell from '@/components/layout/PageShell'
+import SettingsList from '@/components/settings/SettingsList'
+import { useAuth } from '@/features/auth/context/useAuth'
+import ChangeEmailForm from '@/features/profile/components/ChangeEmailForm'
+import ChangePasswordForm from '@/features/profile/components/ChangePasswordForm'
+import PasswordChangedDialog from '@/features/profile/components/PasswordChangedDialog'
+import ProfileAvatarEditor from '@/features/profile/components/ProfileAvatarEditor'
+import ProfileDetailsForm from '@/features/profile/components/ProfileDetailsForm'
+import ProfileSessions from '@/features/profile/components/ProfileSessions'
+import ThemePreferenceSetting from '@/features/profile/components/ThemePreferenceSetting'
+import TwoFactorAuthenticationCard from '@/features/profile/components/TwoFactorAuthenticationCard'
+import { useProfile } from '@/features/profile/hooks/useProfile'
+import { formatDate } from '@/utils/dateFormatter'
 
-function formatDate(value: string | null) {
-  if (!value) {
-    return 'Not available'
-  }
-
-  return new Intl.DateTimeFormat('en-ZA', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(new Date(value))
-}
-
-function formatStatus(status: string) {
+function formatStatus(
+  status: string,
+) {
   return status
     .toLowerCase()
     .replaceAll('_', ' ')
-    .replace(/^\w/, (letter) =>
-      letter.toUpperCase(),
+    .replace(
+      /^\w/,
+      (letter) =>
+        letter.toUpperCase(),
     )
 }
 
 export default function ProfilePage() {
-  const navigate = useNavigate()
-  const { logout } = useAuth()
+  const navigate =
+    useNavigate()
+
+  const { logout } =
+    useAuth()
 
   const [
     passwordChanged,
@@ -61,236 +55,268 @@ export default function ProfilePage() {
     isPending,
   } = useProfile()
 
-  function handlePasswordChanged() {
-    setPasswordChanged(true)
-  }
-
   const finishPasswordChange =
     useCallback(async () => {
-      if (signOutStarted.current) {
+      if (
+        signOutStarted.current
+      ) {
         return
       }
 
-      signOutStarted.current = true
+      signOutStarted.current =
+        true
 
       await logout().catch(
         () => undefined,
       )
 
-      navigate('/login', {
-        replace: true,
-        state: {
-          message:
-            'Password changed successfully. Sign in with your new password.',
+      navigate(
+        '/login',
+        {
+          replace: true,
+          state: {
+            message:
+              'Password changed successfully. Sign in with your new password.',
+          },
         },
-      })
-    }, [logout, navigate])
+      )
+    }, [
+      logout,
+      navigate,
+    ])
 
   if (isPending) {
     return (
       <PageShell>
-        <div className="feature-reveal animate-pulse">
-          <div className="h-3 w-32 rounded bg-[#dfe5df]" />
+        <div className="mx-auto w-full max-w-[1040px] animate-pulse">
+          <div className="h-3 w-32 rounded bg-surface-strong" />
 
-          <div className="mt-5 h-14 w-72 rounded bg-[#dfe5df]" />
+          <div className="mt-4 h-12 w-80 max-w-full rounded bg-surface-strong" />
 
-          <div className="mt-10 h-40 rounded-3xl bg-[#e7ebe6]" />
-
-          <div className="mt-6 grid gap-6 lg:grid-cols-[1.5fr_0.8fr]">
-            <div className="h-[430px] rounded-3xl bg-[#e7ebe6]" />
-
-            <div className="h-[330px] rounded-3xl bg-[#e7ebe6]" />
+          <div className="mt-10 space-y-5">
+            <div className="h-16 rounded bg-surface-strong" />
+            <div className="h-16 rounded bg-surface-strong" />
+            <div className="h-16 rounded bg-surface-strong" />
           </div>
         </div>
       </PageShell>
     )
   }
 
-  if (!profile || error) {
+  if (
+    !profile ||
+    error
+  ) {
     const message =
-      error instanceof ApiClientError
+      error instanceof
+        ApiClientError
         ? error.message
         : 'Unable to load your profile.'
 
     return (
-      <main className="grid min-h-screen place-items-center px-6">
-        <div className="max-w-md text-center">
-          <p className="font-serif text-3xl text-[#173c32]">
+      <PageShell>
+        <div className="mx-auto max-w-xl py-20 text-center">
+          <h1 className="type-page-title">
             We couldn’t open your profile
-          </p>
+          </h1>
 
-          <p className="mt-3 text-sm leading-6 text-[#657972]">
+          <p className="type-body mt-3">
             {message}
           </p>
         </div>
-      </main>
+      </PageShell>
     )
   }
 
-  const displayName =
+  const fullName =
     `${profile.firstName} ${profile.lastName}`
 
-  const initials =
-    `${profile.firstName.charAt(0)}${profile.lastName.charAt(0)}`
-      .toUpperCase()
+  const verificationStatus =
+    profile.emailVerified
+      ? 'Email verified'
+      : 'Email unverified'
 
   return (
     <PageShell>
       <PageHeader
-        eyebrow="Your account"
-        title="Profile & Security"
-        description="Manage the personal details and security protecting your Salif account."
+        eyebrow="Profile & Security"
+        title="Account Settings"
+        description="Manage your personal information, sign-in details and account security."
       />
 
-      <section className="feature-reveal feature-reveal-delay-1 mt-10 overflow-hidden rounded-3xl bg-[#174f43] text-white">
-        <div className="grid gap-7 p-7 sm:p-9 lg:grid-cols-[auto_1fr_auto] lg:items-center">
-          <span className="grid size-20 place-items-center rounded-full bg-[#bcd9c5] font-serif text-3xl text-[#174f43]">
-            {initials}
-          </span>
+      <section
+        className="
+          feature-reveal
+          feature-reveal-delay-1
+          mt-7
+          flex
+          flex-col
+          gap-5
+          rounded-2xl
+          border border-line/50
+          bg-surface
+          shadow-[0_10px_30px_rgba(23,60,50,0.05)]
+          p-6
+          sm:flex-row
+          sm:items-center
+          sm:p-7
+        "
+      >
+        <ProfileAvatarEditor
+          profile={profile}
+        />
 
-          <div>
-            <p className="font-serif text-3xl">
-              {displayName}
-            </p>
+        <div className="min-w-0">
+          <h2 className="text-2xl font-bold tracking-[-0.02em] text-ink">
+            {fullName}
+          </h2>
 
-            <p className="mt-2 flex items-center gap-2 text-sm text-[#cfe0d8]">
-              <Mail
-                size={15}
-                aria-hidden
-              />
-              {profile.email}
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-2 lg:justify-end">
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs font-semibold">
-              <ShieldCheck
-                size={15}
-                aria-hidden
-              />
-
-              {formatStatus(
-                profile.status,
+          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+            <span>
+              Member since{' '}
+              —{' '}
+              {formatDate(
+                profile.createdAt,
               )}
-            </span>
-
-            <span className="inline-flex items-center gap-2 rounded-full bg-[#d8b56d]/20 px-4 py-2 text-xs font-semibold text-[#f1d79d]">
-              <BadgeCheck
-                size={15}
-                aria-hidden
-              />
-
-              {profile.emailVerified
-                ? 'Email verified'
-                : 'Email unverified'}
             </span>
           </div>
         </div>
       </section>
 
-      <div className="feature-reveal feature-reveal-delay-2 mt-6 grid items-start gap-6 lg:grid-cols-[1.5fr_0.8fr]">
+      <section
+        className="
+          feature-reveal
+          feature-reveal-delay-2
+          mt-3
+          rounded-2xl
+          border border-line/50
+          bg-surface/75
+          shadow-[0_10px_30px_rgba(23,60,50,0.05)]
+          p-6
+          sm:p-7
+          "
+      >
         <ProfileDetailsForm
           key={profile.version}
           profile={profile}
+        >
+          <ChangeEmailForm
+            currentEmail={
+              profile.email
+            }
+          />
+        </ProfileDetailsForm>
+      </section>
+
+      <section
+        className="
+          feature-reveal
+          feature-reveal-delay-2
+          mt-3
+          rounded-2xl
+          border border-line/40
+          bg-surface/75
+          p-6
+          sm:p-7
+        "
+      >
+        <SectionHeader
+          title="Appearance"
+          description="Choose how Salif looks on this device."
         />
 
-        <aside className="rounded-3xl border border-[#dedbd2] bg-[#f0f3ec] p-6 sm:p-7">
-          <p className="text-xs font-semibold tracking-[0.15em] text-[#657972]">
-            ACCOUNT NOTES
-          </p>
+        <SettingsList className="mt-5">
+          <ThemePreferenceSetting />
+        </SettingsList>
+      </section>
 
-          <h2 className="mt-3 font-serif text-2xl text-[#173c32]">
-            A little context
-          </h2>
-
-          <div className="mt-7 space-y-6">
-            <div className="flex gap-3">
-              <CalendarDays
-                size={19}
-                className="mt-0.5 shrink-0 text-[#4f806f]"
-                aria-hidden
-              />
-
-              <div>
-                <p className="text-sm font-semibold text-[#294e43]">
-                  Salif member since
-                </p>
-
-                <p className="mt-1 text-sm text-[#657972]">
-                  {formatDate(
-                    profile.createdAt,
-                  )}
-                </p>
-              </div>
-            </div>
-
-            <div className="border-t border-[#d8ddd6]" />
-
-            <div className="flex gap-3">
-              <Clock3
-                size={19}
-                className="mt-0.5 shrink-0 text-[#4f806f]"
-                aria-hidden
-              />
-
-              <div>
-                <p className="text-sm font-semibold text-[#294e43]">
-                  Last signed in
-                </p>
-
-                <p className="mt-1 text-sm text-[#657972]">
-                  {formatDate(
-                    profile.lastLoginAt,
-                  )}
-                </p>
-              </div>
-            </div>
-
-            <div className="border-t border-[#d8ddd6]" />
-
-            <div className="flex gap-3">
-              <BadgeCheck
-                size={19}
-                className="mt-0.5 shrink-0 text-[#4f806f]"
-                aria-hidden
-              />
-
-              <div>
-                <p className="text-sm font-semibold text-[#294e43]">
-                  Account access
-                </p>
-
-                <p className="mt-1 text-sm text-[#657972]">
-                  {profile.roles
-                    .map((role) =>
-                      role.replace(
-                        'ROLE_',
-                        '',
-                      ),
-                    )
-                    .join(', ')}
-                </p>
-              </div>
-            </div>
-          </div>
-        </aside>
-      </div>
-
-      <div className="feature-reveal feature-reveal-delay-3 mt-6">
-        <TwoFactorAuthenticationCard />
-      </div>
-
-      <div className="feature-reveal feature-reveal-delay-3 mt-6 grid items-stretch gap-6 lg:grid-cols-2">
-        <ChangeEmailForm
-          currentEmail={profile.email}
+      <section
+        className="
+        feature-reveal
+        feature-reveal-delay-2
+        mt-3
+        rounded-2xl
+        border border-line/50
+        bg-surface/75
+        shadow-[0_10px_30px_rgba(23,60,50,0.05)]
+          p-6
+          sm:p-7
+        "
+      >
+        <SectionHeader
+          title="Security"
+          description="Manage how you sign in and protect your Salif account."
         />
 
-        <ChangePasswordForm
-          onPasswordChanged={
-            handlePasswordChanged
-          }
+        <SettingsList className="mt-5">
+          <ChangePasswordForm
+            passwordChangedAt={
+              profile.passwordChangedAt
+            }
+            onPasswordChanged={() =>
+              setPasswordChanged(true,)
+            }
+          />
+
+          <TwoFactorAuthenticationCard />
+        </SettingsList>
+      </section>
+
+      <section
+        className="
+          feature-reveal
+          feature-reveal-delay-3
+          mt-3
+          rounded-2xl
+          border border-line/60
+          bg-surface/75
+          shadow-[0_10px_30px_rgba(23,60,50,0.05)]
+          p-6
+          sm:p-7
+        "
+      >
+        <SectionHeader
+          title="Sessions"
+          description="Review the devices currently signed in to your Salif account."
         />
-      </div>
+
+        <ProfileSessions />
+      </section>
+
+      <section
+        className="
+          feature-reveal
+          feature-reveal-delay-3
+          mt-3
+          rounded-2xl
+          border border-line/40
+          bg-surface/75
+          shadow-[0_10px_30px_rgba(23,60,50,0.05)]
+          p-6
+          sm:p-7
+        "
+      >
+        <SectionHeader
+          title="Account"
+          description="General information about your Salif account."
+        />
+
+        <SettingsList className="mt-5">
+          <AccountRow
+            label="Status"
+            value={formatStatus(
+              profile.status,
+            )}
+          />
+
+          <AccountRow
+            label="Verification"
+            value={
+              verificationStatus
+            }
+          />
+        </SettingsList>
+      </section>
 
       {passwordChanged && (
         <PasswordChangedDialog
@@ -300,5 +326,58 @@ export default function ProfilePage() {
         />
       )}
     </PageShell>
+  )
+}
+
+interface SectionHeaderProps {
+  readonly title: string
+  readonly description: string
+}
+
+function SectionHeader({
+  title,
+  description,
+}: SectionHeaderProps) {
+  return (
+    <div>
+      <h2 className="type-section-title">
+        {title}
+      </h2>
+
+      <p className="type-body mt-1">
+        {description}
+      </p>
+    </div>
+  )
+}
+
+interface AccountRowProps {
+  readonly label: string
+  readonly value: string
+}
+
+function AccountRow({
+  label,
+  value,
+}: AccountRowProps) {
+  return (
+    <div
+      className="
+        grid
+        gap-1
+        py-4
+        sm:grid-cols-[180px_minmax(0,1fr)]
+        sm:items-center
+        sm:gap-8
+      "
+    >
+      <p className="text-sm font-medium text-muted">
+        {label}
+      </p>
+
+      <p className="text-sm font-medium text-ink">
+        {value}
+      </p>
+    </div>
   )
 }

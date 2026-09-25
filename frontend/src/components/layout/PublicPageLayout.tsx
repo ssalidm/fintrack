@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { ArrowRight } from 'lucide-react'
 import { Link, NavLink } from 'react-router'
 
-import salifLogoGreen from '../../assets/brand/salif-logo-green.svg'
+import salifLogoGreen from '@/assets/brand/salif-logo-green.svg'
 
 interface PublicPageLayoutProps {
   children: ReactNode

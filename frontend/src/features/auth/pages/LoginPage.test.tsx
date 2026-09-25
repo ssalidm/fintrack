@@ -21,13 +21,20 @@ import {
 import type {
   LoginRequest,
   LoginResponse,
-} from '../api/types'
-import { useAuth } from '../context/useAuth'
+} from '@/features/auth/api/types'
+import { useAuth } from '@/features/auth/context/useAuth'
 import LoginPage from './LoginPage'
 
-vi.mock('../context/useAuth', () => ({
+vi.mock('@/features/auth/context/useAuth', () => ({
   useAuth: vi.fn(),
 }))
+
+vi.mock(
+  '@/features/auth/components/GoogleSignInButton',
+  () => ({
+    default: () => null,
+  }),
+)
 
 const loginMock = vi.fn<
   (
@@ -95,6 +102,18 @@ describe('LoginPage', () => {
       accessToken: null,
       status: 'unauthenticated',
       login: loginMock,
+
+      googleLogin: vi.fn(
+          async () => ({
+            status: 'AUTHENTICATED' as const,
+            token: {
+              accessToken: 'access-token',
+              refreshToken: 'refresh-token',
+              tokenType: 'Bearer',
+              expiresIn: 900,
+            },
+          }),
+        ),
 
       verifyMfa: vi.fn(
         async () => undefined,

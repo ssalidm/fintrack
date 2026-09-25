@@ -1,7 +1,7 @@
 import {
   CheckCircle2,
+  CircleAlert,
   LoaderCircle,
-  MailWarning,
 } from 'lucide-react'
 import {
   useEffect,
@@ -9,14 +9,17 @@ import {
   useState,
 } from 'react'
 import {
-  Link,
   useNavigate,
   useSearchParams,
 } from 'react-router'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import { authApi } from '../api/authApi'
-import { useAuth } from '../context/useAuth'
+import { ApiClientError } from '@/api/ApiClientError'
+import { authApi } from '@/features/auth/api/authApi'
+import AuthAlert from '@/features/auth/components/AuthAlert'
+import AuthButton from '@/features/auth/components/AuthButton'
+import AuthHeader from '@/features/auth/components/AuthHeader'
+import AuthPanel from '@/features/auth/components/AuthPanel'
+import { useAuth } from '@/features/auth/context/useAuth'
 
 type ConfirmationStatus =
   | 'confirming'
@@ -25,61 +28,95 @@ type ConfirmationStatus =
   | 'missing'
 
 export default function VerifyEmailChangePage() {
-  const [searchParams] = useSearchParams()
-  const navigate = useNavigate()
-  const { logout } = useAuth()
-  const attemptedToken = useRef<string | null>(null)
-  const confirmationCompleted = useRef(false)
+  const [searchParams] =
+    useSearchParams()
+
+  const navigate =
+    useNavigate()
+
+  const { logout } =
+    useAuth()
+
+  const attemptedToken =
+    useRef<string | null>(null)
+
+  const confirmationCompleted =
+    useRef(false)
 
   const token =
-    searchParams.get('token')?.trim() ?? ''
+    searchParams
+      .get('token')
+      ?.trim() ?? ''
 
-  const [status, setStatus] =
-    useState<ConfirmationStatus>(
-      token ? 'confirming' : 'missing',
-    )
+  const [
+    status,
+    setStatus,
+  ] = useState<ConfirmationStatus>(
+    token
+      ? 'confirming'
+      : 'missing',
+  )
 
-  const [message, setMessage] = useState('')
+  const [
+    message,
+    setMessage,
+  ] = useState('')
 
   useEffect(() => {
     if (!token) {
-      if (!confirmationCompleted.current) {
+      if (
+        !confirmationCompleted.current
+      ) {
         setStatus('missing')
       }
 
       return
     }
 
-    if (attemptedToken.current === token) {
+    if (
+      attemptedToken.current ===
+      token
+    ) {
       return
     }
 
-    attemptedToken.current = token
+    attemptedToken.current =
+      token
+
     setStatus('confirming')
     setMessage('')
 
     async function confirmChange() {
       try {
         const response =
-          await authApi.confirmEmailChange({ token })
+          await authApi.confirmEmailChange({
+            token,
+          })
 
-        confirmationCompleted.current = true
+        confirmationCompleted.current =
+          true
 
-        await logout().catch(() => undefined)
+        await logout().catch(
+          () => undefined,
+        )
 
         setMessage(
           response.message ||
-          'Your email address has been changed successfully.',
+            'Your email address has been changed successfully.',
         )
 
         setStatus('success')
 
-        navigate('/verify-email-change', {
-          replace: true,
-        })
+        navigate(
+          '/verify-email-change',
+          {
+            replace: true,
+          },
+        )
       } catch (error) {
         setMessage(
-          error instanceof ApiClientError
+          error instanceof
+            ApiClientError
             ? error.isNetworkError
               ? 'We couldn’t connect to Salif right now. Please try again in a moment.'
               : error.message
@@ -91,111 +128,129 @@ export default function VerifyEmailChangePage() {
     }
 
     void confirmChange()
-  }, [logout, navigate, token])
+  }, [
+    logout,
+    navigate,
+    token,
+  ])
 
-  if (status === 'confirming') {
+  if (
+    status === 'confirming'
+  ) {
     return (
-      <section
-        className="w-full max-w-md text-center"
-        aria-labelledby="email-change-title"
-        aria-busy="true"
-      >
-        <LoaderCircle
-          size={42}
-          className="mx-auto animate-spin text-[#1F7A5C]"
-          aria-hidden
-        />
-
-        <h1
-          id="email-change-title"
-          className="mt-6 text-3xl font-semibold text-slate-950"
+      <AuthPanel className="auth-panel-enter">
+        <div
+          aria-labelledby="email-change-title"
+          aria-busy="true"
         >
-          Confirming your new email
-        </h1>
+          <LoaderCircle
+            size={28}
+            className="mb-5 animate-spin text-[#16805f]"
+            aria-hidden
+          />
 
-        <p className="mt-3 text-sm leading-6 text-slate-600">
-          We’re securely updating your Salif account.
-        </p>
-      </section>
+          <AuthHeader
+            title="Confirming your new email"
+            description="We’re securely updating your Salif account."
+            titleId="email-change-title"
+          />
+        </div>
+      </AuthPanel>
     )
   }
 
-  if (status === 'success') {
+  if (
+    status === 'success'
+  ) {
     return (
-      <section
-        className="w-full max-w-md text-center"
-        aria-labelledby="email-change-title"
-      >
-        <span className="mx-auto grid size-14 place-items-center rounded-full bg-emerald-100 text-[#1F7A5C]">
-          <CheckCircle2 size={29} aria-hidden />
-        </span>
-
-        <p className="mt-5 text-sm font-semibold text-[#1F7A5C]">
-          Email updated
-        </p>
-
-        <h1
-          id="email-change-title"
-          className="mt-2 text-3xl font-semibold text-slate-950"
+      <AuthPanel className="auth-panel-enter">
+        <div
+          aria-labelledby="email-change-title"
         >
-          Your new address is ready
-        </h1>
+          <span className="mb-5 grid size-10 place-items-center rounded-full bg-[#e5f1eb] text-[#16805f]">
+            <CheckCircle2
+              size={20}
+              aria-hidden
+            />
+          </span>
 
-        <p className="mt-3 text-sm leading-6 text-slate-600">
-          {message} For your security, your previous
-          sessions have been closed. Sign in using your
-          new email address.
-        </p>
+          <AuthHeader
+            title="Your new email is ready"
+            description={`${message} For your security, your previous sessions have been closed. Sign in using your new email address.`}
+            titleId="email-change-title"
+          />
 
-        <Link
-          to="/login"
-          state={{
-            message:
-              'Email changed successfully. Sign in with your new email address.',
-          }}
-          className="mt-7 inline-flex cursor-pointer rounded-lg bg-[#1F7A5C] px-5 py-2.5 font-semibold text-white transition hover:bg-[#19664D]"
-        >
-          Continue to sign in
-        </Link>
-      </section>
+          <div className="mt-6">
+            <AuthButton
+              type="button"
+              onClick={() =>
+                navigate(
+                  '/login',
+                  {
+                    state: {
+                      message:
+                        'Email changed successfully. Sign in with your new email address.',
+                    },
+                  },
+                )
+              }
+            >
+              Continue to sign in
+            </AuthButton>
+          </div>
+        </div>
+      </AuthPanel>
     )
   }
 
-  const missingToken = status === 'missing'
+  const missingToken =
+    status === 'missing'
 
   return (
-    <section
-      className="w-full max-w-md text-center"
-      aria-labelledby="email-change-title"
-    >
-      <span className="mx-auto grid size-14 place-items-center rounded-full bg-red-100 text-red-600">
-        <MailWarning size={28} aria-hidden />
-      </span>
-
-      <h1
-        id="email-change-title"
-        className="mt-6 text-3xl font-semibold text-slate-950"
+    <AuthPanel className="auth-panel-enter">
+      <div
+        aria-labelledby="email-change-title"
       >
-        {missingToken
-          ? 'Confirmation token missing'
-          : 'Email change unsuccessful'}
-      </h1>
+        <span className="mb-5 grid size-10 place-items-center rounded-full bg-red-50 text-red-600">
+          <CircleAlert
+            size={20}
+            aria-hidden
+          />
+        </span>
 
-      <p
-        className="mt-3 text-sm leading-6 text-slate-600"
-        role="alert"
-      >
-        {missingToken
-          ? 'Open the complete email-change link from your inbox.'
-          : message}
-      </p>
+        <AuthHeader
+          title={
+            missingToken
+              ? 'Confirmation link missing'
+              : 'Email change unsuccessful'
+          }
+          description={
+            missingToken
+              ? 'Open the complete email-change link from your inbox.'
+              : undefined
+          }
+          titleId="email-change-title"
+        />
 
-      <Link
-        to="/login"
-        className="mt-7 inline-flex cursor-pointer font-semibold text-[#1F7A5C] hover:underline"
-      >
-        Return to sign in
-      </Link>
-    </section>
+        {!missingToken && (
+          <div className="mt-5">
+            <AuthAlert variant="error">
+              {message}
+            </AuthAlert>
+          </div>
+        )}
+
+        <div className="mt-6">
+          <AuthButton
+            type="button"
+            onClick={() =>
+              navigate('/login')
+            }
+          >
+            Return to sign in
+          </AuthButton>
+        </div>
+      </div>
+    </AuthPanel>
   )
 }

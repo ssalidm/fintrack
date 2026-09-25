@@ -7,20 +7,23 @@ import {
   type ReactNode,
 } from 'react'
 
-import { ApiClientError } from '../../../api/ApiClientError'
-import { queryClient } from '../../../api/queryClient'
-import { authApi } from '../api/authApi'
+import { ApiClientError } from '@/api/ApiClientError'
+import { queryClient } from '@/api/queryClient'
+import { authApi } from '@/features/auth/api/authApi'
 import type {
+  GoogleLoginRequest,
   LoginRequest,
   MfaRecoverRequest,
   MfaVerifyRequest,
   TokenResponse,
-} from '../api/types'
+} from '@/features/auth/api/types'
 import {
   AuthContext,
   type AuthContextValue,
   type AuthStatus,
 } from './AuthContext'
+import { disableGoogleAutoSelect } from '@/features/auth/utils/googleIdentity'
+
 
 const REFRESH_TOKEN_KEY =
   'salif.auth.refreshToken'
@@ -36,206 +39,394 @@ export default function AuthProvider({
     useState<string | null>(null)
 
   const [status, setStatus] =
-    useState<AuthStatus>('checking')
+    useState<AuthStatus>(
+      'checking',
+    )
 
-  const hasRestoredSession = useRef(false)
+  const hasRestoredSession =
+    useRef(false)
 
   const refreshPromise =
-    useRef<Promise<string | null> | null>(
+    useRef<
+      Promise<
+        string | null
+      > | null
+    >(null)
+
+  const sessionVersion =
+    useRef(0)
+
+  /*
+   * Kept in memory only.
+   *
+   * If Google tells us that an existing
+   * account must be linked, the credential
+   * survives normal password login and MFA
+   * without being stored in browser storage.
+   */
+  const pendingGoogleCredential =
+    useRef<string | null>(
       null,
     )
 
-  const sessionVersion = useRef(0)
+  const establishSession =
+    useCallback(
+      (
+        tokens: TokenResponse,
+      ) => {
+        setAccessToken(
+          tokens.accessToken,
+        )
 
-  const establishSession = useCallback(
-    (tokens: TokenResponse) => {
-      setAccessToken(tokens.accessToken)
+        sessionStorage.setItem(
+          REFRESH_TOKEN_KEY,
+          tokens.refreshToken,
+        )
 
-      sessionStorage.setItem(
-        REFRESH_TOKEN_KEY,
-        tokens.refreshToken,
-      )
-
-      setStatus('authenticated')
-    },
-    [],
-  )
-
-  const clearSession = useCallback(() => {
-    sessionVersion.current += 1
-
-    setAccessToken(null)
-
-    sessionStorage.removeItem(
-      REFRESH_TOKEN_KEY,
+        setStatus(
+          'authenticated',
+        )
+      },
+      [],
     )
 
-    queryClient.clear()
+  const clearSession =
+    useCallback(() => {
+      sessionVersion.current += 1
 
-    setStatus('unauthenticated')
-  }, [])
+      pendingGoogleCredential.current =
+        null
 
-  const login = useCallback(
-    async (request: LoginRequest) => {
-      const response =
-        await authApi.login(request)
+      setAccessToken(null)
 
-      if (
-        response.data.status ===
-        'AUTHENTICATED'
-      ) {
-        if (!response.data.tokens) {
-          throw new ApiClientError(
-            'The server returned an invalid login response.',
-            response.status,
-          )
+      sessionStorage.removeItem(
+        REFRESH_TOKEN_KEY,
+      )
+
+      queryClient.clear()
+
+      setStatus(
+        'unauthenticated',
+      )
+    }, [])
+
+  const completeAuthentication =
+    useCallback(
+      async (
+        tokens: TokenResponse,
+      ) => {
+        const pendingCredential =
+          pendingGoogleCredential.current
+
+        if (pendingCredential) {
+          try {
+            await authApi.linkGoogle(
+              {
+                credential:
+                  pendingCredential,
+              },
+              tokens.accessToken,
+            )
+
+            pendingGoogleCredential.current =
+              null
+          } catch (error) {
+            /*
+             * Authentication succeeded on
+             * the backend, but linking did
+             * not.
+             *
+             * Revoke the newly-created
+             * session rather than leaving
+             * an untracked active session.
+             */
+            pendingGoogleCredential.current =
+              null
+
+            try {
+              await authApi.logout(
+                tokens.accessToken,
+              )
+            } catch {
+              /*
+               * Best-effort cleanup.
+               *
+               * The frontend never stores
+               * the failed session tokens.
+               */
+            }
+
+            throw error
+          }
         }
 
-        /*
-         * Invalidate any older refresh
-         * operation before establishing
-         * the new session.
-         */
         sessionVersion.current += 1
 
         establishSession(
-          response.data.tokens,
+          tokens,
         )
-      }
+      },
+      [establishSession],
+    )
 
-      /*
-       * MFA_REQUIRED is returned without
-       * creating a frontend session.
-       * LoginPage will use the challenge
-       * to continue authentication.
-       */
-      return response.data
-    },
-    [establishSession],
-  )
+  const login =
+    useCallback(
+      async (
+        request: LoginRequest,
+      ) => {
+        const response =
+          await authApi.login(
+            request,
+          )
 
-  const verifyMfa = useCallback(
-    async (request: MfaVerifyRequest) => {
-      const response =
-        await authApi.verifyMfa(request)
+        if (
+          response.data.status ===
+          'AUTHENTICATED'
+        ) {
+          if (
+            !response.data.tokens
+          ) {
+            throw new ApiClientError(
+              'The server returned an invalid login response.',
+              response.status,
+            )
+          }
 
-      sessionVersion.current += 1
+          await completeAuthentication(
+            response.data.tokens,
+          )
+        }
 
-      establishSession(response.data)
-    },
-    [establishSession],
-  )
+        return response.data
+      },
+      [
+        completeAuthentication,
+      ],
+    )
 
-  const recoverMfa = useCallback(
-    async (request: MfaRecoverRequest) => {
-      const response =
-        await authApi.recoverMfa(request)
+  const googleLogin =
+    useCallback(
+      async (
+        request:
+          GoogleLoginRequest,
+      ) => {
+        /*
+         * A new Google attempt replaces
+         * any previous unfinished linking
+         * attempt.
+         */
+        pendingGoogleCredential.current =
+          null
 
-      sessionVersion.current += 1
+        const response =
+          await authApi.googleLogin(
+            request,
+          )
 
-      establishSession(response.data)
-    },
-    [establishSession],
-  )
+        if (
+          response.data.status ===
+          'AUTHENTICATED'
+        ) {
+          if (
+            !response.data.tokens
+          ) {
+            throw new ApiClientError(
+              'The server returned an invalid Google login response.',
+              response.status,
+            )
+          }
+
+          await completeAuthentication(
+            response.data.tokens,
+          )
+        }
+
+        if (
+          response.data.status ===
+          'ACCOUNT_LINK_REQUIRED'
+        ) {
+          pendingGoogleCredential.current =
+            request.credential
+        }
+
+        return response.data
+      },
+      [
+        completeAuthentication,
+      ],
+    )
+
+  const verifyMfa =
+    useCallback(
+      async (
+        request:
+          MfaVerifyRequest,
+      ) => {
+        const response =
+          await authApi.verifyMfa(
+            request,
+          )
+
+        await completeAuthentication(
+          response.data,
+        )
+      },
+      [
+        completeAuthentication,
+      ],
+    )
+
+  const recoverMfa =
+    useCallback(
+      async (
+        request:
+          MfaRecoverRequest,
+      ) => {
+        const response =
+          await authApi.recoverMfa(
+            request,
+          )
+
+        await completeAuthentication(
+          response.data,
+        )
+      },
+      [
+        completeAuthentication,
+      ],
+    )
 
   const refreshAccessToken =
-    useCallback((): Promise<
-      string | null
-    > => {
-      if (refreshPromise.current) {
-        return refreshPromise.current
-      }
+    useCallback(
+      (): Promise<
+        string | null
+      > => {
+        if (
+          refreshPromise.current
+        ) {
+          return refreshPromise.current
+        }
 
-      const storedRefreshToken =
-        sessionStorage.getItem(
-          REFRESH_TOKEN_KEY,
-        )
+        const storedRefreshToken =
+          sessionStorage.getItem(
+            REFRESH_TOKEN_KEY,
+          )
 
-      if (!storedRefreshToken) {
+        if (
+          !storedRefreshToken
+        ) {
+          clearSession()
+
+          return Promise.resolve(
+            null,
+          )
+        }
+
+        const versionAtStart =
+          sessionVersion.current
+
+        const request =
+          authApi
+            .refresh({
+              refreshToken:
+                storedRefreshToken,
+            })
+            .then(
+              (response) => {
+                if (
+                  versionAtStart !==
+                  sessionVersion.current
+                ) {
+                  return null
+                }
+
+                establishSession(
+                  response.data,
+                )
+
+                return response
+                  .data
+                  .accessToken
+              },
+            )
+            .catch(() => {
+              if (
+                versionAtStart ===
+                sessionVersion.current
+              ) {
+                clearSession()
+              }
+
+              return null
+            })
+            .finally(() => {
+              refreshPromise.current =
+                null
+            })
+
+        refreshPromise.current =
+          request
+
+        return request
+      },
+      [
+        clearSession,
+        establishSession,
+      ],
+    )
+
+  const logout =
+    useCallback(
+      async () => {
+        const tokenToRevoke =
+          accessToken
+
+        /*
+       * Record that the user deliberately
+       * signed out of Salif.
+       *
+       * This does not sign them out of
+       * their Google account.
+       */
+        disableGoogleAutoSelect()
+
         clearSession()
 
-        return Promise.resolve(null)
-      }
+        if (!tokenToRevoke) {
+          return
+        }
 
-      const versionAtStart =
-        sessionVersion.current
-
-      const request = authApi
-        .refresh({
-          refreshToken:
-            storedRefreshToken,
-        })
-        .then((response) => {
+        try {
+          await authApi.logout(
+            tokenToRevoke,
+          )
+        } catch {
           /*
-           * Ignore a refresh response if
-           * logout or login happened while
-           * the request was in progress.
+           * Local logout remains successful
+           * if the backend cannot be reached.
            */
-          if (
-            versionAtStart !==
-            sessionVersion.current
-          ) {
-            return null
-          }
-
-          establishSession(response.data)
-
-          return response.data.accessToken
-        })
-        .catch(() => {
-          if (
-            versionAtStart ===
-            sessionVersion.current
-          ) {
-            clearSession()
-          }
-
-          return null
-        })
-        .finally(() => {
-          refreshPromise.current = null
-        })
-
-      refreshPromise.current = request
-
-      return request
-    }, [
-      clearSession,
-      establishSession,
-    ])
-
-  const logout = useCallback(async () => {
-    const tokenToRevoke = accessToken
-
-    /*
-     * Clear immediately and invalidate
-     * any in-flight refresh request.
-     */
-    clearSession()
-
-    if (!tokenToRevoke) {
-      return
-    }
-
-    try {
-      await authApi.logout(tokenToRevoke)
-    } catch {
-      /*
-       * Local logout remains successful
-       * if the backend is unreachable.
-       */
-    }
-  }, [accessToken, clearSession])
+        }
+      },
+      [
+        accessToken,
+        clearSession,
+      ],
+    )
 
   useEffect(() => {
-    if (hasRestoredSession.current) {
+    if (
+      hasRestoredSession.current
+    ) {
       return
     }
 
-    hasRestoredSession.current = true
+    hasRestoredSession.current =
+      true
 
     void refreshAccessToken()
-  }, [refreshAccessToken])
+  }, [
+    refreshAccessToken,
+  ])
 
   const value =
     useMemo<AuthContextValue>(
@@ -243,6 +434,7 @@ export default function AuthProvider({
         accessToken,
         status,
         login,
+        googleLogin,
         verifyMfa,
         recoverMfa,
         logout,
@@ -252,6 +444,7 @@ export default function AuthProvider({
         accessToken,
         status,
         login,
+        googleLogin,
         verifyMfa,
         recoverMfa,
         logout,
@@ -260,7 +453,9 @@ export default function AuthProvider({
     )
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider
+      value={value}
+    >
       {children}
     </AuthContext.Provider>
   )

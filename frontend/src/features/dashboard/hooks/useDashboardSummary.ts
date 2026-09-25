@@ -1,6 +1,6 @@
 import {useQuery} from '@tanstack/react-query'
-import {useAuthenticatedRequest} from '../../auth/hooks/useAuthenticatedRequest'
-import type {DashboardSummary} from '../api/types'
+import {useAuthenticatedRequest} from '@/features/auth/hooks/useAuthenticatedRequest'
+import type {DashboardSummary} from '@/features/dashboard/api/types'
 
 export const dashboardSummaryQueryKey = [
   'dashboard',

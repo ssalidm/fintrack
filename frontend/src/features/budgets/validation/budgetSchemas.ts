@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { hasAtMostFourDecimalPlaces } from '../../../utils/numberValidation'
+import { hasAtMostFourDecimalPlaces } from '@/utils/numberValidation'
 
 export const budgetCurrencies = [
   'ZAR',

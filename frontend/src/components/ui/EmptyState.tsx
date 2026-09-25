@@ -16,34 +16,43 @@ export default function EmptyState({
   description,
   action,
   variant = 'dashed',
-  iconClassName = 'bg-[#e0ece4] text-[#2d684f]',
+  iconClassName = 'bg-accent-soft text-accent',
   className = '',
 }: EmptyStateProps) {
   const panelClasses =
     variant === 'solid'
-      ? 'border-[#dedbd2] py-16'
-      : 'border-dashed border-[#cfcac0] py-14'
-
-  const descriptionSpacing =
-    variant === 'solid' ? 'mt-3' : 'mt-2'
+      ? 'border-line/50 py-12'
+      : 'border-dashed border-line-strong py-12'
 
   return (
     <section
-      className={`rounded-3xl border bg-[#fffdf8] px-6 text-center ${panelClasses} ${className}`}
+      className={`
+        rounded-2xl
+        border
+        bg-surface
+        px-6
+        text-center
+        ${panelClasses}
+        ${className}
+      `}
     >
       <span
-        className={`mx-auto grid size-14 place-items-center rounded-full ${iconClassName}`}
+        className={`
+          mx-auto
+          grid size-12
+          place-items-center
+          rounded-xl
+          ${iconClassName}
+        `}
       >
         {icon}
       </span>
 
-      <h2 className="mt-5 font-serif text-3xl text-[#173c32]">
+      <h2 className="mt-4 text-xl font-semibold tracking-[-0.02em] text-ink">
         {title}
       </h2>
 
-      <p
-        className={`mx-auto max-w-md text-sm leading-6 text-[#657972] ${descriptionSpacing}`}
-      >
+      <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted">
         {description}
       </p>
 

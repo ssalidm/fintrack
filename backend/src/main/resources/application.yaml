@@ -57,6 +57,9 @@ fintrack:
       max-attempts: 5
       lockout-duration: PT15M
 
+    google:
+      client-id: ${FINTRACK_GOOGLE_CLIENT_ID:}
+
     cors:
       allowed-origins: []
 

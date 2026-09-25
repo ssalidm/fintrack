@@ -16,11 +16,11 @@ import {
   vi,
 } from 'vitest'
 
-import type { UserProfile } from '../../profile/api/types'
-import { useProfile } from '../../profile/hooks/useProfile'
+import type { UserProfile } from '@/features/profile/api/types'
+import { useProfile } from '@/features/profile/hooks/useProfile'
 import AdminRoute from './AdminRoute'
 
-vi.mock('../../profile/hooks/useProfile', () => ({
+vi.mock('@/features/profile/hooks/useProfile', () => ({
   useProfile: vi.fn(),
 }))
 
@@ -32,12 +32,14 @@ const adminProfile: UserProfile = {
   email: 'admin@salif.test',
   firstName: 'Salif',
   lastName: 'Admin',
+  preferredName: null,
   timeZone: 'Africa/Johannesburg',
   status: 'ACTIVE',
   emailVerified: true,
   emailVerifiedAt: '2026-09-01T08:00:00Z',
   roles: ['ROLE_USER', 'ROLE_ADMIN'],
   lastLoginAt: '2026-09-11T08:00:00Z',
+  passwordChangedAt: null,
   createdAt: '2026-09-01T08:00:00Z',
   updatedAt: '2026-09-11T08:00:00Z',
   version: 2,

@@ -1,18 +1,18 @@
 import { useEffect, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { ApiClientError } from '../../../api/ApiClientError'
-import type { Account } from '../api/types'
+import { ApiClientError } from '@/api/ApiClientError'
+import type { Account } from '@/features/accounts/api/types'
 import {
   useCreateAccount,
   useUpdateAccount,
-} from '../hooks/useAccounts'
+} from '@/features/accounts/hooks/useAccounts'
 import {
   accountFormSchema,
   type AccountFormValues,
   accountTypes,
   supportedCurrencies,
-} from '../validation/accountSchema'
+} from '@/features/accounts/validation/accountSchema'
 
 interface AccountFormProps {
   account?: Account

@@ -14,10 +14,12 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AccountEmailService {
 
+    private static final String REGISTRATION_TEMPLATE = "email/registration";
     private static final String VERIFICATION_TEMPLATE = "email/verification";
     private static final String PASSWORD_RESET_TEMPLATE = "email/password-reset";
     private static final String EMAIL_CHANGE_TEMPLATE = "email/email-change-verification";
 
+    private static final String REGISTRATION_SUBJECT = "Finish creating your Salif account";
     private static final String VERIFICATION_SUBJECT = "Verify your Salif email";
     private static final String PASSWORD_RESET_SUBJECT = "Reset your Salif password";
     private static final String EMAIL_CHANGE_SUBJECT = "Confirm your new email address";
@@ -25,6 +27,44 @@ public class AccountEmailService {
     private final EmailSender emailSender;
     private final EmailTemplateRenderer emailTemplateRenderer;
     private final EmailProperties emailProperties;
+
+
+    public void sendRegistrationEmail(
+        String recipient,
+        String rawToken
+    ) {
+        String registrationUrl =
+            UriComponentsBuilder
+                .fromUriString(
+                    emailProperties
+                        .frontendBaseUrl()
+                )
+                .pathSegment(
+                    "register",
+                    "complete"
+                )
+                .queryParam(
+                    "token",
+                    rawToken
+                )
+                .build()
+                .encode()
+                .toUriString();
+
+        String body =
+            emailTemplateRenderer.render(
+                REGISTRATION_TEMPLATE,
+                Map.of("registrationUrl", registrationUrl)
+            );
+
+        emailSender.send(
+            new EmailMessage(
+                recipient,
+                REGISTRATION_SUBJECT,
+                body
+            )
+        );
+    }
 
     public void sendVerificationEmail(
         String recipient,

@@ -1,5 +1,5 @@
-import FormDrawer from '../../../components/ui/FormDrawer'
-import type { BudgetSummary } from '../api/types'
+import FormDrawer from '@/components/ui/FormDrawer'
+import type { BudgetSummary } from '@/features/budgets/api/types'
 import BudgetForm from './BudgetForm'
 
 interface BudgetModalProps {

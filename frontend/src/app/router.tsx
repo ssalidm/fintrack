@@ -3,16 +3,19 @@ import {
   Navigate,
 } from 'react-router'
 
-import AdminRoute from '../features/admin/components/AdminRoute.tsx'
-import ProtectedRoute from '../features/auth/components/ProtectedRoute.tsx'
-import AuthLayout from '../features/auth/layouts/AuthLayout.tsx'
-import DashboardLayout from '../features/dashboard/layouts/DashboardLayout.tsx'
-import RouteErrorPage from '../pages/RouteErrorPage.tsx'
+import AdminRoute from '@/features/admin/components/AdminRoute.tsx'
+import ProtectedRoute from '@/features/auth/components/ProtectedRoute.tsx'
+import AuthLayout from '@/features/auth/layouts/AuthLayout.tsx'
+import DashboardLayout from '@/features/dashboard/layouts/DashboardLayout.tsx'
+import RouteErrorPage from '@/pages/RouteErrorPage.tsx'
+import RootLayout from '@/components/layout/RootLayout'
+
 
 import {
   HomePage,
   NotFoundPage,
   SupportPage,
+  CompleteRegistrationPage,
   LoginPage,
   MfaChallengePage,
   RegisterPage,
@@ -38,6 +41,7 @@ import {
 
 export const router = createBrowserRouter([
   {
+    element: <RootLayout />,
     errorElement: <RouteErrorPage />,
     children: [
       {
@@ -59,6 +63,10 @@ export const router = createBrowserRouter([
       {
         element: <AuthLayout />,
         children: [
+          {
+            path: '/register/complete',
+            element: <CompleteRegistrationPage />,
+          },
           {
             path: '/login',
             element: <LoginPage />,

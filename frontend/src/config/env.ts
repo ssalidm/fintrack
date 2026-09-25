@@ -20,9 +20,19 @@ function requireHttpUrl(name: string, value: string | undefined): string {
   return parsedUrl.toString().replace(/\/$/, '')
 }
 
+function optionalValue(value: string | undefined,): string | null {
+  const normalizedValue = value?.trim()
+
+  return normalizedValue || null
+}
+
 export const env = Object.freeze({
   apiBaseUrl: requireHttpUrl(
     'VITE_API_BASE_URL',
     import.meta.env.VITE_API_BASE_URL,
+  ),
+
+  googleClientId: optionalValue(
+    import.meta.env.VITE_GOOGLE_CLIENT_ID,
   ),
 })

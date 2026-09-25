@@ -15,7 +15,7 @@ on:
       - develop
       - main
     paths:
-      - "frontend"
+      - "frontend/**"
       - ".nvmrc"
       - ".github/workflows/frontend-ci.yml"
 

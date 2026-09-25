@@ -151,8 +151,7 @@ public class AdminUserController {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
-                ApiMessage.Admin.SESSIONS_REVOKED,
-                null
+                ApiMessage.Admin.SESSIONS_REVOKED
             )
         );
     }

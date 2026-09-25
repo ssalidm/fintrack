@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-import { useAuthenticatedRequest } from '../../auth/hooks/useAuthenticatedRequest'
-import type { MonthlyCashFlow } from '../api/types'
+import { useAuthenticatedRequest } from '@/features/auth/hooks/useAuthenticatedRequest'
+import type { MonthlyCashFlow } from '@/features/dashboard/api/types'
 
 function formatMonthStart(date: Date) {
   const year = date.getFullYear()

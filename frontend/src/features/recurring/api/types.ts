@@ -1,4 +1,4 @@
-import type {Transaction} from '../../transactions/api/types'
+import type {Transaction} from '@/features/transactions/api/types'
 
 export type RecurringTransactionType =
   | 'INCOME'

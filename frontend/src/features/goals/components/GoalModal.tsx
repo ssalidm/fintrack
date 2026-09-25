@@ -1,5 +1,5 @@
-import FormDrawer from '../../../components/ui/FormDrawer'
-import type { SavingsGoal } from '../api/types'
+import FormDrawer from '@/components/ui/FormDrawer'
+import type { SavingsGoal } from '@/features/goals/api/types'
 import GoalForm from './GoalForm'
 
 interface GoalModalProps {

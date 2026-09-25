@@ -10,10 +10,7 @@ import za.co.pixelly.fintrack.config.security.JwtProperties;
 import za.co.pixelly.fintrack.identity.api.*;
 import za.co.pixelly.fintrack.identity.application.exceptions.InvalidCredentialsException;
 import za.co.pixelly.fintrack.identity.application.exceptions.InvalidRefreshTokenException;
-import za.co.pixelly.fintrack.identity.application.mfa.IssuedMfaChallenge;
-import za.co.pixelly.fintrack.identity.application.mfa.MfaChallengeService;
 import za.co.pixelly.fintrack.identity.domain.AuthSession;
-import za.co.pixelly.fintrack.identity.domain.MfaStatus;
 import za.co.pixelly.fintrack.identity.domain.RefreshToken;
 import za.co.pixelly.fintrack.identity.domain.User;
 import za.co.pixelly.fintrack.identity.persistence.*;
@@ -31,13 +28,10 @@ public class DefaultAuthenticationService implements AuthenticationService {
     private final AuthSessionRepository sessionRepository;
     private final LoginAttemptService loginAttemptService;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final UserMfaRepository userMfaRepository;
-    private final MfaChallengeService mfaChallengeService;
-    private final AuthenticatedSessionService authenticatedSessionService;
-
     private final PasswordEncoder passwordEncoder;
     private final OpaqueTokenCodec refreshTokenCodec;
     private final AccessTokenService accessTokenService;
+    private final LoginCompletionService loginCompletionService;
     private final JwtProperties jwtProperties;
 
 
@@ -58,6 +52,10 @@ public class DefaultAuthenticationService implements AuthenticationService {
          * Do not allow further attempts during a temporary lock.
          */
         if (user.isTemporarilyLocked(now)) {
+            throw new InvalidCredentialsException();
+        }
+
+        if (!user.hasPassword()) {
             throw new InvalidCredentialsException();
         }
 
@@ -84,33 +82,10 @@ public class DefaultAuthenticationService implements AuthenticationService {
             throw new InvalidCredentialsException();
         }
 
-        boolean mfaEnabled =
-            userMfaRepository.existsByUserIdAndStatus(
-                user.getId(),
-                MfaStatus.ENABLED
-            );
-
-        if (mfaEnabled) {
-            IssuedMfaChallenge challenge =
-                mfaChallengeService.issue(
-                    user.getId(),
-                    userAgent
-                );
-
-            return LoginResponse.mfaRequired(
-                new MfaChallengeResponse(
-                    challenge.rawToken(),
-                    challenge.expiresAt()
-                )
-            );
-        }
-
-        return LoginResponse.authenticated(
-            authenticatedSessionService.issue(
-                user,
-                userAgent,
-                now
-            )
+        return loginCompletionService.complete(
+            user,
+            userAgent,
+            now
         );
     }
 

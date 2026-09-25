@@ -16,6 +16,9 @@ public record UpdateUserProfileRequest(
     @Size(max = 100)
     String lastName,
 
+    @Size(max = 100)
+    String preferredName,
+
     @Size(max = 64)
     @ValidTimeZone(message = "Must be a valid IANA time zone ID (e.g., Africa/Johannesburg)")
     String timeZone

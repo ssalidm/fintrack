@@ -3,13 +3,13 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 
-import {useAuthenticatedRequest} from '../../auth/hooks/useAuthenticatedRequest'
+import {useAuthenticatedRequest} from '@/features/auth/hooks/useAuthenticatedRequest'
 import type {
   ChangeEmailRequest,
   ChangePasswordRequest,
   UpdateUserProfileRequest,
   UserProfile,
-} from '../api/types'
+} from '@/features/profile/api/types'
 import {profileQueryKey} from './useProfile'
 
 export function useUpdateProfile() {

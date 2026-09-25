@@ -1,4 +1,4 @@
-import type { UserStatus } from '../../profile/api/types'
+import type { UserStatus } from '@/features/profile/api/types'
 
 export interface AdminUser {
   readonly id: string
