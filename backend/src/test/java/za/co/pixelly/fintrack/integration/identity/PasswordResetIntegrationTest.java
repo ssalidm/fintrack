@@ -6,6 +6,7 @@ import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.boot.json.JsonParser;
 import za.co.pixelly.fintrack.identity.application.OpaqueTokenCodec;
 import za.co.pixelly.fintrack.integration.AbstractIntegrationTest;
+import za.co.pixelly.fintrack.integration.support.IdentityTestClient;
 
 import java.util.Map;
 import java.util.UUID;
@@ -361,8 +362,9 @@ class PasswordResetIntegrationTest
     // Helpers
     // -----------------------------------------------------
 
-    private String createVerifiedUser(String prefix)
-        throws Exception {
+    private String createVerifiedUser(
+        String prefix
+    ) throws Exception {
 
         String email =
             "%s+%s@example.com"
@@ -371,44 +373,10 @@ class PasswordResetIntegrationTest
                     UUID.randomUUID()
                 );
 
-        mockMvc.perform(
-                post(api("/auth/register"))
-                    .contentType(
-                        "application/json"
-                    )
-                    .content("""
-                        {
-                          "email": "%s",
-                          "password":
-                          "SecurePassword123!",
-                          "firstName": "David",
-                          "lastName": "Test"
-                        }
-                        """.formatted(email))
-            )
-            .andExpect(status().isCreated());
-
-        String verificationToken =
-            emailSender.tokenFor(email);
-
-        assertNotNull(verificationToken);
-
-        mockMvc.perform(
-                post(
-                    api("/auth/verify-email")
-                )
-                    .contentType(
-                        "application/json"
-                    )
-                    .content("""
-                        {
-                          "token": "%s"
-                        }
-                        """.formatted(
-                        verificationToken
-                    ))
-            )
-            .andExpect(status().isOk());
+        identityTestClient.createUser(
+            email,
+            IdentityTestClient.DEFAULT_PASSWORD
+        );
 
         return email;
     }

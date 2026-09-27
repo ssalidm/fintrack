@@ -166,23 +166,23 @@ public class User {
     }
 
 
-    public static User register(
-        String email,
-        String passwordHash,
-        String firstName,
-        String lastName,
-        Instant now
-    ) {
-        return new User(
-            email,
-            passwordHash,
-            firstName,
-            lastName,
-            UserStatus.PENDING_VERIFICATION,
-            null,
-            now
-        );
-    }
+//    public static User register(
+//        String email,
+//        String passwordHash,
+//        String firstName,
+//        String lastName,
+//        Instant now
+//    ) {
+//        return new User(
+//            email,
+//            passwordHash,
+//            firstName,
+//            lastName,
+//            UserStatus.PENDING_VERIFICATION,
+//            null,
+//            now
+//        );
+//    }
 
 
     public static User registerExternal(

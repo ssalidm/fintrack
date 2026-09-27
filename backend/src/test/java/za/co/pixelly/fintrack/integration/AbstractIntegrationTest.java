@@ -115,7 +115,7 @@ public abstract class AbstractIntegrationTest {
         identityTestClient =
             new IdentityTestClient(
                 mockMvc,
-                emailSender,
+                registrationEmailSender,
                 jwtDecoder,
                 apiProperties
             );
