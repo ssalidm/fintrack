@@ -12,6 +12,7 @@ import za.co.pixelly.fintrack.identity.domain.User;
 import za.co.pixelly.fintrack.identity.persistence.EmailVerificationTokenRepository;
 import za.co.pixelly.fintrack.identity.persistence.UserRepository;
 
+import java.time.Clock;
 import java.time.Instant;
 
 import static za.co.pixelly.fintrack.identity.application.EmailAddressNormalizer.normalize;
@@ -25,6 +26,7 @@ public class EmailVerificationService {
     private final OpaqueTokenCodec tokenCodec;
     private final EmailVerificationProperties properties;
     private final ApplicationEventPublisher eventPublisher;
+    private final Clock applicationClock;
 
     @Transactional
     public void issueFor(User user) {
@@ -34,7 +36,7 @@ public class EmailVerificationService {
     @Transactional
     public void verify(String rawToken) {
 
-        Instant now = Instant.now();
+        Instant now = applicationClock.instant();
 
         String tokenHash =
             tokenCodec.hash(rawToken);
@@ -77,7 +79,7 @@ public class EmailVerificationService {
 
     private void issueToken(User user) {
 
-        Instant now = Instant.now();
+        Instant now = applicationClock.instant();
 
         tokenRepository
             .findActiveByUserIdForUpdate(user.getId())

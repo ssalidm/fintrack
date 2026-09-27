@@ -16,6 +16,7 @@ import za.co.pixelly.fintrack.identity.domain.User;
 import za.co.pixelly.fintrack.identity.domain.UserStatus;
 import za.co.pixelly.fintrack.identity.persistence.*;
 
+import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,7 @@ public class DefaultAdminUserService implements AdminUserService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
+    private final Clock applicationClock;
 
 
     @Override
@@ -152,7 +154,7 @@ public class DefaultAdminUserService implements AdminUserService {
             )
         );
 
-        Instant now = Instant.now();
+        Instant now = applicationClock.instant();
 
         targetUser.deactivate(now);
 
@@ -229,7 +231,7 @@ public class DefaultAdminUserService implements AdminUserService {
             )
         );
 
-        targetUser.activate(Instant.now());
+        targetUser.activate(applicationClock.instant());
 
         User saved = userRepository.saveAndFlush(targetUser);
 
@@ -273,7 +275,7 @@ public class DefaultAdminUserService implements AdminUserService {
             );
         }
 
-        Instant now = Instant.now();
+        Instant now = applicationClock.instant();
 
         Page<AdminUserSessionResponse> sessions = authSessionRepository
             .findAllByUserIdOrderByCreatedAtDesc(
@@ -322,7 +324,7 @@ public class DefaultAdminUserService implements AdminUserService {
             );
         }
 
-        Instant now = Instant.now();
+        Instant now = applicationClock.instant();
 
         /*
          * Revoke refresh tokens first so no new access

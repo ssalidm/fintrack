@@ -8,7 +8,7 @@ import za.co.pixelly.fintrack.config.security.LoginSecurityProperties;
 import za.co.pixelly.fintrack.identity.domain.User;
 import za.co.pixelly.fintrack.identity.persistence.UserRepository;
 
-import java.time.Instant;
+import java.time.Clock;
 import java.util.UUID;
 
 @Service
@@ -17,6 +17,8 @@ public class LoginAttemptService {
 
     private final UserRepository userRepository;
     private final LoginSecurityProperties properties;
+    private final Clock applicationClock;
+
 
     @Transactional(
         propagation = Propagation.REQUIRES_NEW
@@ -27,7 +29,7 @@ public class LoginAttemptService {
             .orElseThrow();
 
         user.recordFailedLogin(
-            Instant.now(),
+            applicationClock.instant(),
             properties.maxFailedAttempts(),
             properties.lockDuration()
         );

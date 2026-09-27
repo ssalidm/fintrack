@@ -14,6 +14,7 @@ import za.co.pixelly.fintrack.identity.domain.RefreshToken;
 import za.co.pixelly.fintrack.identity.domain.User;
 import za.co.pixelly.fintrack.identity.persistence.*;
 
+import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -34,6 +35,7 @@ public class DefaultAuthenticationService implements AuthenticationService {
     private final AccessTokenService accessTokenService;
     private final LoginCompletionService loginCompletionService;
     private final JwtProperties jwtProperties;
+    private final Clock applicationClock;
 
 
     @Override
@@ -42,7 +44,7 @@ public class DefaultAuthenticationService implements AuthenticationService {
         LoginRequest request,
         String userAgent
     ) {
-        Instant now = Instant.now();
+        Instant now = applicationClock.instant();
         String email = normalize(request.email());
 
         User user = userRepository
@@ -94,7 +96,7 @@ public class DefaultAuthenticationService implements AuthenticationService {
     @Transactional
     public TokenResponse refresh(RefreshRequest request) {
 
-        Instant now = Instant.now();
+        Instant now = applicationClock.instant();
 
         String hash =
             refreshTokenCodec.hash(request.refreshToken());
@@ -173,7 +175,7 @@ public class DefaultAuthenticationService implements AuthenticationService {
             .findByIdAndUserId(sessionId, userId)
             .orElseThrow(InvalidRefreshTokenException::new);
 
-        Instant now = Instant.now();
+        Instant now = applicationClock.instant();
 
         session.revoke(now, "USER_LOGOUT");
 
