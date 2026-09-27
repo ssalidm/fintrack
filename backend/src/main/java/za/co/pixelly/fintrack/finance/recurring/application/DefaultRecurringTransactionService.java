@@ -355,7 +355,7 @@ public class DefaultRecurringTransactionService
             request.autoPost() == null
                 ? schedule.isAutoPost()
                 : request.autoPost(),
-            Instant.now()
+            applicationClock.instant()
         );
 
 
@@ -408,7 +408,7 @@ public class DefaultRecurringTransactionService
         );
 
         schedule.pause(
-            Instant.now()
+            applicationClock.instant()
         );
 
         return RecurringTransactionResponse.from(
@@ -468,7 +468,7 @@ public class DefaultRecurringTransactionService
         );
 
         schedule.resume(
-            Instant.now()
+            applicationClock.instant()
         );
 
         return RecurringTransactionResponse.from(
@@ -508,7 +508,7 @@ public class DefaultRecurringTransactionService
         );
 
         schedule.archive(
-            Instant.now()
+            applicationClock.instant()
         );
 
         return RecurringTransactionResponse.from(

@@ -16,7 +16,7 @@ import za.co.pixelly.fintrack.finance.currency.application.InvalidCurrencyExcept
 import za.co.pixelly.fintrack.finance.currency.persistence.CurrencyRepository;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.Clock;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -25,10 +25,13 @@ import static za.co.pixelly.fintrack.common.concurrency.VersionGuard.requireCurr
 
 @Service
 @RequiredArgsConstructor
-public class DefaultAccountService implements AccountService {
+public class DefaultAccountService
+    implements AccountService {
 
     private final AccountRepository accountRepository;
     private final CurrencyRepository currencyRepository;
+    private final Clock applicationClock;
+
 
     @Override
     @Transactional
@@ -36,17 +39,28 @@ public class DefaultAccountService implements AccountService {
         UUID userId,
         CreateAccountRequest request
     ) {
-        String name = request.name().trim();
+        String name =
+            request.name().trim();
+
         String currencyCode =
-            request.currencyCode().trim().toUpperCase(Locale.ROOT);
+            request.currencyCode()
+                .trim()
+                .toUpperCase(
+                    Locale.ROOT
+                );
 
-        validateCurrency(currencyCode);
+        validateCurrency(
+            currencyCode
+        );
 
-        if (accountRepository.existsByNormalizedName(
-            userId,
-            name,
-            AccountStatus.ACTIVE
-        )) {
+        if (
+            accountRepository
+                .existsByNormalizedName(
+                    userId,
+                    name,
+                    AccountStatus.ACTIVE
+                )
+        ) {
             throw new DuplicateAccountNameException();
         }
 
@@ -67,26 +81,34 @@ public class DefaultAccountService implements AccountService {
                 currencyCode,
                 openingBalance,
                 includeInNetWorth,
-                Instant.now()
+                applicationClock.instant()
             );
 
         try {
             return AccountResponse.from(
-                accountRepository.saveAndFlush(account)
+                accountRepository
+                    .saveAndFlush(
+                        account
+                    )
             );
-        } catch (DataIntegrityViolationException exception) {
-
+        } catch (
+            DataIntegrityViolationException exception
+        ) {
             /*
              * The database unique index remains the final
              * concurrency authority.
              */
-            if (accountRepository.existsByNormalizedName(
-                userId,
-                name,
-                AccountStatus.ACTIVE
-            )) {
+            if (
+                accountRepository
+                    .existsByNormalizedName(
+                        userId,
+                        name,
+                        AccountStatus.ACTIVE
+                    )
+            ) {
                 throw new DuplicateAccountNameException();
             }
+
             throw exception;
         }
     }
@@ -104,7 +126,9 @@ public class DefaultAccountService implements AccountService {
                 status
             )
             .stream()
-            .map(AccountResponse::from)
+            .map(
+                AccountResponse::from
+            )
             .toList();
     }
 
@@ -115,17 +139,14 @@ public class DefaultAccountService implements AccountService {
         UUID userId,
         UUID accountId
     ) {
-        Account account =
-            accountRepository.findByIdAndUserId(
-                    accountId,
-                    userId
-                )
-                .orElseThrow(
-                    AccountNotFoundException::new
-                );
-
-        return AccountResponse.from(account);
+        return AccountResponse.from(
+            findOwnedAccount(
+                userId,
+                accountId
+            )
+        );
     }
+
 
     @Override
     @Transactional
@@ -140,7 +161,10 @@ public class DefaultAccountService implements AccountService {
                 accountId
             );
 
-        if (account.getStatus() == AccountStatus.ARCHIVED) {
+        if (
+            account.getStatus()
+                == AccountStatus.ARCHIVED
+        ) {
             throw new ArchivedAccountModificationException();
         }
 
@@ -150,18 +174,22 @@ public class DefaultAccountService implements AccountService {
             StaleAccountVersionException::new
         );
 
-
-        String normalizedName = null;
+        String normalizedName =
+            null;
 
         if (request.name() != null) {
-            normalizedName = request.name().trim();
+            normalizedName =
+                request.name().trim();
 
-            if (accountRepository.existsByNormalizedNameExcludingAccount(
-                userId,
-                accountId,
-                normalizedName,
-                AccountStatus.ACTIVE
-            )) {
+            if (
+                accountRepository
+                    .existsByNormalizedNameExcludingAccount(
+                        userId,
+                        accountId,
+                        normalizedName,
+                        AccountStatus.ACTIVE
+                    )
+            ) {
                 throw new DuplicateAccountNameException();
             }
         }
@@ -171,13 +199,20 @@ public class DefaultAccountService implements AccountService {
             request.accountType(),
             request.openingBalance(),
             request.includeInNetWorth(),
-            Instant.now()
+            applicationClock.instant()
         );
 
-        Account saved = accountRepository.saveAndFlush(account);
+        Account saved =
+            accountRepository
+                .saveAndFlush(
+                    account
+                );
 
-        return AccountResponse.from(saved);
+        return AccountResponse.from(
+            saved
+        );
     }
+
 
     @Override
     @Transactional
@@ -192,7 +227,10 @@ public class DefaultAccountService implements AccountService {
                 accountId
             );
 
-        if (account.getStatus() == AccountStatus.ARCHIVED) {
+        if (
+            account.getStatus()
+                == AccountStatus.ARCHIVED
+        ) {
             throw new AccountAlreadyArchivedException();
         }
 
@@ -202,28 +240,37 @@ public class DefaultAccountService implements AccountService {
             StaleAccountVersionException::new
         );
 
-        account.archive(Instant.now());
+        account.archive(
+            applicationClock.instant()
+        );
 
         Account saved =
-            accountRepository.saveAndFlush(account);
+            accountRepository
+                .saveAndFlush(
+                    account
+                );
 
-        return AccountResponse.from(saved);
+        return AccountResponse.from(
+            saved
+        );
     }
 
 
-    // =======================================================================
-    // Helper Methods
-    // =======================================================================
-
-    private void validateCurrency(String currencyCode) {
+    private void validateCurrency(
+        String currencyCode
+    ) {
         currencyRepository
-            .findByCodeAndActiveTrue(currencyCode)
+            .findByCodeAndActiveTrue(
+                currencyCode
+            )
             .orElseThrow(
-                () -> new InvalidCurrencyException(
-                    currencyCode
-                )
+                () ->
+                    new InvalidCurrencyException(
+                        currencyCode
+                    )
             );
     }
+
 
     private Account findOwnedAccount(
         UUID userId,
@@ -234,6 +281,8 @@ public class DefaultAccountService implements AccountService {
                 accountId,
                 userId
             )
-            .orElseThrow(AccountNotFoundException::new);
+            .orElseThrow(
+                AccountNotFoundException::new
+            );
     }
 }

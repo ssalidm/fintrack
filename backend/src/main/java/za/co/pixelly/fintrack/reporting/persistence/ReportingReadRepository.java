@@ -46,47 +46,19 @@ public class ReportingReadRepository {
                 """,
             (resultSet, rowNum) ->
                 new AccountBalanceRow(
-                    resultSet.getObject(
-                        "account_id",
-                        UUID.class
-                    ),
-                    resultSet.getString(
-                        "account_name"
-                    ),
-                    resultSet.getString(
-                        "account_type"
-                    ),
-                    resultSet.getString(
-                        "currency_code"
-                    ),
-                    resultSet.getBigDecimal(
-                        "opening_balance"
-                    ),
-                    resultSet.getBigDecimal(
-                        "transaction_total"
-                    ),
-                    resultSet.getBigDecimal(
-                        "current_balance"
-                    ),
-                    resultSet.getLong(
-                        "posted_transaction_count"
-                    ),
-                    resultSet.getBoolean(
-                        "include_in_net_worth"
-                    ),
-                    resultSet.getString(
-                        "status"
-                    ),
-                    resultSet
-                        .getTimestamp(
-                            "created_at"
-                        )
-                        .toInstant(),
-                    resultSet
-                        .getTimestamp(
-                            "updated_at"
-                        )
-                        .toInstant()
+                    resultSet.getObject("account_id", UUID.class),
+                    resultSet.getString("account_name"),
+                    resultSet.getString("account_type"),
+                    resultSet.getString("currency_code"),
+                    resultSet.getBigDecimal("opening_balance"),
+                    resultSet.getBigDecimal("transaction_total"),
+                    resultSet.getBigDecimal("current_balance"),
+                    resultSet.getLong("posted_transaction_count"),
+                    resultSet.getBoolean("include_in_net_worth"),
+                    resultSet.getString("status"),
+                    resultSet.getTimestamp("created_at")
+                        .toInstant(), resultSet.getTimestamp("updated_at")
+                    .toInstant()
                 ),
             userId
         );
@@ -110,21 +82,11 @@ public class ReportingReadRepository {
                 ORDER BY currency_code
                 """,
             (resultSet, rowNum) ->
-                new NetWorthRow(
-                    resultSet.getString(
-                        "currency_code"
-                    ),
-                    resultSet.getBigDecimal(
-                        "net_worth"
-                    ),
-                    resultSet.getLong(
-                        "included_account_count"
-                    ),
-                    resultSet.getLong(
-                        "active_account_count"
-                    ),
-                    resultSet.getLong(
-                        "archived_account_count"
+                new NetWorthRow(resultSet.getString("currency_code"),
+                    resultSet.getBigDecimal("net_worth"),
+                    resultSet.getLong("included_account_count"),
+                    resultSet.getLong("active_account_count"),
+                    resultSet.getLong("archived_account_count"
                     )
                 ),
             userId
@@ -156,22 +118,11 @@ public class ReportingReadRepository {
                 """,
             (resultSet, rowNum) ->
                 new MonthlyCashFlowRow(
-                    resultSet.getString(
-                        "currency_code"
-                    ),
-                    resultSet.getObject(
-                        "month_start",
-                        LocalDate.class
-                    ),
-                    resultSet.getBigDecimal(
-                        "total_income"
-                    ),
-                    resultSet.getBigDecimal(
-                        "total_expenses"
-                    ),
-                    resultSet.getBigDecimal(
-                        "net_cash_flow"
-                    )
+                    resultSet.getString("currency_code"),
+                    resultSet.getObject("month_start", LocalDate.class),
+                    resultSet.getBigDecimal("total_income"),
+                    resultSet.getBigDecimal("total_expenses"),
+                    resultSet.getBigDecimal("net_cash_flow")
                 ),
             userId,
             fromMonth,
@@ -207,26 +158,12 @@ public class ReportingReadRepository {
                 """,
             (resultSet, rowNum) ->
                 new MonthlyCategorySpendingRow(
-                    resultSet.getString(
-                        "currency_code"
-                    ),
-                    resultSet.getObject(
-                        "month_start",
-                        LocalDate.class
-                    ),
-                    resultSet.getObject(
-                        "category_id",
-                        UUID.class
-                    ),
-                    resultSet.getString(
-                        "category_name"
-                    ),
-                    resultSet.getBigDecimal(
-                        "spent_amount"
-                    ),
-                    resultSet.getLong(
-                        "transaction_count"
-                    )
+                    resultSet.getString("currency_code"),
+                    resultSet.getObject("month_start", LocalDate.class),
+                    resultSet.getObject("category_id", UUID.class),
+                    resultSet.getString("category_name"),
+                    resultSet.getBigDecimal("spent_amount"),
+                    resultSet.getLong("transaction_count")
                 ),
             userId,
             fromMonth,
@@ -266,49 +203,19 @@ public class ReportingReadRepository {
                 """,
             (resultSet, rowNum) ->
                 new BudgetPerformanceRow(
-                    resultSet.getObject(
-                        "budget_id",
-                        UUID.class
-                    ),
-                    resultSet.getString(
-                        "budget_name"
-                    ),
-                    resultSet.getObject(
-                        "budget_month",
-                        LocalDate.class
-                    ),
-                    resultSet.getString(
-                        "currency_code"
-                    ),
-                    resultSet.getString(
-                        "budget_status"
-                    ),
-                    resultSet.getObject(
-                        "budget_limit_id",
-                        UUID.class
-                    ),
-                    resultSet.getObject(
-                        "category_id",
-                        UUID.class
-                    ),
-                    resultSet.getString(
-                        "category_name"
-                    ),
-                    resultSet.getBigDecimal(
-                        "limit_amount"
-                    ),
-                    resultSet.getBigDecimal(
-                        "spent_amount"
-                    ),
-                    resultSet.getBigDecimal(
-                        "remaining_amount"
-                    ),
-                    resultSet.getBigDecimal(
-                        "utilization_percentage"
-                    ),
-                    resultSet.getBoolean(
-                        "exceeded"
-                    )
+                    resultSet.getObject("budget_id", UUID.class),
+                    resultSet.getString("budget_name"),
+                    resultSet.getObject("budget_month", LocalDate.class),
+                    resultSet.getString("currency_code"),
+                    resultSet.getString("budget_status"),
+                    resultSet.getObject("budget_limit_id", UUID.class),
+                    resultSet.getObject("category_id", UUID.class),
+                    resultSet.getString("category_name"),
+                    resultSet.getBigDecimal("limit_amount"),
+                    resultSet.getBigDecimal("spent_amount"),
+                    resultSet.getBigDecimal("remaining_amount"),
+                    resultSet.getBigDecimal("utilization_percentage"),
+                    resultSet.getBoolean("exceeded")
                 ),
             userId,
             budgetId
@@ -372,65 +279,23 @@ public class ReportingReadRepository {
                       AND goal_id = ?
                     """,
                 (resultSet, rowNum) ->
-                    new SavingsGoalProgressRow(
-                        resultSet.getObject(
-                            "goal_id",
-                            UUID.class
-                        ),
-                        resultSet.getString(
-                            "goal_name"
-                        ),
-                        resultSet.getString(
-                            "description"
-                        ),
-                        resultSet.getString(
-                            "currency_code"
-                        ),
-                        resultSet.getBigDecimal(
-                            "target_amount"
-                        ),
-                        resultSet.getBigDecimal(
-                            "contributed_amount"
-                        ),
-                        resultSet.getBigDecimal(
-                            "remaining_amount"
-                        ),
-                        resultSet.getBigDecimal(
-                            "progress_percentage"
-                        ),
-                        resultSet.getBoolean(
-                            "target_reached"
-                        ),
-                        resultSet.getObject(
-                            "target_date",
-                            LocalDate.class
-                        ),
-                        resultSet.getObject(
-                            "days_remaining",
-                            Integer.class
-                        ),
-                        resultSet.getLong(
-                            "contribution_count"
-                        ),
-                        resultSet.getString(
-                            "status"
-                        ),
-                        instant(
-                            resultSet,
-                            "completed_at"
-                        ),
-                        instant(
-                            resultSet,
-                            "archived_at"
-                        ),
-                        instant(
-                            resultSet,
-                            "created_at"
-                        ),
-                        instant(
-                            resultSet,
-                            "updated_at"
-                        )
+                    new SavingsGoalProgressRow(resultSet.getObject("goal_id", UUID.class),
+                        resultSet.getString("goal_name"),
+                        resultSet.getString("description"),
+                        resultSet.getString("currency_code"),
+                        resultSet.getBigDecimal("target_amount"),
+                        resultSet.getBigDecimal("contributed_amount"),
+                        resultSet.getBigDecimal("remaining_amount"),
+                        resultSet.getBigDecimal("progress_percentage"),
+                        resultSet.getBoolean("target_reached"),
+                        resultSet.getObject("target_date", LocalDate.class),
+                        resultSet.getObject("days_remaining", Integer.class),
+                        resultSet.getLong("contribution_count"),
+                        resultSet.getString("status"),
+                        instant(resultSet, "completed_at"),
+                        instant(resultSet, "archived_at"),
+                        instant(resultSet, "created_at"),
+                        instant(resultSet, "updated_at")
                     ),
                 userId,
                 goalId
@@ -473,52 +338,20 @@ public class ReportingReadRepository {
                 """,
             (resultSet, rowNum) ->
                 new RecurringTransactionDueRow(
-                    resultSet.getObject(
-                        "recurring_transaction_id",
-                        UUID.class
-                    ),
-                    resultSet.getString(
-                        "name"
-                    ),
-                    resultSet.getString(
-                        "transaction_type"
-                    ),
-                    resultSet.getBigDecimal(
-                        "amount"
-                    ),
-                    resultSet.getString(
-                        "frequency"
-                    ),
-                    resultSet.getShort(
-                        "interval_count"
-                    ),
-                    resultSet.getObject(
-                        "next_due_date",
-                        LocalDate.class
-                    ),
-                    resultSet.getInt(
-                        "days_overdue"
-                    ),
-                    resultSet.getBoolean(
-                        "auto_post"
-                    ),
-                    resultSet.getObject(
-                        "account_id",
-                        UUID.class
-                    ),
-                    resultSet.getString(
-                        "account_name"
-                    ),
-                    resultSet.getString(
-                        "currency_code"
-                    ),
-                    resultSet.getObject(
-                        "category_id",
-                        UUID.class
-                    ),
-                    resultSet.getString(
-                        "category_name"
-                    )
+                    resultSet.getObject("recurring_transaction_id", UUID.class),
+                    resultSet.getString("name"),
+                    resultSet.getString("transaction_type"),
+                    resultSet.getBigDecimal("amount"),
+                    resultSet.getString("frequency"),
+                    resultSet.getShort("interval_count"),
+                    resultSet.getObject("next_due_date", LocalDate.class),
+                    resultSet.getInt("days_overdue"),
+                    resultSet.getBoolean("auto_post"),
+                    resultSet.getObject("account_id", UUID.class),
+                    resultSet.getString("account_name"),
+                    resultSet.getString("currency_code"),
+                    resultSet.getObject("category_id", UUID.class),
+                    resultSet.getString("category_name")
                 ),
             userId,
             limit

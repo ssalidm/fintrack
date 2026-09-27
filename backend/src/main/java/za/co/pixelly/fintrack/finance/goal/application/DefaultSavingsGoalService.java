@@ -15,6 +15,7 @@ import za.co.pixelly.fintrack.finance.goal.domain.*;
 import za.co.pixelly.fintrack.finance.goal.persistence.*;
 
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -29,6 +30,7 @@ public class DefaultSavingsGoalService
     private final SavingsGoalRepository savingsGoalRepository;
     private final GoalContributionRepository contributionRepository;
     private final GoalCurrencyLookupRepository currencyLookupRepository;
+    private final Clock applicationClock;
 
 
     @Override
@@ -64,7 +66,7 @@ public class DefaultSavingsGoalService
             currency,
             request.targetAmount(),
             request.targetDate(),
-            Instant.now()
+            applicationClock.instant()
         );
 
         try {
@@ -191,7 +193,7 @@ public class DefaultSavingsGoalService
             Boolean.TRUE.equals(
                 request.clearTargetDate()
             ),
-            Instant.now()
+            applicationClock.instant()
         );
 
         try {
@@ -252,7 +254,7 @@ public class DefaultSavingsGoalService
         }
 
         goal.complete(
-            Instant.now()
+            applicationClock.instant()
         );
 
         SavingsGoal saved = savingsGoalRepository
@@ -297,7 +299,7 @@ public class DefaultSavingsGoalService
         );
 
         goal.archive(
-            Instant.now()
+            applicationClock.instant()
         );
 
         SavingsGoal saved = savingsGoalRepository
@@ -332,7 +334,7 @@ public class DefaultSavingsGoalService
                 request.amount(),
                 request.contributionDate(),
                 request.note(),
-                Instant.now()
+                applicationClock.instant()
             );
 
         contributionRepository
@@ -456,7 +458,7 @@ public class DefaultSavingsGoalService
             request.amount(),
             request.contributionDate(),
             request.note(),
-            Instant.now()
+            applicationClock.instant()
         );
 
         contributionRepository
@@ -513,7 +515,7 @@ public class DefaultSavingsGoalService
          */
         contribution.voidContribution(
             request.reason(),
-            Instant.now()
+           applicationClock.instant()
         );
 
         contributionRepository
