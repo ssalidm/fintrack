@@ -1,6 +1,6 @@
 import {
   ArrowRight,
-  Plus,
+  ReceiptText,
   Repeat2,
 } from 'lucide-react'
 import { useState } from 'react'
@@ -171,10 +171,10 @@ export default function OverviewBalancePanel({
             inline-flex
             items-center
             justify-center
-            gap-2
+            gap-1
             rounded-xl
             bg-primary
-            px-4 py-2.5
+            px-2 py-2.5
             text-sm font-semibold
             text-inverse
             transition
@@ -195,17 +195,17 @@ export default function OverviewBalancePanel({
             inline-flex
             items-center
             justify-center
-            gap-2
+            gap-1
             rounded-xl
             bg-surface-muted
-            px-4 py-2.5
+            px-2 py-2.5
             text-sm font-semibold
             text-ink
             transition
             hover:bg-surface-strong
           "
         >
-          <Plus
+          <ReceiptText
             size={15}
             aria-hidden
           />

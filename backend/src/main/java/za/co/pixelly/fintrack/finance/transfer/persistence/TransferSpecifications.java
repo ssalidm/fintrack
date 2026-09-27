@@ -16,18 +16,15 @@ public final class TransferSpecifications {
         UUID userId,
         TransferQuery filters
     ) {
-        Specification<Transfer> specification =
-            ownedBy(userId);
+        Specification<Transfer> specification = ownedBy(userId);
 
         if (
-            filters.getSourceAccountId()
-                != null
+            filters.getSourceAccountId() != null
         ) {
             specification =
                 specification.and(
                     sourceAccountIs(
-                        filters
-                            .getSourceAccountId()
+                        filters.getSourceAccountId()
                     )
                 );
         }
