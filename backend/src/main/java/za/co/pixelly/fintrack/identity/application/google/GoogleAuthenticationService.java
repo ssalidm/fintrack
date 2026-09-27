@@ -129,7 +129,8 @@ public class GoogleAuthenticationService {
         userRoleRepository.save(
             UserRole.assign(
                 user,
-                role
+                role,
+                now
             )
         );
 

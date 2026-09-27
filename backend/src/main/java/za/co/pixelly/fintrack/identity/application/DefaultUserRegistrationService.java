@@ -15,6 +15,9 @@ import za.co.pixelly.fintrack.identity.persistence.ApplicationRoleRepository;
 import za.co.pixelly.fintrack.identity.persistence.UserRepository;
 import za.co.pixelly.fintrack.identity.persistence.UserRoleRepository;
 
+import java.time.Clock;
+import java.time.Instant;
+
 import static za.co.pixelly.fintrack.identity.application.EmailAddressNormalizer.normalize;
 
 @Service
@@ -28,11 +31,13 @@ public class DefaultUserRegistrationService implements UserRegistrationService {
     private final UserRoleRepository userRoleRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailVerificationService emailVerificationService;
+    private final Clock applicationClock;
 
     @Override
     @Transactional
     public RegisterResponse register(RegisterRequest request) {
         String email = normalize(request.email());
+        Instant now = applicationClock.instant();
 
         if (userRepository.existsByEmail(email)) {
             throw new DuplicateEmailException();
@@ -45,7 +50,8 @@ public class DefaultUserRegistrationService implements UserRegistrationService {
             email,
             passwordEncoder.encode(request.password().trim()),
             request.firstName().trim(),
-            request.lastName().trim()
+            request.lastName().trim(),
+            now
         );
 
         try {
@@ -55,7 +61,10 @@ public class DefaultUserRegistrationService implements UserRegistrationService {
         }
 
         userRoleRepository.save(
-            UserRole.assign(user, userRole)
+            UserRole.assign(
+                user,
+                userRole,
+                now)
         );
 
         emailVerificationService.issueFor(user);

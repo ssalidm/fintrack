@@ -106,7 +106,8 @@ public class RegistrationCompletionService {
         userRoleRepository.save(
             UserRole.assign(
                 user,
-                userRole
+                userRole,
+                now
             )
         );
 

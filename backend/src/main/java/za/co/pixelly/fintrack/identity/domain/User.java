@@ -8,15 +8,23 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users", schema = "identity")
+@Table(
+    name = "users",
+    schema = "identity"
+)
 @Getter
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(
+        strategy = GenerationType.UUID
+    )
     private UUID id;
 
-    @Column(nullable = false, length = 320)
+    @Column(
+        nullable = false,
+        length = 320
+    )
     private String email;
 
     /*
@@ -24,7 +32,10 @@ public class User {
      * a local password until the user explicitly
      * creates one.
      */
-    @Column(name = "password_hash", length = 255)
+    @Column(
+        name = "password_hash",
+        length = 255
+    )
     private String passwordHash;
 
     @Column(
@@ -130,7 +141,8 @@ public class User {
         String preferredName,
         Instant now
     ) {
-        User user = new User();
+        User user =
+            new User();
 
         user.email = email;
         user.passwordHash = passwordHash;
@@ -158,10 +170,9 @@ public class User {
         String email,
         String passwordHash,
         String firstName,
-        String lastName
+        String lastName,
+        Instant now
     ) {
-        Instant now = Instant.now();
-
         return new User(
             email,
             passwordHash,
@@ -204,7 +215,8 @@ public class User {
 
 
     public boolean isActive() {
-        return status == UserStatus.ACTIVE;
+        return status
+            == UserStatus.ACTIVE;
     }
 
 
@@ -219,7 +231,8 @@ public class User {
 
 
     public boolean isPendingVerification() {
-        return status == UserStatus.PENDING_VERIFICATION;
+        return status
+            == UserStatus.PENDING_VERIFICATION;
     }
 
 
@@ -227,31 +240,45 @@ public class User {
         Instant now
     ) {
         if (
-            status != UserStatus.PENDING_VERIFICATION
+            status
+                != UserStatus.PENDING_VERIFICATION
         ) {
             throw new IllegalStateException(
                 "User is not awaiting email verification"
             );
         }
 
-        status = UserStatus.ACTIVE;
-        emailVerifiedAt = now;
-        updatedAt = now;
+        status =
+            UserStatus.ACTIVE;
+
+        emailVerifiedAt =
+            now;
+
+        updatedAt =
+            now;
     }
 
 
     public void recordSuccessfulLogin(
         Instant now
     ) {
-        failedLoginAttempts = 0;
-        lockedUntil = null;
-        lastLoginAt = now;
-        updatedAt = now;
+        failedLoginAttempts =
+            0;
+
+        lockedUntil =
+            null;
+
+        lastLoginAt =
+            now;
+
+        updatedAt =
+            now;
     }
 
 
     public boolean isPasswordResetEligible() {
-        return status != UserStatus.DEACTIVATED;
+        return status
+            != UserStatus.DEACTIVATED;
     }
 
 
@@ -259,11 +286,20 @@ public class User {
         String newPasswordHash,
         Instant now
     ) {
-        passwordHash = newPasswordHash;
-        passwordChangedAt = now;
-        failedLoginAttempts = 0;
-        lockedUntil = null;
-        updatedAt = now;
+        passwordHash =
+            newPasswordHash;
+
+        passwordChangedAt =
+            now;
+
+        failedLoginAttempts =
+            0;
+
+        lockedUntil =
+            null;
+
+        updatedAt =
+            now;
     }
 
 
@@ -288,19 +324,27 @@ public class User {
                 now
             )
         ) {
-            failedLoginAttempts = 0;
-            lockedUntil = null;
+            failedLoginAttempts =
+                0;
+
+            lockedUntil =
+                null;
         }
 
         failedLoginAttempts++;
 
         if (
-            failedLoginAttempts >= maxFailedAttempts
+            failedLoginAttempts
+                >= maxFailedAttempts
         ) {
-            lockedUntil = now.plus(lockDuration);
+            lockedUntil =
+                now.plus(
+                    lockDuration
+                );
         }
 
-        updatedAt = now;
+        updatedAt =
+            now;
     }
 
 
@@ -308,14 +352,17 @@ public class User {
         String firstName,
         String lastName,
         String preferredName,
-        String timeZone
+        String timeZone,
+        Instant now
     ) {
         if (firstName != null) {
-            this.firstName = firstName.trim();
+            this.firstName =
+                firstName.trim();
         }
 
         if (lastName != null) {
-            this.lastName = lastName.trim();
+            this.lastName =
+                lastName.trim();
         }
 
         if (preferredName != null) {
@@ -326,8 +373,12 @@ public class User {
         }
 
         if (timeZone != null) {
-            this.timeZone = timeZone.trim();
+            this.timeZone =
+                timeZone.trim();
         }
+
+        updatedAt =
+            now;
     }
 
 
@@ -335,9 +386,14 @@ public class User {
         String newEmail,
         Instant now
     ) {
-        email = newEmail;
-        emailVerifiedAt = now;
-        updatedAt = now;
+        email =
+            newEmail;
+
+        emailVerifiedAt =
+            now;
+
+        updatedAt =
+            now;
     }
 
 
@@ -345,8 +401,11 @@ public class User {
         String timeZone,
         Instant now
     ) {
-        this.timeZone = timeZone;
-        updatedAt = now;
+        this.timeZone =
+            timeZone;
+
+        updatedAt =
+            now;
     }
 
 
@@ -354,15 +413,19 @@ public class User {
         Instant now
     ) {
         if (
-            status == UserStatus.DEACTIVATED
+            status
+                == UserStatus.DEACTIVATED
         ) {
             throw new IllegalStateException(
                 "User is already deactivated"
             );
         }
 
-        status = UserStatus.DEACTIVATED;
-        updatedAt = now;
+        status =
+            UserStatus.DEACTIVATED;
+
+        updatedAt =
+            now;
     }
 
 
@@ -370,21 +433,18 @@ public class User {
         Instant now
     ) {
         if (
-            status != UserStatus.DEACTIVATED
+            status
+                != UserStatus.DEACTIVATED
         ) {
             throw new IllegalStateException(
                 "Only deactivated users can be activated"
             );
         }
 
-        status = UserStatus.ACTIVE;
-        updatedAt = now;
-    }
+        status =
+            UserStatus.ACTIVE;
 
-
-    @PreUpdate
-    void updateTimeStamp() {
         updatedAt =
-            Instant.now();
+            now;
     }
 }
