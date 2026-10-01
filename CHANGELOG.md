@@ -2,7 +2,7 @@
 
 All notable changes to Salif will be documented in this file.
 
-## [2.0.0] - 2026-10-01qq
+## [2.0.0] - 2026-10-01
 
 ### Breaking Changes
 
