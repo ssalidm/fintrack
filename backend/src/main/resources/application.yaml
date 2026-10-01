@@ -64,7 +64,7 @@ fintrack:
       allowed-origins: []
 
   api:
-    base-path: ${FINTRACK_API_BASE_PATH:/api/v1}
+    base-path: ${FINTRACK_API_BASE_PATH:/api/v2}
 
   recurring:
     processing-cron: "0 0 * * * *"
@@ -94,6 +94,18 @@ fintrack:
       ip-daily-window: PT24H
       email-capacity: 3
       email-window: PT1H
+
+  profile:
+    avatar:
+      storage: ${FINTRACK_PROFILE_AVATAR_STORAGE:filesystem}
+      directory: ${FINTRACK_PROFILE_AVATAR_DIRECTORY:./data/profile-avatars}
+
+  storage:
+    r2:
+      endpoint: ${FINTRACK_R2_ENDPOINT:}
+      bucket: ${FINTRACK_R2_BUCKET:}
+      access-key-id: ${FINTRACK_R2_ACCESS_KEY_ID:}
+      secret-access-key: ${FINTRACK_R2_SECRET_ACCESS_KEY:}
 
 springdoc:
   api-docs:

@@ -28,8 +28,12 @@ public class IdentityTestClient {
         "FinTrack integration test";
 
     private final MockMvc mockMvc;
-    private final TestEmailVerificationSender emailVerificationSender;
+
+    private final TestRegistrationEmailSender
+        registrationEmailSender;
+
     private final JwtDecoder jwtDecoder;
+
     private final ApiProperties apiProperties;
 
     private final JsonParser jsonParser =
@@ -38,15 +42,21 @@ public class IdentityTestClient {
 
     public IdentityTestClient(
         MockMvc mockMvc,
-        TestEmailVerificationSender emailVerificationSender,
+        TestRegistrationEmailSender registrationEmailSender,
         JwtDecoder jwtDecoder,
         ApiProperties apiProperties
     ) {
-        this.mockMvc = mockMvc;
-        this.emailVerificationSender =
-            emailVerificationSender;
-        this.jwtDecoder = jwtDecoder;
-        this.apiProperties = apiProperties;
+        this.mockMvc =
+            mockMvc;
+
+        this.registrationEmailSender =
+            registrationEmailSender;
+
+        this.jwtDecoder =
+            jwtDecoder;
+
+        this.apiProperties =
+            apiProperties;
     }
 
 
@@ -61,16 +71,41 @@ public class IdentityTestClient {
                     UUID.randomUUID()
                 );
 
-        register(
+        createUser(
             email,
             DEFAULT_PASSWORD
         );
 
-        verifyEmail(email);
-
         return login(
             email,
             DEFAULT_PASSWORD
+        );
+    }
+
+
+    public void createUser(
+        String email,
+        String password
+    ) throws Exception {
+
+        startRegistration(
+            email
+        );
+
+        String registrationToken =
+            registrationEmailSender
+                .tokenFor(
+                    email
+                );
+
+        assertNotNull(
+            registrationToken,
+            "Registration should issue a registration token"
+        );
+
+        completeRegistration(
+            registrationToken,
+            password
         );
     }
 
@@ -95,7 +130,11 @@ public class IdentityTestClient {
     ) throws Exception {
 
         return mockMvc.perform(
-            post(api("/auth/login"))
+            post(
+                api(
+                    "/auth/login"
+                )
+            )
                 .header(
                     "User-Agent",
                     userAgent
@@ -134,29 +173,34 @@ public class IdentityTestClient {
 
         Map<String, Object> root =
             jsonParser.parseMap(
-                result.getResponse()
+                result
+                    .getResponse()
                     .getContentAsString()
             );
 
         Map<String, Object> response =
-            (Map<String, Object>) root.get(
-                "result"
-            );
+            (Map<String, Object>)
+                root.get(
+                    "result"
+                );
 
         Map<String, Object> tokens =
-            (Map<String, Object>) response.get(
-                "tokens"
-            );
+            (Map<String, Object>)
+                response.get(
+                    "tokens"
+                );
 
         String accessToken =
-            (String) tokens.get(
-                "accessToken"
-            );
+            (String)
+                tokens.get(
+                    "accessToken"
+                );
 
         String refreshToken =
-            (String) tokens.get(
-                "refreshToken"
-            );
+            (String)
+                tokens.get(
+                    "refreshToken"
+                );
 
         Jwt jwt =
             jwtDecoder.decode(
@@ -333,15 +377,14 @@ public class IdentityTestClient {
     }
 
 
-    private void register(
-        String email,
-        String password
+    private void startRegistration(
+        String email
     ) throws Exception {
 
         mockMvc.perform(
                 post(
                     api(
-                        "/auth/register"
+                        "/auth/registration/start"
                     )
                 )
                     .contentType(
@@ -349,13 +392,43 @@ public class IdentityTestClient {
                     )
                     .content("""
                         {
-                          "email": "%s",
-                          "password": "%s",
-                          "firstName": "Integration",
-                          "lastName": "Test"
+                          "email": "%s"
                         }
                         """.formatted(
-                        email,
+                        email
+                    ))
+            )
+            .andExpect(
+                status().isAccepted()
+            );
+    }
+
+
+    private void completeRegistration(
+        String registrationToken,
+        String password
+    ) throws Exception {
+
+        mockMvc.perform(
+                post(
+                    api(
+                        "/auth/registration/complete"
+                    )
+                )
+                    .contentType(
+                        MediaType.APPLICATION_JSON
+                    )
+                    .content("""
+                        {
+                          "token": "%s",
+                          "firstName": "Integration",
+                          "lastName": "Test",
+                          "preferredName": null,
+                          "password": "%s",
+                          "acceptTerms": true
+                        }
+                        """.formatted(
+                        registrationToken,
                         password
                     ))
             )
@@ -365,46 +438,9 @@ public class IdentityTestClient {
     }
 
 
-    private void verifyEmail(
-        String email
-    ) throws Exception {
-
-        String verificationToken =
-            emailVerificationSender
-                .tokenFor(email);
-
-        assertNotNull(
-            verificationToken,
-            "Registration should issue an email verification token"
-        );
-
-        mockMvc.perform(
-                post(
-                    api(
-                        "/auth/verify-email"
-                    )
-                )
-                    .contentType(
-                        MediaType.APPLICATION_JSON
-                    )
-                    .content("""
-                        {
-                          "token": "%s"
-                        }
-                        """.formatted(
-                        verificationToken
-                    ))
-            )
-            .andExpect(
-                status().isOk()
-            );
-    }
-
-
     private String api(
         String path
     ) {
-
         if (
             path == null
                 || path.isBlank()
@@ -413,7 +449,8 @@ public class IdentityTestClient {
         }
 
         return path.startsWith("/")
-            ? apiProperties.basePath() + path
+            ? apiProperties.basePath()
+            + path
             : apiProperties.basePath()
             + "/"
             + path;

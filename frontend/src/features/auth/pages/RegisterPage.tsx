@@ -353,7 +353,7 @@ export default function RegisterPage() {
 
         <Link
           to="/login"
-          className="font-semibold text-[#16805f] transition hover:text-[#0d4f3f] hover:underline"
+          className="font-semibold text-accent transition hover:text-[#0d4f3f] hover:underline"
         >
           Sign in
         </Link>

@@ -28,32 +28,15 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
     private final JsonParser jsonParser = new JacksonJsonParser();
 
     @Test
-    void pendingVerificationUserCannotLogin() throws Exception {
-        String email = uniqueEmail("pending");
-        String password = "SecurePassword123!";
-
-        registerUser(email, password);
-
-        mockMvc.perform(post(api("/auth/login"))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                        {
-                            "email": "%s",
-                            "password": "%s"
-                        }
-                    """.formatted(email, password)))
-            .andExpect(status().isForbidden())
-            .andExpect(jsonPath("$.success").value(false));
-
-    }
-
-    @Test
     void loginRejectsIncorrectPassword() throws Exception {
 
         String email = uniqueEmail("wrong-password");
+        String password = "SecurePassword123!";
 
-        registerUser(email, "SecurePassword123!");
-        activateUser(email);
+        identityTestClient.createUser(
+            email,
+            password
+        );
 
         mockMvc.perform(post(api("/auth/login"))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -75,8 +58,10 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
         String email = uniqueEmail("login");
         String password = "SecurePassword123!";
 
-        registerUser(email, password);
-        activateUser(email);
+        identityTestClient.createUser(
+            email,
+            password
+        );
 
         MvcResult result = login(email, password);
 
@@ -137,8 +122,10 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
         String email = uniqueEmail("jwt");
         String password = "SecurePassword123!";
 
-        registerUser(email, password);
-        activateUser(email);
+        identityTestClient.createUser(
+            email,
+            password
+        );
 
         MvcResult loginResult =
             login(email, password);
@@ -215,8 +202,10 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
         String email = uniqueEmail("refresh");
         String password = "SecurePassword123!";
 
-        registerUser(email, password);
-        activateUser(email);
+        identityTestClient.createUser(
+            email,
+            password
+        );
 
         MvcResult loginResult =
             login(email, password);
@@ -298,36 +287,17 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
             .andExpect(status().isUnauthorized());
     }
 
-    private void registerUser(
-        String email,
-        String password
-    ) throws Exception {
-        mockMvc.perform(post(api("/auth/register"))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                    {
-                       "email": "%s",
-                       "password": "%s",
-                       "firstName": "David",
-                       "lastName": "Test"
-                    }
-                    """.formatted(email, password)))
-            .andExpect(status().isCreated());
-    }
-
     @Test
     void failedLoginIncrementsFailedAttemptCounter()
         throws Exception {
 
-        String email =
-            uniqueEmail("failed-attempt");
+        String email = uniqueEmail("failed-attempt");
+        String password = "SecurePassword123!";
 
-        registerUser(
+        identityTestClient.createUser(
             email,
-            "SecurePassword123!"
+            password
         );
-
-        activateUser(email);
 
         mockMvc.perform(
                 post(api("/auth/login"))
@@ -358,15 +328,13 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
     void repeatedFailedLoginsTemporarilyLockAccount()
         throws Exception {
 
-        String email =
-            uniqueEmail("lockout");
+        String email = uniqueEmail("lockout");
+        String password = "SecurePassword123!";
 
-        registerUser(
+        identityTestClient.createUser(
             email,
-            "SecurePassword123!"
+            password
         );
-
-        activateUser(email);
 
         for (int attempt = 0; attempt < 5; attempt++) {
 
@@ -439,15 +407,13 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
     void successfulLoginClearsPreviousFailedAttempts()
         throws Exception {
 
-        String email =
-            uniqueEmail("failure-reset");
+        String email = uniqueEmail("failure-reset");
+        String password = "SecurePassword123!";
 
-        registerUser(
+        identityTestClient.createUser(
             email,
-            "SecurePassword123!"
+            password
         );
-
-        activateUser(email);
 
         for (int attempt = 0; attempt < 2; attempt++) {
 
@@ -503,15 +469,13 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
     void expiredTemporaryLockAllowsLoginAgain()
         throws Exception {
 
-        String email =
-            uniqueEmail("expired-lock");
+        String email = uniqueEmail("expired-lock");
+        String password = "SecurePassword123!";
 
-        registerUser(
+        identityTestClient.createUser(
             email,
-            "SecurePassword123!"
+            password
         );
-
-        activateUser(email);
 
         jdbcTemplate.update("""
                 UPDATE identity.users
@@ -548,8 +512,10 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
         String email = uniqueEmail("logout");
         String password = "SecurePassword123!";
 
-        registerUser(email, password);
-        activateUser(email);
+        identityTestClient.createUser(
+            email,
+            password
+        );
 
         MvcResult loginResult =
             login(email, password);
@@ -624,12 +590,10 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
         String password =
             "SecurePassword123!";
 
-        registerUser(
+        identityTestClient.createUser(
             email,
             password
         );
-
-        activateUser(email);
 
         UUID userId =
             jdbcTemplate.queryForObject(
@@ -671,7 +635,7 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
                 )
                 """,
             userId,
-            new byte[] { 1 },
+            new byte[]{1},
             new byte[12]
         );
 
@@ -686,11 +650,11 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
                             MediaType.APPLICATION_JSON
                         )
                         .content("""
-                        {
-                          "email": "%s",
-                          "password": "%s"
-                        }
-                        """.formatted(
+                            {
+                              "email": "%s",
+                              "password": "%s"
+                            }
+                            """.formatted(
                             email,
                             password
                         ))
@@ -802,21 +766,6 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
             challengeToken,
             challengeHash
         );
-    }
-
-
-    private void activateUser(String email) {
-
-        int updated = jdbcTemplate.update("""
-                UPDATE identity.users
-                   SET status = 'ACTIVE',
-                       email_verified_at = CURRENT_TIMESTAMP
-                 WHERE email = ?
-                """,
-            email
-        );
-
-        assertEquals(1, updated);
     }
 
     private MvcResult login(

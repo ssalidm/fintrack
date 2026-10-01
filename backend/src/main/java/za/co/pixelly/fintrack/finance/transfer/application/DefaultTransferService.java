@@ -14,7 +14,7 @@ import za.co.pixelly.fintrack.finance.account.application.exceptions.AccountNotF
 import za.co.pixelly.fintrack.finance.account.domain.Account;
 import za.co.pixelly.fintrack.finance.account.domain.AccountStatus;
 import za.co.pixelly.fintrack.finance.account.persistence.AccountRepository;
-import za.co.pixelly.fintrack.finance.transaction.persistence.TransferSpecifications;
+import za.co.pixelly.fintrack.finance.transfer.persistence.TransferSpecifications;
 import za.co.pixelly.fintrack.finance.transfer.api.CreateTransferRequest;
 import za.co.pixelly.fintrack.finance.transfer.api.TransferQuery;
 import za.co.pixelly.fintrack.finance.transfer.api.TransferResponse;
@@ -27,7 +27,6 @@ import za.co.pixelly.fintrack.finance.transfer.persistence.TransferRepository;
 
 import java.util.UUID;
 
-import static za.co.pixelly.fintrack.common.Util.normalizeNullable;
 import static za.co.pixelly.fintrack.common.concurrency.VersionGuard.requireCurrent;
 
 
@@ -161,5 +160,15 @@ public class DefaultTransferService implements TransferService {
         }
 
         return account;
+    }
+
+    private String normalizeNullable(String value) {
+        if (value == null) {
+            return null;
+        }
+
+        String trimmed = value.trim();
+
+        return trimmed.isEmpty() ? null : trimmed;
     }
 }

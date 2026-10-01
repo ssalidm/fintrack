@@ -59,7 +59,6 @@ public class SecurityConfig {
                     HttpMethod.POST,
                     apiPrefix + "/auth/registration/start",
                     apiPrefix + "/auth/registration/complete",
-                    apiPrefix + "/auth/register",
                     apiPrefix + "/auth/login",
                     apiPrefix + "/auth/google",
                     apiPrefix + "/auth/refresh",

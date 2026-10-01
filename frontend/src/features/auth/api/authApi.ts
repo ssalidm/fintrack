@@ -12,8 +12,6 @@ import type {
   MfaRecoverRequest,
   MfaVerifyRequest,
   RefreshRequest,
-  RegisterRequest,
-  RegisterResponse,
   ResendVerificationRequest,
   ResetPasswordRequest,
   TokenResponse,
@@ -46,15 +44,6 @@ export const authApi = {
     )
   },
   
-  register(request: RegisterRequest) {
-    return apiRequest<RegisterResponse>(
-      '/auth/register',
-      {
-        method: 'POST',
-        body: request,
-      },
-    )
-  },
 
   login(request: LoginRequest) {
     return apiRequest<LoginResponse>(

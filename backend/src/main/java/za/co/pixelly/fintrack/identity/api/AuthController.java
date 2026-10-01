@@ -34,7 +34,6 @@ public class AuthController {
 
     private final RegistrationRequestService registrationRequestService;
     private final RegistrationCompletionService registrationCompletionService;
-    private final UserRegistrationService registrationService;
     private final AuthenticationService authenticationService;
     private final EmailVerificationService emailVerificationService;
     private final PasswordResetService passwordResetService;
@@ -81,22 +80,6 @@ public class AuthController {
                     ApiMessage.Auth.REGISTRATION_COMPLETED
                 )
             );
-    }
-
-
-    @PostMapping("/register")
-    public ResponseEntity<ApiResponse<RegisterResponse>> register(
-        @Valid @RequestBody RegisterRequest request
-    ) {
-        RegisterResponse response = registrationService.register(request);
-
-        return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(ApiResponse.success(
-                HttpStatus.CREATED,
-                ApiMessage.Auth.REGISTER_SUCCESS,
-                response
-            ));
     }
 
 

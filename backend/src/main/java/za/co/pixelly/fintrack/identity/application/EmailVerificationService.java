@@ -12,8 +12,10 @@ import za.co.pixelly.fintrack.identity.domain.User;
 import za.co.pixelly.fintrack.identity.persistence.EmailVerificationTokenRepository;
 import za.co.pixelly.fintrack.identity.persistence.UserRepository;
 
+import java.time.Clock;
 import java.time.Instant;
-import java.util.Locale;
+
+import static za.co.pixelly.fintrack.identity.application.EmailAddressNormalizer.normalize;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +26,7 @@ public class EmailVerificationService {
     private final OpaqueTokenCodec tokenCodec;
     private final EmailVerificationProperties properties;
     private final ApplicationEventPublisher eventPublisher;
+    private final Clock applicationClock;
 
     @Transactional
     public void issueFor(User user) {
@@ -33,16 +36,16 @@ public class EmailVerificationService {
     @Transactional
     public void verify(String rawToken) {
 
-        Instant now = Instant.now();
+        Instant now = applicationClock.instant();
 
         String tokenHash =
             tokenCodec.hash(rawToken);
 
         EmailVerificationToken token = tokenRepository
-                .findByTokenHashForUpdate(tokenHash)
-                .orElseThrow(
-                    InvalidEmailVerificationTokenException::new
-                );
+            .findByTokenHashForUpdate(tokenHash)
+            .orElseThrow(
+                InvalidEmailVerificationTokenException::new
+            );
 
         if (!token.isUsable(now)) {
             throw new InvalidEmailVerificationTokenException();
@@ -68,19 +71,15 @@ public class EmailVerificationService {
 
     @Transactional
     public void resend(String email) {
-
-        String normalizedEmail =
-            email.trim().toLowerCase(Locale.ROOT);
-
         userRepository
-            .findByEmail(normalizedEmail)
+            .findByEmail(normalize(email))
             .filter(User::isPendingVerification)
             .ifPresent(this::issueToken);
     }
 
     private void issueToken(User user) {
 
-        Instant now = Instant.now();
+        Instant now = applicationClock.instant();
 
         tokenRepository
             .findActiveByUserIdForUpdate(user.getId())

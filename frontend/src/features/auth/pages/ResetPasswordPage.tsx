@@ -147,7 +147,7 @@ export default function ResetPasswordPage() {
         <div
           aria-labelledby="reset-password-title"
         >
-          <span className="mb-5 grid size-10 place-items-center rounded-full bg-[#e5f1eb] text-[#16805f]">
+          <span className="mb-5 grid size-10 place-items-center rounded-full bg-accent-soft text-accent">
             <CheckCircle2
               size={20}
               aria-hidden
@@ -193,7 +193,7 @@ export default function ResetPasswordPage() {
             Need another link?{' '}
             <Link
               to="/forgot-password"
-              className="font-semibold text-[#16805f] transition hover:text-[#0d4f3f] hover:underline"
+              className="font-semibold text-accent transition hover:text-[#0d4f3f] hover:underline"
             >
               Request a new one
             </Link>
@@ -354,7 +354,7 @@ export default function ResetPasswordPage() {
         <p className="mt-5 text-center text-sm text-[#657972]">
           <Link
             to="/login"
-            className="font-semibold text-[#16805f] transition hover:text-[#0d4f3f] hover:underline"
+            className="font-semibold text-accent transition hover:text-[#0d4f3f] hover:underline"
           >
             Return to sign in
           </Link>

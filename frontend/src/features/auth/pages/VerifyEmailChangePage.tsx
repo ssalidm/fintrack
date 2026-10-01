@@ -145,7 +145,7 @@ export default function VerifyEmailChangePage() {
         >
           <LoaderCircle
             size={28}
-            className="mb-5 animate-spin text-[#16805f]"
+            className="mb-5 animate-spin text-accent"
             aria-hidden
           />
 
@@ -167,7 +167,7 @@ export default function VerifyEmailChangePage() {
         <div
           aria-labelledby="email-change-title"
         >
-          <span className="mb-5 grid size-10 place-items-center rounded-full bg-[#e5f1eb] text-[#16805f]">
+          <span className="mb-5 grid size-10 place-items-center rounded-full bg-accent-soft text-accent">
             <CheckCircle2
               size={20}
               aria-hidden

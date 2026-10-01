@@ -5,7 +5,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import za.co.pixelly.fintrack.common.Util;
 import za.co.pixelly.fintrack.config.security.PasswordResetProperties;
 import za.co.pixelly.fintrack.identity.application.exceptions.InvalidPasswordResetTokenException;
 import za.co.pixelly.fintrack.identity.domain.PasswordResetToken;
@@ -15,8 +14,11 @@ import za.co.pixelly.fintrack.identity.persistence.PasswordResetTokenRepository;
 import za.co.pixelly.fintrack.identity.persistence.RefreshTokenRepository;
 import za.co.pixelly.fintrack.identity.persistence.UserRepository;
 
+import java.time.Clock;
 import java.time.Instant;
-import java.util.Locale;
+
+import static za.co.pixelly.fintrack.identity.application.EmailAddressNormalizer.normalize;
+
 
 @Service
 @RequiredArgsConstructor
@@ -34,15 +36,13 @@ public class PasswordResetService {
     private final PasswordResetProperties properties;
 
     private final ApplicationEventPublisher eventPublisher;
+    private final Clock applicationClock;
+
 
     @Transactional
     public void requestReset(String email) {
-
-        String normalizedEmail =
-            email.trim().toLowerCase(Locale.ROOT);
-
         userRepository
-            .findByEmail(normalizedEmail)
+            .findByEmail(normalize(email))
             .filter(User::isPasswordResetEligible)
             .ifPresent(this::issueToken);
     }
@@ -52,7 +52,7 @@ public class PasswordResetService {
         String rawToken,
         String newPassword
     ) {
-        Instant now = Instant.now();
+        Instant now = applicationClock.instant();
 
         String tokenHash =
             tokenCodec.hash(rawToken);
@@ -103,7 +103,7 @@ public class PasswordResetService {
 
     private void issueToken(User user) {
 
-        Instant now = Util.now();
+        Instant now = applicationClock.instant();
 
         tokenRepository
             .findActiveByUserIdForUpdate(user.getId())

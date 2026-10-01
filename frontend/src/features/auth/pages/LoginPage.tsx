@@ -522,7 +522,7 @@ export default function LoginPage() {
 
         <Link
           to="/register"
-          className="font-semibold text-[#16805f] transition hover:text-[#0d4f3f] hover:underline"
+          className="font-semibold text-accent transition hover:text-[#0d4f3f] hover:underline"
         >
           Create an account
         </Link>

@@ -5,8 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import za.co.pixelly.fintrack.identity.application.OpaqueTokenCodec;
+import za.co.pixelly.fintrack.identity.domain.User;
+import za.co.pixelly.fintrack.identity.persistence.UserRepository;
 import za.co.pixelly.fintrack.integration.AbstractIntegrationTest;
 
+import java.time.Clock;
 import java.util.Map;
 import java.util.UUID;
 
@@ -25,6 +28,12 @@ public class EmailFirstRegistrationIntegrationTest
 
     @Autowired
     private OpaqueTokenCodec tokenCodec;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private Clock applicationClock;
 
 
     @Test
@@ -176,7 +185,7 @@ public class EmailFirstRegistrationIntegrationTest
         String email =
             uniqueEmail("existing-user");
 
-        registerLegacyUser(
+        createExistingUserDirectly(
             email,
             PASSWORD
         );
@@ -692,7 +701,7 @@ public class EmailFirstRegistrationIntegrationTest
          * winning the race after the registration
          * email was issued.
          */
-        registerLegacyUser(
+        createExistingUserDirectly(
             email,
             PASSWORD
         );
@@ -845,37 +854,25 @@ public class EmailFirstRegistrationIntegrationTest
     }
 
 
-    private void registerLegacyUser(
+    private void createExistingUserDirectly(
         String email,
         String password
-    ) throws Exception {
-
-        mockMvc.perform(
-                post(
-                    api(
-                        "/auth/register"
-                    )
-                )
-                    .contentType(
-                        MediaType.APPLICATION_JSON
-                    )
-                    .content(
-                        """
-                            {
-                              "email": "%s",
-                              "password": "%s",
-                              "firstName": "Existing",
-                              "lastName": "User"
-                            }
-                            """.formatted(
-                            email,
-                            password
-                        )
-                    )
-            )
-            .andExpect(
-                status().isCreated()
+    ) {
+        User user =
+            User.registerVerified(
+                email,
+                passwordEncoder.encode(
+                    password
+                ),
+                "Existing",
+                "User",
+                null,
+                applicationClock.instant()
             );
+
+        userRepository.saveAndFlush(
+            user
+        );
     }
 
 

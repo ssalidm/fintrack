@@ -392,10 +392,7 @@ export default function SupportPage() {
                 </p>
 
                 <h1 className="mt-4 text-4xl font-bold leading-[1.02] tracking-[-0.045em] text-ink sm:text-5xl lg:text-[3.6rem]">
-                  How can we Help
-                  <span className="blocks text-accent">
-                    ?
-                  </span>
+                  How can we help?
                 </h1>
 
                 <p className="mt-4 max-w-xl text-base leading-7 text-muted">
@@ -540,6 +537,7 @@ export default function SupportPage() {
                   aria-busy={
                     isSubmitting
                   }
+                  noValidate
                 >
                   <fieldset
                     disabled={
@@ -821,15 +819,9 @@ export default function SupportPage() {
 
                     {siteKey ? (
                       <SupportVerification
-                        key={
-                          verificationKey
-                        }
-                        siteKey={
-                          siteKey
-                        }
-                        onTokenChange={
-                          setTurnstileToken
-                        }
+                        key={verificationKey}
+                        siteKey={siteKey}
+                        onTokenChange={setTurnstileToken}
                       />
                     ) : (
                       <p

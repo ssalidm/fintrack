@@ -16,7 +16,7 @@ describe('formatMoney', () => {
     {
       amount: 1234.5,
       currency: 'USD',
-      expected: 'US$1\u00a0234,50',
+      expected: '$1\u00a0234,50',
     },
     {
       amount: 1234.5,

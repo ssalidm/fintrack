@@ -19,6 +19,7 @@ import za.co.pixelly.fintrack.identity.persistence.RefreshTokenRepository;
 import za.co.pixelly.fintrack.identity.persistence.UserRepository;
 import za.co.pixelly.fintrack.identity.persistence.UserRoleRepository;
 
+import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -34,6 +35,7 @@ public class DefaultUserProfileService implements UserProfileService {
     private final PasswordEncoder passwordEncoder;
     private final AuthSessionRepository authSessionRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final Clock applicationClock;
 
     private static final String PASSWORD_CHANGE_REASON = "PASSWORD_CHANGED";
     private static final String USER_SESSION_REVOCATION_REASON = "USER_REVOKED_SESSION";
@@ -71,7 +73,8 @@ public class DefaultUserProfileService implements UserProfileService {
             request.firstName(),
             request.lastName(),
             request.preferredName(),
-            request.timeZone()
+            request.timeZone(),
+            applicationClock.instant()
         );
 
         User saved = userRepository.saveAndFlush(user);
@@ -89,7 +92,7 @@ public class DefaultUserProfileService implements UserProfileService {
     @Override
     @Transactional
     public void changePassword(UUID userId, ChangePasswordRequest request) {
-        Instant now = Instant.now();
+        Instant now = applicationClock.instant();
 
         User user = getUserForUpdate(userId);
 
@@ -157,7 +160,7 @@ public class DefaultUserProfileService implements UserProfileService {
     @Override
     @Transactional(readOnly = true)
     public List<UserSessionResponse> getSessions(UUID userId, UUID currentSessionId) {
-        Instant now = Instant.now();
+        Instant now = applicationClock.instant();
 
         return authSessionRepository.
             findAllByUserIdAndRevokedAtIsNullAndExpiresAtAfterOrderByLastSeenAtDesc(
@@ -201,7 +204,7 @@ public class DefaultUserProfileService implements UserProfileService {
                         )
                 );
 
-        Instant now = Instant.now();
+        Instant now = applicationClock.instant();
 
         refreshTokenRepository
             .revokeActiveBySessionId(
@@ -223,7 +226,7 @@ public class DefaultUserProfileService implements UserProfileService {
         UUID userId,
         UUID currentSessionId
     ) {
-        Instant now = Instant.now();
+        Instant now = applicationClock.instant();
 
         refreshTokenRepository
             .revokeActiveByUserIdExcludingSession(

@@ -21,6 +21,7 @@ import za.co.pixelly.fintrack.finance.category.domain.CategoryStatus;
 import za.co.pixelly.fintrack.finance.category.domain.CategoryType;
 import za.co.pixelly.fintrack.finance.category.persistence.CategoryRepository;
 
+import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -37,6 +38,7 @@ public class DefaultBudgetService implements BudgetService {
     private final BudgetCategoryLimitRepository budgetCategoryLimitRepository;
     private final BudgetCurrencyLookupRepository currencyLookupRepository;
     private final CategoryRepository categoryRepository;
+    private final Clock applicationClock;
 
 
     @Override
@@ -76,7 +78,7 @@ public class DefaultBudgetService implements BudgetService {
             request.name(),
             budgetMonth,
             currencyCode,
-            Instant.now()
+            applicationClock.instant()
         );
 
         try {
@@ -144,7 +146,7 @@ public class DefaultBudgetService implements BudgetService {
             )
         );
 
-        budget.rename(request.name(), Instant.now());
+        budget.rename(request.name(), applicationClock.instant());
 
         Budget saved = budgetRepository.saveAndFlush(budget);
 
@@ -173,7 +175,7 @@ public class DefaultBudgetService implements BudgetService {
             )
         );
 
-        budget.archive(Instant.now());
+        budget.archive(applicationClock.instant());
 
         Budget saved = budgetRepository.saveAndFlush(budget);
 
@@ -213,7 +215,7 @@ public class DefaultBudgetService implements BudgetService {
             userId,
             category.getId(),
             request.limitAmount(),
-            Instant.now()
+            applicationClock.instant()
         );
 
         try {
@@ -296,7 +298,7 @@ public class DefaultBudgetService implements BudgetService {
             limit.update(
                 request.categoryId(),
                 request.limitAmount(),
-                Instant.now()
+                applicationClock.instant()
             );
 
             budgetCategoryLimitRepository.saveAndFlush(limit);

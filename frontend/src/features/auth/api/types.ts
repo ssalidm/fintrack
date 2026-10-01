@@ -17,22 +17,6 @@ export interface CompleteRegistrationRequest {
   readonly acceptTerms: boolean
 }
 
-export interface RegisterRequest {
-  readonly email: string
-  readonly password: string
-  readonly firstName: string
-  readonly lastName: string
-}
-
-export interface RegisterResponse {
-  readonly id: string
-  readonly email: string
-  readonly firstName: string
-  readonly lastName: string
-  readonly status: UserStatus
-  readonly createdAt: string
-}
-
 export interface LoginRequest {
   readonly email: string
   readonly password: string

@@ -21,11 +21,11 @@ export default function AdminRoute() {
         <div className="text-center">
           <LoaderCircle
             size={30}
-            className="mx-auto animate-spin text-[#1f7a5c]"
+            className="mx-auto animate-spin text-accent"
             aria-hidden
           />
 
-          <p className="mt-3 text-sm text-[#607069]">
+          <p className="mt-3 text-sm text-muted">
             Confirming admin access…
           </p>
         </div>
@@ -33,30 +33,34 @@ export default function AdminRoute() {
     )
   }
 
-  const isAdmin = profileQuery.data?.roles.includes(
-    'ROLE_ADMIN',
-  )
+  const isAdmin =
+    profileQuery.data?.roles.includes(
+      'ROLE_ADMIN',
+    )
 
-  if (profileQuery.isError || !isAdmin) {
+  if (
+    profileQuery.isError ||
+    !isAdmin
+  ) {
     return (
       <main className="grid min-h-[calc(100vh-4rem)] place-items-center px-6 lg:min-h-screen">
-        <section className="w-full max-w-lg rounded-[2rem] border border-[#dedbd2] bg-[#fffdf8] p-8 text-center shadow-[0_20px_60px_rgba(23,79,67,0.08)]">
-          <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-[#f5e8df] text-[#a6533f]">
+        <section className="w-full max-w-lg rounded-[2rem] border border-line bg-surface p-8 text-center shadow-[var(--salif-shadow-panel)]">
+          <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-danger-soft text-danger">
             <ShieldAlert
               size={27}
               aria-hidden
             />
           </span>
 
-          <p className="mt-5 text-xs font-bold uppercase tracking-[0.18em] text-[#9a6c45]">
+          <p className="mt-5 text-xs font-bold uppercase tracking-[0.18em] text-warning">
             Restricted area
           </p>
 
-          <h1 className="mt-2 font-serif text-3xl text-[#173c32]">
+          <h1 className="mt-2 font-serif text-3xl text-ink">
             Admin access required
           </h1>
 
-          <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-[#607069]">
+          <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-muted">
             {profileQuery.isError
               ? 'We could not confirm your access right now. Please try again.'
               : 'Your account does not have permission to manage Salif users.'}
@@ -66,8 +70,10 @@ export default function AdminRoute() {
             {profileQuery.isError && (
               <button
                 type="button"
-                onClick={() => void profileQuery.refetch()}
-                className="cursor-pointer rounded-full bg-[#174f43] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0f3f35]"
+                onClick={() =>
+                  void profileQuery.refetch()
+                }
+                className="cursor-pointer rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-inverse transition hover:bg-primary-hover"
               >
                 Try again
               </button>
@@ -75,7 +81,7 @@ export default function AdminRoute() {
 
             <Link
               to="/dashboard"
-              className="cursor-pointer rounded-full border border-[#cfcac0] px-5 py-2.5 text-sm font-semibold text-[#173c32] transition hover:bg-[#f1eee6]"
+              className="cursor-pointer rounded-full border border-line-strong px-5 py-2.5 text-sm font-semibold text-ink transition hover:bg-surface-muted"
             >
               Return to overview
             </Link>

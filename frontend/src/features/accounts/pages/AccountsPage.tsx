@@ -471,7 +471,7 @@ export default function AccountsPage() {
                             }
                             {' · '}
                             {
-                              account.currencyCode
+                              account.currencyCode 
                             }
                             {' · '}
                             {balance

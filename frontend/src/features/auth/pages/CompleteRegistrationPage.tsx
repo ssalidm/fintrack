@@ -186,7 +186,7 @@ export default function CompleteRegistrationPage() {
         <div
           aria-labelledby="registration-complete-title"
         >
-          <span className="mb-5 grid size-10 place-items-center rounded-full bg-[#e5f1eb] text-[#16805f]">
+          <span className="mb-5 grid size-10 place-items-center rounded-full bg-accent-soft text-accent">
             <CheckCircle2
               size={20}
               aria-hidden
@@ -230,7 +230,7 @@ export default function CompleteRegistrationPage() {
             Need a new link?{' '}
             <Link
               to="/register"
-              className="font-semibold text-[#16805f] transition hover:text-[#0d4f3f] hover:underline"
+              className="font-semibold text-accent transition hover:text-[#0d4f3f] hover:underline"
             >
               Start registration again
             </Link>
@@ -501,7 +501,7 @@ export default function CompleteRegistrationPage() {
                   to="/terms"
                   target="_blank"
                   rel="noreferrer"
-                  className="font-semibold text-[#16805f] hover:text-[#0d4f3f] hover:underline"
+                  className="font-semibold text-accent hover:text-[#0d4f3f] hover:underline"
                   onClick={(
                     event,
                   ) =>
@@ -515,7 +515,7 @@ export default function CompleteRegistrationPage() {
                   to="/privacy"
                   target="_blank"
                   rel="noreferrer"
-                  className="font-semibold text-[#16805f] hover:text-[#0d4f3f] hover:underline"
+                  className="font-semibold text-accent hover:text-[#0d4f3f] hover:underline"
                   onClick={(
                     event,
                   ) =>
@@ -564,7 +564,7 @@ export default function CompleteRegistrationPage() {
           Already have an account?{' '}
           <Link
             to="/login"
-            className="font-semibold text-[#16805f] transition hover:text-[#0d4f3f] hover:underline"
+            className="font-semibold text-accent transition hover:text-[#0d4f3f] hover:underline"
           >
             Sign in
           </Link>

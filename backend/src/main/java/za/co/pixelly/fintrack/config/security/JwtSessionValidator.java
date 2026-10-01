@@ -1,6 +1,5 @@
 package za.co.pixelly.fintrack.config.security;
 
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
@@ -11,49 +10,98 @@ import org.springframework.stereotype.Component;
 import za.co.pixelly.fintrack.identity.domain.AuthSession;
 import za.co.pixelly.fintrack.identity.persistence.AuthSessionRepository;
 
-import java.time.Instant;
+import java.time.Clock;
 import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class JwtSessionValidator implements OAuth2TokenValidator<Jwt> {
+public class JwtSessionValidator
+    implements OAuth2TokenValidator<Jwt> {
 
-    private static final OAuth2Error INVALID_SESSION = new OAuth2Error(
-        OAuth2ErrorCodes.INVALID_TOKEN,
-        "The access token is invalid or no longer active",
-        null
-    );
+    private static final OAuth2Error
+        INVALID_SESSION =
+        new OAuth2Error(
+            OAuth2ErrorCodes.INVALID_TOKEN,
+            "The access token is invalid or no longer active",
+            null
+        );
 
-    private final AuthSessionRepository authSessionRepository;
+    private final AuthSessionRepository
+        authSessionRepository;
+
+    private final Clock applicationClock;
 
 
     @Override
-    public OAuth2TokenValidatorResult validate(Jwt token) {
-        UUID userId = parseUuid(token.getSubject());
-        UUID sessionId = parseUuid(token.getClaimAsString("sid"));
+    public OAuth2TokenValidatorResult validate(
+        Jwt token
+    ) {
+        UUID userId =
+            parseUuid(
+                token.getSubject()
+            );
 
-        if (userId == null || sessionId == null) {
-            return OAuth2TokenValidatorResult.failure(INVALID_SESSION);
+        UUID sessionId =
+            parseUuid(
+                token.getClaimAsString(
+                    "sid"
+                )
+            );
+
+        if (
+            userId == null
+                || sessionId == null
+        ) {
+            return OAuth2TokenValidatorResult
+                .failure(
+                    INVALID_SESSION
+                );
         }
 
-        AuthSession session = authSessionRepository
-            .findByIdAndUserId(sessionId, userId).orElse(null);
+        AuthSession session =
+            authSessionRepository
+                .findByIdAndUserId(
+                    sessionId,
+                    userId
+                )
+                .orElse(
+                    null
+                );
 
-        if (session == null || !session.isActive(Instant.now())) {
-            return OAuth2TokenValidatorResult.failure(INVALID_SESSION);
+        if (
+            session == null
+                || !session.isActive(
+                applicationClock.instant()
+            )
+        ) {
+            return OAuth2TokenValidatorResult
+                .failure(
+                    INVALID_SESSION
+                );
         }
 
-        return OAuth2TokenValidatorResult.success();
+        return OAuth2TokenValidatorResult
+            .success();
     }
 
-    private UUID parseUuid(String value) {
-        if (value == null || value.isBlank()) {
+
+    private UUID parseUuid(
+        String value
+    ) {
+        if (
+            value == null
+                || value.isBlank()
+        ) {
             return null;
         }
 
         try {
-            return UUID.fromString(value);
-        } catch (IllegalArgumentException e) {
+            return UUID.fromString(
+                value
+            );
+        } catch (
+            IllegalArgumentException exception
+        ) {
             return null;
         }
     }

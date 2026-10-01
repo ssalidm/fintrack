@@ -12,7 +12,7 @@ public class CorsIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void allowsConfiguredFrontendOrigin() throws Exception {
-        mockMvc.perform(options(api("/auth/register"))
+        mockMvc.perform(options(api("/auth/registeration/start"))
                 .header(
                     HttpHeaders.ORIGIN,
                     "http://localhost:5173"
@@ -38,7 +38,7 @@ public class CorsIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void rejectsUnconfiguredOrigin() throws Exception {
-        mockMvc.perform(options(api("/auth/register"))
+        mockMvc.perform(options(api("/auth/registeration/start"))
                 .header(
                     HttpHeaders.ORIGIN,
                     "https://untrusted.example"

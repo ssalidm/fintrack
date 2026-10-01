@@ -4,8 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import za.co.pixelly.fintrack.common.Util;
-import za.co.pixelly.fintrack.finance.account.application.exceptions.AccountNotActiveException;
+import za.co.pixelly.fintrack.identity.application.exceptions.UserAccountNotActiveException;
 import za.co.pixelly.fintrack.config.security.JwtProperties;
 import za.co.pixelly.fintrack.identity.api.*;
 import za.co.pixelly.fintrack.identity.application.exceptions.InvalidCredentialsException;
@@ -15,9 +14,12 @@ import za.co.pixelly.fintrack.identity.domain.RefreshToken;
 import za.co.pixelly.fintrack.identity.domain.User;
 import za.co.pixelly.fintrack.identity.persistence.*;
 
+import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+
+import static za.co.pixelly.fintrack.identity.application.EmailAddressNormalizer.normalize;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +35,7 @@ public class DefaultAuthenticationService implements AuthenticationService {
     private final AccessTokenService accessTokenService;
     private final LoginCompletionService loginCompletionService;
     private final JwtProperties jwtProperties;
+    private final Clock applicationClock;
 
 
     @Override
@@ -41,8 +44,8 @@ public class DefaultAuthenticationService implements AuthenticationService {
         LoginRequest request,
         String userAgent
     ) {
-        Instant now = Instant.now();
-        String email = Util.normalizeEmail(request.email());
+        Instant now = applicationClock.instant();
+        String email = normalize(request.email());
 
         User user = userRepository
             .findByEmail(email)
@@ -76,7 +79,7 @@ public class DefaultAuthenticationService implements AuthenticationService {
         if (!user.isActive()) {
 
             if (user.isPendingVerification()) {
-                throw new AccountNotActiveException();
+                throw new UserAccountNotActiveException();
             }
 
             throw new InvalidCredentialsException();
@@ -93,7 +96,7 @@ public class DefaultAuthenticationService implements AuthenticationService {
     @Transactional
     public TokenResponse refresh(RefreshRequest request) {
 
-        Instant now = Instant.now();
+        Instant now = applicationClock.instant();
 
         String hash =
             refreshTokenCodec.hash(request.refreshToken());
@@ -172,7 +175,7 @@ public class DefaultAuthenticationService implements AuthenticationService {
             .findByIdAndUserId(sessionId, userId)
             .orElseThrow(InvalidRefreshTokenException::new);
 
-        Instant now = Instant.now();
+        Instant now = applicationClock.instant();
 
         session.revoke(now, "USER_LOGOUT");
 

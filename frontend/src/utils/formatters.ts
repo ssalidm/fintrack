@@ -37,6 +37,7 @@ export function formatMoney(
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: currencyCode,
+    currencyDisplay: currencyCode === 'USD' ? 'narrowSymbol' : 'symbol',
     maximumFractionDigits,
   }).format(amount)
 }

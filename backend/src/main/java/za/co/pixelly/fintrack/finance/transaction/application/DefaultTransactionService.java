@@ -25,10 +25,10 @@ import za.co.pixelly.fintrack.finance.transaction.domain.TransactionType;
 import za.co.pixelly.fintrack.finance.transaction.persistence.TransactionRepository;
 import za.co.pixelly.fintrack.finance.transaction.persistence.TransactionSpecifications;
 
+import java.time.Clock;
 import java.time.Instant;
 import java.util.UUID;
 
-import static za.co.pixelly.fintrack.common.Util.normalizeNullable;
 import static za.co.pixelly.fintrack.common.concurrency.VersionGuard.requireCurrent;
 
 @Service
@@ -38,6 +38,7 @@ public class DefaultTransactionService implements TransactionService {
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
     private final CategoryRepository categoryRepository;
+    private final Clock applicationClock;
 
 
     @Override
@@ -51,7 +52,7 @@ public class DefaultTransactionService implements TransactionService {
 
         validateCategoryType(transactionType, category);
 
-        Instant now = Instant.now();
+        Instant now = applicationClock.instant();
 
         Transaction transaction = Transaction.createTransaction(
             userId,
@@ -62,8 +63,8 @@ public class DefaultTransactionService implements TransactionService {
             transactionType,
             request.amount(),
             request.transactionDate(),
-            normalizeNullable(request.description()),
-            normalizeNullable(request.merchantName()),
+            request.description(),
+            request.merchantName(),
             now
         );
 
@@ -82,7 +83,7 @@ public class DefaultTransactionService implements TransactionService {
             query.getSize(),
             Sort.by(
                 Sort.Order.desc("transactionDate"),
-                Sort.Order.desc("CreatedAt"),
+                Sort.Order.desc("createdAt"),
                 Sort.Order.desc("id")
             )
         );
@@ -179,7 +180,7 @@ public class DefaultTransactionService implements TransactionService {
             request.transactionDate(),
             request.description(),
             request.merchantName(),
-            Instant.now()
+            applicationClock.instant()
         );
 
         return TransactionResponse.from(
@@ -213,7 +214,7 @@ public class DefaultTransactionService implements TransactionService {
 
         transaction.voidTransaction(
             request.reason(),
-            Instant.now()
+            applicationClock.instant()
         );
 
         return TransactionResponse.from(

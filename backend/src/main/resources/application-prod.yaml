@@ -28,6 +28,10 @@ fintrack:
     cors:
       allowed-origins: ${FINTRACK_CORS_ALLOWED_ORIGINS:}
 
+  profile:
+    avatar:
+      storage: ${FINTRACK_PROFILE_AVATAR_STORAGE:r2}
+
 springdoc:
   api-docs:
     enabled: false
