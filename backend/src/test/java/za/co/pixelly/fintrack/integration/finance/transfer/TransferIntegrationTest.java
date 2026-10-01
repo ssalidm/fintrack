@@ -279,7 +279,7 @@ class TransferIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/transfers"
+                    api("/transfers")
                         + "?page=0&size=2"
                 )
                     .header(
@@ -359,7 +359,7 @@ class TransferIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/transfers/{transferId}",
+                    api("/transfers/{transferId}"),
                     transferId
                 )
                     .header(
@@ -423,7 +423,7 @@ class TransferIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/transfers/{transferId}/void",
+                    api("/transfers/{transferId}/void"),
                     transferId
                 )
                     .header(
@@ -570,7 +570,7 @@ class TransferIntegrationTest
 
         MvcResult transfer =
             mockMvc.perform(
-                    post("/api/v1/transfers")
+                    post(api("/transfers"))
                         .header(
                             "Authorization",
                             bearer(user)
@@ -625,7 +625,7 @@ class TransferIntegrationTest
 
         mockMvc.perform(
                 patch(
-                    "/api/v1/transactions/{transactionId}",
+                    api("/transactions/{transactionId}"),
                     transactionId
                 )
                     .header(
@@ -673,7 +673,7 @@ class TransferIntegrationTest
 
         MvcResult transfer =
             mockMvc.perform(
-                    post("/api/v1/transfers")
+                    post(api("/transfers"))
                         .header(
                             "Authorization",
                             bearer(user)
@@ -727,7 +727,7 @@ class TransferIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/transactions/{transactionId}/void",
+                    api("/transactions/{transactionId}/void"),
                     transactionId
                 )
                     .header(
@@ -754,7 +754,7 @@ class TransferIntegrationTest
         throws Exception {
 
         mockMvc.perform(
-                get("/api/v1/transfers")
+                get(api("/transfers"))
             )
             .andExpect(
                 status().isUnauthorized()
@@ -774,7 +774,7 @@ class TransferIntegrationTest
 
         MvcResult result =
             mockMvc.perform(
-                    post("/api/v1/accounts")
+                    post(api("/accounts"))
                         .header(
                             "Authorization",
                             bearer(user)
@@ -816,7 +816,7 @@ class TransferIntegrationTest
     ) throws Exception {
 
         return mockMvc.perform(
-            post("/api/v1/transfers")
+            post(api("/transfers"))
                 .header(
                     "Authorization",
                     bearer(user)
@@ -849,7 +849,7 @@ class TransferIntegrationTest
 
         return mockMvc.perform(
             post(
-                "/api/v1/transfers/{transferId}/void",
+                api("/transfers/{transferId}/void"),
                 transferId
             )
                 .header(

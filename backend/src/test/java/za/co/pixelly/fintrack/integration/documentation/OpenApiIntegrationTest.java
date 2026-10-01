@@ -39,13 +39,17 @@ class OpenApiIntegrationTest
     void accountsAreIncludedInOpenApiSpecification()
         throws Exception {
 
+        String accountsPath = api("/accounts");
+
         mockMvc.perform(
                 get("/v3/api-docs")
             )
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath(
-                    "$.paths['/api/v1/accounts']"
+                    "$.paths['%s']".formatted(
+                        api("/accounts")
+                    )
                 )
                     .exists()
             );
@@ -62,7 +66,9 @@ class OpenApiIntegrationTest
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath(
-                    "$.paths['/api/v1/categories']"
+                    "$.paths['%s']".formatted(
+                        api("/categories")
+                    )
                 )
                     .exists()
             );
@@ -74,7 +80,7 @@ class OpenApiIntegrationTest
         throws Exception {
 
         mockMvc.perform(
-                get("/api/v1/accounts")
+                get(api("/accounts"))
             )
             .andExpect(
                 status().isUnauthorized()

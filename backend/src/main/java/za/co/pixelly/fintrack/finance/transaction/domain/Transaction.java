@@ -96,8 +96,8 @@ public class Transaction {
         transaction.transactionType = transactionType;
         transaction.amount = amount;
         transaction.transactionDate = transactionDate;
-        transaction.description = description;
-        transaction.merchantName = merchantName;
+        transaction.description = normalizeNullable(description);
+        transaction.merchantName = normalizeNullable(merchantName);
         transaction.status = TransactionStatus.POSTED;
         transaction.voidedAt = null;
         transaction.voidReason = null;

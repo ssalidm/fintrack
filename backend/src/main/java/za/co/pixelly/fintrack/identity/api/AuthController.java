@@ -6,18 +6,20 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import za.co.pixelly.fintrack.common.api.ApiMessage;
 import za.co.pixelly.fintrack.common.api.ApiResponse;
-import za.co.pixelly.fintrack.identity.application.AuthenticationService;
-import za.co.pixelly.fintrack.identity.application.EmailVerificationService;
-import za.co.pixelly.fintrack.identity.application.PasswordResetService;
-import za.co.pixelly.fintrack.identity.application.UserRegistrationService;
+import za.co.pixelly.fintrack.common.security.CurrentSessionId;
+import za.co.pixelly.fintrack.common.security.CurrentUserId;
+import za.co.pixelly.fintrack.common.security.CurrentUserRoles;
+import za.co.pixelly.fintrack.identity.application.*;
+import za.co.pixelly.fintrack.identity.application.emailchange.EmailChangeService;
+import za.co.pixelly.fintrack.identity.application.mfa.MfaLoginService;
+import za.co.pixelly.fintrack.identity.application.mfa.MfaManagementService;
+import za.co.pixelly.fintrack.identity.application.mfa.MfaSetupService;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
 
@@ -26,45 +28,81 @@ import java.util.UUID;
     description = "Registration, authentication and account security"
 )
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final UserRegistrationService registrationService;
+    private final RegistrationRequestService registrationRequestService;
+    private final RegistrationCompletionService registrationCompletionService;
     private final AuthenticationService authenticationService;
     private final EmailVerificationService emailVerificationService;
     private final PasswordResetService passwordResetService;
+    private final MfaSetupService mfaSetupService;
+    private final MfaLoginService mfaLoginService;
+    private final MfaManagementService mfaManagementService;
+    private final EmailChangeService emailChangeService;
 
-    @PostMapping("/register")
-    public ResponseEntity<ApiResponse<RegisterResponse>> register(
-        @Valid @RequestBody RegisterRequest request
+
+    @PostMapping("/registration/start")
+    public ResponseEntity<ApiResponse<Void>>
+    startRegistration(
+        @Valid
+        @RequestBody
+        StartRegistrationRequest request
     ) {
-        RegisterResponse response = registrationService.register(request);
+        registrationRequestService.start(
+            request.email()
+        );
+
+        return ResponseEntity
+            .status(HttpStatus.ACCEPTED)
+            .body(ApiResponse.success(
+                    HttpStatus.ACCEPTED,
+                    ApiMessage.Auth.REGISTRATION_STARTED
+                )
+            );
+    }
+
+
+    @PostMapping("/registration/complete")
+    public ResponseEntity<ApiResponse<Void>>
+    completeRegistration(
+        @Valid
+        @RequestBody
+        CompleteRegistrationRequest request
+    ) {
+        registrationCompletionService.complete(request);
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(ApiResponse.success(
-                HttpStatus.CREATED,
-                ApiMessage.Auth.REGISTER_SUCCESS,
-                response
-            ));
+                    HttpStatus.CREATED,
+                    ApiMessage.Auth.REGISTRATION_COMPLETED
+                )
+            );
     }
 
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<TokenResponse>> login(
+    public ResponseEntity<ApiResponse<LoginResponse>> login(
         @Valid @RequestBody LoginRequest request,
         HttpServletRequest servletRequest
     ) {
-        TokenResponse response = authenticationService.login(
-            request,
-            servletRequest.getHeader("User-Agent")
-        );
+        LoginResponse response =
+            authenticationService.login
+                (
+                    request,
+                    servletRequest.getHeader("User-Agent")
+                );
+
+        String message = response.status() == LoginStatus.MFA_REQUIRED
+            ? ApiMessage.Auth.TFA_REQUIRED
+            : ApiMessage.Auth.LOGIN_SUCCESS;
 
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
-                ApiMessage.Auth.LOGIN_SUCCESS,
+                message,
                 response
             )
         );
@@ -89,18 +127,18 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(
-        @AuthenticationPrincipal Jwt jwt
+        @CurrentUserId UUID userId,
+        @CurrentSessionId UUID sessionId
     ) {
         authenticationService.logout(
-            UUID.fromString(Objects.requireNonNull(jwt.getSubject())),
-            UUID.fromString(Objects.requireNonNull(jwt.getClaimAsString("sid")))
+            userId,
+            sessionId
         );
 
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
-                ApiMessage.Auth.LOGOUT_SUCCESS,
-                null
+                ApiMessage.Auth.LOGOUT_SUCCESS
             )
         );
     }
@@ -117,8 +155,7 @@ public class AuthController {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
-                ApiMessage.Auth.VERIFY_SUCCESS,
-                null
+                ApiMessage.Auth.VERIFY_SUCCESS
             )
         );
     }
@@ -140,8 +177,7 @@ public class AuthController {
             .body(
                 ApiResponse.success(
                     HttpStatus.ACCEPTED,
-                    ApiMessage.Auth.RESEND_VERIFY,
-                    null
+                    ApiMessage.Auth.RESEND_VERIFY
                 )
             );
     }
@@ -162,8 +198,7 @@ public class AuthController {
             .body(
                 ApiResponse.success(
                     HttpStatus.ACCEPTED,
-                    ApiMessage.Auth.FORGOT_PASSWORD,
-                    null
+                    ApiMessage.Auth.FORGOT_PASSWORD
                 )
             );
     }
@@ -183,8 +218,26 @@ public class AuthController {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
-                ApiMessage.Auth.RESET_SUCCESS,
-                null
+                ApiMessage.Auth.RESET_SUCCESS
+            )
+        );
+    }
+
+
+    @PostMapping("/change-email/confirm")
+    public ResponseEntity<ApiResponse<Void>> confirmEmailChange(
+        @Valid
+        @RequestBody
+        ConfirmEmailChangeRequest request
+    ) {
+        emailChangeService.confirm(
+            request.token()
+        );
+
+        return ResponseEntity.ok(
+            ApiResponse.success(
+                HttpStatus.OK,
+                ApiMessage.Auth.EMAIL_CHANGED
             )
         );
     }
@@ -192,12 +245,143 @@ public class AuthController {
 
     @GetMapping("/me")
     public Map<String, Object> me(
-        @AuthenticationPrincipal Jwt jwt
+        @CurrentUserId UUID userId,
+        @CurrentSessionId UUID sessionId,
+        @CurrentUserRoles List<String> roles
     ) {
         return Map.of(
-            "userId", Objects.requireNonNull(jwt.getSubject()),
-            "sessionId", Objects.requireNonNull(jwt.getClaimAsString("sid")),
-            "roles", Objects.requireNonNull(jwt.getClaimAsStringList("roles"))
+            "userId", userId,
+            "sessionId", sessionId,
+            "roles", roles
+        );
+    }
+
+
+    @PostMapping("/mfa/setup")
+    public ResponseEntity<ApiResponse<MfaSetupResponse>>
+    startMfaSetup(@CurrentUserId UUID userId) {
+
+        return ResponseEntity.ok(
+            ApiResponse.success(
+                HttpStatus.OK,
+                ApiMessage.Auth.TFA_SETUP,
+                mfaSetupService.startSetup(userId)
+            )
+        );
+    }
+
+
+    @PostMapping("/mfa/setup/confirm")
+    public ResponseEntity<ApiResponse<MfaSetupConfirmResponse>>
+    confirmMfaSetup(
+        @CurrentUserId UUID userId,
+        @Valid @RequestBody MfaSetupConfirmRequest request
+    ) {
+        return ResponseEntity.ok(
+            ApiResponse.success(
+                HttpStatus.OK,
+                "Two-factor authentication enabled",
+                mfaSetupService.confirmSetup(userId, request.code())
+            )
+        );
+    }
+
+
+    @PostMapping("/mfa/verify")
+    public ResponseEntity<ApiResponse<TokenResponse>>
+    verifyMfa(
+        @Valid
+        @RequestBody
+        MfaVerifyRequest request
+    ) {
+        return ResponseEntity.ok(
+            ApiResponse.success(
+                HttpStatus.OK,
+                ApiMessage.Auth.LOGIN_SUCCESS,
+                mfaLoginService.verify(request.challengeToken(), request.code())
+            )
+        );
+    }
+
+
+    @PostMapping("/mfa/recover")
+    public ResponseEntity<ApiResponse<TokenResponse>>
+    recoverMfa(
+        @Valid
+        @RequestBody
+        MfaRecoverRequest request
+    ) {
+        return ResponseEntity.ok(
+            ApiResponse.success(
+                HttpStatus.OK,
+                ApiMessage.Auth.LOGIN_SUCCESS,
+                mfaLoginService.recover(request.challengeToken(), request.recoveryCode())
+            )
+        );
+    }
+
+
+    @GetMapping("/mfa/status")
+    public ResponseEntity<ApiResponse<MfaStatusResponse>>
+    getMfaStatus(@CurrentUserId UUID userId) {
+
+        MfaStatusResponse response =
+            mfaManagementService.status(
+                userId
+            );
+
+        return ResponseEntity.ok(
+            ApiResponse.success(
+                HttpStatus.OK,
+                ApiMessage.Auth.TFA_STATUS_FETCHED,
+                response
+            )
+        );
+    }
+
+
+    @PostMapping("/mfa/disable")
+    public ResponseEntity<ApiResponse<Void>>
+    disableMfa(
+        @CurrentUserId UUID userId,
+        @Valid
+        @RequestBody
+        MfaDisableRequest request
+    ) {
+        mfaManagementService.disable(
+            userId,
+            request.currentPassword(),
+            request.mfaCode()
+        );
+
+        return ResponseEntity.ok(
+            ApiResponse.success(
+                HttpStatus.OK,
+                ApiMessage.Auth.TFA_DISABLED
+            )
+        );
+    }
+
+
+    @PostMapping("/mfa/recovery-codes/regenerate")
+    public ResponseEntity<ApiResponse<MfaRecoveryCodesResponse>>
+    regenerateMfaRecoveryCodes(
+        @CurrentUserId UUID userId,
+        @Valid
+        @RequestBody
+        MfaRecoveryCodesRegenerateRequest request
+    ) {
+        return ResponseEntity.ok(
+            ApiResponse.success(
+                HttpStatus.OK,
+                ApiMessage.Auth.TFA_CODES_GENERATED,
+                mfaManagementService
+                    .regenerateRecoveryCodes(
+                        userId,
+                        request.currentPassword(),
+                        request.code()
+                    )
+            )
         );
     }
 }

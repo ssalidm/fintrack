@@ -75,6 +75,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      mailpit:
+        condition: service_started
 
     env_file:
       - .env
@@ -106,12 +108,33 @@ services:
       retries: 10
       start_period: 30s
 
+
+    networks:
+      - fintrack-network
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: fintrack-mailpit
+    restart: unless-stopped
+
+    environment:
+      - MP_DATABASE=/data/mailpit.db
+      - MP_MAX_MESSAGES=1500
+    volumes:
+      - fintrack-mailpit-data:/data
+
+    ports:
+      - "127.0.0.1:1025:1025" # SMTP port
+      - "127.0.0.1:8025:8025" # Web UI Dashboard port
+
     networks:
       - fintrack-network
 
 volumes:
   fintrack-postgres-data:
     name: fintrack-postgres-data
+  fintrack-mailpit-data:
+    name: fintrack-mailpit-data
 
 networks:
   fintrack-network:

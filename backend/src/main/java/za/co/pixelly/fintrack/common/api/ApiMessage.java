@@ -12,14 +12,26 @@ public final class ApiMessage {
         private Auth() {
         }
 
+        public static final String REGISTRATION_STARTED = "If this email can be used to create an account, a registration link will be sent";
+        public static final String REGISTRATION_COMPLETED = "Account created successfully";
         public static final String REGISTER_SUCCESS = "User registered successfully";
         public static final String LOGIN_SUCCESS = "Login successful";
         public static final String LOGOUT_SUCCESS = "Logged out successfully";
+        public static final String TFA_SETUP = "Two-factor authentication setup started";
+        public static final String TFA_REQUIRED = "Two-factor authentication required";
+        public static final String TFA_STATUS_FETCHED = "Two-factor authentication status retrieved";
+        public static final String TFA_DISABLED = "Two-factor authentication disabled";
+        public static final String TFA_CODES_GENERATED = "Recovery codes regenerated";
         public static final String REFRESH_SUCCESS = "Token refreshed successfully";
         public static final String VERIFY_SUCCESS = "Email verified successfully";
         public static final String RESEND_VERIFY = "If an eligible account exists, a verification email will be sent";
         public static final String FORGOT_PASSWORD = "If an eligible account exists, password reset instructions will be sent";
         public static final String RESET_SUCCESS = "Password reset successfully. Please log in again";
+        public static final String EMAIL_CHANGED = "Email address changed successfully";
+        public static final String GOOGLE_LINKED = "Google account linked successfully";
+        public static final String EMAIL_VERIFICATION_REQUIRED = "Email verification required";
+        public static final String ACCOUNT_LINK_REQUIRED =
+            "An account already exists with this email. Sign in with your password to connect Google.";
     }
 
     /*
@@ -32,6 +44,10 @@ public final class ApiMessage {
         public static final String FETCHED = "Profile retrieved successfully";
         public static final String UPDATED = "Profile updated successfully";
         public static final String PASSWORD_UPDATED = "Password changed successfully";
+        public static final String EMAIL_CHANGE_REQUESTED = "Email change verification sent";
+        public static final String SESSIONS_FETCHED = "Active sessions retrieved successfully";
+        public static final String SESSION_REVOKED = "Session signed out successfully";
+        public static final String OTHER_SESSIONS_REVOKED = "Other sessions signed out successfully";
     }
 
     /*

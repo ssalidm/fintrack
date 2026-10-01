@@ -14,10 +14,9 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.postgresql.PostgreSQLContainer;
-import za.co.pixelly.fintrack.integration.support.AuthenticatedUser;
-import za.co.pixelly.fintrack.integration.support.IdentityTestClient;
-import za.co.pixelly.fintrack.integration.support.TestEmailVerificationSender;
-import za.co.pixelly.fintrack.integration.support.TestPasswordResetSender;
+import za.co.pixelly.fintrack.config.security.ApiProperties;
+import za.co.pixelly.fintrack.identity.application.EmailChangeSender;
+import za.co.pixelly.fintrack.integration.support.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -88,25 +87,50 @@ public abstract class AbstractIntegrationTest {
     protected JdbcTemplate jdbcTemplate;
 
     @Autowired
+    protected TestRegistrationEmailSender registrationEmailSender;
+
+    @Autowired
     protected TestEmailVerificationSender emailSender;
 
     @Autowired
     protected TestPasswordResetSender passwordResetSender;
 
     @Autowired
+    protected TestEmailChangeSender emailChangeSender;
+
+    @Autowired
     protected JwtDecoder jwtDecoder;
 
     protected IdentityTestClient identityTestClient;
 
+    @Autowired
+    protected ApiProperties apiProperties;
+
     @BeforeEach
     void configureIdentityTestClient() {
+
+        emailChangeSender.clear();
+        registrationEmailSender.clear();
 
         identityTestClient =
             new IdentityTestClient(
                 mockMvc,
-                emailSender,
-                jwtDecoder
+                registrationEmailSender,
+                jwtDecoder,
+                apiProperties
             );
+    }
+
+    protected String api(
+        String path
+    ) {
+        if (path == null || path.isBlank()) {
+            return apiProperties.basePath();
+        }
+
+        return path.startsWith("/")
+            ? apiProperties.basePath() + path
+            : apiProperties.basePath() + "/" + path;
     }
 
     protected AuthenticatedUser createAuthenticatedUser(
@@ -161,6 +185,12 @@ public abstract class AbstractIntegrationTest {
         MockMvc mockMvc;
 
         @Bean
+        TestRegistrationEmailSender
+        registrationEmailSender() {
+            return new TestRegistrationEmailSender();
+        }
+
+        @Bean
         TestEmailVerificationSender emailVerificationSender() {
             return new TestEmailVerificationSender();
         }
@@ -170,5 +200,9 @@ public abstract class AbstractIntegrationTest {
             return new TestPasswordResetSender();
         }
 
+        @Bean
+        TestEmailChangeSender emailChangeSender() {
+            return new TestEmailChangeSender();
+        }
     }
 }

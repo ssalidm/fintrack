@@ -2,40 +2,82 @@ package za.co.pixelly.fintrack.integration.identity;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import za.co.pixelly.fintrack.identity.application.EmailVerificationService;
 import za.co.pixelly.fintrack.identity.application.OpaqueTokenCodec;
+import za.co.pixelly.fintrack.identity.domain.ApplicationRole;
+import za.co.pixelly.fintrack.identity.domain.User;
+import za.co.pixelly.fintrack.identity.domain.UserRole;
+import za.co.pixelly.fintrack.identity.persistence.ApplicationRoleRepository;
+import za.co.pixelly.fintrack.identity.persistence.UserRepository;
+import za.co.pixelly.fintrack.identity.persistence.UserRoleRepository;
 import za.co.pixelly.fintrack.integration.AbstractIntegrationTest;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class EmailVerificationIntegrationTest
     extends AbstractIntegrationTest {
 
+    private static final String DEFAULT_ROLE =
+        "ROLE_USER";
+
     @Autowired
     private OpaqueTokenCodec tokenCodec;
 
+    @Autowired
+    private EmailVerificationService
+        emailVerificationService;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private UserRoleRepository userRoleRepository;
+
+    @Autowired
+    private ApplicationRoleRepository
+        applicationRoleRepository;
+
+    @Autowired
+    private Clock applicationClock;
+
+
     @Test
-    void registrationIssuesHashedVerificationToken()
+    void pendingUserReceivesHashedVerificationToken()
         throws Exception {
 
         String email =
-            uniqueEmail("verification-hash");
+            uniqueEmail(
+                "verification-hash"
+            );
 
-        register(email);
+        createPendingUser(
+            email
+        );
 
         String rawToken =
-            emailSender.tokenFor(email);
+            emailSender.tokenFor(
+                email
+            );
 
-        assertNotNull(rawToken);
+        assertNotNull(
+            rawToken
+        );
 
         String hash =
-            tokenCodec.hash(rawToken);
+            tokenCodec.hash(
+                rawToken
+            );
 
         Integer tokenCount =
-            jdbcTemplate.queryForObject("""
+            jdbcTemplate.queryForObject(
+                """
                     SELECT COUNT(*)
                     FROM identity.email_verification_tokens
                     WHERE token_hash = ?
@@ -44,39 +86,55 @@ class EmailVerificationIntegrationTest
                 hash
             );
 
-        assertEquals(1, tokenCount);
-        assertNotEquals(rawToken, hash);
-        assertEquals(64, hash.length());
+        assertEquals(
+            1,
+            tokenCount
+        );
+
+        assertNotEquals(
+            rawToken,
+            hash
+        );
+
+        assertEquals(
+            64,
+            hash.length()
+        );
     }
+
 
     @Test
     void validTokenVerifiesUser()
         throws Exception {
 
         String email =
-            uniqueEmail("verify");
+            uniqueEmail(
+                "verify"
+            );
 
-        register(email);
+        createPendingUser(
+            email
+        );
 
         String token =
-            emailSender.tokenFor(email);
+            emailSender.tokenFor(
+                email
+            );
 
-        mockMvc.perform(
-                post("/api/v1/auth/verify-email")
-                    .contentType("application/json")
-                    .content("""
-                        {
-                          "token": "%s"
-                        }
-                        """.formatted(token))
-            )
-            .andExpect(status().isOk())
+        verify(
+            token
+        )
             .andExpect(
-                jsonPath("$.success").value(true)
+                status().isOk()
+            )
+            .andExpect(
+                jsonPath("$.success")
+                    .value(true)
             );
 
         String status =
-            jdbcTemplate.queryForObject("""
+            jdbcTemplate.queryForObject(
+                """
                     SELECT status
                     FROM identity.users
                     WHERE email = ?
@@ -85,10 +143,14 @@ class EmailVerificationIntegrationTest
                 email
             );
 
-        assertEquals("ACTIVE", status);
+        assertEquals(
+            "ACTIVE",
+            status
+        );
 
         Object verifiedAt =
-            jdbcTemplate.queryForObject("""
+            jdbcTemplate.queryForObject(
+                """
                     SELECT email_verified_at
                     FROM identity.users
                     WHERE email = ?
@@ -97,88 +159,157 @@ class EmailVerificationIntegrationTest
                 email
             );
 
-        assertNotNull(verifiedAt);
+        assertNotNull(
+            verifiedAt
+        );
 
         Object consumedAt =
-            jdbcTemplate.queryForObject("""
+            jdbcTemplate.queryForObject(
+                """
                     SELECT consumed_at
                     FROM identity.email_verification_tokens
                     WHERE token_hash = ?
                     """,
                 Object.class,
-                tokenCodec.hash(token)
+                tokenCodec.hash(
+                    token
+                )
             );
 
-        assertNotNull(consumedAt);
+        assertNotNull(
+            consumedAt
+        );
+
+        UUID userId =
+            jdbcTemplate.queryForObject(
+                """
+                    SELECT id
+                    FROM identity.users
+                    WHERE email = ?
+                    """,
+                UUID.class,
+                email
+            );
+
+        Integer templateCount =
+            jdbcTemplate.queryForObject(
+                """
+                    SELECT COUNT(*)
+                    FROM finance.category_templates
+                    WHERE active = TRUE
+                    """,
+                Integer.class
+            );
+
+        Integer categoryCount =
+            jdbcTemplate.queryForObject(
+                """
+                    SELECT COUNT(*)
+                    FROM finance.categories
+                    WHERE user_id = ?
+                    """,
+                Integer.class,
+                userId
+            );
+
+        assertEquals(
+            templateCount,
+            categoryCount,
+            "Activating a verified user should provision default categories"
+        );
     }
+
 
     @Test
     void verificationTokenCannotBeReplayed()
         throws Exception {
 
         String email =
-            uniqueEmail("replay");
+            uniqueEmail(
+                "replay"
+            );
 
-        register(email);
+        createPendingUser(
+            email
+        );
 
         String token =
-            emailSender.tokenFor(email);
+            emailSender.tokenFor(
+                email
+            );
 
-        verify(token)
-            .andExpect(status().isOk());
+        verify(
+            token
+        )
+            .andExpect(
+                status().isOk()
+            );
 
-        verify(token)
-            .andExpect(status().isBadRequest());
+        verify(
+            token
+        )
+            .andExpect(
+                status().isBadRequest()
+            );
     }
+
 
     @Test
     void resendInvalidatesPreviousToken()
         throws Exception {
 
         String email =
-            uniqueEmail("resend");
+            uniqueEmail(
+                "resend"
+            );
 
-        register(email);
+        createPendingUser(
+            email
+        );
 
         String firstToken =
-            emailSender.tokenFor(email);
+            emailSender.tokenFor(
+                email
+            );
 
-        mockMvc.perform(
-                post(
-                    "/api/v1/auth/resend-verification"
-                )
-                    .contentType("application/json")
-                    .content("""
-                        {
-                          "email": "%s"
-                        }
-                        """.formatted(email))
-            )
-            .andExpect(status().isAccepted());
+        resend(
+            email
+        );
 
         String secondToken =
-            emailSender.tokenFor(email);
+            emailSender.tokenFor(
+                email
+            );
 
-        assertNotNull(secondToken);
+        assertNotNull(
+            secondToken
+        );
+
         assertNotEquals(
             firstToken,
             secondToken
         );
 
         Object invalidatedAt =
-            jdbcTemplate.queryForObject("""
+            jdbcTemplate.queryForObject(
+                """
                     SELECT invalidated_at
                     FROM identity.email_verification_tokens
                     WHERE token_hash = ?
                     """,
                 Object.class,
-                tokenCodec.hash(firstToken)
+                tokenCodec.hash(
+                    firstToken
+                )
             );
 
-        assertNotNull(invalidatedAt);
+        assertNotNull(
+            invalidatedAt
+        );
 
         Integer activeTokens =
-            jdbcTemplate.queryForObject("""
+            jdbcTemplate.queryForObject(
+                """
                     SELECT COUNT(*)
                     FROM identity.email_verification_tokens evt
                     JOIN identity.users u
@@ -191,32 +322,55 @@ class EmailVerificationIntegrationTest
                 email
             );
 
-        assertEquals(1, activeTokens);
+        assertEquals(
+            1,
+            activeTokens
+        );
     }
+
 
     @Test
     void oldTokenCannotBeUsedAfterResend()
         throws Exception {
 
         String email =
-            uniqueEmail("old-token");
+            uniqueEmail(
+                "old-token"
+            );
 
-        register(email);
+        createPendingUser(
+            email
+        );
 
         String oldToken =
-            emailSender.tokenFor(email);
+            emailSender.tokenFor(
+                email
+            );
 
-        resend(email);
+        resend(
+            email
+        );
 
-        verify(oldToken)
-            .andExpect(status().isBadRequest());
+        verify(
+            oldToken
+        )
+            .andExpect(
+                status().isBadRequest()
+            );
 
         String newToken =
-            emailSender.tokenFor(email);
+            emailSender.tokenFor(
+                email
+            );
 
-        verify(newToken)
-            .andExpect(status().isOk());
+        verify(
+            newToken
+        )
+            .andExpect(
+                status().isOk()
+            );
     }
+
 
     @Test
     void resendDoesNotRevealWhetherAccountExists()
@@ -224,9 +378,13 @@ class EmailVerificationIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/auth/resend-verification"
+                    api(
+                        "/auth/resend-verification"
+                    )
                 )
-                    .contentType("application/json")
+                    .contentType(
+                        "application/json"
+                    )
                     .content("""
                         {
                           "email":
@@ -236,90 +394,97 @@ class EmailVerificationIntegrationTest
                         UUID.randomUUID()
                     ))
             )
-            .andExpect(status().isAccepted())
             .andExpect(
-                jsonPath("$.success").value(true)
+                status().isAccepted()
+            )
+            .andExpect(
+                jsonPath("$.success")
+                    .value(true)
             );
     }
 
-    @Test
-    void verifiedUserCanLogin()
-        throws Exception {
 
-        String email =
-            uniqueEmail("verified-login");
+    private void createPendingUser(
+        String email
+    ) {
 
-        register(email);
+        Instant now =
+            applicationClock.instant();
 
-        String token =
-            emailSender.tokenFor(email);
-
-        verify(token)
-            .andExpect(status().isOk());
-
-        mockMvc.perform(
-                post("/api/v1/auth/login")
-                    .contentType(
-                        "application/json"
-                    )
-                    .content("""
-                        {
-                          "email": "%s",
-                          "password":
-                          "SecurePassword123!"
-                        }
-                        """.formatted(email))
-            )
-            .andExpect(status().isOk())
-            .andExpect(
-                jsonPath(
-                    "$.result.accessToken"
-                ).isNotEmpty()
+        User user =
+            User.registerExternal(
+                email,
+                "David",
+                "Test",
+                false,
+                now
             );
+
+        userRepository.saveAndFlush(
+            user
+        );
+
+        ApplicationRole role =
+            applicationRoleRepository
+                .findByCode(
+                    DEFAULT_ROLE
+                )
+                .orElseThrow(
+                    () ->
+                        new IllegalStateException(
+                            "Required role ROLE_USER is not configured"
+                        )
+                );
+
+        userRoleRepository
+            .saveAndFlush(
+                UserRole.assign(
+                    user,
+                    role,
+                    now
+                )
+            );
+
+        emailVerificationService.issueFor(
+            user
+        );
     }
 
-    private void register(String email)
-        throws Exception {
-
-        mockMvc.perform(
-                post("/api/v1/auth/register")
-                    .contentType(
-                        "application/json"
-                    )
-                    .content("""
-                        {
-                          "email": "%s",
-                          "password":
-                          "SecurePassword123!",
-                          "firstName": "David",
-                          "lastName": "Test"
-                        }
-                        """.formatted(email))
-            )
-            .andExpect(status().isCreated());
-    }
 
     private org.springframework.test.web.servlet.ResultActions
-    verify(String token)
-        throws Exception {
+    verify(
+        String token
+    ) throws Exception {
 
         return mockMvc.perform(
-            post("/api/v1/auth/verify-email")
-                .contentType("application/json")
+            post(
+                api(
+                    "/auth/verify-email"
+                )
+            )
+                .contentType(
+                    "application/json"
+                )
                 .content("""
                     {
                       "token": "%s"
                     }
-                    """.formatted(token))
+                    """.formatted(
+                    token
+                ))
         );
     }
 
-    private void resend(String email)
-        throws Exception {
+
+    private void resend(
+        String email
+    ) throws Exception {
 
         mockMvc.perform(
                 post(
-                    "/api/v1/auth/resend-verification"
+                    api(
+                        "/auth/resend-verification"
+                    )
                 )
                     .contentType(
                         "application/json"
@@ -328,12 +493,19 @@ class EmailVerificationIntegrationTest
                         {
                           "email": "%s"
                         }
-                        """.formatted(email))
+                        """.formatted(
+                        email
+                    ))
             )
-            .andExpect(status().isAccepted());
+            .andExpect(
+                status().isAccepted()
+            );
     }
 
-    private String uniqueEmail(String prefix) {
+
+    private String uniqueEmail(
+        String prefix
+    ) {
         return "%s+%s@example.com"
             .formatted(
                 prefix,

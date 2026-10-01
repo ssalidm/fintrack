@@ -26,6 +26,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+import static za.co.pixelly.fintrack.common.concurrency.VersionGuard.requireCurrent;
+
 @Service
 @RequiredArgsConstructor
 public class DefaultRecurringTransactionService
@@ -182,9 +184,12 @@ public class DefaultRecurringTransactionService
 
         ensureEditable(schedule);
 
-        validateVersion(
-            schedule,
-            request.version()
+        requireCurrent(
+            schedule.getVersion(),
+            request.version(),
+            () -> new RecurringTransactionConflictException(
+                "The recurring transaction has changed since it was last retrieved"
+            )
         );
 
 
@@ -350,7 +355,7 @@ public class DefaultRecurringTransactionService
             request.autoPost() == null
                 ? schedule.isAutoPost()
                 : request.autoPost(),
-            Instant.now()
+            applicationClock.instant()
         );
 
 
@@ -394,13 +399,16 @@ public class DefaultRecurringTransactionService
             );
         }
 
-        validateVersion(
-            schedule,
-            request.version()
+        requireCurrent(
+            schedule.getVersion(),
+            request.version(),
+            () -> new RecurringTransactionConflictException(
+                "The recurring transaction has changed since it was last retrieved"
+            )
         );
 
         schedule.pause(
-            Instant.now()
+            applicationClock.instant()
         );
 
         return RecurringTransactionResponse.from(
@@ -431,9 +439,12 @@ public class DefaultRecurringTransactionService
             );
         }
 
-        validateVersion(
-            schedule,
-            request.version()
+        requireCurrent(
+            schedule.getVersion(),
+            request.version(),
+            () -> new RecurringTransactionConflictException(
+                "The recurring transaction has changed since it was last retrieved"
+            )
         );
 
         Account account =
@@ -457,7 +468,7 @@ public class DefaultRecurringTransactionService
         );
 
         schedule.resume(
-            Instant.now()
+            applicationClock.instant()
         );
 
         return RecurringTransactionResponse.from(
@@ -488,13 +499,16 @@ public class DefaultRecurringTransactionService
             );
         }
 
-        validateVersion(
-            schedule,
-            request.version()
+        requireCurrent(
+            schedule.getVersion(),
+            request.version(),
+            () -> new RecurringTransactionConflictException(
+                "The recurring transaction has changed since it was last retrieved"
+            )
         );
 
         schedule.archive(
-            Instant.now()
+            applicationClock.instant()
         );
 
         return RecurringTransactionResponse.from(
@@ -636,20 +650,6 @@ public class DefaultRecurringTransactionService
 
             throw new RecurringTransactionConflictException(
                 "Completed or archived recurring transactions cannot be modified"
-            );
-        }
-    }
-
-
-    private void validateVersion(
-        RecurringTransaction schedule,
-        long requestedVersion
-    ) {
-        if (schedule.getVersion()
-            != requestedVersion) {
-
-            throw new RecurringTransactionConflictException(
-                "The recurring transaction has changed since it was last retrieved"
             );
         }
     }

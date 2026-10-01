@@ -6,6 +6,7 @@ import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.boot.json.JsonParser;
 import za.co.pixelly.fintrack.identity.application.OpaqueTokenCodec;
 import za.co.pixelly.fintrack.integration.AbstractIntegrationTest;
+import za.co.pixelly.fintrack.integration.support.IdentityTestClient;
 
 import java.util.Map;
 import java.util.UUID;
@@ -41,10 +42,10 @@ class PasswordResetIntegrationTest
 
         Integer count =
             jdbcTemplate.queryForObject("""
-                        SELECT COUNT(*)
-                        FROM identity.password_reset_tokens
-                        WHERE token_hash = ?
-                        """,
+                    SELECT COUNT(*)
+                    FROM identity.password_reset_tokens
+                    WHERE token_hash = ?
+                    """,
                 Integer.class,
                 hash
             );
@@ -63,13 +64,13 @@ class PasswordResetIntegrationTest
                 .formatted(UUID.randomUUID());
 
         mockMvc.perform(
-                post("/api/v1/auth/forgot-password")
+                post(api("/auth/forgot-password"))
                     .contentType("application/json")
                     .content("""
-                                        {
-                                          "email": "%s"
-                                        }
-                                        """.formatted(email))
+                        {
+                          "email": "%s"
+                        }
+                        """.formatted(email))
             )
             .andExpect(status().isAccepted())
             .andExpect(
@@ -106,10 +107,10 @@ class PasswordResetIntegrationTest
 
         Object invalidatedAt =
             jdbcTemplate.queryForObject("""
-                        SELECT invalidated_at
-                        FROM identity.password_reset_tokens
-                        WHERE token_hash = ?
-                        """,
+                    SELECT invalidated_at
+                    FROM identity.password_reset_tokens
+                    WHERE token_hash = ?
+                    """,
                 Object.class,
                 tokenCodec.hash(firstToken)
             );
@@ -118,14 +119,14 @@ class PasswordResetIntegrationTest
 
         Integer activeCount =
             jdbcTemplate.queryForObject("""
-                        SELECT COUNT(*)
-                        FROM identity.password_reset_tokens prt
-                        JOIN identity.users u
-                          ON u.id = prt.user_id
-                        WHERE u.email = ?
-                          AND prt.consumed_at IS NULL
-                          AND prt.invalidated_at IS NULL
-                        """,
+                    SELECT COUNT(*)
+                    FROM identity.password_reset_tokens prt
+                    JOIN identity.users u
+                      ON u.id = prt.user_id
+                    WHERE u.email = ?
+                      AND prt.consumed_at IS NULL
+                      AND prt.invalidated_at IS NULL
+                    """,
                 Integer.class,
                 email
             );
@@ -157,10 +158,10 @@ class PasswordResetIntegrationTest
 
         Object consumedAt =
             jdbcTemplate.queryForObject("""
-                        SELECT consumed_at
-                        FROM identity.password_reset_tokens
-                        WHERE token_hash = ?
-                        """,
+                    SELECT consumed_at
+                    FROM identity.password_reset_tokens
+                    WHERE token_hash = ?
+                    """,
                 Object.class,
                 tokenCodec.hash(token)
             );
@@ -183,8 +184,12 @@ class PasswordResetIntegrationTest
         )
             .andExpect(status().isOk())
             .andExpect(
+                jsonPath("$.result.status")
+                    .value("AUTHENTICATED")
+            )
+            .andExpect(
                 jsonPath(
-                    "$.result.accessToken"
+                    "$.result.tokens.accessToken"
                 ).isNotEmpty()
             );
     }
@@ -236,15 +241,15 @@ class PasswordResetIntegrationTest
          */
         int updated =
             jdbcTemplate.update("""
-                        UPDATE identity.password_reset_tokens
-                           SET created_at =
-                                   CURRENT_TIMESTAMP
-                                   - INTERVAL '2 hours',
-                               expires_at =
-                                   CURRENT_TIMESTAMP
-                                   - INTERVAL '1 hour'
-                         WHERE token_hash = ?
-                        """,
+                    UPDATE identity.password_reset_tokens
+                       SET created_at =
+                               CURRENT_TIMESTAMP
+                               - INTERVAL '2 hours',
+                           expires_at =
+                               CURRENT_TIMESTAMP
+                               - INTERVAL '1 hour'
+                     WHERE token_hash = ?
+                    """,
                 hash
             );
 
@@ -285,9 +290,12 @@ class PasswordResetIntegrationTest
             (Map<String, Object>)
                 root.get("result");
 
+        @SuppressWarnings("unchecked")
+        Map<String, Object> tokens =
+            (Map<String, Object>) result.get("tokens");
+
         String refreshToken =
-            (String)
-                result.get("refreshToken");
+            (String) tokens.get("refreshToken");
 
         String refreshHash =
             tokenCodec.hash(refreshToken);
@@ -307,13 +315,13 @@ class PasswordResetIntegrationTest
 
         Integer activeSessions =
             jdbcTemplate.queryForObject("""
-                        SELECT COUNT(*)
-                        FROM identity.auth_sessions s
-                        JOIN identity.users u
-                          ON u.id = s.user_id
-                        WHERE u.email = ?
-                          AND s.revoked_at IS NULL
-                        """,
+                    SELECT COUNT(*)
+                    FROM identity.auth_sessions s
+                    JOIN identity.users u
+                      ON u.id = s.user_id
+                    WHERE u.email = ?
+                      AND s.revoked_at IS NULL
+                    """,
                 Integer.class,
                 email
             );
@@ -323,10 +331,10 @@ class PasswordResetIntegrationTest
 
         Object refreshRevokedAt =
             jdbcTemplate.queryForObject("""
-                        SELECT revoked_at
-                        FROM identity.refresh_tokens
-                        WHERE token_hash = ?
-                        """,
+                    SELECT revoked_at
+                    FROM identity.refresh_tokens
+                    WHERE token_hash = ?
+                    """,
                 Object.class,
                 refreshHash
             );
@@ -336,15 +344,15 @@ class PasswordResetIntegrationTest
 
         // Previously issued refresh token is dead.
         mockMvc.perform(
-                post("/api/v1/auth/refresh")
+                post(api("/auth/refresh"))
                     .contentType(
                         "application/json"
                     )
                     .content("""
-                                        {
-                                          "refreshToken": "%s"
-                                        }
-                                        """.formatted(refreshToken))
+                        {
+                          "refreshToken": "%s"
+                        }
+                        """.formatted(refreshToken))
             )
             .andExpect(status().isUnauthorized());
     }
@@ -354,8 +362,9 @@ class PasswordResetIntegrationTest
     // Helpers
     // -----------------------------------------------------
 
-    private String createVerifiedUser(String prefix)
-        throws Exception {
+    private String createVerifiedUser(
+        String prefix
+    ) throws Exception {
 
         String email =
             "%s+%s@example.com"
@@ -364,44 +373,10 @@ class PasswordResetIntegrationTest
                     UUID.randomUUID()
                 );
 
-        mockMvc.perform(
-                post("/api/v1/auth/register")
-                    .contentType(
-                        "application/json"
-                    )
-                    .content("""
-                                        {
-                                          "email": "%s",
-                                          "password":
-                                          "SecurePassword123!",
-                                          "firstName": "David",
-                                          "lastName": "Test"
-                                        }
-                                        """.formatted(email))
-            )
-            .andExpect(status().isCreated());
-
-        String verificationToken =
-            emailSender.tokenFor(email);
-
-        assertNotNull(verificationToken);
-
-        mockMvc.perform(
-                post(
-                    "/api/v1/auth/verify-email"
-                )
-                    .contentType(
-                        "application/json"
-                    )
-                    .content("""
-                                        {
-                                          "token": "%s"
-                                        }
-                                        """.formatted(
-                        verificationToken
-                    ))
-            )
-            .andExpect(status().isOk());
+        identityTestClient.createUser(
+            email,
+            IdentityTestClient.DEFAULT_PASSWORD
+        );
 
         return email;
     }
@@ -411,16 +386,16 @@ class PasswordResetIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/auth/forgot-password"
+                    api("/auth/forgot-password")
                 )
                     .contentType(
                         "application/json"
                     )
                     .content("""
-                                        {
-                                          "email": "%s"
-                                        }
-                                        """.formatted(email))
+                        {
+                          "email": "%s"
+                        }
+                        """.formatted(email))
             )
             .andExpect(status().isAccepted());
     }
@@ -432,14 +407,14 @@ class PasswordResetIntegrationTest
     ) throws Exception {
 
         return mockMvc.perform(
-            post("/api/v1/auth/reset-password")
+            post(api("/auth/reset-password"))
                 .contentType("application/json")
                 .content("""
-                                {
-                                  "token": "%s",
-                                  "newPassword": "%s"
-                                }
-                                """.formatted(
+                    {
+                      "token": "%s",
+                      "newPassword": "%s"
+                    }
+                    """.formatted(
                     token,
                     password
                 ))
@@ -453,14 +428,14 @@ class PasswordResetIntegrationTest
     ) throws Exception {
 
         return mockMvc.perform(
-            post("/api/v1/auth/login")
+            post(api("/auth/login"))
                 .contentType("application/json")
                 .content("""
-                                {
-                                  "email": "%s",
-                                  "password": "%s"
-                                }
-                                """.formatted(
+                    {
+                      "email": "%s",
+                      "password": "%s"
+                    }
+                    """.formatted(
                     email,
                     password
                 ))

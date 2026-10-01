@@ -31,6 +31,13 @@ public record ApiResponse<T>(
         );
     }
 
+    public static <T> ApiResponse<T> success(
+        HttpStatus status,
+        String message
+    ) {
+        return success(status, message, null);
+    }
+
     public static ApiResponse<Void> error(
         HttpStatus status,
         String message

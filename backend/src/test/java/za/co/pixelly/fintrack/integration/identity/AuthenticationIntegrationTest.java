@@ -28,34 +28,17 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
     private final JsonParser jsonParser = new JacksonJsonParser();
 
     @Test
-    void pendingVerificationUserCannotLogin() throws Exception {
-        String email = uniqueEmail("pending");
-        String password = "SecurePassword123!";
-
-        registerUser(email, password);
-
-        mockMvc.perform(post("/api/v1/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                        {
-                            "email": "%s",
-                            "password": "%s"
-                        }
-                    """.formatted(email, password)))
-            .andExpect(status().isForbidden())
-            .andExpect(jsonPath("$.success").value(false));
-
-    }
-
-    @Test
     void loginRejectsIncorrectPassword() throws Exception {
 
         String email = uniqueEmail("wrong-password");
+        String password = "SecurePassword123!";
 
-        registerUser(email, "SecurePassword123!");
-        activateUser(email);
+        identityTestClient.createUser(
+            email,
+            password
+        );
 
-        mockMvc.perform(post("/api/v1/auth/login")
+        mockMvc.perform(post(api("/auth/login"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {
@@ -75,16 +58,18 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
         String email = uniqueEmail("login");
         String password = "SecurePassword123!";
 
-        registerUser(email, password);
-        activateUser(email);
+        identityTestClient.createUser(
+            email,
+            password
+        );
 
         MvcResult result = login(email, password);
 
         String accessToken =
-            resultField(result, "accessToken");
+            loginTokenField(result, "accessToken");
 
         String rawRefreshToken =
-            resultField(result, "refreshToken");
+            loginTokenField(result, "refreshToken");
 
         assertNotNull(accessToken);
         assertFalse(accessToken.isBlank());
@@ -137,16 +122,18 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
         String email = uniqueEmail("jwt");
         String password = "SecurePassword123!";
 
-        registerUser(email, password);
-        activateUser(email);
+        identityTestClient.createUser(
+            email,
+            password
+        );
 
         MvcResult loginResult =
             login(email, password);
 
         String accessToken =
-            resultField(loginResult, "accessToken");
+            loginTokenField(loginResult, "accessToken");
 
-        mockMvc.perform(get("/api/v1/auth/me")
+        mockMvc.perform(get(api("/auth/me"))
                 .header(
                     "Authorization",
                     "Bearer " + accessToken
@@ -161,7 +148,7 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
     void protectedEndpointReturnsJson401WithoutToken() throws Exception {
 
         mockMvc.perform(
-                get("/api/v1/auth/me")
+                get(api("/auth/me"))
             )
             .andExpect(status().isUnauthorized()
             )
@@ -181,7 +168,7 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
         throws Exception {
 
         mockMvc.perform(
-                get("/api/v1/auth/me")
+                get(api("/auth/me"))
                     .header(
                         "Authorization",
                         "Bearer definitely-not-a-jwt"
@@ -215,20 +202,21 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
         String email = uniqueEmail("refresh");
         String password = "SecurePassword123!";
 
-        registerUser(email, password);
-        activateUser(email);
+        identityTestClient.createUser(
+            email,
+            password
+        );
 
         MvcResult loginResult =
             login(email, password);
 
         String oldRefreshToken =
-            resultField(loginResult, "refreshToken");
+            loginTokenField(loginResult, "refreshToken");
 
-        String oldHash =
-            refreshTokenCodec.hash(oldRefreshToken);
+        String oldHash = refreshTokenCodec.hash(oldRefreshToken);
 
         MvcResult refreshResult =
-            mockMvc.perform(post("/api/v1/auth/refresh")
+            mockMvc.perform(post(api("/auth/refresh"))
                     .contentType("application/json")
                     .content("""
                         {
@@ -289,7 +277,7 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
 
 
         // Replay the old refresh token.
-        mockMvc.perform(post("/api/v1/auth/refresh")
+        mockMvc.perform(post(api("/auth/refresh"))
                 .contentType("application/json")
                 .content("""
                     {
@@ -299,39 +287,20 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
             .andExpect(status().isUnauthorized());
     }
 
-    private void registerUser(
-        String email,
-        String password
-    ) throws Exception {
-        mockMvc.perform(post("/api/v1/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                    {
-                       "email": "%s",
-                       "password": "%s",
-                       "firstName": "David",
-                       "lastName": "Test"
-                    }
-                    """.formatted(email, password)))
-            .andExpect(status().isCreated());
-    }
-
     @Test
     void failedLoginIncrementsFailedAttemptCounter()
         throws Exception {
 
-        String email =
-            uniqueEmail("failed-attempt");
+        String email = uniqueEmail("failed-attempt");
+        String password = "SecurePassword123!";
 
-        registerUser(
+        identityTestClient.createUser(
             email,
-            "SecurePassword123!"
+            password
         );
 
-        activateUser(email);
-
         mockMvc.perform(
-                post("/api/v1/auth/login")
+                post(api("/auth/login"))
                     .contentType("application/json")
                     .content("""
                         {
@@ -359,20 +328,18 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
     void repeatedFailedLoginsTemporarilyLockAccount()
         throws Exception {
 
-        String email =
-            uniqueEmail("lockout");
+        String email = uniqueEmail("lockout");
+        String password = "SecurePassword123!";
 
-        registerUser(
+        identityTestClient.createUser(
             email,
-            "SecurePassword123!"
+            password
         );
-
-        activateUser(email);
 
         for (int attempt = 0; attempt < 5; attempt++) {
 
             mockMvc.perform(
-                    post("/api/v1/auth/login")
+                    post(api("/auth/login"))
                         .contentType(
                             "application/json"
                         )
@@ -419,7 +386,7 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
          * during the lock period.
          */
         mockMvc.perform(
-                post("/api/v1/auth/login")
+                post(api("/auth/login"))
                     .contentType(
                         "application/json"
                     )
@@ -440,20 +407,18 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
     void successfulLoginClearsPreviousFailedAttempts()
         throws Exception {
 
-        String email =
-            uniqueEmail("failure-reset");
+        String email = uniqueEmail("failure-reset");
+        String password = "SecurePassword123!";
 
-        registerUser(
+        identityTestClient.createUser(
             email,
-            "SecurePassword123!"
+            password
         );
-
-        activateUser(email);
 
         for (int attempt = 0; attempt < 2; attempt++) {
 
             mockMvc.perform(
-                    post("/api/v1/auth/login")
+                    post(api("/auth/login"))
                         .contentType(
                             "application/json"
                         )
@@ -504,15 +469,13 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
     void expiredTemporaryLockAllowsLoginAgain()
         throws Exception {
 
-        String email =
-            uniqueEmail("expired-lock");
+        String email = uniqueEmail("expired-lock");
+        String password = "SecurePassword123!";
 
-        registerUser(
+        identityTestClient.createUser(
             email,
-            "SecurePassword123!"
+            password
         );
-
-        activateUser(email);
 
         jdbcTemplate.update("""
                 UPDATE identity.users
@@ -549,27 +512,28 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
         String email = uniqueEmail("logout");
         String password = "SecurePassword123!";
 
-        registerUser(email, password);
-        activateUser(email);
+        identityTestClient.createUser(
+            email,
+            password
+        );
 
         MvcResult loginResult =
             login(email, password);
 
         String accessToken =
-            resultField(loginResult, "accessToken");
+            loginTokenField(loginResult, "accessToken");
 
         String refreshToken =
-            resultField(loginResult, "refreshToken");
+            loginTokenField(loginResult, "refreshToken");
 
-        Jwt jwt =
-            jwtDecoder.decode(accessToken);
+        Jwt jwt = jwtDecoder.decode(accessToken);
 
         UUID sessionId =
             UUID.fromString(
                 Objects.requireNonNull(jwt.getClaimAsString("sid"))
             );
 
-        mockMvc.perform(post("/api/v1/auth/logout")
+        mockMvc.perform(post(api("/auth/logout"))
                 .header(
                     "Authorization",
                     "Bearer " + accessToken
@@ -605,7 +569,7 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
         assertNotNull(tokenRevokedAt);
 
 
-        mockMvc.perform(post("/api/v1/auth/refresh")
+        mockMvc.perform(post(api("/auth/refresh"))
                 .contentType("application/json")
                 .content("""
                     {
@@ -615,18 +579,193 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
             .andExpect(status().isUnauthorized());
     }
 
-    private void activateUser(String email) {
 
-        int updated = jdbcTemplate.update("""
-                UPDATE identity.users
-                   SET status = 'ACTIVE',
-                       email_verified_at = CURRENT_TIMESTAMP
-                 WHERE email = ?
-                """,
-            email
+    @Test
+    void mfaEnabledUserReceivesChallengeWithoutSessionOrTokens()
+        throws Exception {
+
+        String email =
+            uniqueEmail("mfa-login");
+
+        String password =
+            "SecurePassword123!";
+
+        identityTestClient.createUser(
+            email,
+            password
         );
 
-        assertEquals(1, updated);
+        UUID userId =
+            jdbcTemplate.queryForObject(
+                """
+                    SELECT id
+                    FROM identity.users
+                    WHERE email = ?
+                    """,
+                UUID.class,
+                email
+            );
+
+        assertNotNull(userId);
+
+        /*
+         * This test is specifically about login behaviour,
+         * not MFA enrollment, so enable MFA directly in the DB.
+         *
+         * The encrypted-secret values do not need to be real
+         * because login only checks whether MFA is ENABLED.
+         */
+        jdbcTemplate.update(
+            """
+                INSERT INTO identity.user_mfa
+                (
+                    user_id,
+                    status,
+                    totp_secret_ciphertext,
+                    totp_secret_iv,
+                    enabled_at
+                )
+                VALUES
+                (
+                    ?,
+                    'ENABLED',
+                    ?,
+                    ?,
+                    CURRENT_TIMESTAMP
+                )
+                """,
+            userId,
+            new byte[]{1},
+            new byte[12]
+        );
+
+        MvcResult result =
+            mockMvc.perform(
+                    post(api("/auth/login"))
+                        .header(
+                            "User-Agent",
+                            "reko MFA integration test"
+                        )
+                        .contentType(
+                            MediaType.APPLICATION_JSON
+                        )
+                        .content("""
+                            {
+                              "email": "%s",
+                              "password": "%s"
+                            }
+                            """.formatted(
+                            email,
+                            password
+                        ))
+                )
+                .andExpect(status().isOk())
+                .andExpect(
+                    jsonPath("$.success")
+                        .value(true)
+                )
+                .andExpect(
+                    jsonPath("$.result.status")
+                        .value("MFA_REQUIRED")
+                )
+                .andExpect(
+                    jsonPath("$.result.tokens")
+                        .doesNotExist()
+                )
+                .andExpect(
+                    jsonPath(
+                        "$.result.mfaChallenge.challengeToken"
+                    ).isNotEmpty()
+                )
+                .andExpect(
+                    jsonPath(
+                        "$.result.mfaChallenge.expiresAt"
+                    ).isNotEmpty()
+                )
+                .andReturn();
+
+        String challengeToken =
+            mfaChallengeField(
+                result,
+                "challengeToken"
+            );
+
+        assertNotNull(challengeToken);
+        assertFalse(challengeToken.isBlank());
+
+        /*
+         * Password + first factor alone must NOT create
+         * an authenticated session.
+         */
+        Integer sessionCount =
+            jdbcTemplate.queryForObject(
+                """
+                    SELECT COUNT(*)
+                    FROM identity.auth_sessions
+                    WHERE user_id = ?
+                    """,
+                Integer.class,
+                userId
+            );
+
+        assertEquals(
+            0,
+            sessionCount
+        );
+
+        /*
+         * And therefore no refresh token should exist either.
+         */
+        Integer refreshTokenCount =
+            jdbcTemplate.queryForObject(
+                """
+                    SELECT COUNT(*)
+                    FROM identity.refresh_tokens rt
+                    JOIN identity.auth_sessions s
+                      ON s.id = rt.session_id
+                    WHERE s.user_id = ?
+                    """,
+                Integer.class,
+                userId
+            );
+
+        assertEquals(
+            0,
+            refreshTokenCount
+        );
+
+        /*
+         * The raw challenge token must not be stored.
+         */
+        String challengeHash =
+            refreshTokenCodec.hash(
+                challengeToken
+            );
+
+        Integer challengeCount =
+            jdbcTemplate.queryForObject(
+                """
+                    SELECT COUNT(*)
+                    FROM identity.mfa_login_challenges
+                    WHERE user_id = ?
+                      AND token_hash = ?
+                      AND consumed_at IS NULL
+                      AND invalidated_at IS NULL
+                    """,
+                Integer.class,
+                userId,
+                challengeHash
+            );
+
+        assertEquals(
+            1,
+            challengeCount
+        );
+
+        assertNotEquals(
+            challengeToken,
+            challengeHash
+        );
     }
 
     private MvcResult login(
@@ -634,7 +773,7 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
         String password
     ) throws Exception {
 
-        return mockMvc.perform(post("/api/v1/auth/login")
+        return mockMvc.perform(post(api("/auth/login"))
                 .header("User-Agent", "FinTrack integration test")
                 .contentType("application/json")
                 .content("""
@@ -645,10 +784,57 @@ public class AuthenticationIntegrationTest extends AbstractIntegrationTest {
                     """.formatted(email, password)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.success").value(true))
-            .andExpect(jsonPath("$.result.accessToken").isNotEmpty())
-            .andExpect(jsonPath("$.result.refreshToken").isNotEmpty())
-            .andExpect(jsonPath("$.result.tokenType").value("Bearer"))
+            .andExpect(jsonPath("$.result.status").value("AUTHENTICATED"))
+            .andExpect(jsonPath("$.result.tokens.accessToken").isNotEmpty())
+            .andExpect(jsonPath("$.result.tokens.refreshToken").isNotEmpty())
+            .andExpect(jsonPath("$.result.tokens.tokenType").value("Bearer"))
+            .andExpect(jsonPath("$.result.mfaChallenge").doesNotExist())
             .andReturn();
+    }
+
+
+    @SuppressWarnings("unchecked")
+    private String mfaChallengeField(
+        MvcResult result,
+        String field
+    ) throws Exception {
+
+        Map<String, Object> root =
+            jsonParser.parseMap(
+                result.getResponse()
+                    .getContentAsString()
+            );
+
+        Map<String, Object> body =
+            (Map<String, Object>) root.get(
+                "result"
+            );
+
+        Map<String, Object> challenge =
+            (Map<String, Object>) body.get(
+                "mfaChallenge"
+            );
+
+        return (String) challenge.get(field);
+    }
+
+
+    @SuppressWarnings("unchecked")
+    private String loginTokenField(
+        MvcResult result,
+        String field
+    ) throws Exception {
+        Map<String, Object> root = jsonParser.parseMap(
+            result.getResponse().getContentAsString()
+        );
+
+        Map<String, Object> body =
+            (Map<String, Object>) root.get("result");
+
+        Map<String, Object> tokens =
+            (Map<String, Object>) body.get("tokens");
+
+        return (String) tokens.get(field);
     }
 
     @SuppressWarnings("unchecked")

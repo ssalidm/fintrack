@@ -288,7 +288,7 @@ class RecurringTransactionIntegrationTest extends AbstractIntegrationTest {
 
         mockMvc.perform(
                 post(
-                    "/api/v1/recurring-transactions/{scheduleId}/post-due",
+                    api("/recurring-transactions/{scheduleId}/post-due"),
                     scheduleId
                 )
                     .header(
@@ -401,7 +401,7 @@ class RecurringTransactionIntegrationTest extends AbstractIntegrationTest {
 
         mockMvc.perform(
                 post(
-                    "/api/v1/recurring-transactions/{scheduleId}/post-due",
+                    api("/recurring-transactions/{scheduleId}/post-due"),
                     scheduleId
                 )
                     .header(
@@ -631,7 +631,7 @@ class RecurringTransactionIntegrationTest extends AbstractIntegrationTest {
 
         mockMvc.perform(
                 get(
-                    "/api/v1/recurring-transactions/{scheduleId}",
+                    api("/recurring-transactions/{scheduleId}"),
                     scheduleId
                 )
                     .header(
@@ -814,7 +814,7 @@ class RecurringTransactionIntegrationTest extends AbstractIntegrationTest {
 
         mockMvc.perform(
                 get(
-                    "/api/v1/recurring-transactions"
+                    api("/recurring-transactions")
                 )
             )
             .andExpect(
@@ -849,7 +849,7 @@ class RecurringTransactionIntegrationTest extends AbstractIntegrationTest {
     ) throws Exception {
 
         MvcResult result = mockMvc.perform(
-                post("/api/v1/accounts")
+                post(api("/accounts"))
                     .header(
                         "Authorization",
                         bearer(user)
@@ -902,7 +902,7 @@ class RecurringTransactionIntegrationTest extends AbstractIntegrationTest {
 
         return mockMvc.perform(
             post(
-                "/api/v1/recurring-transactions"
+                api("/recurring-transactions")
             )
                 .header(
                     "Authorization",
@@ -984,7 +984,7 @@ class RecurringTransactionIntegrationTest extends AbstractIntegrationTest {
 
         return mockMvc.perform(
             post(
-                "/api/v1/recurring-transactions"
+                api("/recurring-transactions")
             )
                 .header(
                     "Authorization",
@@ -1034,7 +1034,7 @@ class RecurringTransactionIntegrationTest extends AbstractIntegrationTest {
 
         return mockMvc.perform(
             post(
-                "/api/v1/recurring-transactions/{scheduleId}/{operation}",
+                api("/recurring-transactions/{scheduleId}/{operation}"),
                 scheduleId,
                 operation
             )
@@ -1065,7 +1065,7 @@ class RecurringTransactionIntegrationTest extends AbstractIntegrationTest {
 
         return mockMvc.perform(
             patch(
-                "/api/v1/recurring-transactions/{scheduleId}",
+                api("/recurring-transactions/{scheduleId}"),
                 scheduleId
             )
                 .header(
@@ -1109,7 +1109,7 @@ class RecurringTransactionIntegrationTest extends AbstractIntegrationTest {
 
         return mockMvc.perform(
             post(
-                "/api/v1/accounts/{accountId}/archive",
+                api("/accounts/{accountId}/archive"),
                 accountId
             )
                 .header(

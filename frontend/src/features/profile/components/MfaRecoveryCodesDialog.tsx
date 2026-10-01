@@ -1,0 +1,292 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import {
+  Eye,
+  EyeOff,
+  KeyRound,
+  LoaderCircle,
+  X,
+} from 'lucide-react'
+import { useState } from 'react'
+import {
+  Controller,
+  useForm,
+} from 'react-hook-form'
+
+import { ApiClientError } from '@/api/ApiClientError'
+import OtpCodeInput from '@/features/auth/components/OtpCodeInput'
+import { useRegenerateMfaRecoveryCodes } from '@/features/profile/hooks/useMfaManagement'
+import {
+  regenerateRecoveryCodesSchema,
+  type RegenerateRecoveryCodesFormValues,
+} from '@/features/profile/validation/profileSchemas'
+import RecoveryCodesPanel from './RecoveryCodesPanel'
+
+interface MfaRecoveryCodesDialogProps {
+  onClose: () => void
+}
+
+const passwordInputClasses =
+  'w-full rounded-xl border border-line bg-surface px-4 py-3 pr-12 text-sm ' +
+  'text-ink outline-none transition focus:border-accent focus:ring-4 ' +
+  'focus:ring-accent/15 disabled:cursor-not-allowed disabled:opacity-60'
+
+export default function MfaRecoveryCodesDialog({
+  onClose,
+}: MfaRecoveryCodesDialogProps) {
+  const regenerateCodes =
+    useRegenerateMfaRecoveryCodes()
+
+  const [showPassword, setShowPassword] =
+    useState(false)
+
+  const [formError, setFormError] =
+    useState<string | null>(null)
+
+  const [recoveryCodes, setRecoveryCodes] =
+    useState<readonly string[] | null>(null)
+
+  const form =
+    useForm<RegenerateRecoveryCodesFormValues>({
+      resolver: zodResolver(
+        regenerateRecoveryCodesSchema,
+      ),
+      defaultValues: {
+        currentPassword: '',
+        code: '',
+      },
+    })
+
+  async function submit(
+    values: RegenerateRecoveryCodesFormValues,
+  ) {
+    setFormError(null)
+
+    try {
+      const response =
+        await regenerateCodes.mutateAsync({
+          currentPassword:
+            values.currentPassword,
+          code: values.code.trim(),
+        })
+
+      setRecoveryCodes(response.recoveryCodes)
+    } catch (error) {
+      setFormError(
+        error instanceof ApiClientError
+          ? error.message
+          : 'Unable to generate new recovery codes.',
+      )
+    }
+  }
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={
+        recoveryCodes
+          ? undefined
+          : 'recovery-codes-title'
+      }
+      aria-label={
+        recoveryCodes
+          ? 'Save new recovery codes'
+          : undefined
+      }
+      className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-[#102c25]/65 p-5 backdrop-blur-sm"
+    >
+      <div className="relative my-auto w-full max-w-lg rounded-3xl border border-line bg-surface p-6 shadow-2xl sm:p-8">
+        {recoveryCodes ? (
+          <RecoveryCodesPanel
+            codes={recoveryCodes}
+            onDone={onClose}
+          />
+        ) : (
+          <>
+            <button
+              type="button"
+              aria-label="Close recovery code dialog"
+              disabled={
+                regenerateCodes.isPending
+              }
+              onClick={onClose}
+              className="absolute right-5 top-5 grid size-9 cursor-pointer place-items-center rounded-full text-muted transition hover:bg-surface-muted hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <X size={18} aria-hidden />
+            </button>
+
+            <span className="grid size-12 place-items-center rounded-2xl bg-accent-soft text-accent">
+              <KeyRound
+                size={22}
+                aria-hidden
+              />
+            </span>
+
+            <p className="mt-6 text-xs font-semibold tracking-[0.15em] text-accent">
+              RECOVERY ACCESS
+            </p>
+
+            <h2
+              id="recovery-codes-title"
+              className="mt-3 pr-10 font-serif text-3xl text-ink"
+            >
+              Generate new recovery codes
+            </h2>
+
+            <p className="mt-3 text-sm leading-6 text-muted">
+              Once generated, every previous
+              recovery code will immediately stop
+              working.
+            </p>
+
+            <form
+              className="mt-6 space-y-5"
+              onSubmit={form.handleSubmit(submit)}
+              noValidate
+            >
+              <label className="block text-sm font-semibold text-ink">
+                Current password
+
+                <span className="relative mt-2 block">
+                  <input
+                    {...form.register(
+                      'currentPassword',
+                    )}
+                    type={
+                      showPassword
+                        ? 'text'
+                        : 'password'
+                    }
+                    autoComplete="current-password"
+                    disabled={
+                      regenerateCodes.isPending
+                    }
+                    className={
+                      passwordInputClasses
+                    }
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setShowPassword(
+                        (current) => !current,
+                      )
+                    }
+                    aria-label={
+                      showPassword
+                        ? 'Hide current password'
+                        : 'Show current password'
+                    }
+                    className="absolute right-3 top-1/2 grid size-8 -translate-y-1/2 cursor-pointer place-items-center rounded-lg text-muted hover:bg-surface-muted hover:text-primary"
+                  >
+                    {showPassword ? (
+                      <EyeOff
+                        size={18}
+                        aria-hidden
+                      />
+                    ) : (
+                      <Eye
+                        size={18}
+                        aria-hidden
+                      />
+                    )}
+                  </button>
+                </span>
+
+                {form.formState.errors
+                  .currentPassword && (
+                  <span className="mt-2 block text-xs font-medium text-danger">
+                    {
+                      form.formState.errors
+                        .currentPassword.message
+                    }
+                  </span>
+                )}
+              </label>
+
+              <div>
+                <label
+                  htmlFor="regenerateMfaCode"
+                  className="block text-center text-sm font-semibold text-ink"
+                >
+                  Authenticator code
+                </label>
+
+                <div className="mt-3">
+                  <Controller
+                    name="code"
+                    control={form.control}
+                    render={({ field }) => (
+                      <OtpCodeInput
+                        id="regenerateMfaCode"
+                        name={field.name}
+                        value={field.value}
+                        disabled={
+                          regenerateCodes.isPending
+                        }
+                        invalid={Boolean(
+                          form.formState.errors.code,
+                        )}
+                        describedBy={
+                          form.formState.errors.code
+                            ? 'regenerate-mfa-code-error'
+                            : undefined
+                        }
+                        inputRef={field.ref}
+                        onBlur={field.onBlur}
+                        onChange={field.onChange}
+                      />
+                    )}
+                  />
+                </div>
+
+                {form.formState.errors.code && (
+                  <p
+                    id="regenerate-mfa-code-error"
+                    role="alert"
+                    className="mt-2 text-center text-xs font-medium text-danger"
+                  >
+                    {
+                      form.formState.errors.code
+                        .message
+                    }
+                  </p>
+                )}
+              </div>
+
+              {formError && (
+                <p
+                  role="alert"
+                  className="rounded-xl bg-danger-soft px-4 py-3 text-sm text-danger"
+                >
+                  {formError}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                disabled={
+                  regenerateCodes.isPending
+                }
+                className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-inverse transition hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {regenerateCodes.isPending && (
+                  <LoaderCircle
+                    size={17}
+                    className="animate-spin"
+                    aria-hidden
+                  />
+                )}
+
+                {regenerateCodes.isPending
+                  ? 'Generating'
+                  : 'Generate new codes'}
+              </button>
+            </form>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}

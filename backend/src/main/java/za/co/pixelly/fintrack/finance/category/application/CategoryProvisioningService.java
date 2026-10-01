@@ -8,6 +8,7 @@ import za.co.pixelly.fintrack.finance.category.domain.CategoryTemplate;
 import za.co.pixelly.fintrack.finance.category.persistence.CategoryRepository;
 import za.co.pixelly.fintrack.finance.category.persistence.CategoryTemplateRepository;
 
+import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -17,33 +18,49 @@ import java.util.UUID;
 public class CategoryProvisioningService {
 
     private final CategoryRepository categoryRepository;
-    private final CategoryTemplateRepository categoryTemplateRepository;
+    private final CategoryTemplateRepository
+        categoryTemplateRepository;
+
+    private final Clock applicationClock;
+
 
     @Transactional
-    public void provisionDefaults(UUID userId) {
-        List<CategoryTemplate> templates = categoryTemplateRepository
-            .findAllByActiveTrueOrderByDisplayOrderAsc();
+    public void provisionDefaults(
+        UUID userId
+    ) {
+        List<CategoryTemplate> templates =
+            categoryTemplateRepository
+                .findAllByActiveTrueOrderByDisplayOrderAsc();
 
-        Instant now = Instant.now();
+        Instant now =
+            applicationClock.instant();
 
-        List<Category> categories = templates
-            .stream()
-            .filter(template ->
-                !categoryRepository.existsByUserIdAndTemplateCode(
-                    userId,
-                    template.getCode()
+        List<Category> categories =
+            templates
+                .stream()
+                .filter(
+                    template ->
+                        !categoryRepository
+                            .existsByUserIdAndTemplateCode(
+                                userId,
+                                template.getCode()
+                            )
                 )
-            )
-            .map(template -> Category.createFromTemplate(
-                    userId,
-                    template,
-                    now
+                .map(
+                    template ->
+                        Category.createFromTemplate(
+                            userId,
+                            template,
+                            now
+                        )
                 )
-            )
-            .toList();
+                .toList();
 
         if (!categories.isEmpty()) {
-            categoryRepository.saveAllAndFlush(categories);
+            categoryRepository
+                .saveAllAndFlush(
+                    categories
+                );
         }
     }
 }

@@ -1,10 +1,8 @@
 package za.co.pixelly.fintrack.reporting.persistence;
 
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import za.co.pixelly.fintrack.reporting.api.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,49 +19,56 @@ public class ReportingReadRepository {
     private final JdbcTemplate jdbcTemplate;
 
 
-    public List<AccountBalanceReportResponse> findAccountBalances(UUID userId) {
+    public List<AccountBalanceRow> findAccountBalances(
+        UUID userId
+    ) {
         return jdbcTemplate.query(
             """
                 SELECT
-                     account_id,
-                     account_name,
-                     account_type,
-                     currency_code,
-                     opening_balance,
-                     transaction_total,
-                     current_balance,
-                     posted_transaction_count,
-                     include_in_net_worth,
-                     status,
-                     created_at,
-                     updated_at
-                 FROM reporting.account_balances
-                 WHERE user_id = ?
-                 ORDER BY
-                     currency_code,
-                     account_name,
-                     account_id
+                    account_id,
+                    account_name,
+                    account_type,
+                    currency_code,
+                    opening_balance,
+                    transaction_total,
+                    current_balance,
+                    posted_transaction_count,
+                    include_in_net_worth,
+                    status,
+                    created_at,
+                    updated_at
+                FROM reporting.account_balances
+                WHERE user_id = ?
+                ORDER BY
+                    currency_code,
+                    account_name,
+                    account_id
                 """,
-            (resultSet, rowNum) -> new AccountBalanceReportResponse(
-                resultSet.getObject("account_id", UUID.class),
-                resultSet.getString("account_name"),
-                resultSet.getString("account_type"),
-                resultSet.getString("currency_code"),
-                resultSet.getBigDecimal("opening_balance"),
-                resultSet.getBigDecimal("transaction_total"),
-                resultSet.getBigDecimal("current_balance"),
-                resultSet.getLong("posted_transaction_count"),
-                resultSet.getBoolean("include_in_net_worth"),
-                resultSet.getString("status"),
-                resultSet.getTimestamp("created_at").toInstant(),
-                resultSet.getTimestamp("updated_at").toInstant()
-            ),
+            (resultSet, rowNum) ->
+                new AccountBalanceRow(
+                    resultSet.getObject("account_id", UUID.class),
+                    resultSet.getString("account_name"),
+                    resultSet.getString("account_type"),
+                    resultSet.getString("currency_code"),
+                    resultSet.getBigDecimal("opening_balance"),
+                    resultSet.getBigDecimal("transaction_total"),
+                    resultSet.getBigDecimal("current_balance"),
+                    resultSet.getLong("posted_transaction_count"),
+                    resultSet.getBoolean("include_in_net_worth"),
+                    resultSet.getString("status"),
+                    resultSet.getTimestamp("created_at")
+                        .toInstant(), resultSet.getTimestamp("updated_at")
+                    .toInstant()
+                ),
             userId
         );
     }
 
 
-    public List<NetWorthReportResponse> findNetWorthByCurrency(UUID userId) {
+    public List<NetWorthRow>
+    findNetWorthByCurrency(
+        UUID userId
+    ) {
         return jdbcTemplate.query(
             """
                 SELECT
@@ -76,24 +81,25 @@ public class ReportingReadRepository {
                 WHERE user_id = ?
                 ORDER BY currency_code
                 """,
-            (resultSet, rowNum) -> new NetWorthReportResponse(
-                resultSet.getString("currency_code"),
-                resultSet.getBigDecimal("net_worth"),
-                resultSet.getLong("included_account_count"),
-                resultSet.getLong("active_account_count"),
-                resultSet.getLong("archived_account_count")
-            ),
+            (resultSet, rowNum) ->
+                new NetWorthRow(resultSet.getString("currency_code"),
+                    resultSet.getBigDecimal("net_worth"),
+                    resultSet.getLong("included_account_count"),
+                    resultSet.getLong("active_account_count"),
+                    resultSet.getLong("archived_account_count"
+                    )
+                ),
             userId
         );
     }
 
 
-    public List<MonthlyCashFlowResponse> findMonthlyCashFlow(
+    public List<MonthlyCashFlowRow>
+    findMonthlyCashFlow(
         UUID userId,
         LocalDate fromMonth,
         LocalDate toMonth
     ) {
-
         return jdbcTemplate.query(
             """
                 SELECT
@@ -111,7 +117,7 @@ public class ReportingReadRepository {
                     currency_code
                 """,
             (resultSet, rowNum) ->
-                new MonthlyCashFlowResponse(
+                new MonthlyCashFlowRow(
                     resultSet.getString("currency_code"),
                     resultSet.getObject("month_start", LocalDate.class),
                     resultSet.getBigDecimal("total_income"),
@@ -125,12 +131,12 @@ public class ReportingReadRepository {
     }
 
 
-    public List<MonthlyCategorySpendingResponse> findMonthlyCategorySpending(
+    public List<MonthlyCategorySpendingRow>
+    findMonthlyCategorySpending(
         UUID userId,
         LocalDate fromMonth,
         LocalDate toMonth
     ) {
-
         return jdbcTemplate.query(
             """
                 SELECT
@@ -151,7 +157,7 @@ public class ReportingReadRepository {
                     category_name
                 """,
             (resultSet, rowNum) ->
-                new MonthlyCategorySpendingResponse(
+                new MonthlyCategorySpendingRow(
                     resultSet.getString("currency_code"),
                     resultSet.getObject("month_start", LocalDate.class),
                     resultSet.getObject("category_id", UUID.class),
@@ -166,11 +172,11 @@ public class ReportingReadRepository {
     }
 
 
-    public List<BudgetPerformanceRow> findBudgetPerformance(
+    public List<BudgetPerformanceRow>
+    findBudgetPerformance(
         UUID userId,
         UUID budgetId
     ) {
-
         return jdbcTemplate.query(
             """
                 SELECT
@@ -209,7 +215,8 @@ public class ReportingReadRepository {
                     resultSet.getBigDecimal("spent_amount"),
                     resultSet.getBigDecimal("remaining_amount"),
                     resultSet.getBigDecimal("utilization_percentage"),
-                    resultSet.getBoolean("exceeded")),
+                    resultSet.getBoolean("exceeded")
+                ),
             userId,
             budgetId
         );
@@ -220,7 +227,6 @@ public class ReportingReadRepository {
         UUID userId,
         UUID budgetId
     ) {
-
         Boolean exists =
             jdbcTemplate.queryForObject(
                 """
@@ -242,68 +248,70 @@ public class ReportingReadRepository {
     }
 
 
-    public Optional<SavingsGoalProgressResponse> findSavingsGoalProgress(
+    public Optional<SavingsGoalProgressRow>
+    findSavingsGoalProgress(
         UUID userId,
         UUID goalId
     ) {
+        List<SavingsGoalProgressRow> results =
+            jdbcTemplate.query(
+                """
+                    SELECT
+                        goal_id,
+                        goal_name,
+                        description,
+                        currency_code,
+                        target_amount,
+                        contributed_amount,
+                        remaining_amount,
+                        progress_percentage,
+                        target_reached,
+                        target_date,
+                        days_remaining,
+                        contribution_count,
+                        status,
+                        completed_at,
+                        archived_at,
+                        created_at,
+                        updated_at
+                    FROM reporting.savings_goal_progress
+                    WHERE user_id = ?
+                      AND goal_id = ?
+                    """,
+                (resultSet, rowNum) ->
+                    new SavingsGoalProgressRow(resultSet.getObject("goal_id", UUID.class),
+                        resultSet.getString("goal_name"),
+                        resultSet.getString("description"),
+                        resultSet.getString("currency_code"),
+                        resultSet.getBigDecimal("target_amount"),
+                        resultSet.getBigDecimal("contributed_amount"),
+                        resultSet.getBigDecimal("remaining_amount"),
+                        resultSet.getBigDecimal("progress_percentage"),
+                        resultSet.getBoolean("target_reached"),
+                        resultSet.getObject("target_date", LocalDate.class),
+                        resultSet.getObject("days_remaining", Integer.class),
+                        resultSet.getLong("contribution_count"),
+                        resultSet.getString("status"),
+                        instant(resultSet, "completed_at"),
+                        instant(resultSet, "archived_at"),
+                        instant(resultSet, "created_at"),
+                        instant(resultSet, "updated_at")
+                    ),
+                userId,
+                goalId
+            );
 
-        List<SavingsGoalProgressResponse> results = jdbcTemplate.query(
-            """
-                SELECT
-                    goal_id,
-                    goal_name,
-                    description,
-                    currency_code,
-                    target_amount,
-                    contributed_amount,
-                    remaining_amount,
-                    progress_percentage,
-                    target_reached,
-                    target_date,
-                    days_remaining,
-                    contribution_count,
-                    status,
-                    completed_at,
-                    archived_at,
-                    created_at,
-                    updated_at
-                FROM reporting.savings_goal_progress
-                WHERE user_id = ?
-                  AND goal_id = ?
-                """,
-            (resultSet, rowNum) ->
-                new SavingsGoalProgressResponse(
-                    resultSet.getObject("goal_id", UUID.class),
-                    resultSet.getString("goal_name"),
-                    resultSet.getString("description"),
-                    resultSet.getString("currency_code"),
-                    resultSet.getBigDecimal("target_amount"),
-                    resultSet.getBigDecimal("contributed_amount"),
-                    resultSet.getBigDecimal("remaining_amount"),
-                    resultSet.getBigDecimal("progress_percentage"),
-                    resultSet.getBoolean("target_reached"),
-                    resultSet.getObject("target_date", LocalDate.class),
-                    resultSet.getObject("days_remaining", Integer.class),
-                    resultSet.getLong("contribution_count"),
-                    resultSet.getString("status"),
-                    instant(resultSet, "completed_at"),
-                    instant(resultSet, "archived_at"),
-                    instant(resultSet, "created_at"),
-                    instant(resultSet, "updated_at")),
-            userId,
-            goalId
-        );
-
-        return results.stream()
+        return results
+            .stream()
             .findFirst();
     }
 
 
-    public List<RecurringTransactionDueResponse> findRecurringTransactionsDue(
+    public List<RecurringTransactionDueRow>
+    findRecurringTransactionsDue(
         UUID userId,
         int limit
     ) {
-
         return jdbcTemplate.query(
             """
                 SELECT
@@ -329,7 +337,7 @@ public class ReportingReadRepository {
                 LIMIT ?
                 """,
             (resultSet, rowNum) ->
-                new RecurringTransactionDueResponse(
+                new RecurringTransactionDueRow(
                     resultSet.getObject("recurring_transaction_id", UUID.class),
                     resultSet.getString("name"),
                     resultSet.getString("transaction_type"),
@@ -343,7 +351,8 @@ public class ReportingReadRepository {
                     resultSet.getString("account_name"),
                     resultSet.getString("currency_code"),
                     resultSet.getObject("category_id", UUID.class),
-                    resultSet.getString("category_name")),
+                    resultSet.getString("category_name")
+                ),
             userId,
             limit
         );
@@ -353,16 +362,16 @@ public class ReportingReadRepository {
     public long countRecurringTransactionsDue(
         UUID userId
     ) {
-
-        Long count = jdbcTemplate.queryForObject(
-            """
-                SELECT COUNT(*)
-                FROM reporting.recurring_transactions_due
-                WHERE user_id = ?
-                """,
-            Long.class,
-            userId
-        );
+        Long count =
+            jdbcTemplate.queryForObject(
+                """
+                    SELECT COUNT(*)
+                    FROM reporting.recurring_transactions_due
+                    WHERE user_id = ?
+                    """,
+                Long.class,
+                userId
+            );
 
         return count == null
             ? 0L
@@ -374,7 +383,6 @@ public class ReportingReadRepository {
         ResultSet resultSet,
         String column
     ) throws SQLException {
-
         var timestamp =
             resultSet.getTimestamp(
                 column

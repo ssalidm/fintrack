@@ -5,16 +5,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import za.co.pixelly.fintrack.common.api.ApiMessage;
 import za.co.pixelly.fintrack.common.api.ApiResponse;
+import za.co.pixelly.fintrack.common.security.CurrentUserId;
 import za.co.pixelly.fintrack.finance.recurring.application.RecurringTransactionService;
 import za.co.pixelly.fintrack.finance.recurring.domain.RecurringTransactionStatus;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 import static za.co.pixelly.fintrack.config.OpenApiConfig.BEARER_AUTH;
@@ -25,9 +23,7 @@ import static za.co.pixelly.fintrack.config.OpenApiConfig.BEARER_AUTH;
 )
 @SecurityRequirement(name = BEARER_AUTH)
 @RestController
-@RequestMapping(
-    "/api/v1/recurring-transactions"
-)
+@RequestMapping("/recurring-transactions")
 @RequiredArgsConstructor
 public class RecurringTransactionController {
 
@@ -37,7 +33,7 @@ public class RecurringTransactionController {
     @PostMapping
     public ResponseEntity<ApiResponse<RecurringTransactionResponse>>
     create(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @Valid
         @RequestBody
         CreateRecurringTransactionRequest request
@@ -49,7 +45,7 @@ public class RecurringTransactionController {
                     HttpStatus.CREATED,
                     ApiMessage.Recurring.CREATED,
                     recurringTransactionService.create(
-                        userId(jwt),
+                        userId,
                         request
                     )
                 )
@@ -60,7 +56,7 @@ public class RecurringTransactionController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<RecurringTransactionResponse>>>
     getAll(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @RequestParam(defaultValue = "ACTIVE")
         RecurringTransactionStatus status
     ) {
@@ -70,7 +66,7 @@ public class RecurringTransactionController {
                 ApiMessage.Recurring.FETCHED_ALL,
                 recurringTransactionService
                     .findAll(
-                        userId(jwt),
+                        userId,
                         status
                     )
             )
@@ -81,7 +77,7 @@ public class RecurringTransactionController {
     @GetMapping("/{scheduleId}")
     public ResponseEntity<ApiResponse<RecurringTransactionResponse>>
     getById(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID scheduleId
     ) {
         return ResponseEntity.ok(
@@ -90,7 +86,7 @@ public class RecurringTransactionController {
                 ApiMessage.Recurring.FETCHED,
                 recurringTransactionService
                     .findById(
-                        userId(jwt),
+                        userId,
                         scheduleId
                     )
             )
@@ -101,7 +97,7 @@ public class RecurringTransactionController {
     @PatchMapping("/{scheduleId}")
     public ResponseEntity<ApiResponse<RecurringTransactionResponse>>
     update(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID scheduleId,
         @Valid
         @RequestBody
@@ -113,7 +109,7 @@ public class RecurringTransactionController {
                 ApiMessage.Recurring.UPDATED,
                 recurringTransactionService
                     .update(
-                        userId(jwt),
+                        userId,
                         scheduleId,
                         request
                     )
@@ -125,7 +121,7 @@ public class RecurringTransactionController {
     @PostMapping("/{scheduleId}/pause")
     public ResponseEntity<ApiResponse<RecurringTransactionResponse>>
     pause(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID scheduleId,
         @Valid
         @RequestBody
@@ -137,7 +133,7 @@ public class RecurringTransactionController {
                 ApiMessage.Recurring.PAUSED,
                 recurringTransactionService
                     .pause(
-                        userId(jwt),
+                        userId,
                         scheduleId,
                         request
                     )
@@ -149,7 +145,7 @@ public class RecurringTransactionController {
     @PostMapping("/{scheduleId}/resume")
     public ResponseEntity<ApiResponse<RecurringTransactionResponse>>
     resume(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID scheduleId,
         @Valid
         @RequestBody
@@ -161,7 +157,7 @@ public class RecurringTransactionController {
                 ApiMessage.Recurring.RESUMED,
                 recurringTransactionService
                     .resume(
-                        userId(jwt),
+                        userId,
                         scheduleId,
                         request
                     )
@@ -173,7 +169,7 @@ public class RecurringTransactionController {
     @PostMapping("/{scheduleId}/archive")
     public ResponseEntity<ApiResponse<RecurringTransactionResponse>>
     archive(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID scheduleId,
         @Valid
         @RequestBody
@@ -185,7 +181,7 @@ public class RecurringTransactionController {
                 ApiMessage.Recurring.ARCHIVED,
                 recurringTransactionService
                     .archive(
-                        userId(jwt),
+                        userId,
                         scheduleId,
                         request
                     )
@@ -197,7 +193,7 @@ public class RecurringTransactionController {
     @PostMapping("/{scheduleId}/post-due")
     public ResponseEntity<ApiResponse<RecurringTransactionOccurrenceResponse>>
     postDue(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID scheduleId,
         @Valid
         @RequestBody
@@ -211,20 +207,11 @@ public class RecurringTransactionController {
                     ApiMessage.Recurring.OCCURRENCE_POSTED,
                     recurringTransactionService
                         .postDue(
-                            userId(jwt),
+                            userId,
                             scheduleId,
                             request
                         )
                 )
             );
-    }
-
-
-    private UUID userId(
-        Jwt jwt
-    ) {
-        return UUID.fromString(
-            Objects.requireNonNull(jwt.getSubject())
-        );
     }
 }

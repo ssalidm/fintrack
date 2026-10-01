@@ -73,6 +73,8 @@ desktop.ini
 docker-data/
 postgres-data/
 volumes/
+data/
+backend/data/
 
 # ==========================================
 # Testcontainers

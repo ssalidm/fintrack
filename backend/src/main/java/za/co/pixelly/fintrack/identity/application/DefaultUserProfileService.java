@@ -7,19 +7,24 @@ import org.springframework.transaction.annotation.Transactional;
 import za.co.pixelly.fintrack.identity.api.ChangePasswordRequest;
 import za.co.pixelly.fintrack.identity.api.UpdateUserProfileRequest;
 import za.co.pixelly.fintrack.identity.api.UserProfileResponse;
+import za.co.pixelly.fintrack.identity.api.UserSessionResponse;
 import za.co.pixelly.fintrack.identity.application.exceptions.InvalidCurrentPasswordException;
 import za.co.pixelly.fintrack.identity.application.exceptions.PasswordReuseException;
 import za.co.pixelly.fintrack.identity.application.exceptions.UserProfileConflictException;
 import za.co.pixelly.fintrack.identity.application.exceptions.UserProfileNotFoundException;
+import za.co.pixelly.fintrack.identity.domain.AuthSession;
 import za.co.pixelly.fintrack.identity.domain.User;
 import za.co.pixelly.fintrack.identity.persistence.AuthSessionRepository;
 import za.co.pixelly.fintrack.identity.persistence.RefreshTokenRepository;
 import za.co.pixelly.fintrack.identity.persistence.UserRepository;
 import za.co.pixelly.fintrack.identity.persistence.UserRoleRepository;
 
+import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+
+import static za.co.pixelly.fintrack.common.concurrency.VersionGuard.requireCurrent;
 
 @Service
 @RequiredArgsConstructor
@@ -30,9 +35,12 @@ public class DefaultUserProfileService implements UserProfileService {
     private final PasswordEncoder passwordEncoder;
     private final AuthSessionRepository authSessionRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final Clock applicationClock;
 
     private static final String PASSWORD_CHANGE_REASON = "PASSWORD_CHANGED";
-
+    private static final String USER_SESSION_REVOCATION_REASON = "USER_REVOKED_SESSION";
+    private static final String USER_OTHER_SESSIONS_REVOCATION_REASON =
+        "USER_REVOKED_OTHER_SESSIONS";
 
     @Override
     @Transactional(readOnly = true)
@@ -53,16 +61,20 @@ public class DefaultUserProfileService implements UserProfileService {
     public UserProfileResponse updateProfile(UUID userId, UpdateUserProfileRequest request) {
         User user = getUserForUpdate(userId);
 
-        if (user.getVersion() != request.version()) {
-            throw new UserProfileConflictException(
+        requireCurrent(
+            user.getVersion(),
+            request.version(),
+            () -> new UserProfileConflictException(
                 "The profile has changed since it was last retrieved"
-            );
-        }
+            )
+        );
 
         user.updateProfile(
             request.firstName(),
             request.lastName(),
-            request.timeZone()
+            request.preferredName(),
+            request.timeZone(),
+            applicationClock.instant()
         );
 
         User saved = userRepository.saveAndFlush(user);
@@ -80,7 +92,7 @@ public class DefaultUserProfileService implements UserProfileService {
     @Override
     @Transactional
     public void changePassword(UUID userId, ChangePasswordRequest request) {
-        Instant now = Instant.now();
+        Instant now = applicationClock.instant();
 
         User user = getUserForUpdate(userId);
 
@@ -88,7 +100,8 @@ public class DefaultUserProfileService implements UserProfileService {
          * Re-authenticate the user before allowing
          * security-sensitive credential change.
          */
-        if (!passwordEncoder.matches(
+        if (!user.hasPassword()
+            || !passwordEncoder.matches(
             request.currentPassword(),
             user.getPasswordHash()
         )) {
@@ -100,7 +113,8 @@ public class DefaultUserProfileService implements UserProfileService {
          * strings would not work. We must use matched()
          * against the existing hash.
          */
-        if (passwordEncoder.matches(
+        if (user.hasPassword()
+            && passwordEncoder.matches(
             request.newPassword(),
             user.getPasswordHash()
         )) {
@@ -139,6 +153,95 @@ public class DefaultUserProfileService implements UserProfileService {
                 userId,
                 now,
                 PASSWORD_CHANGE_REASON
+            );
+    }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserSessionResponse> getSessions(UUID userId, UUID currentSessionId) {
+        Instant now = applicationClock.instant();
+
+        return authSessionRepository.
+            findAllByUserIdAndRevokedAtIsNullAndExpiresAtAfterOrderByLastSeenAtDesc(
+                userId,
+                now
+            )
+            .stream()
+            .map(session ->
+                UserSessionResponse.from(
+                    session,
+                    currentSessionId
+                )
+            )
+            .toList();
+    }
+
+
+    @Override
+    @Transactional
+    public void revokeSession(
+        UUID userId,
+        UUID currentSessionId,
+        UUID sessionId
+    ) {
+        if (currentSessionId.equals(sessionId)) {
+            throw new UserProfileConflictException(
+                "The current session cannot be revoked from session management"
+            );
+        }
+
+        AuthSession session =
+            authSessionRepository
+                .findByIdAndUserId(
+                    sessionId,
+                    userId
+                )
+                .orElseThrow(
+                    () ->
+                        new UserProfileConflictException(
+                            "Session not found"
+                        )
+                );
+
+        Instant now = applicationClock.instant();
+
+        refreshTokenRepository
+            .revokeActiveBySessionId(
+                sessionId,
+                now,
+                USER_SESSION_REVOCATION_REASON
+            );
+
+        session.revoke(
+            now,
+            USER_SESSION_REVOCATION_REASON
+        );
+    }
+
+
+    @Override
+    @Transactional
+    public void revokeOtherSessions(
+        UUID userId,
+        UUID currentSessionId
+    ) {
+        Instant now = applicationClock.instant();
+
+        refreshTokenRepository
+            .revokeActiveByUserIdExcludingSession(
+                userId,
+                currentSessionId,
+                now,
+                USER_OTHER_SESSIONS_REVOCATION_REASON
+            );
+
+        authSessionRepository
+            .revokeActiveByUserIdExcludingSession(
+                userId,
+                currentSessionId,
+                now,
+                USER_OTHER_SESSIONS_REVOCATION_REASON
             );
     }
 

@@ -15,9 +15,12 @@ import za.co.pixelly.fintrack.finance.goal.domain.*;
 import za.co.pixelly.fintrack.finance.goal.persistence.*;
 
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static za.co.pixelly.fintrack.common.concurrency.VersionGuard.requireCurrent;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +30,7 @@ public class DefaultSavingsGoalService
     private final SavingsGoalRepository savingsGoalRepository;
     private final GoalContributionRepository contributionRepository;
     private final GoalCurrencyLookupRepository currencyLookupRepository;
+    private final Clock applicationClock;
 
 
     @Override
@@ -62,7 +66,7 @@ public class DefaultSavingsGoalService
             currency,
             request.targetAmount(),
             request.targetDate(),
-            Instant.now()
+            applicationClock.instant()
         );
 
         try {
@@ -160,9 +164,12 @@ public class DefaultSavingsGoalService
 
         ensureActive(goal);
 
-        validateGoalVersion(
-            goal,
-            request.version()
+        requireCurrent(
+            goal.getVersion(),
+            request.version(),
+            () -> new SavingsGoalConflictException(
+                "The savings goal has changed since it was last retrieved"
+            )
         );
 
         if (request.name() != null
@@ -186,7 +193,7 @@ public class DefaultSavingsGoalService
             Boolean.TRUE.equals(
                 request.clearTargetDate()
             ),
-            Instant.now()
+            applicationClock.instant()
         );
 
         try {
@@ -223,9 +230,12 @@ public class DefaultSavingsGoalService
 
         ensureActive(goal);
 
-        validateGoalVersion(
-            goal,
-            request.version()
+        requireCurrent(
+            goal.getVersion(),
+            request.version(),
+            () -> new SavingsGoalConflictException(
+                "The savings goal has changed since it was last retrieved"
+            )
         );
 
         BigDecimal currentAmount =
@@ -244,7 +254,7 @@ public class DefaultSavingsGoalService
         }
 
         goal.complete(
-            Instant.now()
+            applicationClock.instant()
         );
 
         SavingsGoal saved = savingsGoalRepository
@@ -280,13 +290,16 @@ public class DefaultSavingsGoalService
             );
         }
 
-        validateGoalVersion(
-            goal,
-            request.version()
+        requireCurrent(
+            goal.getVersion(),
+            request.version(),
+            () -> new SavingsGoalConflictException(
+                "The savings goal has changed since it was last retrieved"
+            )
         );
 
         goal.archive(
-            Instant.now()
+            applicationClock.instant()
         );
 
         SavingsGoal saved = savingsGoalRepository
@@ -321,7 +334,7 @@ public class DefaultSavingsGoalService
                 request.amount(),
                 request.contributionDate(),
                 request.note(),
-                Instant.now()
+                applicationClock.instant()
             );
 
         contributionRepository
@@ -413,9 +426,12 @@ public class DefaultSavingsGoalService
             );
         }
 
-        validateContributionVersion(
-            contribution,
-            request.version()
+        requireCurrent(
+            contribution.getVersion(),
+            request.version(),
+            () -> new SavingsGoalConflictException(
+                "The goal contribution has changed since it was last retrieved"
+            )
         );
 
         boolean changesFinancialFields = request.amount() != null
@@ -442,7 +458,7 @@ public class DefaultSavingsGoalService
             request.amount(),
             request.contributionDate(),
             request.note(),
-            Instant.now()
+            applicationClock.instant()
         );
 
         contributionRepository
@@ -482,9 +498,12 @@ public class DefaultSavingsGoalService
             );
         }
 
-        validateContributionVersion(
-            contribution,
-            request.version()
+        requireCurrent(
+            contribution.getVersion(),
+            request.version(),
+            () -> new SavingsGoalConflictException(
+                "The goal contribution has changed since it was last retrieved"
+            )
         );
 
         /*
@@ -496,7 +515,7 @@ public class DefaultSavingsGoalService
          */
         contribution.voidContribution(
             request.reason(),
-            Instant.now()
+           applicationClock.instant()
         );
 
         contributionRepository
@@ -552,30 +571,6 @@ public class DefaultSavingsGoalService
         if (goal.getStatus() != SavingsGoalStatus.ACTIVE) {
 
             throw new SavingsGoalConflictException("Contributions may only be added to active goals");
-        }
-    }
-
-
-    private void validateGoalVersion(
-        SavingsGoal goal,
-        long requestedVersion
-    ) {
-        if (goal.getVersion()
-            != requestedVersion) {
-
-            throw new SavingsGoalConflictException("The savings goal has changed since it was last retrieved");
-        }
-    }
-
-
-    private void validateContributionVersion(
-        GoalContribution contribution,
-        long requestedVersion
-    ) {
-        if (contribution.getVersion()
-            != requestedVersion) {
-
-            throw new SavingsGoalConflictException("The goal contribution has changed since it was last retrieved");
         }
     }
 

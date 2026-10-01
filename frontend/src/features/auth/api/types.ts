@@ -1,0 +1,91 @@
+export type UserStatus =
+  | 'PENDING_VERIFICATION'
+  | 'ACTIVE'
+  | 'LOCKED'
+  | 'DEACTIVATED'
+
+export interface StartRegistrationRequest {
+  readonly email: string
+}
+
+export interface CompleteRegistrationRequest {
+  readonly token: string
+  readonly firstName: string
+  readonly lastName: string
+  readonly preferredName?: string
+  readonly password: string
+  readonly acceptTerms: boolean
+}
+
+export interface LoginRequest {
+  readonly email: string
+  readonly password: string
+}
+
+export type LoginStatus =
+  | 'AUTHENTICATED'
+  | 'MFA_REQUIRED'
+  | 'EMAIL_VERIFICATION_REQUIRED'
+  | 'ACCOUNT_LINK_REQUIRED'
+
+export interface MfaChallengeResponse {
+  readonly challengeToken: string
+  readonly expiresAt: string
+}
+
+export interface LoginResponse {
+  readonly status: LoginStatus
+  readonly tokens?: TokenResponse
+  readonly mfaChallenge?: MfaChallengeResponse
+}
+
+export interface TokenResponse {
+  readonly accessToken: string
+  readonly refreshToken: string
+  readonly tokenType: string
+  readonly expiresIn: number
+}
+
+export interface GoogleLoginRequest {
+  readonly credential: string
+}
+
+export interface GoogleLinkRequest {
+  readonly credential: string
+}
+
+export interface RefreshRequest {
+  readonly refreshToken: string
+}
+
+export interface MfaVerifyRequest {
+  readonly challengeToken: string
+  readonly code: string
+}
+
+export interface MfaRecoverRequest {
+  readonly challengeToken: string
+  readonly recoveryCode: string
+}
+
+export interface VerifyEmailRequest {
+  readonly token: string
+}
+
+export interface ResendVerificationRequest {
+  readonly email: string
+}
+
+export interface ForgotPasswordRequest {
+  readonly email: string
+}
+
+export interface ResetPasswordRequest {
+  readonly token: string
+  readonly newPassword: string
+}
+
+export interface ConfirmEmailChangeRequest {
+  readonly token: string
+}
+

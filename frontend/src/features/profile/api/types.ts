@@ -1,0 +1,85 @@
+export type UserStatus =
+  | 'PENDING_VERIFICATION'
+  | 'ACTIVE'
+  | 'LOCKED'
+  | 'DEACTIVATED'
+
+export interface UserProfile {
+  readonly id: string
+  readonly email: string
+  readonly firstName: string
+  readonly lastName: string
+  readonly preferredName: string | null
+  readonly timeZone: string
+  readonly status: UserStatus
+  readonly emailVerified: boolean
+  readonly emailVerifiedAt: string | null
+  readonly roles: string[]
+  readonly lastLoginAt: string | null
+  readonly passwordChangedAt: string | null
+  readonly createdAt: string
+  readonly updatedAt: string
+  readonly version: number
+}
+
+export interface UpdateUserProfileRequest {
+  version: number
+  firstName: string
+  lastName: string
+  preferredName?: string
+  timeZone: string
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string
+  newPassword: string
+}
+
+export interface ChangeEmailRequest {
+  newEmail: string
+  currentPassword: string
+  mfaCode?: string
+}
+
+export interface MfaStatus {
+  readonly enabled: boolean
+  readonly setupPending: boolean
+  readonly enabledAt: string | null
+  readonly remainingRecoveryCodes: number
+}
+
+export interface MfaSetup {
+  readonly manualEntryKey: string
+  readonly otpAuthUri: string
+}
+
+export interface ConfirmMfaSetupRequest {
+  code: string
+}
+
+export interface ConfirmMfaSetupResponse {
+  readonly recoveryCodes: string[]
+}
+
+export interface DisableMfaRequest {
+  currentPassword: string
+  mfaCode: string
+}
+
+export interface RegenerateMfaRecoveryCodesRequest {
+  currentPassword: string
+  code: string
+}
+
+export interface MfaRecoveryCodesResponse {
+  readonly recoveryCodes: string[]
+}
+
+export interface UserSession {
+  readonly id: string
+  readonly createdAt: string
+  readonly lastSeenAt: string
+  readonly expiresAt: string
+  readonly userAgent: string | null
+  readonly current: boolean
+}

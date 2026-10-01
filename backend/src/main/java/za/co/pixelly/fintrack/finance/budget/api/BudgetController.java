@@ -7,16 +7,14 @@ import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import za.co.pixelly.fintrack.common.api.ApiMessage;
 import za.co.pixelly.fintrack.common.api.ApiResponse;
+import za.co.pixelly.fintrack.common.security.CurrentUserId;
 import za.co.pixelly.fintrack.finance.budget.application.BudgetService;
 import za.co.pixelly.fintrack.finance.budget.domain.BudgetStatus;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 import static za.co.pixelly.fintrack.config.OpenApiConfig.BEARER_AUTH;
@@ -29,7 +27,7 @@ import static za.co.pixelly.fintrack.config.OpenApiConfig.BEARER_AUTH;
 )
 @SecurityRequirement(name = BEARER_AUTH)
 @RestController
-@RequestMapping("/api/v1/budgets")
+@RequestMapping("/budgets")
 @RequiredArgsConstructor
 public class BudgetController {
 
@@ -39,7 +37,7 @@ public class BudgetController {
     @PostMapping
     public ResponseEntity<ApiResponse<BudgetResponse>>
     createBudget(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @Valid
         @RequestBody
         CreateBudgetRequest request
@@ -50,7 +48,7 @@ public class BudgetController {
                 ApiResponse.success(
                     HttpStatus.CREATED,
                     ApiMessage.Budget.CREATED,
-                    budgetService.create(userId(jwt), request)
+                    budgetService.create(userId, request)
                 )
             );
     }
@@ -58,7 +56,7 @@ public class BudgetController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<BudgetSummaryResponse>>> getBudgets(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @RequestParam(defaultValue = "ACTIVE")
         BudgetStatus status
     ) {
@@ -66,7 +64,7 @@ public class BudgetController {
             ApiResponse.success(
                 HttpStatus.OK,
                 ApiMessage.Budget.FETCHED_ALL,
-                budgetService.findBudgets(userId(jwt), status)
+                budgetService.findBudgets(userId, status)
             )
         );
     }
@@ -74,14 +72,14 @@ public class BudgetController {
 
     @GetMapping("/{budgetId}")
     public ResponseEntity<ApiResponse<BudgetResponse>> getBudget(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID budgetId
     ) {
         return ResponseEntity.ok(
             ApiResponse.success(
                 HttpStatus.OK,
                 ApiMessage.Budget.FETCHED,
-                budgetService.findById(userId(jwt), budgetId)
+                budgetService.findById(userId, budgetId)
             )
         );
     }
@@ -89,7 +87,7 @@ public class BudgetController {
 
     @PatchMapping("/{budgetId}")
     public ResponseEntity<ApiResponse<BudgetResponse>> updateBudget(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID budgetId,
         @Valid
         @RequestBody
@@ -99,7 +97,7 @@ public class BudgetController {
             ApiResponse.success(
                 HttpStatus.OK,
                 ApiMessage.Budget.UPDATED,
-                budgetService.update(userId(jwt), budgetId, request)
+                budgetService.update(userId, budgetId, request)
             )
         );
     }
@@ -107,7 +105,7 @@ public class BudgetController {
 
     @PostMapping("/{budgetId}/archive")
     public ResponseEntity<ApiResponse<BudgetResponse>> archiveBudget(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID budgetId,
         @Valid
         @RequestBody
@@ -117,7 +115,7 @@ public class BudgetController {
             ApiResponse.success(
                 HttpStatus.OK,
                 ApiMessage.Budget.ARCHIVED,
-                budgetService.archive(userId(jwt), budgetId, request)
+                budgetService.archive(userId, budgetId, request)
             )
         );
     }
@@ -125,7 +123,7 @@ public class BudgetController {
 
     @PostMapping("/{budgetId}/limits")
     public ResponseEntity<ApiResponse<BudgetResponse>> addLimit(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID budgetId,
         @Valid
         @RequestBody
@@ -137,17 +135,15 @@ public class BudgetController {
                 ApiResponse.success(
                     HttpStatus.CREATED,
                     ApiMessage.Budget.LIMIT_CREATED,
-                    budgetService.addLimit(userId(jwt), budgetId, request)
+                    budgetService.addLimit(userId, budgetId, request)
                 )
             );
     }
 
 
-    @PatchMapping(
-        "/{budgetId}/limits/{limitId}"
-    )
+    @PatchMapping("/{budgetId}/limits/{limitId}")
     public ResponseEntity<ApiResponse<BudgetResponse>> updateLimit(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID budgetId,
         @PathVariable UUID limitId,
         @Valid
@@ -159,7 +155,7 @@ public class BudgetController {
                 HttpStatus.OK,
                 ApiMessage.Budget.LIMIT_UPDATED,
                 budgetService.updateLimit(
-                    userId(jwt),
+                    userId,
                     budgetId,
                     limitId,
                     request
@@ -169,11 +165,9 @@ public class BudgetController {
     }
 
 
-    @DeleteMapping(
-        "/{budgetId}/limits/{limitId}"
-    )
+    @DeleteMapping("/{budgetId}/limits/{limitId}")
     public ResponseEntity<Void> deleteLimit(
-        @AuthenticationPrincipal Jwt jwt,
+        @CurrentUserId UUID userId,
         @PathVariable UUID budgetId,
         @PathVariable UUID limitId,
 
@@ -182,7 +176,7 @@ public class BudgetController {
         long version
     ) {
         budgetService.deleteLimit(
-            userId(jwt),
+            userId,
             budgetId,
             limitId,
             version
@@ -191,14 +185,5 @@ public class BudgetController {
         return ResponseEntity
             .noContent()
             .build();
-    }
-
-
-    private UUID userId(
-        Jwt jwt
-    ) {
-        return UUID.fromString(
-            Objects.requireNonNull(jwt.getSubject())
-        );
     }
 }

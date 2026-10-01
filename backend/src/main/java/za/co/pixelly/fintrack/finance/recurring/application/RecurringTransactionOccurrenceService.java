@@ -24,6 +24,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import static za.co.pixelly.fintrack.common.concurrency.VersionGuard.requireCurrent;
+
 @Service
 @RequiredArgsConstructor
 public class RecurringTransactionOccurrenceService {
@@ -55,13 +57,13 @@ public class RecurringTransactionOccurrenceService {
                     RecurringTransactionNotFoundException::new
                 );
 
-        if (schedule.getVersion()
-            != requestedVersion) {
-
-            throw new RecurringTransactionConflictException(
+        requireCurrent(
+            schedule.getVersion(),
+            requestedVersion,
+            () -> new RecurringTransactionConflictException(
                 "The recurring transaction has changed since it was last retrieved"
-            );
-        }
+            )
+        );
 
         if (schedule.getStatus()
             != RecurringTransactionStatus.ACTIVE) {

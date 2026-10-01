@@ -3,24 +3,45 @@ package za.co.pixelly.fintrack.config.security;
 import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration(proxyBeanMethods = false)
+@EnableWebSecurity
 public class SecurityConfig {
+
+    private final ApiProperties apiProperties;
+
+    public SecurityConfig(ApiProperties apiProperties) {
+        this.apiProperties = apiProperties;
+    }
+
 
     @Bean
     SecurityFilterChain securityFilterChain(
         HttpSecurity http,
         JwtAuthenticationConverter jwtAuthenticationConverter,
         RestAuthenticationEntryPoint authenticationEntryPoint,
-        RestAccessDeniedHandler accessDeniedHandler
+        RestAccessDeniedHandler accessDeniedHandler,
+        UrlBasedCorsConfigurationSource corsConfigurationSource
     ) throws Exception {
+
+        String apiPrefix = apiProperties.basePath();
+
         http
+            .cors(cors ->
+                cors.configurationSource(corsConfigurationSource)
+            )
             .csrf(AbstractHttpConfigurer::disable)
 
             .sessionManagement(session ->
@@ -36,13 +57,19 @@ public class SecurityConfig {
 
                 .requestMatchers(
                     HttpMethod.POST,
-                    "/api/v1/auth/register",
-                    "/api/v1/auth/login",
-                    "/api/v1/auth/refresh",
-                    "/api/v1/auth/verify-email",
-                    "/api/v1/auth/resend-verification",
-                    "/api/v1/auth/forgot-password",
-                    "/api/v1/auth/reset-password"
+                    apiPrefix + "/auth/registration/start",
+                    apiPrefix + "/auth/registration/complete",
+                    apiPrefix + "/auth/login",
+                    apiPrefix + "/auth/google",
+                    apiPrefix + "/auth/refresh",
+                    apiPrefix + "/auth/verify-email",
+                    apiPrefix + "/auth/resend-verification",
+                    apiPrefix + "/auth/forgot-password",
+                    apiPrefix + "/auth/reset-password",
+                    apiPrefix + "/auth/mfa/verify",
+                    apiPrefix + "/auth/mfa/recover",
+                    apiPrefix + "/auth/change-email/confirm",
+                    apiPrefix + "/support/contact"
                 ).permitAll()
 
                 // OpenAPI / Swagger
@@ -53,7 +80,7 @@ public class SecurityConfig {
                 )
                 .permitAll()
 
-                .requestMatchers("/api/v1/admin/**")
+                .requestMatchers(apiPrefix + "/admin/**")
                 .hasAuthority("ROLE_ADMIN")
 
                 .anyRequest()
@@ -86,5 +113,44 @@ public class SecurityConfig {
             );
 
         return http.build();
+    }
+
+    @Bean
+    UrlBasedCorsConfigurationSource corsConfigurationSource(
+        CorsProperties corsProperties
+    ) {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.setAllowedOrigins(
+            corsProperties.allowedOrigins()
+        );
+
+        configuration.setAllowedMethods(List.of(
+            HttpMethod.GET.name(),
+            HttpMethod.POST.name(),
+            HttpMethod.PUT.name(),
+            HttpMethod.PATCH.name(),
+            HttpMethod.DELETE.name(),
+            HttpMethod.OPTIONS.name()
+        ));
+
+        configuration.setAllowedHeaders(List.of(
+            HttpHeaders.AUTHORIZATION,
+            HttpHeaders.CONTENT_TYPE,
+            HttpHeaders.ACCEPT
+        ));
+
+        configuration.setAllowCredentials(false);
+        configuration.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source =
+            new UrlBasedCorsConfigurationSource();
+
+        source.registerCorsConfiguration(
+            apiProperties.basePath() + "/**",
+            configuration
+        );
+
+        return source;
     }
 }

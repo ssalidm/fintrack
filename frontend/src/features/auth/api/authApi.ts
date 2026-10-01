@@ -1,0 +1,180 @@
+import { apiRequest } from '@/api/client'
+
+import type {
+  StartRegistrationRequest,
+  CompleteRegistrationRequest,
+  ConfirmEmailChangeRequest,
+  ForgotPasswordRequest,
+  LoginRequest,
+  GoogleLoginRequest,
+  GoogleLinkRequest,
+  LoginResponse,
+  MfaRecoverRequest,
+  MfaVerifyRequest,
+  RefreshRequest,
+  ResendVerificationRequest,
+  ResetPasswordRequest,
+  TokenResponse,
+  VerifyEmailRequest,
+} from './types'
+
+
+export const authApi = {
+  startRegistration(
+    request: StartRegistrationRequest,
+  ) {
+    return apiRequest<void>(
+      '/auth/registration/start',
+      {
+        method: 'POST',
+        body: request,
+      },
+    )
+  },
+
+  completeRegistration(
+    request: CompleteRegistrationRequest,
+  ) {
+    return apiRequest<void>(
+      '/auth/registration/complete',
+      {
+        method: 'POST',
+        body: request,
+      },
+    )
+  },
+  
+
+  login(request: LoginRequest) {
+    return apiRequest<LoginResponse>(
+      '/auth/login',
+      {
+        method: 'POST',
+        body: request,
+      },
+    )
+  },
+
+  googleLogin(
+    request: GoogleLoginRequest,
+  ) {
+    return apiRequest<LoginResponse>(
+      '/auth/google',
+      {
+        method: 'POST',
+        body: request,
+      },
+    )
+  },
+
+  linkGoogle(
+    request: GoogleLinkRequest,
+    accessToken: string,
+  ) {
+    return apiRequest<void>(
+      '/auth/google/link',
+      {
+        method: 'POST',
+        body: request,
+        accessToken,
+      },
+    )
+  },
+
+  verifyMfa(request: MfaVerifyRequest) {
+    return apiRequest<TokenResponse>(
+      '/auth/mfa/verify',
+      {
+        method: 'POST',
+        body: request,
+      },
+    )
+  },
+
+  recoverMfa(request: MfaRecoverRequest) {
+    return apiRequest<TokenResponse>(
+      '/auth/mfa/recover',
+      {
+        method: 'POST',
+        body: request,
+      },
+    )
+  },
+
+  refresh(request: RefreshRequest) {
+    return apiRequest<TokenResponse>(
+      '/auth/refresh',
+      {
+        method: 'POST',
+        body: request,
+      },
+    )
+  },
+
+  logout(accessToken: string) {
+    return apiRequest<void>(
+      '/auth/logout',
+      {
+        method: 'POST',
+        accessToken,
+      },
+    )
+  },
+
+  verifyEmail(request: VerifyEmailRequest) {
+    return apiRequest<void>(
+      '/auth/verify-email',
+      {
+        method: 'POST',
+        body: request,
+      },
+    )
+  },
+
+  resendVerification(
+    request: ResendVerificationRequest,
+  ) {
+    return apiRequest<void>(
+      '/auth/resend-verification',
+      {
+        method: 'POST',
+        body: request,
+      },
+    )
+  },
+
+  forgotPassword(
+    request: ForgotPasswordRequest,
+  ) {
+    return apiRequest<void>(
+      '/auth/forgot-password',
+      {
+        method: 'POST',
+        body: request,
+      },
+    )
+  },
+
+  resetPassword(
+    request: ResetPasswordRequest,
+  ) {
+    return apiRequest<void>(
+      '/auth/reset-password',
+      {
+        method: 'POST',
+        body: request,
+      },
+    )
+  },
+
+  confirmEmailChange(
+    request: ConfirmEmailChangeRequest) {
+    return apiRequest<void>(
+      '/auth/change-email/confirm',
+      {
+        method: 'POST',
+        body: request,
+      },
+    )
+  },
+}

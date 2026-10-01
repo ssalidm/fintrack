@@ -25,7 +25,7 @@ public class OpenApiConfig {
                             management application.
                             """
                     )
-                    .version("v1")
+                    .version("v2.0.0")
             )
             .components(
                 new Components()

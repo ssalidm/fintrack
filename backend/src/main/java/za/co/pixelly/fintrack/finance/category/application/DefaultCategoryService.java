@@ -3,22 +3,33 @@ package za.co.pixelly.fintrack.finance.category.application;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import za.co.pixelly.fintrack.finance.category.api.*;
-import za.co.pixelly.fintrack.finance.category.application.exceptions.*;
+import za.co.pixelly.fintrack.finance.category.api.ArchiveCategoryRequest;
+import za.co.pixelly.fintrack.finance.category.api.CategoryResponse;
+import za.co.pixelly.fintrack.finance.category.api.CreateCategoryRequest;
+import za.co.pixelly.fintrack.finance.category.api.UpdateCategoryRequest;
+import za.co.pixelly.fintrack.finance.category.application.exceptions.ArchivedCategoryModificationException;
+import za.co.pixelly.fintrack.finance.category.application.exceptions.CategoryAlreadyArchivedException;
+import za.co.pixelly.fintrack.finance.category.application.exceptions.CategoryNotFoundException;
+import za.co.pixelly.fintrack.finance.category.application.exceptions.DuplicateCategoryNameException;
+import za.co.pixelly.fintrack.finance.category.application.exceptions.StaleCategoryVersionException;
 import za.co.pixelly.fintrack.finance.category.domain.Category;
 import za.co.pixelly.fintrack.finance.category.domain.CategoryStatus;
 import za.co.pixelly.fintrack.finance.category.domain.CategoryType;
 import za.co.pixelly.fintrack.finance.category.persistence.CategoryRepository;
 
-import java.time.Instant;
+import java.time.Clock;
 import java.util.List;
 import java.util.UUID;
 
+import static za.co.pixelly.fintrack.common.concurrency.VersionGuard.requireCurrent;
+
 @Service
 @RequiredArgsConstructor
-public class DefaultCategoryService implements CategoryService {
+public class DefaultCategoryService
+    implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final Clock applicationClock;
 
 
     @Override
@@ -27,14 +38,18 @@ public class DefaultCategoryService implements CategoryService {
         UUID userId,
         CreateCategoryRequest request
     ) {
-        String name = request.name().trim();
+        String name =
+            request.name().trim();
 
-        if (categoryRepository.existsByNormalizedName(
-            userId,
-            request.categoryType(),
-            name,
-            CategoryStatus.ACTIVE
-        )) {
+        if (
+            categoryRepository
+                .existsByNormalizedName(
+                    userId,
+                    request.categoryType(),
+                    name,
+                    CategoryStatus.ACTIVE
+                )
+        ) {
             throw new DuplicateCategoryNameException();
         }
 
@@ -49,15 +64,18 @@ public class DefaultCategoryService implements CategoryService {
                 name,
                 request.categoryType(),
                 displayOrder,
-                Instant.now()
+                applicationClock.instant()
             );
 
         Category saved =
-            categoryRepository.saveAndFlush(
-                category
-            );
+            categoryRepository
+                .saveAndFlush(
+                    category
+                );
 
-        return CategoryResponse.from(saved);
+        return CategoryResponse.from(
+            saved
+        );
     }
 
 
@@ -89,7 +107,9 @@ public class DefaultCategoryService implements CategoryService {
 
         return categories
             .stream()
-            .map(CategoryResponse::from)
+            .map(
+                CategoryResponse::from
+            )
             .toList();
     }
 
@@ -122,14 +142,17 @@ public class DefaultCategoryService implements CategoryService {
                 categoryId
             );
 
-        if (category.getStatus()
-            == CategoryStatus.ARCHIVED) {
+        if (
+            category.getStatus()
+                == CategoryStatus.ARCHIVED
+        ) {
             throw new ArchivedCategoryModificationException();
         }
 
-        validateVersion(
-            category,
-            request.version()
+        requireCurrent(
+            category.getVersion(),
+            request.version(),
+            StaleCategoryVersionException::new
         );
 
         String targetName =
@@ -142,14 +165,16 @@ public class DefaultCategoryService implements CategoryService {
                 ? category.getCategoryType()
                 : request.categoryType();
 
-        if (categoryRepository
-            .existsByNormalizedNameExcludingCategory(
-                userId,
-                categoryId,
-                targetType,
-                targetName,
-                CategoryStatus.ACTIVE
-            )) {
+        if (
+            categoryRepository
+                .existsByNormalizedNameExcludingCategory(
+                    userId,
+                    categoryId,
+                    targetType,
+                    targetName,
+                    CategoryStatus.ACTIVE
+                )
+        ) {
             throw new DuplicateCategoryNameException();
         }
 
@@ -159,15 +184,18 @@ public class DefaultCategoryService implements CategoryService {
                 : request.name().trim(),
             request.categoryType(),
             request.displayOrder(),
-            Instant.now()
+            applicationClock.instant()
         );
 
         Category saved =
-            categoryRepository.saveAndFlush(
-                category
-            );
+            categoryRepository
+                .saveAndFlush(
+                    category
+                );
 
-        return CategoryResponse.from(saved);
+        return CategoryResponse.from(
+            saved
+        );
     }
 
 
@@ -184,26 +212,32 @@ public class DefaultCategoryService implements CategoryService {
                 categoryId
             );
 
-        if (category.getStatus()
-            == CategoryStatus.ARCHIVED) {
+        if (
+            category.getStatus()
+                == CategoryStatus.ARCHIVED
+        ) {
             throw new CategoryAlreadyArchivedException();
         }
 
-        validateVersion(
-            category,
-            request.version()
+        requireCurrent(
+            category.getVersion(),
+            request.version(),
+            StaleCategoryVersionException::new
         );
 
         category.archive(
-            Instant.now()
+            applicationClock.instant()
         );
 
         Category saved =
-            categoryRepository.saveAndFlush(
-                category
-            );
+            categoryRepository
+                .saveAndFlush(
+                    category
+                );
 
-        return CategoryResponse.from(saved);
+        return CategoryResponse.from(
+            saved
+        );
     }
 
 
@@ -219,16 +253,5 @@ public class DefaultCategoryService implements CategoryService {
             .orElseThrow(
                 CategoryNotFoundException::new
             );
-    }
-
-
-    private void validateVersion(
-        Category category,
-        Long requestedVersion
-    ) {
-        if (category.getVersion()
-            != requestedVersion) {
-            throw new StaleCategoryVersionException();
-        }
     }
 }

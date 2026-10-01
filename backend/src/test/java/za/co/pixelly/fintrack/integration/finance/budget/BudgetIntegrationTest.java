@@ -330,7 +330,7 @@ class BudgetIntegrationTest
 
         mockMvc.perform(
                 patch(
-                    "/api/v1/budgets/{budgetId}/limits/{limitId}",
+                    api("/budgets/{budgetId}/limits/{limitId}"),
                     budgetId,
                     limitId
                 )
@@ -448,7 +448,7 @@ class BudgetIntegrationTest
 
         mockMvc.perform(
                 post(
-                    "/api/v1/budgets/{budgetId}/archive",
+                    api("/budgets/{budgetId}/archive"),
                     budgetId
                 )
                     .header(
@@ -552,7 +552,7 @@ class BudgetIntegrationTest
 
         mockMvc.perform(
                 delete(
-                    "/api/v1/budgets/{budgetId}/limits/{limitId}",
+                    api("/budgets/{budgetId}/limits/{limitId}"),
                     budgetId,
                     limitId
                 )
@@ -571,7 +571,7 @@ class BudgetIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/budgets/{budgetId}",
+                    api("/budgets/{budgetId}"),
                     budgetId
                 )
                     .header(
@@ -622,7 +622,7 @@ class BudgetIntegrationTest
 
         mockMvc.perform(
                 get(
-                    "/api/v1/budgets/{budgetId}",
+                    api("/budgets/{budgetId}"),
                     budgetId
                 )
                     .header(
@@ -641,7 +641,7 @@ class BudgetIntegrationTest
         throws Exception {
 
         mockMvc.perform(
-                get("/api/v1/budgets")
+                get(api("/budgets"))
             )
             .andExpect(
                 status().isUnauthorized()
@@ -660,7 +660,7 @@ class BudgetIntegrationTest
     ) throws Exception {
 
         return mockMvc.perform(
-            post("/api/v1/budgets")
+            post(api("/budgets"))
                 .header(
                     "Authorization",
                     bearer(user)
@@ -691,7 +691,7 @@ class BudgetIntegrationTest
 
         return mockMvc.perform(
             post(
-                "/api/v1/budgets/{budgetId}/limits",
+                api("/budgets/{budgetId}/limits"),
                 budgetId
             )
                 .header(
@@ -723,7 +723,7 @@ class BudgetIntegrationTest
 
         return mockMvc.perform(
             patch(
-                "/api/v1/budgets/{budgetId}",
+                api("/budgets/{budgetId}"),
                 budgetId
             )
                 .header(
@@ -766,7 +766,7 @@ class BudgetIntegrationTest
 
         return mockMvc.perform(
             post(
-                "/api/v1/categories/{categoryId}/archive",
+                api("/categories/{categoryId}/archive"),
                 categoryId
             )
                 .header(

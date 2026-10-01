@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<tr th:fragment="footer">
+  <td align="center" style="padding: 0 32px 32px;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+      <tr>
+        <td align="center" style="
+                        /*border-top: 1px solid #E4E1D8;*/
+                        padding-top: 22px;
+                        font-family: Arial, Helvetica, sans-serif;
+                        font-size: 12px;
+                        line-height: 1.7;
+                        color: #8A8578;
+                    ">
+          <p style="
+                            margin: 0 0 8px;
+                            font-weight: 600;
+                            color: #5B6472;
+                        ">
+            Salif &middot;
+            Personal finance, in order.
+          </p>
+
+          <p style="
+                            margin: 0 0 10px;
+                        ">
+            <a href="#" th:href="${homeUrl}" style="
+                                color: #1F7A5C;
+                                text-decoration: none;
+                            ">
+              Home
+            </a>
+
+            <span style="
+                                color: #C9C5B8;
+                                padding: 0 7px;
+                            ">
+                &middot;
+              </span>
+
+            <a href="#" th:href="${supportUrl}" style="
+                                color: #1F7A5C;
+                                text-decoration: none;
+                            ">
+              Support
+            </a>
+
+            <span style="
+                                color: #C9C5B8;
+                                padding: 0 7px;
+                            ">
+                &middot;
+              </span>
+
+            <a href="#" th:href="${privacyUrl}" style="
+                                color: #1F7A5C;
+                                text-decoration: none;
+                            ">
+              Privacy
+            </a>
+
+            <span style="
+                                color: #C9C5B8;
+                                padding: 0 7px;
+                            ">
+                &middot;
+              </span>
+
+            <a href="#" th:href="${termsUrl}" style="
+                                color: #1F7A5C;
+                                text-decoration: none;
+                            ">
+              Terms
+            </a>
+          </p>
+
+          <p style="margin: 0;">
+            &copy;
+            <span th:text="${currentYear}">2026</span>
+            Salif. All rights reserved.
+          </p>
+        </td>
+      </tr>
+    </table>
+  </td>
+</tr>
+
+</body>
+
+</html>
