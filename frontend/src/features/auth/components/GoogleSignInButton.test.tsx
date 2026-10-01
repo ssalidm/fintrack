@@ -26,7 +26,7 @@ vi.mock(
   () => ({
     env: {
       apiBaseUrl:
-        'http://localhost:8080/api/v1',
+        'http://localhost:8080/api/v2',
       googleClientId:
         'test-google-client-id',
     },

@@ -5,8 +5,8 @@ import {
   useRef,
 } from 'react'
 
-import { env } from '../../../config/env'
-import { ThemeContext } from '../../theme/context/ThemeContext'
+import { env } from '@/config/env'
+import { ThemeContext } from '@/features/theme/context/ThemeContext'
 
 interface GoogleCredentialResponse {
   readonly credential?: string

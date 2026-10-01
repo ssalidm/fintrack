@@ -26,39 +26,39 @@ export default function LegalNoticeDialog({
       role="dialog"
       aria-modal="true"
       aria-labelledby="legal-dialog-title"
-      className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-slate-950/60 p-5 backdrop-blur-sm"
+      className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/60 p-5 backdrop-blur-sm"
     >
-      <div className="relative max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-3xl bg-[#fffdf8] p-6 shadow-2xl sm:p-8">
+      <div className="relative max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-line bg-surface p-6 shadow-2xl sm:p-8">
         <button
           type="button"
           onClick={onClose}
           aria-label={`Close ${title}`}
-          className="absolute right-5 top-5 grid size-9 cursor-pointer place-items-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+          className="absolute right-5 top-5 grid size-9 cursor-pointer place-items-center rounded-full text-muted transition hover:bg-surface-muted hover:text-ink"
         >
-          <X size={18} aria-hidden/>
+          <X size={18} aria-hidden />
         </button>
 
-        <span className="grid size-11 place-items-center rounded-2xl bg-[#e4f0e9] text-[#1F7A5C]">
+        <span className="grid size-11 place-items-center rounded-2xl bg-accent-soft text-accent">
           {isTerms ? (
-            <FileText size={21} aria-hidden/>
+            <FileText size={21} aria-hidden />
           ) : (
-            <ShieldCheck size={21} aria-hidden/>
+            <ShieldCheck size={21} aria-hidden />
           )}
         </span>
 
-        <p className="mt-5 text-xs font-semibold tracking-[0.15em] text-[#1F7A5C]">
+        <p className="mt-5 text-xs font-semibold tracking-[0.15em] text-accent">
           SALIF
         </p>
 
         <h2
           id="legal-dialog-title"
-          className="mt-2 pr-10 font-serif text-3xl text-[#173c32]"
+          className="mt-2 pr-10 font-serif text-3xl text-ink"
         >
           {title}
         </h2>
 
         {isTerms ? (
-          <div className="mt-5 space-y-4 text-sm leading-6 text-slate-600">
+          <div className="mt-5 space-y-4 text-sm leading-6 text-muted">
             <p>
               Salif provides tools for organising your
               personal financial information. It does
@@ -79,7 +79,7 @@ export default function LegalNoticeDialog({
             </p>
           </div>
         ) : (
-          <div className="mt-5 space-y-4 text-sm leading-6 text-slate-600">
+          <div className="mt-5 space-y-4 text-sm leading-6 text-muted">
             <p>
               Salif processes the account and financial
               information you provide so that it can
@@ -104,7 +104,7 @@ export default function LegalNoticeDialog({
         <button
           type="button"
           onClick={onClose}
-          className="mt-7 w-full cursor-pointer rounded-full bg-[#174f43] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#103d34]"
+          className="mt-7 w-full cursor-pointer rounded-full bg-primary px-5 py-3 text-sm font-semibold text-inverse transition hover:bg-primary-hover"
         >
           Close
         </button>

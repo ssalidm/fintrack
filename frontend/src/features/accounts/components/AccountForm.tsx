@@ -41,10 +41,12 @@ const currencyLabels = {
   (typeof supportedCurrencies)[number],
   string
 >
+const labelClasses = 'text-sm font-semibold text-ink'
 
 const fieldClasses =
-  'mt-2 block w-full rounded-xl border border-[#d8d6ce] bg-[#fffdf8] px-4 py-3 text-[#173c32] outline-none' + '' +
-  'transition placeholder:text-[#98a39f] focus:border-[#39725d] focus:ring-2 focus:ring-[#39725d]/15 disabled:bg-[#efede7]'
+  'mt-2 block w-full rounded-xl border border-line bg-surface px-4 py-3 text-ink outline-none ' +
+  'transition placeholder:text-subtle focus:border-accent focus:ring-2 focus:ring-accent/10 ' +
+  'disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-muted'
 
 const accountFormFields = new Set<
   keyof AccountFormValues
@@ -184,7 +186,7 @@ export default function AccountForm({
       <div>
         <label
           htmlFor="account-name"
-          className="text-sm font-semibold text-[#173c32]"
+          className={labelClasses}
         >
           Account name
         </label>
@@ -217,7 +219,7 @@ export default function AccountForm({
       <div>
         <label
           htmlFor="account-type"
-          className="text-sm font-semibold text-[#173c32]"
+          className={labelClasses}
         >
           Account type
         </label>
@@ -246,7 +248,7 @@ export default function AccountForm({
       <div>
         <label
           htmlFor="currency-code"
-          className="text-sm font-semibold text-[#173c32]"
+          className={labelClasses}
         >
           Currency
         </label>
@@ -258,7 +260,7 @@ export default function AccountForm({
               {...register('currencyCode')}
             />
 
-            <div className={`${fieldClasses} bg-[#efede7]`}>
+            <div className={`${fieldClasses} bg-surface-muted text-muted`}>
               {currencyLabels[
                 account.currencyCode as AccountFormValues['currencyCode']
                 ] ?? account.currencyCode}
@@ -300,7 +302,7 @@ export default function AccountForm({
       <div>
         <label
           htmlFor="opening-balance"
-          className="text-sm font-semibold text-[#173c32]"
+          className={labelClasses}
         >
           Opening balance
         </label>
@@ -340,16 +342,16 @@ export default function AccountForm({
         )}
       </div>
 
-      <label className="flex items-start gap-3 rounded-2xl bg-[#eef3ed] p-4">
+      <label className="flex items-start gap-3 rounded-2xl bg-surface-muted p-4">
         <input
           type="checkbox"
           disabled={isSubmitting}
-          className="mt-0.5 size-4 accent-[#39725d]"
+          className="mt-0.5 size-4 accent-[var(--salif-color-accent)]"
           {...register('includeInNetWorth')}
         />
 
         <span>
-          <span className="block text-sm font-semibold text-[#173c32]">
+          <span className="block text-sm font-semibold text-muted">
             Include in net worth
           </span>
 
@@ -362,19 +364,19 @@ export default function AccountForm({
 
       {submitError && (
         <div
-          className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          className="rounded-xl border border-danger/30 bg-danger-soft px-4 py-3 text-sm text-danger"
           role="alert"
         >
           {submitError}
         </div>
       )}
 
-      <div className="flex flex-col-reverse gap-3 border-t border-[#dedbd2] pt-6 sm:flex-row sm:justify-end">
+      <div className="flex flex-col-reverse gap-3 border-t border-line pt-6 sm:flex-row sm:justify-end">
         <button
           type="button"
           disabled={isSubmitting}
           onClick={onCancel}
-          className="rounded-full border border-[#d8d6ce] px-5 py-2.5 text-sm font-semibold text-[#173c32] transition hover:bg-[#efede7] disabled:opacity-60"
+          className="rounded-full border border-line px-5 py-2.5 text-sm font-semibold text-ink transition hover:bg-surface-muted disabled:opacity-60"
         >
           Cancel
         </button>
@@ -382,7 +384,7 @@ export default function AccountForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="rounded-full bg-[#174f43] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#236a58] disabled:opacity-60"
+          className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-inverse transition hover:bg-primary-hover disabled:opacity-60"
         >
           {isSubmitting
             ? isEditing

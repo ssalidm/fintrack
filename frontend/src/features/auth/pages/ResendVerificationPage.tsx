@@ -158,7 +158,7 @@ export default function ResendVerificationPage() {
         <div
           aria-labelledby="resend-title"
         >
-          <span className="mb-5 grid size-10 place-items-center rounded-full bg-[#e5f1eb] text-[#16805f]">
+          <span className="mb-5 grid size-10 place-items-center rounded-full bg-accent-soft text-accent">
             <CheckCircle2
               size={20}
               aria-hidden
@@ -173,7 +173,7 @@ export default function ResendVerificationPage() {
             titleId="resend-title"
           />
 
-          <p className="mt-3 break-all text-sm font-semibold text-[#173c32]">
+          <p className="mt-3 break-all text-sm font-semibold text-muted">
             {getValues('email')}
           </p>
 
@@ -207,9 +207,9 @@ export default function ResendVerificationPage() {
               border border-[#16805f]
               px-4
               text-sm font-semibold
-              text-[#16805f]
+              text-accent
               transition
-              hover:bg-[#e8f2ed]
+              hover:bg-surface-muted
               disabled:cursor-not-allowed
               disabled:border-[#cbd8d1]
               disabled:bg-[#eef3f0]
@@ -236,7 +236,7 @@ export default function ResendVerificationPage() {
           <p className="mt-5 text-center text-sm text-[#657972]">
             <Link
               to="/login"
-              className="font-semibold text-[#16805f] transition hover:text-[#0d4f3f] hover:underline"
+              className="font-semibold text-accent transition hover:text-[#0d4f3f] hover:underline"
             >
               Return to sign in
             </Link>
@@ -327,7 +327,7 @@ export default function ResendVerificationPage() {
         <p className="mt-5 text-center text-sm text-[#657972]">
           <Link
             to="/login"
-            className="font-semibold text-[#16805f] transition hover:text-[#0d4f3f] hover:underline"
+            className="font-semibold text-accent transition hover:text-[#0d4f3f] hover:underline"
           >
             Return to sign in
           </Link>

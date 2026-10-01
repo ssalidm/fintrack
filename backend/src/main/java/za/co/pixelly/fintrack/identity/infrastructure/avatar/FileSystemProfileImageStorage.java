@@ -2,6 +2,7 @@ package za.co.pixelly.fintrack.identity.infrastructure.avatar;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import za.co.pixelly.fintrack.identity.application.avatar.ProfileImageStorage;
 import za.co.pixelly.fintrack.identity.application.avatar.StoredProfileImage;
@@ -16,6 +17,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Component
+@ConditionalOnProperty(
+    prefix = "fintrack.profile.avatar",
+    name = "storage",
+    havingValue = "filesystem",
+    matchIfMissing = true
+)
 public class FileSystemProfileImageStorage
     implements ProfileImageStorage {
 
@@ -39,9 +46,7 @@ public class FileSystemProfileImageStorage
     private final Path storageDirectory;
 
     public FileSystemProfileImageStorage(
-        @Value(
-            "${fintrack.profile.avatar.directory:./data/profile-avatars}"
-        )
+        @Value("${fintrack.profile.avatar.directory}")
         String storageDirectory
     ) {
         this.storageDirectory =

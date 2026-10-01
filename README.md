@@ -1,15 +1,41 @@
-# FinTrack
+# Fintrack
 
-FinTrack is a secure full-stack personal finance management platform for
-tracking financial accounts, income, expenses, transfers, budgets and
-savings goals.
+Fintrack is a secure full-stack personal finance management platform for
+tracking financial accounts, income, expenses, transfers, budgets,
+recurring transactions and savings goals.
+
+## Current release
+
+**Version:** 2.0.0
+
+Fintrack 2.0 introduces a new email-first registration flow and version 2
+of the REST API.
+
+### API
+
+The current API base path is:
+
+```text
+/api/v2
+```
+Local registration now uses a two-step email-first flow:
+
+```text
+POST /api/v2/auth/registration/start
+POST /api/v2/auth/registration/complete
+```
+The legacy endpoint below was removed in version 2.0:
+```text
+POST /api/v1/auth/register
+```
+See [CHANGELOG.md](CHANGELOG.md) for release details and breaking changes.
 
 ## Project status
+Fintrack is under active development and includes a functional backend,
+frontend, database migrations, automated integration tests and API
+documentation.
 
-The project is currently under active development.
-
-## Planned technology stack
-
+## Technology Stack
 ### Backend
 
 - Java
@@ -56,7 +82,9 @@ fintrack/
 
 ## Development status
 
-The current development phase covers project setup and architecture.
+Fintrack has progressed beyond initial setup and architecture into active
+feature development, integration testing, security hardening and
+production-oriented refinement.
 
 ## Project objectives
 

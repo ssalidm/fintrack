@@ -293,7 +293,7 @@ export default function MfaChallengePage() {
           titleId="mfa-title"
         />
 
-        <p className="mt-2 text-xs text-[#7a8881]">
+        <p className="mt-2 text-xs text-muted">
           {challengeExpiry(
             challenge.expiresAt,
           )}
@@ -479,7 +479,7 @@ export default function MfaChallengePage() {
               cursor-pointer
               text-sm
               font-semibold
-              text-[#16805f]
+              text-accent
               transition
               hover:text-[#0d4f3f]
               hover:underline
@@ -503,7 +503,7 @@ export default function MfaChallengePage() {
                 text-sm
                 text-[#657972]
                 transition
-                hover:text-[#173c32]
+                hover:text-muted
               "
             >
               <ArrowLeft

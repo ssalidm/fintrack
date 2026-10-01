@@ -537,6 +537,7 @@ export default function SupportPage() {
                   aria-busy={
                     isSubmitting
                   }
+                  noValidate
                 >
                   <fieldset
                     disabled={
@@ -818,15 +819,9 @@ export default function SupportPage() {
 
                     {siteKey ? (
                       <SupportVerification
-                        key={
-                          verificationKey
-                        }
-                        siteKey={
-                          siteKey
-                        }
-                        onTokenChange={
-                          setTurnstileToken
-                        }
+                        key={verificationKey}
+                        siteKey={siteKey}
+                        onTokenChange={setTurnstileToken}
                       />
                     ) : (
                       <p

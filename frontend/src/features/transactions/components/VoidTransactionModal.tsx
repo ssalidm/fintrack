@@ -70,21 +70,46 @@ export default function VoidTransactionModal({
       onClose={onClose}
       variant="plain"
     >
-      <label className="mt-5 block text-sm font-semibold text-[#173c32]">
+      <label className="mt-5 block text-sm font-semibold text-ink">
         Reason
+
         <textarea
           rows={3}
           maxLength={255}
           value={reason}
           disabled={voidTransaction.isPending}
           onChange={(event) => setReason(event.target.value)}
-          className="mt-2 block w-full resize-none rounded-xl border border-[#d8d6ce] bg-white px-4 py-3 font-normal outline-none focus:border-[#9b5845] focus:ring-2 focus:ring-[#9b5845]/15"
+          className="
+            mt-2
+            block
+            w-full
+            resize-none
+            rounded-xl
+            border border-line
+            bg-surface
+            px-4
+            py-3
+            font-normal
+            text-ink
+            outline-none
+            transition
+            placeholder:text-subtle
+            focus:border-danger
+            focus:ring-2
+            focus:ring-danger/10
+            disabled:cursor-not-allowed
+            disabled:bg-surface-muted
+            disabled:text-muted
+          "
           placeholder="Why is this transaction being voided?"
         />
       </label>
 
       {errorMessage && (
-        <p className="mt-3 text-sm text-red-700" role="alert">
+        <p
+          className="mt-3 text-sm text-danger"
+          role="alert"
+        >
           {errorMessage}
         </p>
       )}
